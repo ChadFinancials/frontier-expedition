@@ -59,6 +59,8 @@ func setup(_params: Dictionary) -> void:
 
 
 func _refresh() -> void:
+	if run == null or not run.in_cave() or not is_inside_tree():
+		return
 	light_bar.value = int(run.cave.light)
 	light_bar.text_override = "%d (%s)" % [int(run.cave.light), run.light_name()]
 	backdrop.light = float(run.cave.light) / 100.0
@@ -181,6 +183,7 @@ func _curio_room() -> void:
 
 
 func _advance() -> void:
+	UI.clear(btn_row)
 	var msgs := run.cave_advance()
 	Audio.play("footsteps")
 	for m in msgs:

@@ -13,6 +13,10 @@ func _ready() -> void:
 		var kv := a.split("=")
 		args[kv[0]] = kv[1] if kv.size() > 1 else "1"
 	var t0 := Time.get_ticks_msec()
+	if args.has("campaign"):
+		full_campaign(int(args.campaign), int(args.get("weeks", "40")))
+		get_tree().quit(0)
+		return
 	if args.has("balance"):
 		balance(int(args.balance), int(args.get("weeks", "6")))
 		get_tree().quit(0)
@@ -276,7 +280,7 @@ func test_settlement_services() -> void:
 	# Gear needs levels.
 	var g: Hero = co.heroes[2]
 	check(co.can_upgrade_gear(0, g, "weapon").begins_with("Needs hero level"), "gear gated by level")
-	g.add_xp(10)
+	g.add_xp(int(DB.cfg("xp_levels")[1]))
 	check(co.upgrade_gear(0, g, "weapon") and g.weapon_tier == 2, "upgrade weapon at level 2")
 
 
@@ -362,3 +366,85 @@ func balance(campaigns: int, weeks: int) -> void:
 		float(agg.first_run_deaths) / campaigns, 100.0 * agg.first_run_victory / campaigns])
 	print("  avg fatigue %.1f   fights %s" % [float(agg.fatigue) / maxf(1, agg.fatigue_n), bstats])
 	print("  boss first beaten on week: %s" % [agg.boss_week])
+
+
+## Long simulated campaigns: the bot manages the company like a steady player: hires,
+## rests, trains, buys gear, founds outposts and pushes west.
+func full_campaign(runs: int, weeks: int) -> void:
+	var results: Array = []
+	for n in runs:
+		var co := Company.new()
+		co.new_game(500 + n)
+		var bot := Bot.new(500 + n)
+		bot.cautious = true
+		var beaten_week := {}
+		var statuses := {}
+		for w in weeks:
+			var front := co.frontier_index()
+			# Found any settlement we can.
+			for i in co.site_count():
+				if co.can_found(i) == "":
+					co.found(i)
+			front = co.frontier_index()
+			if co.site_by_index(front).get("region_west", "") == "":
+				break
+			# Move seasoned heroes west, one stop at a time (the stage line takes weeks).
+			for i in range(front):
+				var need_level := int(DB.regions[co.site_by_index(i + 1).region_west].tier) * 2 - 1 if co.site_by_index(i + 1).get("region_west", "") != "" else 5
+				for h in co.heroes_at(i).filter(func(x): return x.available() and x.level >= need_level):
+					if co.founded(i + 1) and co.heroes_at(i + 1).size() < 8 and co.can_send(i, i + 1, h) == "":
+						co.send_hero(i, i + 1, h)
+			# Staff up and look after heroes wherever they are.
+			for st in co.settlements:
+				var i: int = st.index
+				while co.heroes_at(i).filter(func(x): return x.available()).size() < 4 and not st.recruits.is_empty() and co.heroes.size() < 20:
+					if co.hire(i, 0) == null:
+						break
+				for h in co.heroes_at(i):
+					if h.fatigue > 55 and h.available():
+						for b in ["saloon", "chapel", "boot_hill"]:
+							if co.can_do_activity(i, b, "bar" if b == "saloon" else ("prayer" if b == "chapel" else "remember"), h) == "":
+								co.do_activity(i, b, "bar" if b == "saloon" else ("prayer" if b == "chapel" else "remember"), h)
+								break
+					if co.money > 900:
+						for kind in ["weapon", "armor"]:
+							if co.can_upgrade_gear(i, h, kind) == "":
+								co.upgrade_gear(i, h, kind)
+						for sid in h.equipped:
+							if co.money > 700 and co.can_upgrade_skill(i, h, sid) == "":
+								co.upgrade_skill(i, h, sid)
+					for k in co.stash.duplicate():
+						if h.keepsakes.size() < 2:
+							co.equip_keepsake(h, k)
+				# Build useful buildings when rich.
+				for b in ["chapel", "drill_hall", "doctor", "saloon", "smithy", "general_store", "hiring_board"]:
+					if co.money > 1500 and co.can_build(i, b) == "":
+						co.build(i, b)
+				if co.can_upgrade_tier(i) == "":
+					co.upgrade_tier(i)
+			# Expedition from the westernmost settlement with a ready party.
+			var from := -1
+			for st2 in co.settlements:
+				if co.heroes_at(st2.index).filter(func(x): return x.available()).size() >= 3 and co.site_by_index(st2.index).get("region_west", "") != "":
+					from = st2.index
+			if from < 0:
+				co.advance_week()
+				continue
+			var s := bot.play_expedition(co, from)
+			statuses[s.status] = statuses.get(s.status, 0) + 1
+			if s.status == "no_run":
+				co.advance_week()
+			for r in co.beaten:
+				if not beaten_week.has(r):
+					beaten_week[r] = w + 1
+		var lv := 0.0
+		for h in co.heroes:
+			lv += h.level
+		var deaths := {}
+		for k in bot.stats:
+			if str(k).begins_with("deaths_") or str(k).begins_with("fights_"):
+				deaths[k] = bot.stats[k]
+		results.append({"kills": deaths, "beaten": beaten_week, "week": co.week, "dead": co.dead.size(), "alive": co.heroes.size(),
+			"avg_level": lv / maxf(1, co.heroes.size()), "money": co.money, "settlements": co.settlements.size(), "statuses": statuses})
+	for r in results:
+		print("CAMPAIGN ", r)

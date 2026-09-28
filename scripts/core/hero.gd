@@ -77,7 +77,7 @@ func base_stat(s: String) -> float:
 		"speed":
 			return c.get("speed", 0)
 		"dmg_pct":
-			return DB.cfg("weapon_dmg_pct", 12) * (weapon_tier - 1)
+			return DB.cfg("weapon_dmg_pct", 12) * (weapon_tier - 1) + DB.cfg("level_dmg_pct", 0) * (level - 1)
 		"stun_res", "bleed_res", "poison_res", "move_res", "debuff_res":
 			return c.get("res", {}).get(s.trim_suffix("_res"), 30)
 		"deathblow":

@@ -4,6 +4,7 @@ extends RefCounted
 ## same rules layer the UI uses (Company, RunState, CombatEngine) with no nodes involved.
 
 var rng := RandomNumberGenerator.new()
+var cautious := false
 var stats := {"fights": 0, "wins": 0, "losses": 0, "fled": 0, "rounds": 0, "max_rounds": 0, "deaths": 0,
 	"events": 0, "curios": 0, "camps": 0, "caves": 0, "errors": []}
 
@@ -93,10 +94,11 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 	for h in party:
 		uids.append(h.uid)
 	var supplies := {"food": 20, "bandages": 2, "lamp_oil": 3, "wagon_parts": 1, "shovel": 1, "crowbar": 1, "salt": 1}
-	while co.supply_cost(i, supplies) > co.money and supplies.food > 6:
-		supplies.food -= 2
-		supplies.erase("salt")
-		supplies.erase("crowbar")
+	while co.supply_cost(i, supplies) > co.money and supplies.food > 0:
+		supplies.food = maxi(0, supplies.food - 2)
+		for k in ["salt", "crowbar", "shovel", "wagon_parts", "lamp_oil", "bandages"]:
+			if co.supply_cost(i, supplies) > co.money:
+				supplies.erase(k)
 	var r := co.start_run(i, uids, supplies)
 	if r == null:
 		return {"status": "no_run", "reason": co.can_embark(i, uids, supplies)}
@@ -117,6 +119,23 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 		if nxt.is_empty():
 			r.status = "victory" if r.boss_won else "abandoned"
 			break
+		# A prudent player turns back when battered, and only takes on a boss when fresh.
+		if cautious:
+			var hs := r.party_heroes()
+			var hp_ratio := 0.0
+			for h in hs:
+				hp_ratio += float(h.hp) / h.max_hp()
+			hp_ratio /= maxf(1, hs.size())
+			var dd := hs.filter(func(h): return h.deaths_door or h.hp <= 0).size()
+			var lvl := 0.0
+			for h in hs:
+				lvl += h.level
+			lvl /= maxf(1, hs.size())
+			var boss_next := nxt.any(func(id): return r.node(id).type == "boss")
+			if dd >= 2 or hp_ratio < 0.35 or hs.size() <= 2 or (boss_next and (hp_ratio < 0.65 or lvl < r.tier() * 1.4)):
+				r.status = "abandoned"
+				stats.turned_back = stats.get("turned_back", 0) + 1
+				break
 		r.travel_to(Stats.pick(rng, nxt))
 		resolve_node(r)
 		if r.party_heroes().is_empty():
@@ -128,6 +147,9 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 
 func run_fight(r: RunState, enemies: Array, kind: String, surprise: String = "", reward: Dictionary = {}) -> bool:
 	var e := fight(r.party_heroes(), enemies, r.combat_options(kind, surprise))
+	var key := "deaths_" + kind + "_t%d" % r.tier()
+	stats[key] = stats.get(key, 0) + e.fallen.size()
+	stats["fights_" + kind + "_t%d" % r.tier()] = stats.get("fights_" + kind + "_t%d" % r.tier(), 0) + 1
 	var res := r.after_combat(e, kind, reward)
 	if kind == "boss":
 		stats.boss_fights = stats.get("boss_fights", 0) + 1

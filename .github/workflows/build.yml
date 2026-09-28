@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: 4.7.2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot and export templates
+        run: |
+          mkdir -p ~/godot ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          cd ~/godot
+          curl -sSL -o godot.zip https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+          unzip -q godot.zip && mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 godot
+          curl -sSL -o templates.tpz https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
+          unzip -jq templates.tpz 'templates/version.txt' 'templates/windows_release_x86_64*' 'templates/windows_debug_x86_64*' -d ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          rm templates.tpz
+
+      - name: Import project
+        run: ~/godot/godot --headless --path . --import || true
+
+      - name: Run tests
+        run: ~/godot/godot --headless --path . res://tests/test_runner.tscn
+
+      - name: Export Windows build
+        run: |
+          mkdir -p build/windows
+          ~/godot/godot --headless --path . --export-release "Windows Desktop" build/windows/FrontierExpedition.exe
+          cd build/windows && zip -9 ../FrontierExpedition-windows.zip FrontierExpedition.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FrontierExpedition-windows
+          path: build/FrontierExpedition-windows.zip
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/FrontierExpedition-windows.zip

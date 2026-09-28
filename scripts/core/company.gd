@@ -605,6 +605,10 @@ func send_hero(from_i: int, to_i: int, h: Hero) -> bool:
 func advance_week() -> Array:
 	var msgs: Array = []
 	week += 1
+	var floor_money: int = DB.cfg("grubstake_floor", 150)
+	if money < floor_money:
+		msgs.append("Fort Providence's merchants stake the company $%d." % (floor_money - money))
+		money = floor_money
 	for h in heroes:
 		if h.busy_weeks > 0:
 			h.busy_weeks -= 1

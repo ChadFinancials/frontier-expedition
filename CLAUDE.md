@@ -1,0 +1,39 @@
+# Frontier Expedition: working notes
+
+Godot 4.7 / GDScript game inspired by Darkest Dungeon 1 & 2 with an Oregon Trail theme.
+Read `docs/DESIGN_BRIEF.md` (creative direction agreed with the owner) before changing design.
+
+## Architecture
+
+- **Data-driven.** Content and balance live in `data/*.json`, loaded by the `DB` autoload.
+  Prefer adding content there over code. `docs/ADDING_CONTENT.md` documents every field.
+  JSON numbers are normalized to ints when integral (`DB.normalize`).
+- **Rules are node-free** (`scripts/core/`): `CombatEngine` returns event dictionaries,
+  `Company` holds the campaign, `RunState` holds an expedition. Screens only animate
+  events and call these APIs. Keep it that way so the headless tests cover the rules.
+- **Screens** (`scripts/screens/`) are built in code with the `UI` helpers; `Main` switches
+  screens (`Main.inst.goto`) and shows modals (`modal`, `dialog`, `confirm`, `toast`).
+- **Art is drawn in code** (`scripts/visual/`): `Figure` renders characters from a `look` dict.
+
+## GDScript gotchas (Godot 4.7)
+
+- `var x := <expression involving a Variant>` is a *parse error*. Loop variables over
+  untyped arrays and dictionary values are Variants. Use an explicit type: `var x: int = ...`.
+- Lambdas capture locals **by value**. To reference something assigned later (for example a
+  modal wrapper, or a recursive lambda), capture a dictionary holder: `var holder := {"wrap": null}`.
+
+## Checks to run before committing
+
+```bash
+tools/check.sh                                          # compile all scripts
+$GODOT --headless --path . res://tests/test_runner.tscn # rules/data tests
+$GODOT --headless --path . -- shot=autoplay expeditions=3   # UI smoke test
+tools/shot.sh <scene> /tmp/x.png                        # look at it (xvfb)
+```
+In the cloud dev container: `GODOT=/home/user/tools/godot/Godot_v4.7.2-stable_linux.x86_64`.
+
+## Environment notes
+
+- On Windows, pass `encoding='utf-8'` explicitly for file I/O in Python tools.
+- Audio is generated: edit `tools/gen_audio.py` and rerun rather than hand-editing WAVs.
+- Heroes use they/them in all text; names are random and don't imply gender.

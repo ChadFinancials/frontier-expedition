@@ -56,7 +56,7 @@ func _tip(id: int) -> String:
 		"fight", "elite":
 			t += "\n" + ", ".join(n.data.enemies.map(func(e): return DB.enemy(e).get("name", e)))
 		"boss":
-			t += ": " + run.region().boss.name
+			t += ": " + run.region().boss.name + "\nRecommended level " + str(run.region().get("rec_level", "?")) + ". No retreat."
 		"crossing":
 			t += ": " + run.region().crossing.name
 		"cave":

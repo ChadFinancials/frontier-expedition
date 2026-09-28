@@ -6,6 +6,10 @@ const PAPER := Color("#f3e9d2")
 var kind: String = "crate"
 
 
+func _init() -> void:
+	clip_contents = true
+
+
 func _poly(pts: Array, c: Color) -> void:
 	var p := PackedVector2Array(pts)
 	var sh := PackedVector2Array()

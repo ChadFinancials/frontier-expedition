@@ -6,14 +6,16 @@
   "start_iron": 8,
   "start_heroes": ["marshal", "gunslinger", "preacher", "sharpshooter", "mountain_man", "frontier_doctor"],
   "roster_cap": 24,
+  "grubstake_floor": 150,
 
-  "level_hp_pct": 8,
-  "level_acc": 2,
+  "level_hp_pct": 12,
+  "level_dmg_pct": 5,
+  "level_acc": 3,
   "level_crit": 1,
   "armor_hp_pct": 8,
   "armor_dodge": 2,
   "weapon_dmg_pct": 12,
-  "xp_levels": [0, 10, 25, 45, 70],
+  "xp_levels": [0, 12, 32, 60, 100],
   "max_level": 5,
   "max_tier": 4,
   "max_skill_level": 4,
@@ -26,10 +28,10 @@
 
   "enemy_hp_mult": 1.0,
   "enemy_dmg_mult": 1.0,
-  "tier_hp_pct": 40,
-  "tier_dmg_pct": 30,
-  "tier_acc": 5,
-  "tier_dodge": 4,
+  "tier_hp_pct": 20,
+  "tier_dmg_pct": 12,
+  "tier_acc": 3,
+  "tier_dodge": 3,
   "tier_res": 5,
   "tier_effect": 5,
 
@@ -86,7 +88,7 @@
   "max_positive_quirks": 4,
   "max_negative_quirks": 4,
 
-  "xp_per_node": 1,
+  "xp_per_node": 2,
   "xp_boss": 6,
   "xp_elite": 2,
 

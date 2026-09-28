@@ -247,6 +247,9 @@ func _skill_button(c: Combatant, sid: String, n: int) -> Control:
 		tip += "\n[No valid targets]"
 	b.tooltip_text = tip
 	b.disabled = not usable
+	b.theme_type_variation = "" if usable else "Tab"
+	if not usable:
+		b.modulate = Color(1, 1, 1, 0.45)
 	b.set_meta("sid", sid)
 	b.pressed.connect(func():
 		Audio.play("click", 0.5)
@@ -273,7 +276,8 @@ func _select_skill(sid: String) -> void:
 			v.set_glow("")
 	for b in skill_row.get_children():
 		var s: String = b.get_meta("sid", "")
-		b.theme_type_variation = "Good" if s == sid else "Tab"
+		if not b.disabled:
+			b.theme_type_variation = "Good" if s == sid else ""
 
 
 func _fill_hero_info(c: Combatant) -> void:
@@ -305,6 +309,20 @@ func _fill_hero_info(c: Combatant) -> void:
 		var l := UI.wrap(UI.lbl("%s: %s" % [st.name, st.desc], 15), 420)
 		l.add_theme_color_override("font_color", Color(st.get("color", "#ffffff")))
 		hero_info.add_child(l)
+
+
+func _fill_enemy_info(c: Combatant) -> void:
+	UI.clear(hero_info)
+	UI.clear(skill_row)
+	UI.clear(action_row)
+	hero_info.add_child(UI.hdr(c.display_name, 24))
+	if c.data.has("title"):
+		hero_info.add_child(UI.lbl(str(c.data.title), 17))
+	var hpb := UI.bar(c.hp, c.max_hp, UI.HP, 300, 16, true)
+	hpb.text_override = "HP %d/%d" % [c.hp, c.max_hp]
+	hero_info.add_child(hpb)
+	hero_info.add_child(UI.lbl(", ".join(c.tags).capitalize(), 16))
+	skill_row.add_child(UI.lbl("Enemy turn...", 22, "Bold"))
 
 
 func _hide_controls() -> void:
@@ -486,6 +504,7 @@ func _play_one(e: Dictionary) -> void:
 					views[id].set_glow("")
 				views[e.actor].set_glow("active")
 				if not c.is_hero():
+					_fill_enemy_info(c)
 					await _wait(0.35)
 		"surprise":
 			await _banner("Ambush!" if e.who == "heroes" else "Surprise Attack!", 1.1)

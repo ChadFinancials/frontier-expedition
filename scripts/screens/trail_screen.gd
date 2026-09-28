@@ -76,6 +76,8 @@ func setup(_params: Dictionary) -> void:
 	bh.add_child(log_label)
 	refresh()
 	Audio.play_music("music_trail")
+	if run.day == 1 and run.current == 0:
+		Main.inst.toast("Click a glowing stop on the map to travel west. Hover a stop to see what's there.")
 	# Arrived somewhere that hasn't been dealt with yet (e.g. after loading a save).
 	if not run.current_node().done:
 		call_deferred("_resolve_node")
@@ -161,8 +163,18 @@ func _open_hero(h: Hero) -> void:
 
 # --- Travel ---------------------------------------------------------------------------
 
-func _travel(id: int) -> void:
+func _travel(id: int, confirmed: bool = false) -> void:
 	if travelling or Main.inst.has_modal():
+		return
+	if not confirmed and run.node(id).type == "boss":
+		var lvl := 0.0
+		var hs := run.party_heroes()
+		for h in hs:
+			lvl += h.level
+		lvl /= maxf(1, hs.size())
+		var rec: String = run.region().get("rec_level", "?")
+		Main.inst.dialog("Face %s?" % run.region().boss.name, "Ahead waits the master of this region. Recommended level: [b]%s[/b]. Your party averages level [b]%.1f[/b].\n\nThere is [b]no retreat[/b] from a boss fight. You can also turn back now and come again stronger." % [rec, lvl],
+			[["Ride On", func(): _travel(id, true), "Danger"], ["Not Yet", Callable()]])
 		return
 	travelling = true
 	map.enabled = false
@@ -196,7 +208,11 @@ func _resolve_node() -> void:
 			_to_combat(n.data.enemies, n.type)
 		"boss":
 			var b: Dictionary = run.region().boss
-			Main.inst.dialog(b.name, b.intro, [["Fight!", func(): _to_combat(n.data.enemies, "boss"), "Danger"]])
+			Main.inst.dialog(b.name, b.intro, [["Fight!", func(): _to_combat(n.data.enemies, "boss"), "Danger"],
+				["Turn Back", func():
+					var summary := Game.company.finish_run("abandoned")
+					Game.save_game()
+					Main.inst.goto("results", {"summary": summary})]])
 		"crossing":
 			Main.inst.dialog(run.region().crossing.name, "The last stretch before %s. Somebody's waiting there." % run.region().boss.landmark, [["Fight!", func(): _to_combat(n.data.enemies, "crossing"), "Danger"]])
 		"event", "homestead":

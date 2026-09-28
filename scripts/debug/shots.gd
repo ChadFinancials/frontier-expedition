@@ -9,6 +9,13 @@ static func run(main: Main, args: Dictionary) -> void:
 	var scenario: String = args.get("shot", "menu")
 	var out: String = args.get("out", "user://shot.png")
 	var wait := int(args.get("wait", "40"))
+	if scenario == "autoplay":
+		Game.delete_save()
+		var ap = load("res://tests/autopilot.gd").new()
+		ap.expeditions_target = int(args.get("expeditions", "3"))
+		main.add_child(ap)
+		await main.goto("menu", {}, true)
+		return
 	Game.company = Company.new()
 	Game.company.new_game(int(args.get("seed", "12")))
 	match scenario:
