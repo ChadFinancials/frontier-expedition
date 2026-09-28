@@ -1,0 +1,113 @@
+{
+  "_comment": "A region is one expedition map. tier scales enemies. fights/elites/cave_fights are weighted enemy groups (front rank first). boss.enemies is the boss formation; crossing is the fight at the map's end once the boss is beaten. palette/props drive the painted backdrop.",
+
+  "tallgrass": {
+    "name": "The Tallgrass Sea", "tier": 1, "rec_level": "1-2",
+    "desc": "Grass as high as a horse's shoulder, rolling to the horizon like an ocean. Outlaws, wolves, and something that whispers when the wind stops.",
+    "palette": {"sky_top": "#3d5a80", "sky_bottom": "#f6bd60", "sun": "#fff1c1", "far": "#8d7b68", "mid": "#a98f5f", "near": "#6b7d3c", "ground": "#4f5d2f", "accent": "#d4a24c"},
+    "props": ["grass", "fence", "tree", "rock"],
+    "cave_name": "Sinkhole Cave",
+    "fights": [
+      {"enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "weight": 3},
+      {"enemies": ["outlaw_knifeman", "outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "weight": 2},
+      {"enemies": ["prairie_wolf", "prairie_wolf", "coyote"], "weight": 3},
+      {"enemies": ["rattlesnake", "rattlesnake", "carrion_crows"], "weight": 2},
+      {"enemies": ["prairie_wolf", "coyote", "carrion_crows"], "weight": 2},
+      {"enemies": ["outlaw_knifeman", "outlaw_gunhand", "carrion_crows"], "weight": 2},
+      {"enemies": ["prairie_haint", "coyote", "carrion_crows"], "weight": 1},
+      {"enemies": ["outlaw_brawler", "outlaw_knifeman", "outlaw_gunhand"], "weight": 2}
+    ],
+    "elites": [
+      {"enemies": ["crane_lieutenant", "outlaw_gunhand", "outlaw_rifleman"], "weight": 2},
+      {"enemies": ["buffalo_bull", "coyote", "coyote"], "weight": 2},
+      {"enemies": ["prairie_haint", "prairie_haint", "carrion_crows"], "weight": 1}
+    ],
+    "cave_fights": [
+      {"enemies": ["giant_bat", "giant_bat", "giant_bat"], "weight": 2},
+      {"enemies": ["tommyknocker", "giant_bat", "tommyknocker"], "weight": 2},
+      {"enemies": ["pale_crawler", "giant_bat"], "weight": 2},
+      {"enemies": ["rattlesnake", "rattlesnake", "giant_bat"], "weight": 1}
+    ],
+    "boss": {"name": "Silas Crane's Gang", "landmark": "Crane's Crossing",
+      "intro": "The trail ends at a rope-and-plank toll bridge over the Redwater. Silas Crane leans on the post, twirling a silver revolver. \"Toll's everything you got, pilgrims.\"",
+      "victory": "Silas Crane falls into the Redwater and the current takes him. His toll bridge is yours, and the river crossing is the perfect place for a settlement.",
+      "enemies": ["crane_lieutenant", "silas_crane", "outlaw_gunhand", "outlaw_rifleman"], "keepsake": "cranes_revolver"},
+    "crossing": {"name": "Toll Bridge Holdouts", "enemies": ["crane_lieutenant", "outlaw_knifeman", "outlaw_gunhand", "outlaw_rifleman"]},
+    "events": ["river_crossing", "broken_axle", "prairie_fire", "stranger_on_road", "buffalo_herd", "sick_traveler", "rattler_in_bedroll", "thunderstorm", "lost_trail", "wolf_tracks", "abandoned_homestead", "haint_lights", "peddler", "wagon_stuck", "gravesite", "hunting_grounds", "outlaw_ambush_warning", "fork_in_trail"],
+    "homestead_events": ["homestead_family", "homestead_widow", "homestead_drifter"],
+    "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "prairie_well", "scarecrow", "berry_bushes", "cattle_skull", "dead_horse", "standing_stone"],
+    "cave_curios": ["miners_cache", "whiskey_barrel", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox"]
+  },
+
+  "red_canyons": {
+    "name": "The Red Canyons", "tier": 2, "rec_level": "2-4",
+    "desc": "A maze of red rock, claim jumpers and railroad thugs. Songs echo through the canyons that no living throat is singing.",
+    "palette": {"sky_top": "#5b3758", "sky_bottom": "#f28f3b", "sun": "#ffe1a8", "far": "#9e4b3a", "mid": "#b8603f", "near": "#8a4a2f", "ground": "#6b3a26", "accent": "#e07a5f"},
+    "props": ["mesa", "cactus", "rock", "skull"],
+    "cave_name": "Abandoned Mine",
+    "fights": [
+      {"enemies": ["claim_jumper", "railroad_enforcer", "dynamiter"], "weight": 3},
+      {"enemies": ["railroad_enforcer", "claim_jumper", "outlaw_gunhand", "dynamiter"], "weight": 2},
+      {"enemies": ["gila_monster", "dust_devil", "canyon_siren"], "weight": 2},
+      {"enemies": ["canyon_siren", "canyon_siren"], "weight": 1},
+      {"enemies": ["gila_monster", "rattlesnake", "carrion_crows"], "weight": 2},
+      {"enemies": ["claim_jumper", "claim_jumper", "dynamiter"], "weight": 2},
+      {"enemies": ["dust_devil", "dust_devil", "canyon_siren"], "weight": 1},
+      {"enemies": ["railroad_enforcer", "outlaw_knifeman", "outlaw_rifleman"], "weight": 2}
+    ],
+    "elites": [
+      {"enemies": ["railroad_enforcer", "hired_gun", "dynamiter"], "weight": 2},
+      {"enemies": ["stone_ram", "canyon_siren", "canyon_siren"], "weight": 1},
+      {"enemies": ["gila_monster", "hired_gun", "dust_devil"], "weight": 1}
+    ],
+    "cave_fights": [
+      {"enemies": ["tommyknocker", "tommyknocker", "giant_bat"], "weight": 2},
+      {"enemies": ["pale_crawler", "pale_crawler", "giant_bat"], "weight": 2},
+      {"enemies": ["claim_jumper", "tommyknocker", "dynamiter"], "weight": 1}
+    ],
+    "boss": {"name": "The Cyclops of Deadeye Mesa", "landmark": "Deadeye Mesa",
+      "intro": "The mesa top is a pasture of boulders. Then the boulders stand up, bleating, and behind them rises a shepherd forty feet tall with one great, wet eye.",
+      "victory": "The Cyclops crashes down the side of the mesa like a rockslide. Its stone rams crumble into gravel. Deadeye Mesa is quiet, and it has fresh water. A fine spot to build.",
+      "enemies": ["stone_ram", "cyclops", "canyon_siren"], "keepsake": "cyclops_eye_stone"},
+    "crossing": {"name": "Mesa Guardians", "enemies": ["stone_ram", "stone_ram", "hired_gun", "canyon_siren"]},
+    "events": ["river_crossing", "broken_axle", "stranger_on_road", "rattler_in_bedroll", "thunderstorm", "lost_trail", "peddler", "wagon_stuck", "gravesite", "flash_flood", "railroad_survey", "siren_song", "heat_wave", "claim_dispute", "fork_in_trail", "outlaw_ambush_warning"],
+    "homestead_events": ["homestead_family", "homestead_drifter", "homestead_widow"],
+    "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "cattle_skull", "standing_stone", "miners_cache", "petroglyph_wall", "dead_horse", "railroad_crate"],
+    "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox", "ore_vein"]
+  },
+
+  "thunder_peaks": {
+    "name": "The Thunder Peaks", "tier": 3, "rec_level": "4-5",
+    "desc": "Snow and granite and storms that never end. The giants here are old, and the oldest of them all sits in the pass to the Sundown Sea.",
+    "palette": {"sky_top": "#1b263b", "sky_bottom": "#8d99ae", "sun": "#e0e1dd", "far": "#6c7a89", "mid": "#4f5d6b", "near": "#3a4652", "ground": "#e0e6ea", "accent": "#9ee6ff"},
+    "props": ["pine", "snowrock", "rock", "cairn"],
+    "cave_name": "Ice Cave",
+    "fights": [
+      {"enemies": ["mountain_bandit", "mountain_bandit", "outlaw_rifleman"], "weight": 3},
+      {"enemies": ["grizzly", "storm_hawk"], "weight": 2},
+      {"enemies": ["frost_wight", "storm_hawk", "storm_hawk"], "weight": 2},
+      {"enemies": ["mountain_bandit", "frost_wight", "outlaw_rifleman", "storm_hawk"], "weight": 2},
+      {"enemies": ["grizzly", "prairie_wolf", "prairie_wolf"], "weight": 2},
+      {"enemies": ["frost_wight", "frost_wight", "tommyknocker"], "weight": 1}
+    ],
+    "elites": [
+      {"enemies": ["stone_giant_youth", "storm_hawk", "storm_hawk"], "weight": 2},
+      {"enemies": ["grizzly", "grizzly", "frost_wight"], "weight": 1},
+      {"enemies": ["stone_giant_youth", "mountain_bandit", "frost_wight"], "weight": 1}
+    ],
+    "cave_fights": [
+      {"enemies": ["pale_crawler", "frost_wight", "giant_bat"], "weight": 2},
+      {"enemies": ["tommyknocker", "tommyknocker", "frost_wight"], "weight": 2},
+      {"enemies": ["grizzly", "giant_bat"], "weight": 1}
+    ],
+    "boss": {"name": "The Titan of the Pass", "landmark": "Titan's Pass",
+      "intro": "What you took for the mountain's shoulder turns its head. Lightning crawls across a crown of granite. The Titan of the Pass has blocked the way west since before there were people to go west.",
+      "victory": "The Titan sinks to its knees and is still, and the snow begins to cover it. Beyond the pass, the land slopes down and down to a shining sea.",
+      "enemies": ["stone_giant_youth", "titan", "storm_hawk"], "keepsake": "titan_shard"},
+    "crossing": {"name": "Children of the Titan", "enemies": ["stone_giant_youth", "frost_wight", "storm_hawk", "storm_hawk"]},
+    "events": ["broken_axle", "stranger_on_road", "thunderstorm", "lost_trail", "wolf_tracks", "peddler", "wagon_stuck", "gravesite", "avalanche", "blizzard", "frozen_traveler", "giant_footprints", "fork_in_trail", "hunting_grounds"],
+    "homestead_events": ["homestead_drifter", "homestead_trapper_cabin"],
+    "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "standing_stone", "frozen_pack", "cairn", "dead_horse", "giant_bones", "hot_spring"],
+    "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "ore_vein", "frozen_pack"]
+  }
+}

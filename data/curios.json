@@ -1,0 +1,192 @@
+{
+  "_comment": "hand: weighted outcomes when investigated by hand. keys: item id -> guaranteed outcome when that item is used (the item is consumed). tags: whiskey / treasure / strange trigger quirk compulsions. {hero} in text is replaced by the investigating hero's name. Effects use the shared effect format (see scripts/core/effects.gd).",
+
+  "abandoned_wagon": {"name": "Abandoned Wagon", "art": "wagon", "tags": ["treasure"],
+    "desc": "A prairie schooner on its side, canvas flapping. Whoever owned it left in a hurry.",
+    "hand": [
+      {"weight": 4, "text": "{hero} finds a sack of flour and some tinned peaches.", "effects": [{"type": "food", "amount": 4}]},
+      {"weight": 3, "text": "{hero} pries loose a few good boards and some iron fittings.", "effects": [{"type": "timber", "amount": 2}, {"type": "iron", "amount": 1}]},
+      {"weight": 2, "text": "A rattlesnake was nesting in the flour barrel!", "effects": [{"type": "damage_pct", "value": 10, "target": "actor"}, {"type": "fatigue", "amount": 8, "target": "actor"}]},
+      {"weight": 1, "text": "Nothing but a child's rag doll. {hero} can't stop wondering what happened.", "effects": [{"type": "fatigue", "amount": 10, "target": "actor"}]}
+    ],
+    "keys": {"crowbar": {"text": "{hero} pries open the locked sea chest under the seat. Silver coins, and a keepsake wrapped in a handkerchief.", "effects": [{"type": "money", "min": 60, "max": 110}, {"type": "keepsake"}]}}},
+
+  "whiskey_barrel": {"name": "Whiskey Barrel", "art": "barrel", "tags": ["whiskey"],
+    "desc": "A barrel of Taos Lightning, half-full and sloshing.",
+    "hand": [
+      {"weight": 4, "text": "{hero} takes a long pull. Liquid courage.", "effects": [{"type": "fatigue", "amount": -12, "target": "actor"}]},
+      {"weight": 3, "text": "Rotgut. {hero} is sick as a dog.", "effects": [{"type": "damage_pct", "value": 8, "target": "actor"}, {"type": "fatigue", "amount": 6, "target": "actor"}]},
+      {"weight": 2, "text": "{hero} fills a few bottles for later.", "effects": [{"type": "item", "item": "whiskey", "amount": 2}]},
+      {"weight": 1, "text": "{hero} drinks... and keeps drinking.", "effects": [{"type": "quirk", "quirk": "drinker", "target": "actor"}, {"type": "fatigue", "amount": -20, "target": "actor"}]}
+    ],
+    "keys": {"crowbar": {"text": "Under the false bottom: a smuggler's stash of coins and good bourbon.", "effects": [{"type": "money", "min": 40, "max": 80}, {"type": "item", "item": "whiskey", "amount": 3}]}}},
+
+  "old_grave": {"name": "Lonely Grave", "art": "grave", "tags": ["treasure", "strange"],
+    "desc": "A wooden cross, the name worn away. Somebody piled stones on it to keep the wolves off.",
+    "hand": [
+      {"weight": 3, "text": "{hero} says a few words over the grave. The company feels a little lighter.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}]},
+      {"weight": 3, "text": "{hero} digs with their hands and finds nothing but bones and a cold feeling.", "effects": [{"type": "fatigue", "amount": 12, "target": "actor"}]},
+      {"weight": 2, "text": "Buried with the dead: a pocket watch and some coins.", "effects": [{"type": "money", "min": 30, "max": 60}, {"type": "quirk", "quirk": "superstitious", "target": "actor", "chance": 30}]}
+    ],
+    "keys": {"shovel": {"text": "{hero} digs carefully and finds the settler was buried with their savings, and their luck.", "effects": [{"type": "money", "min": 70, "max": 120}, {"type": "keepsake", "chance": 50}]},
+             "salt": {"text": "{hero} rings the grave with salt and says the old words. Something settles down to rest.", "effects": [{"type": "fatigue", "amount": -12, "target": "party"}, {"type": "quirk", "quirk": "random_positive", "target": "actor", "chance": 30}]}}},
+
+  "strongbox": {"name": "Stagecoach Strongbox", "art": "strongbox", "tags": ["treasure"],
+    "desc": "Wells Fargo stenciled on the side. Still locked.",
+    "hand": [
+      {"weight": 3, "text": "{hero} bashes at the lock until it gives. Some banknotes inside.", "effects": [{"type": "money", "min": 30, "max": 70}]},
+      {"weight": 3, "text": "The lock won't budge. {hero} bloodies their knuckles trying.", "effects": [{"type": "damage_pct", "value": 6, "target": "actor"}, {"type": "fatigue", "amount": 5, "target": "actor"}]},
+      {"weight": 1, "text": "A spring-loaded blade! Somebody booby-trapped it.", "effects": [{"type": "damage_pct", "value": 15, "target": "actor"}]}
+    ],
+    "keys": {"crowbar": {"text": "The lid pops open. Gold eagles and a mail pouch.", "effects": [{"type": "money", "min": 100, "max": 180}, {"type": "keepsake", "chance": 35}]}}},
+
+  "prairie_well": {"name": "Prairie Well", "art": "well", "tags": [],
+    "desc": "A stone well with a broken windlass. Something glints far below.",
+    "hand": [
+      {"weight": 3, "text": "The water is sweet and cold. Everyone drinks.", "effects": [{"type": "heal_pct", "value": 8, "target": "party"}]},
+      {"weight": 2, "text": "Alkali water. {hero} spends the next hour regretting it.", "effects": [{"type": "damage_pct", "value": 8, "target": "actor"}, {"type": "fatigue", "amount": 6, "target": "actor"}]},
+      {"weight": 2, "text": "{hero} leans over too far and nearly falls in.", "effects": [{"type": "fatigue", "amount": 10, "target": "actor"}]}
+    ],
+    "keys": {"rope": {"text": "{hero} lowers down on the rope and comes back up with a tin box someone hid in the well wall.", "effects": [{"type": "money", "min": 60, "max": 100}, {"type": "heal_pct", "value": 8, "target": "party"}]}}},
+
+  "scarecrow": {"name": "Scarecrow", "art": "scarecrow", "tags": ["strange"],
+    "desc": "A scarecrow in a field nobody's farmed for years. It's facing you. It was facing the other way a minute ago.",
+    "hand": [
+      {"weight": 3, "text": "Just straw and a moth-eaten coat. There's a few coins in the pocket.", "effects": [{"type": "money", "min": 15, "max": 35}]},
+      {"weight": 3, "text": "It turns its head. {hero} doesn't stop shaking for an hour.", "effects": [{"type": "fatigue", "amount": 15, "target": "actor"}]},
+      {"weight": 1, "text": "Straw bursts out of it and it lurches forward. It wasn't a scarecrow!", "effects": [{"type": "fight", "enemies": ["prairie_haint", "carrion_crows"]}]}
+    ],
+    "keys": {"salt": {"text": "{hero} throws salt in its burlap face. Something leaves it with a sigh, and a warm charm falls from its sleeve.", "effects": [{"type": "keepsake", "chance": 60}, {"type": "fatigue", "amount": -8, "target": "party"}]}}},
+
+  "berry_bushes": {"name": "Chokecherry Thicket", "art": "bush", "tags": [],
+    "desc": "Bushes heavy with dark berries along a dry creek.",
+    "hand": [
+      {"weight": 5, "text": "{hero} picks a hatful of berries.", "effects": [{"type": "food", "amount": 3}]},
+      {"weight": 2, "text": "Something else was eating here too. A snake bites {hero}!", "effects": [{"type": "damage_pct", "value": 10, "target": "actor"}]},
+      {"weight": 1, "text": "Wrong berries. {hero} spends the night groaning.", "effects": [{"type": "fatigue", "amount": 12, "target": "actor"}]}
+    ],
+    "keys": {"antivenom": {"text": "{hero} clears the snakes out properly and harvests the whole thicket.", "effects": [{"type": "food", "amount": 6}]}}},
+
+  "cattle_skull": {"name": "Bleached Cattle Skull", "art": "skull", "tags": ["strange"],
+    "desc": "A longhorn skull on a post, painted with symbols no one in the company recognizes.",
+    "hand": [
+      {"weight": 3, "text": "{hero} studies the symbols and figures out it's a trail marker. It points to good water.", "effects": [{"type": "reveal", "amount": 1}, {"type": "fatigue", "amount": -4, "target": "party"}]},
+      {"weight": 3, "text": "The empty eyes seem to follow {hero}. The whole company feels watched.", "effects": [{"type": "fatigue", "amount": 6, "target": "party"}]},
+      {"weight": 1, "text": "A warning sign. Someone was waiting for whoever touched it.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand"]}]}
+    ],
+    "keys": {"salt": {"text": "{hero} sprinkles salt and the painted symbols fade. The land feels friendlier.", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "buff", "stat": "acc", "value": 5}]}}},
+
+  "dead_horse": {"name": "Dead Horse", "art": "horse", "tags": ["treasure"],
+    "desc": "A saddled horse, dead a few days. The saddlebags are still buckled.",
+    "hand": [
+      {"weight": 4, "text": "{hero} goes through the saddlebags: jerky and a few coins.", "effects": [{"type": "food", "amount": 2}, {"type": "money", "min": 15, "max": 40}]},
+      {"weight": 2, "text": "The smell is unbelievable. {hero} gags the whole time.", "effects": [{"type": "fatigue", "amount": 8, "target": "actor"}, {"type": "money", "min": 10, "max": 20}]},
+      {"weight": 1, "text": "The rider's wanted poster is in the bag. The rider's friends are nearby.", "effects": [{"type": "fight", "enemies": ["outlaw_knifeman", "outlaw_gunhand"]}]}
+    ],
+    "keys": {"shovel": {"text": "{hero} gives horse and rider a decent burial. In the rider's boot: a keepsake.", "effects": [{"type": "keepsake", "chance": 70}, {"type": "fatigue", "amount": -5, "target": "party"}]}}},
+
+  "standing_stone": {"name": "Standing Stone", "art": "stone", "tags": ["strange"],
+    "desc": "A slab of rock twice a man's height, humming faintly. Much too big for anyone to have stood it up.",
+    "hand": [
+      {"weight": 3, "text": "{hero} puts a hand on it and feels... strength. Old strength.", "effects": [{"type": "buff", "stat": "dmg_pct", "value": 15, "target": "actor"}, {"type": "heal_pct", "value": 10, "target": "actor"}]},
+      {"weight": 3, "text": "The humming gets into {hero}'s teeth and won't leave.", "effects": [{"type": "fatigue", "amount": 14, "target": "actor"}]},
+      {"weight": 1, "text": "{hero} is changed by the touch.", "effects": [{"type": "quirk", "quirk": "random", "target": "actor"}]}
+    ],
+    "keys": {"salt": {"text": "A ring of salt quiets the stone. It gives up its old strength willingly.", "effects": [{"type": "buff", "stat": "dmg_pct", "value": 12, "target": "party"}, {"type": "quirk", "quirk": "random_positive", "target": "actor", "chance": 40}]}}},
+
+  "miners_cache": {"name": "Miner's Cache", "art": "crate", "tags": ["treasure"],
+    "desc": "Crates and a pickaxe jammed into a crevice. Somebody meant to come back for these.",
+    "hand": [
+      {"weight": 4, "text": "{hero} finds candles, lamp oil and hardtack.", "effects": [{"type": "item", "item": "lamp_oil", "amount": 1}, {"type": "food", "amount": 2}]},
+      {"weight": 3, "text": "Iron tools and ore samples.", "effects": [{"type": "iron", "amount": 2}]},
+      {"weight": 1, "text": "Old blasting powder goes off in {hero}'s face!", "effects": [{"type": "damage_pct", "value": 18, "target": "actor"}]}
+    ],
+    "keys": {"crowbar": {"text": "The nailed crate holds a poke of gold dust and good tools.", "effects": [{"type": "money", "min": 80, "max": 140}, {"type": "iron", "amount": 2}]}}},
+
+  "bone_pile": {"name": "Pile of Bones", "art": "bones", "tags": ["strange", "treasure"],
+    "desc": "Animal bones, and some that aren't animal. Something drags its meals back here.",
+    "hand": [
+      {"weight": 3, "text": "Among the bones: a prospector's pouch of coins.", "effects": [{"type": "money", "min": 30, "max": 60}]},
+      {"weight": 3, "text": "{hero} disturbs the pile and the stench of the den rolls out.", "effects": [{"type": "fatigue", "amount": 10, "target": "actor"}]},
+      {"weight": 1, "text": "The owner of the bones comes home.", "effects": [{"type": "fight", "enemies": ["pale_crawler", "giant_bat"]}]}
+    ],
+    "keys": {"shovel": {"text": "{hero} shovels through the pile quickly and safely. Coins and a strange trinket.", "effects": [{"type": "money", "min": 40, "max": 80}, {"type": "keepsake", "chance": 40}]}}},
+
+  "glowing_pool": {"name": "Glowing Pool", "art": "pool", "tags": ["strange"],
+    "desc": "A still pool that glows a soft blue-green. It's warm.",
+    "hand": [
+      {"weight": 3, "text": "{hero} splashes their face. Wounds close up.", "effects": [{"type": "heal_pct", "value": 20, "target": "actor"}]},
+      {"weight": 2, "text": "The water burns! {hero} jerks back, blistered.", "effects": [{"type": "damage_pct", "value": 12, "target": "actor"}]},
+      {"weight": 1, "text": "{hero} sees something in the reflection that isn't there.", "effects": [{"type": "fatigue", "amount": 15, "target": "actor"}, {"type": "quirk", "quirk": "random", "target": "actor", "chance": 50}]}
+    ],
+    "keys": {"salt": {"text": "Salted, the pool stops glowing and becomes simple healing water.", "effects": [{"type": "heal_pct", "value": 20, "target": "party"}]},
+             "antivenom": {"text": "{hero} neutralizes the water with a tincture. It's safe to drink.", "effects": [{"type": "heal_pct", "value": 15, "target": "party"}]}}},
+
+  "collapsed_tunnel": {"name": "Collapsed Tunnel", "art": "rubble", "tags": ["treasure"],
+    "desc": "A side tunnel choked with rubble. There's a draft coming through.",
+    "hand": [
+      {"weight": 3, "text": "{hero} shifts enough rock to find an old lunch pail with coins inside.", "effects": [{"type": "money", "min": 20, "max": 50}]},
+      {"weight": 3, "text": "Rocks shift and fall on {hero}.", "effects": [{"type": "damage_pct", "value": 12, "target": "actor"}]},
+      {"weight": 1, "text": "Hours of digging for nothing.", "effects": [{"type": "fatigue", "amount": 8, "target": "party"}]}
+    ],
+    "keys": {"shovel": {"text": "{hero} digs through to a sealed pocket: a forgotten ore stash.", "effects": [{"type": "iron", "amount": 3}, {"type": "money", "min": 40, "max": 80}]}}},
+
+  "petroglyph_wall": {"name": "Painted Canyon Wall", "art": "wall", "tags": ["strange"],
+    "desc": "Faded paintings of enormous figures, with tiny people fleeing at their feet.",
+    "hand": [
+      {"weight": 3, "text": "{hero} studies the paintings and learns where the big ones walk, and how they fall.", "effects": [{"type": "buff", "stat": "dmg_pct", "value": 10, "target": "party"}]},
+      {"weight": 3, "text": "The paintings are warnings. {hero} can't shake the dread.", "effects": [{"type": "fatigue", "amount": 10, "target": "party"}]}
+    ],
+    "keys": {"salt": {"text": "Offering salt at the wall, {hero} feels the land accept the company's passing.", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "reveal", "amount": 2}]}}},
+
+  "railroad_crate": {"name": "Railroad Supply Crate", "art": "crate", "tags": ["treasure"],
+    "desc": "Stenciled 'PROPERTY OF THE WESTERN TERRITORIES RAILROAD - NO TRESPASSING'.",
+    "hand": [
+      {"weight": 3, "text": "Spikes, fishplates and coal. The iron is useful.", "effects": [{"type": "iron", "amount": 3}]},
+      {"weight": 2, "text": "The railroad sets alarms. Company men come running.", "effects": [{"type": "fight", "enemies": ["railroad_enforcer", "outlaw_gunhand"]}]},
+      {"weight": 2, "text": "{hero} finds the payroll ledger. The company is swindling everyone.", "effects": [{"type": "fatigue", "amount": 6, "target": "actor"}, {"type": "money", "min": 20, "max": 40}]}
+    ],
+    "keys": {"crowbar": {"text": "{hero} opens it quietly. Dynamite-proof lockbox inside: the payroll!", "effects": [{"type": "money", "min": 120, "max": 200}, {"type": "iron", "amount": 2}]}}},
+
+  "ore_vein": {"name": "Ore Vein", "art": "vein", "tags": ["treasure"],
+    "desc": "A streak of rust-red ore running through the rock. A little gold glitters in it.",
+    "hand": [
+      {"weight": 4, "text": "{hero} chips away with a knife and gets a few chunks.", "effects": [{"type": "iron", "amount": 2}]},
+      {"weight": 2, "text": "A rock splinter catches {hero} in the eye.", "effects": [{"type": "damage_pct", "value": 8, "target": "actor"}, {"type": "iron", "amount": 1}]}
+    ],
+    "keys": {"shovel": {"text": "With a proper tool {hero} digs out a real haul.", "effects": [{"type": "iron", "amount": 5}, {"type": "money", "min": 40, "max": 90}]}}},
+
+  "frozen_pack": {"name": "Frozen Pack", "art": "pack", "tags": ["treasure"],
+    "desc": "A traveler's pack frozen into the ice, its owner nowhere to be seen.",
+    "hand": [
+      {"weight": 3, "text": "{hero} chips it out: frozen food, still good.", "effects": [{"type": "food", "amount": 4}]},
+      {"weight": 2, "text": "{hero}'s fingers go numb and white.", "effects": [{"type": "damage_pct", "value": 10, "target": "actor"}, {"type": "fatigue", "amount": 6, "target": "actor"}]},
+      {"weight": 1, "text": "Inside: a letter to someone's family. {hero} takes it to deliver.", "effects": [{"type": "fatigue", "amount": 8, "target": "actor"}, {"type": "quirk", "quirk": "random_positive", "target": "actor", "chance": 50}]}
+    ],
+    "keys": {"shovel": {"text": "{hero} digs the whole pack out: food, a flask and a keepsake.", "effects": [{"type": "food", "amount": 4}, {"type": "item", "item": "whiskey", "amount": 1}, {"type": "keepsake", "chance": 50}]}}},
+
+  "cairn": {"name": "Stone Cairn", "art": "cairn", "tags": ["strange"],
+    "desc": "A pile of stones marking the trail. Tradition says you add one, and never take one.",
+    "hand": [
+      {"weight": 4, "text": "{hero} adds a stone. The company feels the trail welcome them.", "effects": [{"type": "fatigue", "amount": -8, "target": "party"}]},
+      {"weight": 2, "text": "{hero} takes a stone instead. Nothing happens. Probably.", "effects": [{"type": "quirk", "quirk": "superstitious", "target": "actor", "chance": 50}]},
+      {"weight": 1, "text": "There's a trapper's message hidden in the cairn: a map!", "effects": [{"type": "reveal", "amount": 3}]}
+    ],
+    "keys": {}},
+
+  "giant_bones": {"name": "Giant's Bones", "art": "bones", "tags": ["strange", "treasure"],
+    "desc": "A ribcage big enough to drive a wagon through, half buried in snow.",
+    "hand": [
+      {"weight": 3, "text": "{hero} finds weapons tangled in the ribs: the giant's last meal fought back.", "effects": [{"type": "iron", "amount": 3}, {"type": "money", "min": 30, "max": 60}]},
+      {"weight": 3, "text": "Standing inside the ribs, {hero} really understands how small they are.", "effects": [{"type": "fatigue", "amount": 14, "target": "actor"}]}
+    ],
+    "keys": {"salt": {"text": "{hero} honors the old giant. A marrow-stone falls from the bones: lucky, some say.", "effects": [{"type": "keepsake"}, {"type": "fatigue", "amount": -6, "target": "party"}]}}},
+
+  "hot_spring": {"name": "Hot Spring", "art": "pool", "tags": [],
+    "desc": "Steam rises from a pool in the snow. It smells of sulfur.",
+    "hand": [
+      {"weight": 4, "text": "Everyone takes a soak. Pure bliss.", "effects": [{"type": "heal_pct", "value": 12, "target": "party"}, {"type": "fatigue", "amount": -10, "target": "party"}]},
+      {"weight": 1, "text": "Too hot! {hero} is scalded.", "effects": [{"type": "damage_pct", "value": 12, "target": "actor"}]}
+    ],
+    "keys": {}}
+}

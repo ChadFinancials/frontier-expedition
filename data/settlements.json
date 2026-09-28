@@ -1,0 +1,14 @@
+{
+  "_comment": "The chain of settlement sites from east to west. index orders them. region_west: the region an expedition from here travels. founded_at: the region whose boss must fall before this site can be settled.",
+
+  "fort_providence": {"index": 0, "name": "Fort Providence", "region_west": "tallgrass",
+    "desc": "Last real town before the edge of the map. Timber stockade, muddy streets, and every wagon heading west stops here first.",
+    "start_tier": "town",
+    "start_buildings": {"saloon": 1, "general_store": 1, "hiring_board": 1, "stage_line": 1, "smithy": 1}},
+  "redwater_ford": {"index": 1, "name": "Redwater Ford", "region_west": "red_canyons", "founded_at": "tallgrass",
+    "desc": "Where Silas Crane used to charge a toll to cross. Now it's your crossing, and the canyons rise red to the west."},
+  "cloudbreak": {"index": 2, "name": "Cloudbreak", "region_west": "thunder_peaks", "founded_at": "red_canyons",
+    "desc": "Built in the shadow of Deadeye Mesa, where the Cyclops kept its flock. The mountains beyond are full of thunder."},
+  "sundown_landing": {"index": 3, "name": "Sundown Landing", "region_west": "", "founded_at": "thunder_peaks", "victory": true,
+    "desc": "Past the Titan's pass the land slopes down to the Sundown Sea. The trail ends here. A new life begins."}
+}

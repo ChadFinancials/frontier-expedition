@@ -1,0 +1,26 @@
+{
+  "_comment": "Two keepsake slots per hero. rarity: common / uncommon / rare / boss. price is used by the General Store. class: optional class restriction.",
+
+  "lucky_horseshoe": {"name": "Lucky Horseshoe", "rarity": "common", "price": 250, "desc": "Bent iron, nailed over a hundred doors.", "mods": [{"stat": "crit", "value": 4}, {"stat": "speed", "value": -1}]},
+  "rabbits_foot": {"name": "Rabbit's Foot", "rarity": "common", "price": 250, "desc": "Wasn't lucky for the rabbit.", "mods": [{"stat": "dodge", "value": 8}, {"stat": "acc", "value": -3}]},
+  "silver_spurs": {"name": "Silver Spurs", "rarity": "uncommon", "price": 450, "desc": "They jingle when you walk. Everybody hears you coming.", "mods": [{"stat": "speed", "value": 2}, {"stat": "surprise", "value": -5}]},
+  "grandmas_quilt": {"name": "Grandma's Quilt Square", "rarity": "common", "price": 300, "desc": "Smells like home.", "mods": [{"stat": "fatigue_pct", "value": -12}]},
+  "pocket_bible": {"name": "Pocket Bible", "rarity": "uncommon", "price": 500, "desc": "Stopped a bullet once. Or so they say.", "mods": [{"stat": "deathblow", "value": 5}, {"stat": "fatigue_pct", "value": -5}]},
+  "brass_knuckles": {"name": "Brass Knuckles", "rarity": "common", "price": 250, "desc": "Saloon diplomacy.", "mods": [{"stat": "dmg_pct", "value": 12, "cond": "front"}, {"stat": "dodge", "value": -4}]},
+  "spyglass": {"name": "Brass Spyglass", "rarity": "uncommon", "price": 400, "desc": "Navy surplus.", "mods": [{"stat": "acc", "value": 8, "cond": "back"}, {"stat": "scout", "value": 10}]},
+  "snakeskin_belt": {"name": "Snakeskin Belt", "rarity": "common", "price": 200, "desc": "The snake had it worse.", "mods": [{"stat": "poison_res", "value": 30}, {"stat": "dmg_pct", "value": 8, "cond": "vs:reptile"}]},
+  "wolf_tooth": {"name": "Wolf-Tooth Necklace", "rarity": "common", "price": 250, "desc": "Taken from a wolf that picked the wrong camp.", "mods": [{"stat": "dmg_pct", "value": 12, "cond": "vs:beast"}, {"stat": "bleed_res", "value": 10}]},
+  "wanted_poster": {"name": "Folded Wanted Poster", "rarity": "common", "price": 250, "desc": "The reward's still good.", "mods": [{"stat": "dmg_pct", "value": 12, "cond": "vs:outlaw"}, {"stat": "acc", "value": 4, "cond": "vs:outlaw"}]},
+  "salt_charm": {"name": "Salt-Charm Pouch", "rarity": "uncommon", "price": 400, "desc": "Old country wisdom for new country monsters.", "mods": [{"stat": "dmg_pct", "value": 12, "cond": "vs:mythic"}, {"stat": "fatigue_pct", "value": -15, "cond": "vs:mythic"}]},
+  "tin_canteen": {"name": "Dented Canteen", "rarity": "common", "price": 200, "desc": "Always seems to have one more swallow.", "mods": [{"stat": "heal_pct", "value": 15}, {"stat": "food_pct", "value": -10}]},
+  "iron_gorget": {"name": "Iron Gorget", "rarity": "uncommon", "price": 450, "desc": "Old cavalry armor for the throat.", "mods": [{"stat": "prot", "value": 8}, {"stat": "speed", "value": -1}]},
+  "loaded_dice": {"name": "Loaded Dice", "rarity": "rare", "price": 700, "desc": "They always come up sevens. Almost always.", "mods": [{"stat": "crit", "value": 8}, {"stat": "resolve", "value": -5}]},
+  "wedding_ring": {"name": "Wedding Ring", "rarity": "rare", "price": 650, "desc": "Somebody's waiting back east.", "mods": [{"stat": "resolve", "value": 15}, {"stat": "deathblow", "value": 4}]},
+  "miners_lamp": {"name": "Miner's Lamp", "rarity": "uncommon", "price": 350, "desc": "Never quite goes out.", "mods": [{"stat": "acc", "value": 6, "cond": "in_cave"}, {"stat": "fatigue_pct", "value": -15, "cond": "in_cave"}]},
+  "war_paint": {"name": "Red Bandana", "rarity": "common", "price": 200, "desc": "Somebody's lucky color.", "mods": [{"stat": "dmg_pct", "value": 8}, {"stat": "fatigue_pct", "value": 8}]},
+  "stagecoach_ticket": {"name": "Unused Stage Ticket", "rarity": "uncommon", "price": 350, "desc": "A way home, never used. Yet.", "mods": [{"stat": "resolve", "value": 10}, {"stat": "fatigue_pct", "value": -8}]},
+
+  "cranes_revolver": {"name": "Crane's Engraved Revolver", "rarity": "boss", "price": 0, "desc": "Silas Crane's pride and joy. The grip still has his initials.", "mods": [{"stat": "acc", "value": 8}, {"stat": "crit", "value": 6}, {"stat": "dmg_pct", "value": 10}]},
+  "cyclops_eye_stone": {"name": "Cyclops' Eye-Stone", "rarity": "boss", "price": 0, "desc": "A pupil-sized agate that never stops watching.", "mods": [{"stat": "acc", "value": 10}, {"stat": "scout", "value": 25}, {"stat": "fatigue_pct", "value": -10}]},
+  "titan_shard": {"name": "Shard of the Titan", "rarity": "boss", "price": 0, "desc": "Warm to the touch, and very heavy.", "mods": [{"stat": "prot", "value": 12}, {"stat": "max_hp_pct", "value": 15}, {"stat": "deathblow", "value": 5}]}
+}
