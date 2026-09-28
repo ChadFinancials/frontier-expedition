@@ -347,7 +347,7 @@ func _build_human() -> void:
 	var hand_b := Vector2(-w / 2 + 2, hip + 6)
 	var weapon_ang := 1.1
 	var weapon: String = look.get("weapon", "none")
-	var long_melee: bool = weapon in ["axe", "hammer", "pickaxe", "club"]
+	var long_melee: bool = weapon in ["axe", "hammer", "pickaxe", "big_pickaxe", "club"]
 	var long_gun: bool = weapon in ["rifle", "shotgun"]
 	if long_melee:
 		hand_f = Vector2(w / 2 + 10, hip - 6)
@@ -585,6 +585,13 @@ func _weapon(kind: String, hand: Vector2, ang: float, back: bool) -> void:
 			_line([hand - dir * 8, tip], 6.0, WOOD)
 			var n3 := dir.orthogonal()
 			_poly([tip + n3 * 30 - dir * 12, tip + n3 * 4 + dir * 4, tip - n3 * 26 - dir * 10, tip - n3 * 4 - dir * 6], METAL)
+		"big_pickaxe":
+			# Comically oversized: a full-size miner's pick in very small hands.
+			var tip := hand + dir * 118
+			_line([hand - dir * 16, tip], 10.0, WOOD)
+			var n4 := dir.orthogonal()
+			_poly([tip + n4 * 58 - dir * 26, tip + n4 * 8 + dir * 9, tip - n4 * 50 - dir * 22, tip - n4 * 8 - dir * 12], METAL)
+			_line([tip + n4 * 10 + dir * 6, tip - n4 * 10 + dir * 6], 5.0, METAL.darkened(0.3))
 		"club":
 			var tip := hand + dir * 56
 			_poly([hand + dir.orthogonal() * 3, hand - dir.orthogonal() * 3, tip - dir.orthogonal() * 8, tip + dir.orthogonal() * 8], WOOD.darkened(0.2))

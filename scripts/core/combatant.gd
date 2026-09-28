@@ -17,6 +17,7 @@ var buffs: Array = []            # {"stat", "value", "rounds", "name"}
 var stunned: bool = false
 var stun_guard: int = 0          # rounds of post-stun resistance
 var mark: int = 0
+var used_skills: Array = []      # moves this unit has used this fight (for "once" moves)
 var guard_rounds: int = 0
 var guarding: int = -1           # id of the ally this unit shields
 var guarded_by: int = -1

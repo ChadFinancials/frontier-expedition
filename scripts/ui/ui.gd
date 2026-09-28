@@ -354,7 +354,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 		"light":
 			return "Lamplight %+d" % int(e.get("amount", 10))
 		"summon":
-			return "Calls in %s" % DB.enemies.get(e.get("enemy", ""), {}).get("name", "help")
+			var who: String = DB.enemies.get(e.get("enemy", ""), {}).get("name", "help")
+			return "Calls in %s" % (who if int(e.get("count", 1)) <= 1 else "%d x %s" % [int(e.count), who])
 	return ""
 
 

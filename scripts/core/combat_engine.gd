@@ -386,6 +386,8 @@ func valid_targets(c: Combatant, sid: String) -> Array:
 func usable_skills(c: Combatant) -> Array:
 	var out: Array = []
 	for sid in c.skills:
+		if DB.skill(sid).get("ai", {}).get("once", false) and sid in c.used_skills:
+			continue
 		if not valid_targets(c, sid).is_empty():
 			out.append(sid)
 	return out
@@ -445,8 +447,9 @@ func dmg_preview(a: Combatant, sid: String, t: Combatant) -> Array:
 		return []
 	var r := skill_dmg_range(a, sid)
 	var m := dmg_mult(a, sid, t)
+	var flat := a.stat("dmg_flat", t)
 	var prot := t.stat("prot", a) / 100.0
-	return [maxi(1, int(round(r[0] * m * (1.0 - prot)))), maxi(1, int(round(r[1] * m * (1.0 - prot))))]
+	return [maxi(1, int(round(maxf(0.0, r[0] * m + flat) * (1.0 - prot)))), maxi(1, int(round(maxf(0.0, r[1] * m + flat) * (1.0 - prot))))]
 
 
 ## Base damage for a move. An enemy move may set "dmg_range": [lo, hi], its tier-1 damage
@@ -519,6 +522,7 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 	for t in targets:
 		if not t.id in ids:
 			ids.append(t.id)
+	a.used_skills.append(sid)
 	ev.append({"t": "action", "actor": a.id, "skill": sid, "targets": ids, "anim": sk.get("anim", "melee"),
 		"sfx": sk.get("sfx", ""), "hostile": is_hostile(sk)})
 
@@ -554,6 +558,7 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 		crit = rng.randi_range(1, 100) <= crit_chance(a, sid, t)
 		var r := skill_dmg_range(a, sid)
 		var dmg := float(rng.randi_range(r[0], r[1])) * dmg_mult(a, sid, t)
+		dmg = maxf(0.0, dmg + a.stat("dmg_flat", t))
 		var gamble_text := ""
 		if sk.get("gamble", false):
 			if rng.randf() < 0.5:
@@ -697,17 +702,20 @@ func _apply_self_effect(a: Combatant, sid: String, e: Dictionary, ev: Array) -> 
 		"move":
 			_shift(a, int(e.get("amount", 1)), ev)
 		"buff_kin":
-			# Buffs the user's living allies of the same kind (not itself). Refreshes, never stacks.
+			# Buffs the user's living allies of the same kind (not itself). Refreshes unless "stack".
 			var bname: String = DB.skill(sid).get("name", "")
 			for o in side_of(a):
 				if o == a or o.dead or o.enemy_id != a.enemy_id:
 					continue
-				o.buffs = o.buffs.filter(func(b): return b.get("name", "") != bname)
+				if not e.get("stack", false):
+					o.buffs = o.buffs.filter(func(b): return b.get("name", "") != bname)
 				for m in e.get("mods", []):
 					o.buffs.append({"stat": m.stat, "value": m.value, "rounds": e.get("rounds", 2), "name": bname})
 					ev.append({"t": "buff", "target": o.id, "stat": m.stat, "value": m.value})
 		"summon":
-			if side_of(a).size() < 4:
+			for i in int(e.get("count", 1)):
+				if side_of(a).size() >= 4:
+					break
 				var c := Combatant.from_enemy(e.enemy, _new_id(), a.tier if not a.boss else tier, in_cave)
 				enemies.append(c)
 				units[c.id] = c
@@ -860,7 +868,15 @@ func _ai_turn(c: Combatant) -> Array:
 		return _ai_out_of_position(c)
 	var entries: Array = []
 	for sid in usable:
-		entries.append({"id": sid, "weight": DB.skill(sid).get("ai", {}).get("weight", 1)})
+		var ai: Dictionary = DB.skill(sid).get("ai", {})
+		# An opener is always the unit's first move, if it can use it then.
+		if ai.get("opener", false) and c.used_skills.is_empty():
+			entries = [{"id": sid, "weight": 1}]
+			break
+		var wt: float = ai.get("weight", 1)
+		if ai.has("low_hp_weight") and c.hp_ratio() < float(ai.get("low_hp", 0.5)):
+			wt = ai.low_hp_weight
+		entries.append({"id": sid, "weight": wt})
 	var sid: String = Stats.pick_weighted(rng, entries).id
 	var targets := valid_targets(c, sid)
 	var ai: Dictionary = DB.skill(sid).get("ai", {})

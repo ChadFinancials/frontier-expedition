@@ -85,73 +85,75 @@ Notes:
 
 ## Carrion Crows  (Regular)
 
-`carrion_crows` | HP **7** | dodge 30 | prot 0 | speed 8 | acc +0 | crit 5% | dmg 1-3 | tags: beast, bird
+`carrion_crows` | HP **7** | dodge 25 | prot 0 | speed 8 | acc +0 | crit 2% | dmg 2-4 | tags: beast, bird
 Resists: stun 40, bleed 20, poison 20, move 60, debuff 25
 Found in: The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Peck at the Eyes**: A flurry of beaks. | 1234 | one of 1234 | 88 | 1-2 | bleed 1 x3 rounds | 2 (deaths_door) |
-| **Carrion Chorus**: They know something you don't. | 1234 | one of 1234 | 95 | - | +8 fatigue | 2 |
+| **Peck at the Eyes**: A flurry of beaks. | 1234 | one of 1234 | 88 | 2-4 | bleed 1 x3 rounds | 2 |
+| **Circle the Drain**: The flock wheels overhead, waiting. Hard to aim with that going on. | 1234 | one of 234 | 85 | - | acc -20 for 2 rounds | 1 |
 
 Notes: 
 
 ## Murder of Crows  (Regular)
 
-`murder_of_crows` | HP **9** | dodge 28 | prot 0 | speed 8 | acc +2 | crit 6% | dmg 1-3 | tags: beast, bird
+`murder_of_crows` | HP **9** | dodge 25 | prot 0 | speed 6 | acc +2 | crit 2% | dmg 1-3 | tags: beast, bird
 Resists: stun 40, bleed 20, poison 20, move 70, debuff 25
-Found in: The Crow's Nest, The Tallgrass Sea, Quests, summoned by Silas Crane, summoned by Ruby Blackwing
+Found in: The Crow's Nest, The Tallgrass Sea, Quests, summoned by Crow Lieutenant, summoned by Silas Crane, summoned by Ruby Blackwing
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Peck at the Eyes**: A flurry of beaks. | 1234 | one of 1234 | 88 | 1-2 | bleed 1 x3 rounds | 2 (deaths_door) |
+| **Peck at the Eyes**: A flurry of beaks. | 1234 | one of 1234 | 88 | 1-3 | bleed 1 x3 rounds | 2 |
 | **Carrion Dive**: The flock dives at the weakest face in the line. | 1234 | one of 1234 | 88 | 1-2 | bleed 1 x3 rounds (90%) | 2 (lowest_hp) |
-| **Carrion Chorus**: They know something you don't. | 1234 | one of 1234 | 95 | - | +8 fatigue | 2 |
+| **Circle the Drain**: The flock wheels overhead, waiting. Hard to aim with that going on. | 1234 | one of 234 | 85 | - | acc -20 for 2 rounds | 1 |
+| **Carrion Chorus**: They know something you don't. | 1234 | one of 1234 | 95 | - | +12 fatigue | 2 |
 
 Notes: 
 
 ## Coyote  (Regular)
 
-`coyote` | HP **10** | dodge 15 | prot 0 | speed 6 | acc +0 | crit 5% | dmg 2-5 | tags: beast
-Resists: stun 20, bleed 25, poison 25, move 30, debuff 25
+`coyote` | HP **10** | dodge 12 | prot 0 | speed 3 | acc +0 | crit 5% | dmg 2-5 | tags: beast
+Resists: stun 20, bleed 25, poison 25, move 30, debuff 40
 Found in: The Crow's Nest, The Tallgrass Sea, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Nip**: Darts in, bites, darts out. | 123 | one of 123 | 88 | 2-4 | - | 3 (lowest_hp) |
-| **Yipping**: The whole pack yips at once. | 1234 | ALL of 1234 | 90 | - | +4 fatigue | 1 |
+| **Nip the Heels**: Darts in, bites, darts out. | 123 | one of 123 | 90 | 3-5 | - | 3 (lowest_hp) |
+| **Feral Yipping**: The whole pack yips at once. | 1234 | 2 random in 1234 | 90 | - | +5 fatigue; dodge -2 for 2 rounds | 1 |
 
 Notes: 
 
 ## Prairie Haint  (Regular)
 
-`prairie_haint` | HP **14** | dodge 20 | prot 0 | speed 4 | acc +0 | crit 5% | dmg 3-5 | tags: mythic, spirit
+`prairie_haint` | HP **16** | dodge 20 | prot 0 | speed 4 | acc +0 | crit 5% | dmg 3-5 | tags: mythic, spirit
 Resists: stun 50, bleed 80, poison 80, move 50, debuff 30
 Found in: The Tallgrass Sea, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Haint's Wail**: A voice from the tall grass that sounds like someone you lost. | 1234 | one of 1234 | 92 | - | +12 fatigue | 2 (back) |
-| **Grave Chill**: Cold fingers through the ribs. | 1234 | one of 123 | 88 | 2-4 | speed -3 for 2 rounds | 2 |
+| **Ghost of the Past**: A voice from the tall grass that sounds like someone you lost. | 1234 | one of 34 | 100 | - | +12 fatigue; dmg_flat -2 for 1 rounds | 2 (back) |
+| **Grave Chill**: Cold fingers through the ribs. | 1234 | one of 123 | 100 | 5-8 | speed -3 for 2 rounds | 2 |
 
 Notes: 
 
 ## Crow Lieutenant - Crane's right hand  (Elite)
 
-`crane_lieutenant` | HP **32** | dodge 8 | prot 15 | speed 4 | acc +5 | crit 6% | dmg 5-9 | tags: outlaw, human
+`crane_lieutenant` | HP **40** | dodge 8 | prot 15 | speed 4 | acc +5 | crit 6% | dmg 5-9 | tags: outlaw, human
 Resists: stun 40, bleed 35, poison 35, move 50, debuff 35
 Found in: The Crow's Nest, The Tallgrass Sea, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Scattergun**: Both barrels into the front line. | 12 | ALL of 12 | 85 | 3-6 each | - | 2 |
-| **Hired Gun**: A professional's shot. | 123 | one of 1234 | 90 | 5-9, +5% crit | - | 3 |
+| **Blunderbuss**: Both barrels into the front line. | 12 | ALL of 12 | 85 | 4-8 each | - | 2 |
+| **Circle the Drain**: The flock wheels overhead, waiting. Hard to aim with that going on. | 1234 | one of 234 | 85 | - | acc -20 for 2 rounds | 1 |
+| **Murder of Crows**: Silas whistles, and the sky goes black with wings. | 1234 | self | - | - | summons Murder of Crows | 2 |
 
 Notes: 
 
 ## Buffalo Bull  (Elite)
 
-`buffalo_bull` | HP **38** | dodge 0 | prot 20 | speed 2 | acc +0 | crit 5% | dmg 6-10 | tags: beast
+`buffalo_bull` | HP **30** | dodge 0 | prot 25 | speed 2 | acc +0 | crit 5% | dmg 6-10 | tags: beast
 Resists: stun 60, bleed 30, poison 40, move 80, debuff 35
 Found in: The Tallgrass Sea, Quests
 
@@ -164,29 +166,28 @@ Notes:
 
 ## Silas Crane - King of the Crows  (Boss)
 
-`silas_crane` | HP **130** | dodge 12 | prot 15 | speed 7 | acc +6 | crit 8% | dmg 7-11 | tags: outlaw, human
+`silas_crane` | HP **130** | dodge 12 | prot 10 | speed 3 | acc +6 | crit 5% | dmg 7-11 | tags: outlaw, human
 Resists: stun 60, bleed 40, poison 40, move 70, debuff 45
 Found in: The Tallgrass Sea
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Crane's Fusillade**: Silas empties both revolvers. | 123 | 3 random in 1234 | 85 | 4-6 x3 hits | - | 3 |
-| **Dead Aim**: A slow, deliberate shot at the weakest link. | 123 | one of 234 | 92 | 9-14, +10% crit | - | 2 (lowest_hp) |
-| **Murder of Crows**: Silas whistles, and the sky goes black with wings. | 1234 | self | - | - | summons Murder of Crows | 2 |
-| **Carrion Omen**: Crows settle on every fencepost, watching. Silas smiles. | 1234 | ALL of 1234 | 92 | - | +9 fatigue | 1 |
+| **Crane's Fusillade**: Silas empties both revolvers down the line. | 123 | 6 random in 1234 | 80 | 4-6 x6 hits | - | 3 |
+| **Dead Aim**: A slow, deliberate shot at the weakest link. | 123 | one of 34 | 92 | 8-12, +8% crit | - | 2 (lowest_hp) |
+| **Crowstorm**: Silas raises his arms and the sky over the bridge turns black with wings. | 1234 | self | - | - | summons Murder of Crows | 1 |
 
 Notes: 
 
 ## "Mad Dog" Mulligan - Crane's Enforcer  (Boss)
 
-`mad_dog_mulligan` | HP **34** | dodge 5 | prot 10 | speed 4 | acc +2 | crit 5% | dmg 3-6 | tags: outlaw, human
+`mad_dog_mulligan` | HP **42** | dodge 5 | prot 10 | speed 4 | acc +2 | crit 5% | dmg 4-7 | tags: outlaw, human
 Resists: stun 50, bleed 30, poison 30, move 60, debuff 35
 Found in: The Old Mill Road
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Ham-Fist Haymaker**: A fist like a ham hock. It rings bells. | 12 | one of 12 | 85 | 3-6 | stun (45%) | 3 |
-| **Busted Bottle**: The jagged end of a whiskey bottle. | 123 | one of 123 | 85 | 2-4 | bleed 2 x3 rounds (90%) | 2 |
+| **Ham-Fist Haymaker**: A fist like a ham hock. It rings bells. | 12 | one of 12 | 90 | 4-7 | stun (80%) | 3 |
+| **Busted Bottle**: The jagged end of a whiskey bottle. | 123 | one of 123 | 85 | 3-6 | bleed 2 x3 rounds (90%) | 2 |
 | **Where's My Boys?**: Mulligan hollers for another brawler. | 1234 | self | - | - | summons Outlaw Brawler | 1 |
 
 Notes: 
@@ -199,8 +200,8 @@ Found in: Dry Gulch Mine, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Claim Pick**: "This here's MY claim!" | 12 | one of 12 | 85 | 3-5 | bleed 2 x3 rounds (90%) | 3 |
-| **Face Full of Dirt**: Blinds with a handful of grit. | 123 | one of 123 | 90 | 1-2 | acc -12 for 2 rounds | 1 |
+| **Claim Pick**: "This here's MY claim!" | 123 | one of 123 | 90 | 4-6, +2% crit | stun (75%) | 3 |
+| **Kick Up Dust**: A boot heel's worth of grit in the eyes. | 123 | one of 234 | 90 | 1-2 | acc -12 for 2 rounds | 2 |
 
 Notes: 
 
@@ -394,69 +395,66 @@ Notes:
 
 ## Giant Bat  (Regular)
 
-`giant_bat` | HP **8** | dodge 30 | prot 0 | speed 8 | acc +0 | crit 5% | dmg 2-4 | tags: beast, cave
+`giant_bat` | HP **6** | dodge 30 | prot 0 | speed 8 | acc +0 | crit 5% | dmg 2-4 | tags: beast, cave
 Resists: stun 30, bleed 20, poison 25, move 50, debuff 25
 Found in: The Old Mill Road, Dry Gulch Mine, The Crow's Nest, The Tallgrass Sea, The Red Canyons, The Thunder Peaks, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Bat Bite**: Leathery wings and needle teeth. | 1234 | one of 1234 | 88 | 2-3 | bleed 1 x3 rounds | 3 |
-| **Screech**: A sound too high to hear but not too high to feel. | 1234 | ALL of 1234 | 90 | - | +4 fatigue | 1 |
+| **Bat Bite**: Leathery wings and needle teeth. | 1234 | one of 1234 | 90 | 2-3 | bleed 1 x3 rounds | 3 |
+| **Screech**: A sound too high to hear but not too high to feel. | 1234 | 2 random in 234 | 90 | - | +6 fatigue | 1 |
 
 Notes: 
 
 ## Tommyknocker  (Regular)
 
-`tommyknocker` | HP **11** | dodge 20 | prot 5 | speed 5 | acc +0 | crit 6% | dmg 3-5 | tags: mythic, cave
+`tommyknocker` | HP **12** | dodge 10 | prot 5 | speed 2 | acc +0 | crit 4% | dmg 3-5 | tags: mythic, cave
 Resists: stun 35, bleed 30, poison 40, move 30, debuff 35
-Found in: Dry Gulch Mine, The Tallgrass Sea, The Red Canyons, The Thunder Peaks, Quests, summoned by Old Jeb
+Found in: Dry Gulch Mine, The Tallgrass Sea, The Red Canyons, The Thunder Peaks, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Knock, Knock**: Tapping in the walls. Tapping behind you. | 1234 | one of 1234 | 95 | - | +10 fatigue | 2 (back) |
-| **Tiny Pick**: A miner's pick sized for a very small, very angry miner. | 123 | one of 123 | 88 | 3-4 | bleed 2 x3 rounds (90%) | 2 |
+| **Knock, Knock**: Tapping in the walls. Tapping behind you. | 1234 | one of 1234 | 95 | - | +10 fatigue; dmg_flat -2 for 2 rounds | 2 (back) |
+| **Oversized Pick**: A full-size miner's pick swung by a very small, very angry miner. It takes a moment to recover. | 123 | one of 123 | 80 | 7-10 | stun; stun | 2 |
 
 Notes: 
 
 ## Old Jeb - King Under the Hill  (Boss)
 
-`knocker_king` | HP **44** | dodge 12 | prot 10 | speed 5 | acc +3 | crit 6% | dmg 3-6 | tags: mythic, cave
-Resists: stun 50, bleed 35, poison 45, move 70, debuff 40
+`knocker_king` | HP **58** | dodge 8 | prot 15 | speed 2 | acc +3 | crit 3% | dmg 4-8 | tags: mythic, cave
+Resists: stun 80, bleed 20, poison 20, move 70, debuff 40
 Found in: Dry Gulch Mine
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Cave-In**: Old Jeb knocks twice on the ceiling, and the ceiling answers. | 1234 | ALL of 1234 | 85 | 1-3 each | stun (25%) | 2 |
-| **Tiny Pick**: A miner's pick sized for a very small, very angry miner. | 123 | one of 123 | 88 | 3-5 | bleed 2 x3 rounds (90%) | 2 |
-| **Wake the Knockers**: Tapping answers from every wall. | 1234 | self | - | - | summons Tommyknocker | 1 |
-| **Knock, Knock**: Tapping in the walls. Tapping behind you. | 1234 | one of 1234 | 95 | - | +10 fatigue | 2 (back) |
+| **Cave-In**: Old Jeb knocks twice on the ceiling, and the ceiling answers. | 1234 | ALL of 1234 | 90 | 2-4 each | stun (40%) | 2 |
+| **Oversized Pick**: A full-size miner's pick swung by a very small, very angry miner. It takes a moment to recover. | 123 | one of 123 | 80 | 7-10 | stun; stun | 2 |
 
 Notes: 
 
 ## Ruby Blackwing - Crane's Quartermaster  (Boss)
 
-`ruby_blackwing` | HP **40** | dodge 16 | prot 5 | speed 7 | acc +4 | crit 8% | dmg 3-6 | tags: outlaw, human
-Resists: stun 45, bleed 35, poison 35, move 60, debuff 40
+`ruby_blackwing` | HP **40** | dodge 16 | prot 0 | speed 7 | acc +4 | crit 8% | dmg 3-6 | tags: outlaw, human
+Resists: stun 30, bleed 50, poison 50, move 60, debuff 40
 Found in: The Crow's Nest
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Flight of Knives**: Three throwing knives from one sleeve. | 1234 | 2 random in 1234 | 88 | 2-4 x2 hits | bleed 1 x3 rounds (70%) | 3 |
-| **Call the Flock**: Ruby whistles and the treeline takes wing. | 1234 | self | - | - | summons Murder of Crows | 1 |
-| **Hired Gun**: A professional's shot. | 123 | one of 1234 | 90 | 3-6, +5% crit | - | 3 |
-| **Marked for the Crows**: A black feather pinned to your coat. The crows know you now. | 1234 | one of 1234 | 95 | - | mark 3 rounds; +6 fatigue | 1 |
+| **Fan of Knives**: Three throwing knives from one sleeve. | 1234 | 3 random in 1234 | 90 | 2-4 x3 hits, +2% crit | bleed 1 x3 rounds (70%) | 3 |
+| **Murder of Crows**: Silas whistles, and the sky goes black with wings. | 1234 | self | - | - | summons Murder of Crows | 2 |
+| **Dark Commune**: Ruby presses the crow feather to her lips and whispers. Something whispers back. | 1234 | self | - | - | heal_self_pct; buff; buff; buff | 1 |
 
 Notes: 
 
 ## Pale Crawler  (Regular)
 
-`pale_crawler` | HP **16** | dodge 8 | prot 10 | speed 3 | acc +0 | crit 5% | dmg 3-6 | tags: mythic, cave
+`pale_crawler` | HP **16** | dodge 8 | prot 0 | speed 1 | acc +0 | crit 5% | dmg 3-6 | tags: mythic, cave
 Resists: stun 35, bleed 30, poison 50, move 40, debuff 30
 Found in: Dry Gulch Mine, The Tallgrass Sea, The Red Canyons, The Thunder Peaks
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Pale Grasp**: Cold hands out of the dark. | 12 | one of 12 | 85 | 2-4 | stun (70%) | 2 |
-| **Blind Bite**: It doesn't need eyes. | 123 | one of 12 | 88 | 3-5 | poison 3 x3 rounds | 3 |
+| **Pale Grasp**: Cold hands out of the dark. | 12 | one of 123 | 95 | 2-4 | stun (90%) | 2 |
+| **Horrors from Beyond**: It opens its mouth, and the dark behind it opens too. | 1234 | ALL of 1234 | 85 | 1-2 each | +8-12 fatigue | 2 |
 
 Notes: 

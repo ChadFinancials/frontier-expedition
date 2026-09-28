@@ -155,7 +155,7 @@ func test_enemy_moves() -> void:
 	check(w2.buff_total("acc") == 5 and w2.buff_total("speed") == 1, "howl buffs the other wolf")
 	check(w1.buff_total("acc") == 0 and rifle.buff_total("acc") == 0, "howl skips itself and non-wolves")
 	e.use_skill(w1, "e_wolf_howl", e.heroes[0].id)
-	check(w2.buff_total("acc") == 5, "repeated howls refresh instead of stacking")
+	check(w2.buff_total("acc") == 10, "repeated howls stack")
 	# Rusty Shank always goes for the most wounded hero it can reach.
 	e.heroes[1].set_hp(1)
 	var picks := {}
@@ -177,6 +177,25 @@ func test_enemy_moves() -> void:
 	lone._reindex()
 	out = lone._ai_out_of_position(r2)
 	check(out.any(func(x): return x.t == "action" and x.skill == "e_fallback_swing"), "no usable rank: fallback swing")
+	# Silas opens with Crowstorm (three Murders of Crows), and never casts it again.
+	var sb := CombatEngine.new()
+	sb.setup(party, ["silas_crane"], {"rng": rng, "boss": true})
+	var silas: Combatant = sb.enemies[0]
+	sb._ai_turn(silas)
+	check(sb.enemies.size() == 4 and sb.enemies.slice(1).all(func(x): return x.enemy_id == "murder_of_crows"), "Crowstorm fills ranks 2-4 with crows")
+	sb.enemies = [silas]
+	sb._reindex()
+	check(not "e_crane_storm" in sb.usable_skills(silas), "Crowstorm is once per fight")
+	# The Oversized Pick stuns its own wielder; knocks weaken hits with a flat damage debuff.
+	var kb := CombatEngine.new()
+	kb.setup(party, ["tommyknocker"], {"rng": rng})
+	var tk: Combatant = kb.enemies[0]
+	kb.use_skill(tk, "e_knocker_pick", kb.heroes[0].id)
+	check(tk.stunned, "Oversized Pick stuns the tommyknocker")
+	var before := kb.dmg_preview(kb.heroes[0], "marshal_iron_justice", tk)
+	kb.heroes[0].buffs.append({"stat": "dmg_flat", "value": -2, "rounds": 2, "name": "test"})
+	var after := kb.dmg_preview(kb.heroes[0], "marshal_iron_justice", tk)
+	check(after[1] < before[1], "flat damage debuff lowers hits (%s -> %s)" % [str(before), str(after)])
 
 
 func test_deaths_door() -> void:

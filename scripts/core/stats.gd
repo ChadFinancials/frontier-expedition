@@ -8,7 +8,7 @@ extends RefCounted
 
 const STAT_NAMES := {
 	"max_hp_pct": "Max HP", "acc": "Accuracy", "dodge": "Dodge", "prot": "Protection",
-	"speed": "Speed", "crit": "Crit", "dmg_pct": "Damage", "stun_res": "Stun Resist",
+	"speed": "Speed", "crit": "Crit", "dmg_pct": "Damage", "dmg_flat": "Damage per hit", "stun_res": "Stun Resist",
 	"bleed_res": "Bleed Resist", "poison_res": "Poison Resist", "move_res": "Move Resist",
 	"debuff_res": "Debuff Resist", "deathblow": "Deathblow Resist", "fatigue_pct": "Fatigue Taken",
 	"heal_pct": "Healing Received", "resolve": "Second Wind Chance", "scout": "Scouting",
