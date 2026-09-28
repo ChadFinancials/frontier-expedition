@@ -20,6 +20,7 @@ var views: Dictionary = {}       # combatant id -> UnitView
 var hud_panel: PanelContainer
 var hero_info: VBoxContainer
 var skill_row: HBoxContainer
+var hint_label: RichTextLabel
 var action_row: HBoxContainer
 var log_label: RichTextLabel
 var order_label: RichTextLabel
@@ -107,6 +108,9 @@ func _build_hud() -> void:
 	var mid := UI.vb(8)
 	mid.custom_minimum_size.x = 960
 	h.add_child(mid)
+	hint_label = UI.rich("", 17, false, 950)
+	hint_label.custom_minimum_size = Vector2(950, 24)
+	mid.add_child(hint_label)
 	skill_row = UI.hb(8)
 	mid.add_child(skill_row)
 	action_row = UI.hb(8)
@@ -195,6 +199,7 @@ func _show_controls() -> void:
 	views[c.id].set_glow("active")
 	_update_order()
 	_fill_hero_info(c)
+	hint_label.text = "[b]%s's turn[/b]: pick a move below (hover it for details)." % c.display_name
 	UI.clear(skill_row)
 	var i := 0
 	for sid in c.skills:
@@ -236,11 +241,38 @@ func _skill_button(c: Combatant, sid: String, n: int) -> Control:
 	b.add_child(v)
 	var nl := UI.lbl("%d. %s" % [n, sk.get("name", sid)], 19, "Bold")
 	nl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	nl.custom_minimum_size.x = 180
+	nl.clip_text = true
 	v.add_child(nl)
+	var kind := UI.skill_kind(sid)
+	var icon := ResIcon.make(kind, 26)
+	icon.position = Vector2(192, 8)
+	b.add_child(icon)
+	# Gold frame shown while this move is the selected one.
+	var frame := Panel.new()
+	frame.name = "SelFrame"
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 0.85, 0.4, 0.12)
+	sb.border_color = Color("#f1d38a")
+	sb.set_border_width_all(4)
+	sb.set_corner_radius_all(6)
+	frame.add_theme_stylebox_override("panel", sb)
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	frame.visible = false
+	b.add_child(frame)
+	var tag := UI.lbl("SELECTED", 13, "Bold")
+	tag.name = "SelTag"
+	tag.add_theme_color_override("font_color", Color("#f1d38a"))
+	tag.position = Vector2(150, 60)
+	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tag.visible = false
+	b.add_child(tag)
 	var dots := RankDots.for_skill(sid)
 	v.add_child(dots)
 	var usable := not engine.valid_targets(c, sid).is_empty()
-	var tip := UI.skill_tooltip(sid, c.skill_level(sid))
+	var tip: String = UI.SKILL_KIND_TEXT.get(kind, "") + "\n" + UI.skill_tooltip(sid, c.skill_level(sid))
+	tip += "\n\nDots: gold = ranks you can use it from, red = enemy ranks it can reach."
 	if not engine.can_use_from_rank(c, sid):
 		tip += "\n[Can't use from rank %d]" % c.rank
 	elif not usable:
@@ -276,8 +308,12 @@ func _select_skill(sid: String) -> void:
 			v.set_glow("")
 	for b in skill_row.get_children():
 		var s: String = b.get_meta("sid", "")
-		if not b.disabled:
-			b.theme_type_variation = "Good" if s == sid else ""
+		if b.has_node("SelFrame"):
+			b.get_node("SelFrame").visible = s == sid
+			b.get_node("SelTag").visible = s == sid
+	var sk := DB.skill(sid)
+	var who := "a glowing [color=#e05a4a]enemy[/color]" if hostile else "a glowing [color=#7fb069]ally[/color]"
+	hint_label.text = "[b]%s[/b] is selected: click %s to use it, or pick another move." % [sk.get("name", sid), who]
 
 
 func _fill_hero_info(c: Combatant) -> void:
@@ -303,7 +339,12 @@ func _fill_hero_info(c: Combatant) -> void:
 	v.add_child(fb2)
 	var r := c.dmg_range()
 	var m := 1.0 + c.stat("dmg_pct") / 100.0
-	hero_info.add_child(UI.lbl("Dmg %d-%d  Crit %d%%  Dodge %d  Prot %d%%  Spd %d" % [int(r[0] * m), int(r[1] * m), int(c.stat("crit")), int(c.stat("dodge")), int(c.stat("prot")), int(c.stat("speed"))], 16))
+	hero_info.add_child(UI.stat_row([
+		["dmg", "%d-%d" % [int(r[0] * m), int(r[1] * m)], "Damage per hit, before the move's modifier"],
+		["crit", "%d%%" % int(c.stat("crit")), "Critical hit chance. Crits deal extra damage and lift the party's spirits."],
+		["dodge", str(int(c.stat("dodge"))), "Dodge: lowers the chance enemies hit this hero"],
+		["prot", "%d%%" % int(c.stat("prot")), "Protection: blocks this share of incoming damage"],
+		["speed", str(int(c.stat("speed"))), "Speed: acts earlier in the round"]]))
 	if h.fatigue_state != "":
 		var st: Dictionary = DB.fatigue_states[h.fatigue_state]
 		var l := UI.wrap(UI.lbl("%s: %s" % [st.name, st.desc], 15), 420)
@@ -322,6 +363,10 @@ func _fill_enemy_info(c: Combatant) -> void:
 	hpb.text_override = "HP %d/%d" % [c.hp, c.max_hp]
 	hero_info.add_child(hpb)
 	hero_info.add_child(UI.lbl(", ".join(c.tags).capitalize(), 16))
+	hero_info.add_child(UI.stat_row([
+		["dodge", str(int(c.stat("dodge"))), "Dodge"], ["prot", "%d%%" % int(c.stat("prot")), "Protection"],
+		["speed", str(int(c.stat("speed"))), "Speed"]]))
+	hint_label.text = "[color=#e05a4a]Enemy turn[/color]: watch the arrow to see who they're targeting."
 	skill_row.add_child(UI.lbl("Enemy turn...", 22, "Bold"))
 
 
@@ -329,6 +374,7 @@ func _hide_controls() -> void:
 	awaiting = false
 	selected_skill = ""
 	preview.visible = false
+	hint_label.text = ""
 	UI.clear(skill_row)
 	UI.clear(action_row)
 	for id in views:
@@ -568,7 +614,7 @@ func _play_one(e: Dictionary) -> void:
 			_log("[i]%s[/i]" % e.text)
 			Main.inst.toast(e.text, "purple")
 			await _wait(0.9)
-		"end":
+		"end", "scripted":
 			pass
 		_:
 			_result(e)
@@ -913,6 +959,9 @@ func _banner_skill(text: String, hero: bool, sub: String = "") -> void:
 func _finish() -> void:
 	var state := engine.state
 	var res: Dictionary = run.after_combat(engine, kind, params.get("reward", {}))
+	if state == "scripted":
+		await _scripted_cutscene(engine.story_script)
+		return
 	if params.get("complete_node", false):
 		run.complete_current()
 	Game.save_game()
@@ -956,6 +1005,47 @@ func _finish() -> void:
 	if lines.is_empty():
 		lines.append("The dust settles.")
 	Main.inst.dialog(title, "\n".join(lines), [["Continue", func(): Main.inst.goto(ret)]])
+
+
+## A boss's scripted exit: gunfire in the air, an explosion, and the gang slips away.
+func _scripted_cutscene(sc: Dictionary) -> void:
+	Game.save_game()
+	skill_row.get_parent().visible = false
+	var boss: Combatant = null
+	for c in engine.enemies:
+		if c.data.get("id", "") == sc.get("unit", ""):
+			boss = c
+	if boss != null:
+		views[boss.id].figure.set_pose("attack")
+	for i in 2:
+		Audio.play("gunshot")
+		await _wait(0.35)
+	Audio.play("laugh")
+	await _wait(0.6)
+	Audio.play("explosion")
+	var flash := ColorRect.new()
+	flash.color = Color(1, 0.85, 0.5, 0.0)
+	flash.size = Vector2(1920, 1080)
+	flash.z_index = 45
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(flash)
+	var tw := create_tween()
+	tw.tween_property(flash, "color:a", 0.85, 0.12)
+	tw.tween_property(flash, "color:a", 0.0, 0.9)
+	for c in engine.enemies:
+		for k in 3:
+			_burst(c, Color("#8a8178"), true)
+	var tw2 := create_tween().set_parallel(true)
+	for c in engine.enemies:
+		var v: UnitView = views[c.id]
+		tw2.tween_property(v, "position:x", v.position.x + 520, 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw2.tween_property(v, "modulate:a", 0.0, 1.4)
+	await tw2.finished
+	await _banner(sc.get("title", ""), 1.2)
+	Main.inst.dialog(sc.get("title", ""), sc.get("text", ""), [["Head Home", func():
+		var summary := Game.company.finish_run("driven_back")
+		Game.save_game()
+		Main.inst.goto("results", {"summary": summary}), "Good"]])
 
 
 class _Spark extends Node2D:

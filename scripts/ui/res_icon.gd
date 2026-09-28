@@ -1,6 +1,7 @@
 class_name ResIcon
 extends Control
-## Tiny drawn icons for resources: money, timber, iron, charter, food, week, wagon, xp.
+## Tiny drawn icons for resources (money, timber, iron...), move types (melee, ranged, heal,
+## buff, debuff) and combat stats (dmg, crit, dodge, prot, speed, acc).
 
 var kind: String = "money"
 
@@ -56,6 +57,41 @@ func _draw() -> void:
 			draw_colored_polygon(PackedVector2Array(Figure.ellipse(c, s * 0.45, s * 0.26, 16)), Color("#efe3c8"))
 			draw_circle(c, s * 0.18, Color("#3f6f96"))
 			draw_circle(c, s * 0.08, Color("#1a1210"))
+		"melee":
+			# A knife blade with a wrapped grip.
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.18, s * 0.82), Vector2(s * 0.72, s * 0.14), Vector2(s * 0.84, s * 0.18), Vector2(s * 0.34, s * 0.84)]), Color("#d8dde2"))
+			draw_line(Vector2(s * 0.1, s * 0.62), Vector2(s * 0.42, s * 0.92), Color("#e0bd4f"), s * 0.1)
+			draw_line(Vector2(s * 0.06, s * 0.96), Vector2(s * 0.22, s * 0.78), Color("#6b4a2e"), s * 0.14)
+		"ranged":
+			# Crosshairs.
+			draw_arc(c, s * 0.34, 0, TAU, 20, Color("#e8dcc0"), s * 0.09)
+			for d in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
+				draw_line(c + d * s * 0.14, c + d * s * 0.48, Color("#e8dcc0"), s * 0.08)
+			draw_circle(c, s * 0.07, Color("#e05a4a"))
+		"heal":
+			draw_circle(c, s * 0.44, Color("#f3e9d2"))
+			draw_rect(Rect2(s * 0.4, s * 0.18, s * 0.2, s * 0.64), Color("#c0392b"))
+			draw_rect(Rect2(s * 0.18, s * 0.4, s * 0.64, s * 0.2), Color("#c0392b"))
+		"buff":
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.5, s * 0.08), Vector2(s * 0.9, s * 0.52), Vector2(s * 0.64, s * 0.52), Vector2(s * 0.64, s * 0.92), Vector2(s * 0.36, s * 0.92), Vector2(s * 0.36, s * 0.52), Vector2(s * 0.1, s * 0.52)]), Color("#7fb069"))
+		"debuff":
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.5, s * 0.92), Vector2(s * 0.9, s * 0.48), Vector2(s * 0.64, s * 0.48), Vector2(s * 0.64, s * 0.08), Vector2(s * 0.36, s * 0.08), Vector2(s * 0.36, s * 0.48), Vector2(s * 0.1, s * 0.48)]), Color("#b07cc6"))
+		"dmg":
+			draw_colored_polygon(PackedVector2Array(Figure.star_pts(c, s * 0.46, s * 0.22, 7)), Color("#e05a4a"))
+		"crit":
+			draw_colored_polygon(PackedVector2Array(Figure.star_pts(c, s * 0.48, s * 0.16, 4)), Color("#f1d38a"))
+		"dodge":
+			for i in 3:
+				draw_arc(Vector2(s * (0.62 - i * 0.14), s * 0.5), s * 0.3, -PI * 0.45, PI * 0.45, 8, Color("#9ecbe8", 1.0 - i * 0.28), s * 0.08)
+		"prot":
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.5, s * 0.06), Vector2(s * 0.88, s * 0.2), Vector2(s * 0.82, s * 0.6), Vector2(s * 0.5, s * 0.94), Vector2(s * 0.18, s * 0.6), Vector2(s * 0.12, s * 0.2)]), Color("#8c9096"))
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.5, s * 0.18), Vector2(s * 0.76, s * 0.28), Vector2(s * 0.7, s * 0.58), Vector2(s * 0.5, s * 0.8)]), Color("#c5cad0"))
+		"speed":
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.6, s * 0.04), Vector2(s * 0.2, s * 0.56), Vector2(s * 0.46, s * 0.56), Vector2(s * 0.36, s * 0.96), Vector2(s * 0.8, s * 0.42), Vector2(s * 0.54, s * 0.42)]), Color("#e0bd4f"))
+		"acc":
+			draw_arc(c, s * 0.4, 0, TAU, 20, Color("#e8dcc0"), s * 0.08)
+			draw_arc(c, s * 0.22, 0, TAU, 16, Color("#e05a4a"), s * 0.08)
+			draw_circle(c, s * 0.07, Color("#e8dcc0"))
 		"skull":
 			draw_circle(Vector2(s * 0.5, s * 0.42), s * 0.3, Color("#e9e2cf"))
 			draw_rect(Rect2(s * 0.34, s * 0.6, s * 0.32, s * 0.2), Color("#e9e2cf"))

@@ -39,6 +39,11 @@
     "look": {"body": "human", "build": "broad", "hat": "stetson_black", "coat": "long", "weapon": "pistols", "extra": "mustache", "scale": 1.15,
       "colors": {"coat": "#1f1a1d", "pants": "#26211f", "hat": "#0f0d0c", "accent": "#b8322a"}}},
 
+  "mad_dog_mulligan": {"name": "\"Mad Dog\" Mulligan", "title": "Crane's Enforcer", "tags": ["outlaw", "human"], "hp": 40, "dodge": 5, "prot": 10, "speed": 4, "acc": 4, "crit": 6, "dmg": [4, 7],
+    "res": {"stun": 50, "bleed": 30, "poison": 30, "move": 60, "debuff": 35}, "skills": ["e_mull_haymaker", "e_mull_bottle", "e_mull_whistle"], "boss": true,
+    "look": {"body": "human", "build": "heavy", "hat": "flat_cap", "coat": "shirt", "weapon": "fists", "beard": true, "extra": "mustache", "scale": 1.18,
+      "colors": {"coat": "#8b2e2e", "pants": "#2f2a26", "hat": "#1e1916", "accent": "#e0bd4f"}}},
+
   "claim_jumper": {"name": "Claim Jumper", "tags": ["outlaw", "human"], "hp": 16, "dodge": 6, "prot": 5, "speed": 3, "acc": 0, "crit": 5, "dmg": [3, 6],
     "res": {"stun": 25, "bleed": 25, "poison": 30, "move": 30, "debuff": 25}, "skills": ["e_cj_pick", "e_cj_dirt"],
     "look": {"body": "human", "build": "normal", "hat": "slouch", "coat": "shirt", "weapon": "pickaxe", "beard": true, "colors": {"coat": "#8c5a3c", "pants": "#4a4a55", "hat": "#5e4a36", "accent": "#6b2e2e"}}},

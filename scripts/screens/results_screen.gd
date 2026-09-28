@@ -21,7 +21,7 @@ func setup(params: Dictionary) -> void:
 	var v := UI.vb(12)
 	p.add_child(v)
 	var status: String = s.get("status", "abandoned")
-	var title: String = {"victory": "Expedition Complete!", "abandoned": "The Company Returns", "defeat": "Lost on the Trail"}.get(status, "")
+	var title: String = {"victory": "Expedition Complete!", "abandoned": "The Company Returns", "defeat": "Lost on the Trail", "driven_back": "Driven Back"}.get(status, "")
 	var th := UI.hdr(title, 48, true)
 	th.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(th)
@@ -30,6 +30,10 @@ func setup(params: Dictionary) -> void:
 	v.add_child(sub)
 	if status == "defeat":
 		v.add_child(UI.rich("[center]No one from this party made it home. Whatever they found is lost with them.[/center]", 22, true, 1360))
+	elif status == "driven_back":
+		v.add_child(UI.rich("[center]Silas Crane got away across the Redwater, but he's wounded and the company keeps everything it found. Grow stronger and ride back to finish it.[/center]", 21, true, 1360))
+	if str(s.get("story", "")) != "":
+		v.add_child(UI.rich("[center][color=#3f6128]%s[/color][/center]" % s.story, 21, true, 1360))
 	# Loot.
 	var loot: Dictionary = s.get("loot", {})
 	var lr := UI.hb(30)
@@ -95,7 +99,10 @@ func setup(params: Dictionary) -> void:
 		row2.add_child(fb)
 		if why != "":
 			row2.add_child(UI.lbl("(%s. You can found it later from the settlement screen.)" % why, 17, "Ink"))
-	row2.add_child(UI.btn("Return to %s" % co.settlement_name(origin), func(): Main.inst.goto("settlement", {"index": origin}), "Big"))
+	var home_params := {"index": origin}
+	if s.get("tutorial", false):
+		home_params["intro"] = "home"
+	row2.add_child(UI.btn("%s %s" % ["Ride into" if s.get("tutorial", false) else "Return to", co.settlement_name(origin)], func(): Main.inst.goto("settlement", home_params), "Big"))
 	Audio.play_music("music_town")
 	if status == "victory" and s.get("boss_won", false) and s.get("region", "") == "thunder_peaks" and not co.victory_seen:
 		co.victory_seen = true

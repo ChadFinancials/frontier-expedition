@@ -32,6 +32,9 @@ func _build() -> void:
 		_empty_plot(v)
 		return
 	var co: Company = Game.company
+	if co.is_ruin(index, bid):
+		_ruin(v)
+		return
 	var b: Dictionary = DB.buildings[bid]
 	var lvl := co.building_level(index, bid)
 	var head := UI.hb(12)
@@ -332,6 +335,33 @@ func _upgrade_footer(v: VBoxContainer) -> void:
 		row.add_child(UI.lbl(why, 17, "Ink"))
 
 
+func _ruin(v: VBoxContainer) -> void:
+	var co: Company = Game.company
+	var b: Dictionary = DB.buildings[bid]
+	var head := UI.hb(12)
+	v.add_child(head)
+	head.add_child(UI.hdr("Burned %s" % b.name, 34, true))
+	head.add_child(UI.spacer(0, 0, true))
+	head.add_child(UI.btn("Close", func(): Main.inst.close_modal(wrap), "Small"))
+	v.add_child(UI.wrap(UI.lbl("Silas Crane's gang put this to the torch. The foundations are sound, so rebuilding costs half the usual price.", 19, "Ink"), 1180))
+	v.add_child(UI.wrap(UI.lbl("Once rebuilt: " + b.desc, 19, "InkBold"), 1180))
+	v.add_child(UI.spacer(0, 20))
+	var row := UI.hb(12)
+	v.add_child(row)
+	var why := co.can_build(index, bid)
+	row.add_child(UI.lbl("Rebuild: %s" % Company.cost_text(co.building_cost(index, bid)), 21, "InkBold"))
+	var btn := UI.btn("Rebuild", func():
+		if co.build(index, bid):
+			Audio.play("hammer")
+			Main.inst.toast("%s rebuilt!" % b.name, "good")
+			_changed(), "Good")
+	btn.disabled = why != ""
+	btn.tooltip_text = why
+	row.add_child(btn)
+	if why != "":
+		row.add_child(UI.lbl(why, 17, "Ink"))
+
+
 func _empty_plot(v: VBoxContainer) -> void:
 	var co: Company = Game.company
 	var head := UI.hb(12)
@@ -344,7 +374,7 @@ func _empty_plot(v: VBoxContainer) -> void:
 	var ids: Array = DB.buildings.keys()
 	ids.sort_custom(func(a, b): return DB.buildings[a].get("order", 0) < DB.buildings[b].get("order", 0))
 	for id in ids:
-		if st.buildings.has(id):
+		if st.buildings.has(id) or co.is_ruin(index, id):
 			continue
 		var row := UI.hb(12)
 		var nl := UI.lbl(DB.buildings[id].name, 21, "InkBold")

@@ -19,6 +19,8 @@ Read `docs/DESIGN_BRIEF.md` (creative direction agreed with the owner) before ch
 
 - `var x := <expression involving a Variant>` is a *parse error*. Loop variables over
   untyped arrays and dictionary values are Variants. Use an explicit type: `var x: int = ...`.
+- Don't name a member `script`, `name` or other `Object`/`Node` properties: `script` is
+  a parse error ("Member redefined").
 - Lambdas capture locals **by value**. To reference something assigned later (for example a
   modal wrapper, or a recursive lambda), capture a dictionary holder: `var holder := {"wrap": null}`.
 
@@ -29,6 +31,8 @@ tools/check.sh                                          # compile all scripts
 $GODOT --headless --path . res://tests/test_runner.tscn # rules/data tests
 $GODOT --headless --path . -- shot=autoplay expeditions=3   # UI smoke test
 tools/shot.sh <scene> /tmp/x.png                        # look at it (xvfb)
+# scenes: menu settlement embark trail combat camp cave event curio results hero building
+#         tutorial silas lineup  (see scripts/debug/shots.gd)
 ```
 In the cloud dev container: `GODOT=/home/user/tools/godot/Godot_v4.7.2-stable_linux.x86_64`.
 

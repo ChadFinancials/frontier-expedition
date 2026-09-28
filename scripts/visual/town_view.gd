@@ -14,13 +14,13 @@ var street_y := 700.0
 var _t := 0.0
 
 
-func set_buildings(buildings: Dictionary, slots: int) -> void:
+func set_buildings(buildings: Dictionary, slots: int, ruins: Array = []) -> void:
 	plots.clear()
-	var ids: Array = buildings.keys()
+	var ids: Array = buildings.keys() + ruins.filter(func(r): return not buildings.has(r))
 	ids.sort_custom(func(a, b): return DB.buildings[a].get("order", 0) < DB.buildings[b].get("order", 0))
-	for i in slots:
+	for i in maxi(slots, ids.size()):
 		var bid: String = ids[i] if i < ids.size() else ""
-		plots.append({"id": bid, "level": int(buildings.get(bid, 0)) if bid != "" else 0})
+		plots.append({"id": bid, "level": int(buildings.get(bid, 0)) if bid != "" else 0, "ruin": bid != "" and not buildings.has(bid)})
 	_layout()
 	queue_redraw()
 
@@ -60,7 +60,12 @@ func _gui_input(event: InputEvent) -> void:
 			var tip := ""
 			if h >= 0:
 				var bid: String = plots[h].id
-				tip = "Empty plot: click to build" if bid == "" else "%s (level %d)\n%s" % [DB.buildings[bid].name, plots[h].level, DB.buildings[bid].desc]
+				if bid == "":
+					tip = "Empty plot: click to build"
+				elif plots[h].ruin:
+					tip = "Burned %s: click to rebuild at a discount" % DB.buildings[bid].name
+				else:
+					tip = "%s (level %d)\n%s" % [DB.buildings[bid].name, plots[h].level, DB.buildings[bid].desc]
 			tooltip_text = tip
 			mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if h >= 0 else Control.CURSOR_ARROW
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -128,6 +133,8 @@ func _draw() -> void:
 		var bid: String = pl.id
 		if bid == "":
 			_draw_empty(base)
+		elif pl.get("ruin", false):
+			_draw_ruin(base, DB.buildings[bid].name, i)
 		else:
 			_draw_building(DB.buildings[bid].get("art", "store"), base, int(pl.level), DB.buildings[bid].name)
 		if i == hover:
@@ -140,6 +147,27 @@ func _draw_empty(b: Vector2) -> void:
 	draw_line(b + Vector2(-70, -34), b + Vector2(70, -34), Color("#c8a46a"), 3)
 	_sign(b + Vector2(0, -90), "Empty Plot", 150, Color("#5e3f27"))
 	draw_string(UI.font_bold, b + Vector2(-46, -50), "+ Build", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color("#f3e9d2"))
+
+
+## A burned-out building: charred posts, a fallen beam, a heap of ash and a thread of smoke.
+func _draw_ruin(b: Vector2, bname: String, seed_i: int) -> void:
+	var char_c := Color("#2b2320")
+	_poly([b + Vector2(-95, 0), b + Vector2(-60, -22), b + Vector2(10, -30), b + Vector2(80, -18), b + Vector2(100, 0)], Color("#3d3530"))
+	_rect(Rect2(b + Vector2(-86, -150), Vector2(14, 150)), char_c)
+	_poly([b + Vector2(-20, 0), b + Vector2(-18, -118), b + Vector2(-6, -104), b + Vector2(-4, 0)], char_c)
+	_rect(Rect2(b + Vector2(66, -96), Vector2(14, 96)), char_c)
+	_poly([b + Vector2(-92, -148), b + Vector2(-78, -160), b + Vector2(76, -70), b + Vector2(66, -58)], Color("#3a2c24"))
+	for k in 5:
+		var e := b + Vector2(-60 + k * 28, -12 - (k % 2) * 6)
+		var glow := 0.5 + 0.5 * sin(_t * 2.0 + k * 1.7 + seed_i)
+		draw_circle(e, 4, Color(0.95, 0.45, 0.15, 0.35 + glow * 0.4))
+	for k in 4:
+		var ph := fmod(_t * 0.35 + k * 0.25 + seed_i * 0.13, 1.0)
+		var p := b + Vector2(-10 + sin(ph * 6.0 + k) * 16, -60 - ph * 150)
+		draw_circle(p, 10 + ph * 22, Color(0.45, 0.42, 0.4, 0.35 * (1.0 - ph)))
+	_sign(b + Vector2(0, -190), "Burned " + bname, 200, Color("#4a3a32"))
+	draw_rect(Rect2(b + Vector2(-58, -64), Vector2(116, 34)), Color(0.12, 0.08, 0.06, 0.85))
+	draw_string(UI.font_bold, b + Vector2(-44, -40), "Rebuild", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color("#f1d38a"))
 
 
 func _draw_building(art: String, b: Vector2, level: int, bname: String) -> void:

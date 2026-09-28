@@ -20,6 +20,7 @@ var recruits: Array = []         # hero dicts that join at the end
 var log: Array = []
 var status: String = "active"    # active, victory, defeat, abandoned
 var boss_won: bool = false
+var driven_back: bool = false    # a boss's scripted first meeting sent the company home
 var cave: Dictionary = {}        # {node, room, light} while inside a cave
 var camp: Dictionary = {}        # camp phase state
 var pending_fight: Dictionary = {} # fight queued by an event/curio/ambush
@@ -42,7 +43,10 @@ static func create(c: Company, region: String, origin_index: int, party_uids: Ar
 	for h in r.party_heroes():
 		h.deaths_door = false
 		h.shaken = false
-	r.log.append("The company sets out from %s into %s." % [c.settlement_name(origin_index), r.region().name])
+	if r.region().get("tutorial", false):
+		r.log.append("The company rides %s toward %s." % [r.region().name, c.settlement_name(origin_index)])
+	else:
+		r.log.append("The company sets out from %s into %s." % [c.settlement_name(origin_index), r.region().name])
 	return r
 
 
@@ -276,7 +280,7 @@ func travel_to(id: int) -> Array:
 		else:
 			log.append("Rough trail: the wagon takes %d wear." % wear)
 	# Mishaps on the road.
-	if company.rng.randf() * 100.0 < DB.cfg("mishap_chance", 15):
+	if not region().get("tutorial", false) and company.rng.randf() * 100.0 < DB.cfg("mishap_chance", 15):
 		msgs.append_array(_mishap())
 	msgs.append_array(look_ahead())
 	add_log(msgs)
@@ -349,8 +353,25 @@ func combat_options(kind: String, forced_surprise: String = "") -> Dictionary:
 	var surprise := forced_surprise
 	if surprise == "" and kind != "boss" and kind != "crossing":
 		surprise = surprise_roll()
-	return {"rng": company.rng, "in_cave": in_cave(), "light": int(cave.get("light", 100)), "tier": tier(),
+	var opts := {"rng": company.rng, "in_cave": in_cave(), "light": int(cave.get("light", 100)), "tier": tier(),
 		"boss": kind == "boss", "surprise": surprise, "start_buffs": buffs}
+	# A boss's scripted first meeting, and the wound it carries into the next one.
+	var script: Dictionary = region().get("boss", {}).get("first_script", {})
+	if kind == "boss" and not script.is_empty() and not region_id in company.beaten:
+		if company.story_flags.has(script.id):
+			opts["wounded"] = {script.unit: int(script.get("wound_pct", 100))}
+		else:
+			opts["script"] = script
+	return opts
+
+
+## The boss intro text, which changes after a scripted first meeting.
+func boss_intro() -> String:
+	var b: Dictionary = region().get("boss", {})
+	var script: Dictionary = b.get("first_script", {})
+	if not script.is_empty() and company.story_flags.has(script.id) and b.has("intro_again"):
+		return b.intro_again
+	return b.get("intro", "")
 
 
 ## Called when a fight ends (any result). Updates party order, deaths, loot and XP.
@@ -376,6 +397,11 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		cave.light = engine.light
 	kills += engine.killed.size()
 	company.stats.kills += engine.killed.size()
+	if engine.state == "scripted":
+		company.story_flags[engine.story_script.id] = true
+		driven_back = true
+		xp += int(DB.cfg("xp_boss", 6) / 2.0)
+		return res
 	if engine.state != "victory":
 		return res
 	# Loot.
@@ -398,9 +424,12 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 			res.charters = 1
 	if kind == "boss":
 		xp += DB.cfg("xp_boss", 6)
-		money += DB.cfg("boss_money", 400) * tier()
+		var br: Dictionary = region().get("boss_rewards", {})
+		money += int(br.get("money", DB.cfg("boss_money", 400) * tier()))
 		var first := not region_id in company.beaten
-		res.charters = 2 if first else 1
+		res.charters = int(br.get("charters", 2 if first else 1))
+		res.timber += int(br.get("timber", 0))
+		res.iron += int(br.get("iron", 0))
 		var bk: String = region().get("boss", {}).get("keepsake", "")
 		res.keepsakes.append(bk if first and bk != "" else company.random_keepsake(["rare", "uncommon"]))
 		boss_won = true
@@ -779,7 +808,7 @@ func trade_buy(item_id: String) -> bool:
 # --- Save / load ----------------------------------------------------------------------
 
 const FIELDS := ["region_id", "origin", "party", "nodes", "current", "day", "supplies", "wagon", "loot",
-	"xp", "kills", "pending_buffs", "recruits", "log", "status", "boss_won", "cave", "camp", "pending_fight"]
+	"xp", "kills", "pending_buffs", "recruits", "log", "status", "boss_won", "driven_back", "cave", "camp", "pending_fight"]
 
 
 func to_dict() -> Dictionary:

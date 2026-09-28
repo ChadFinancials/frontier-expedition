@@ -39,6 +39,8 @@ func _ready() -> void:
 	test_settlement_services()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
+	print("> test_tutorial_and_story()")
+	test_tutorial_and_story()
 	test_campaign(int(args.get("sim", "12")), int(args.get("seed", "7")))
 	print("\n=== %d passed, %d failed (%.1fs) ===" % [passes, failures.size(), (Time.get_ticks_msec() - t0) / 1000.0])
 	for f in failures:
@@ -211,7 +213,7 @@ func test_map_gen() -> void:
 			var last: Dictionary = nodes[nodes.size() - 1]
 			check(last.type in ["boss", "crossing"], "%s map ends at boss/crossing" % rid)
 			for n in nodes:
-				if n.col < MapGen.COLUMNS - 1:
+				if n.col < MapGen.column_count(nodes) - 1:
 					check(not n.next.is_empty(), "%s node %d has an exit" % [rid, n.id])
 				if n.type in ["fight", "elite", "boss", "crossing"]:
 					check(not n.data.enemies.is_empty(), "%s fight node has enemies" % rid)
@@ -249,6 +251,11 @@ func test_settlement_services() -> void:
 	var co := Company.new()
 	co.new_game(5)
 	check(co.settlements.size() == 1 and co.heroes.size() == 6, "new game setup")
+	check(co.can_do_activity(0, "saloon", "bar", co.heroes[0]) != "", "saloon is a ruin until the tutorial")
+	co.complete_tutorial()
+	co.money += 3000
+	co.timber += 60
+	co.iron += 40
 	check(co.settlement(0).recruits.size() == 3, "hiring board offers recruits")
 	var h: Hero = co.heroes[0]
 	h.fatigue = 80
@@ -258,7 +265,10 @@ func test_settlement_services() -> void:
 	check(co.can_do_activity(0, "chapel", "prayer", co.heroes[1]) != "", "no chapel at start")
 	check(co.can_build(0, "chapel") == "", "can build chapel in free slot")
 	check(co.build(0, "chapel"), "build chapel")
-	check(co.can_build(0, "doctor") != "", "town is full after 6 buildings")
+	check(co.build(0, "smithy") and not co.is_ruin(0, "smithy"), "rebuild the burned smithy")
+	check(co.build(0, "doctor"), "build doctor in the last free plot")
+	check(co.can_build(0, "drill_hall") != "", "town is full after 6 plots")
+	check(co.can_build(0, "general_store") == "", "a ruin can still be rebuilt when the town is full")
 	co.advance_week()
 	check(h.available(), "hero free after a week")
 	var hired := co.hire(0, 0)
@@ -284,9 +294,56 @@ func test_settlement_services() -> void:
 	check(co.upgrade_gear(0, g, "weapon") and g.weapon_tier == 2, "upgrade weapon at level 2")
 
 
+func test_tutorial_and_story() -> void:
+	var co := Company.new()
+	co.new_game(21)
+	check(co.tutorial_pending(0) and co.expedition_region(0) == "old_mill_road", "new game starts with the tutorial")
+	check(co.is_ruin(0, "saloon") and co.building_level(0, "saloon") == 0, "Fort Providence starts burned")
+	var full: Dictionary = DB.buildings.smithy.costs[0]
+	check(int(co.building_cost(0, "smithy").money) == int(ceil(int(full.money) / 2.0)), "ruins rebuild at half price")
+	var money0 := co.money
+	var r := co.start_tutorial()
+	check(r != null and r.party.size() == 4 and co.money == money0, "tutorial sets out free with four heroes")
+	check(MapGen.column_count(r.nodes) == 5 and r.nodes.size() == 6, "tutorial map: start, 3 stops, boss")
+	check(r.choices() == [1] and r.node(1).type == "fight", "tutorial opens with a fight")
+	check(r.nodes.all(func(n): return MapGen.intel(n) == 3), "tutorial map fully scouted")
+	check(r.node(r.nodes.size() - 1).type == "boss" and "mad_dog_mulligan" in r.node(r.nodes.size() - 1).data.enemies, "tutorial ends at Mulligan")
+	r.boss_won = true
+	var sm := co.finish_run("victory")
+	check(co.tutorial_done and co.building_level(0, "saloon") == 1 and not co.is_ruin(0, "saloon"), "winning the tutorial rebuilds the saloon")
+	check(sm.get("tutorial", false) and str(sm.story) != "", "tutorial summary tells the story")
+	check(co.expedition_region(0) == "tallgrass", "then the real trail opens")
+	# Silas Crane's first meeting ends on a script.
+	var bot := Bot.new(5)
+	var party: Array = []
+	for cid in ["marshal", "gunslinger", "preacher", "sharpshooter"]:
+		party.append(co.make_hero(cid, 2))
+	var sc: Dictionary = DB.regions.tallgrass.boss.first_script
+	var e := bot.fight(party, DB.regions.tallgrass.boss.enemies, {"rng": co.rng, "tier": 1, "boss": true, "script": sc})
+	check(e.state == "scripted" and e.round_num <= int(sc.round), "Silas's first fight ends in his gambit (%s, round %d)" % [e.state, e.round_num])
+	var uids: Array = []
+	for h in co.heroes_at(0).slice(0, 4):
+		h.hp = h.max_hp()
+		uids.append(h.uid)
+	co.start_run(0, uids, {"food": 10})
+	check(co.run.combat_options("boss").has("script"), "first Silas fight carries the script")
+	co.story_flags[sc.id] = true
+	var opts := co.run.combat_options("boss")
+	check(not opts.has("script") and int(opts.wounded.silas_crane) == int(sc.wound_pct), "second meeting: Silas is wounded")
+	check(co.run.boss_intro() == DB.regions.tallgrass.boss.intro_again, "second meeting has its own intro")
+	var e2 := CombatEngine.new()
+	e2.setup(party, DB.regions.tallgrass.boss.enemies, opts)
+	var silas: Combatant = e2.enemies.filter(func(x): return x.data.id == "silas_crane")[0]
+	check(silas.hp < silas.max_hp, "wounded Silas starts below full health")
+	var txt := JSON.stringify(co.to_dict())
+	var co2 := Company.from_dict(DB.normalize(JSON.parse_string(txt)))
+	check(co2.tutorial_done and co2.story_flags.has(sc.id), "tutorial and story flags survive save/load")
+
+
 func test_save_roundtrip() -> void:
 	var co := Company.new()
 	co.new_game(77)
+	co.complete_tutorial()
 	var uids := []
 	for h in co.heroes.slice(0, 4):
 		uids.append(h.uid)

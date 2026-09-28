@@ -85,6 +85,9 @@ func setup(_params: Dictionary) -> void:
 	bh.add_child(log_label)
 	refresh()
 	Audio.play_music("music_trail")
+	if _has_story(run.current_node()):
+		call_deferred("_show_story", run.current_node(), Callable())
+		return
 	if run.day == 1 and run.current == 0:
 		Main.inst.toast("Click a glowing stop on the map to travel west. Hover a stop to see what's there.")
 	# Arrived somewhere that hasn't been dealt with yet (e.g. after loading a save).
@@ -226,16 +229,32 @@ func _travel(id: int, confirmed: bool = false) -> void:
 	_resolve_node()
 
 
+func _has_story(n: Dictionary) -> bool:
+	return n.get("data", {}).has("story") and not n.data.get("story_seen", false)
+
+
+## Story text for a hand-authored stop (the tutorial), shown once on arrival.
+func _show_story(n: Dictionary, then: Callable) -> void:
+	Main.inst.dialog(n.data.get("title", MapGen.TYPE_NAMES.get(n.type, "")), n.data.story, [["Continue", func():
+		n.data["story_seen"] = true
+		Game.save_game()
+		if then.is_valid():
+			then.call(), "Good"]])
+
+
 func _resolve_node() -> void:
 	var n := run.current_node()
 	if n.done:
+		return
+	if _has_story(n):
+		_show_story(n, _resolve_node)
 		return
 	match n.type:
 		"fight", "elite":
 			_to_combat(n.data.enemies, n.type)
 		"boss":
 			var b: Dictionary = run.region().boss
-			Main.inst.dialog(b.name, b.intro, [["Fight!", func(): _to_combat(n.data.enemies, "boss"), "Danger"],
+			Main.inst.dialog(b.name, run.boss_intro(), [["Fight!", func(): _to_combat(n.data.enemies, "boss"), "Danger"],
 				["Turn Back", func():
 					var summary := Game.company.finish_run("abandoned")
 					Game.save_game()
@@ -277,7 +296,7 @@ func _check_end() -> void:
 		Main.inst.goto("results", {"summary": summary})
 		return
 	if run.is_final_node() and run.current_node().done:
-		var summary2 := Game.company.finish_run("victory" if run.boss_won else "abandoned")
+		var summary2 := Game.company.finish_run("victory" if run.boss_won else ("driven_back" if run.driven_back else "abandoned"))
 		Game.save_game()
 		Main.inst.goto("results", {"summary": summary2})
 

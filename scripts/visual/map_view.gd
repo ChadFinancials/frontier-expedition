@@ -18,7 +18,7 @@ func _process(delta: float) -> void:
 
 
 func node_pos(n: Dictionary) -> Vector2:
-	var cols := MapGen.COLUMNS
+	var cols := MapGen.column_count(run.nodes) if run != null else MapGen.COLUMNS
 	var x := 90.0 + float(n.col) * (size.x - 180.0) / float(cols - 1)
 	var y := 40.0 + float(n.y) * (size.y - 80.0)
 	return Vector2(x, y)

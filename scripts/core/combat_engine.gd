@@ -16,7 +16,7 @@ var units: Dictionary = {}
 var round_num: int = 0
 var queue: Array = []
 var current: Combatant = null
-var state: String = "running"   # running, await, victory, defeat, fled
+var state: String = "running"   # running, await, victory, defeat, fled, scripted
 var in_cave: bool = false
 var light: int = 100
 var tier: int = 1
@@ -24,6 +24,7 @@ var boss_fight: bool = false
 var surprise: String = ""       # "" / "heroes" (heroes were surprised) / "enemies"
 var killed: Array = []          # enemy data ids slain
 var fallen: Array = []          # hero uids who died
+var story_script: Dictionary = {}     # scripted ending (a boss's first meeting); see _check_script
 var _next_id: int = 1
 
 
@@ -34,6 +35,8 @@ func setup(party: Array, enemy_ids: Array, opts: Dictionary = {}) -> Array:
 	tier = opts.get("tier", 1)
 	boss_fight = opts.get("boss", false)
 	surprise = opts.get("surprise", "")
+	story_script = opts.get("script", {})
+	var wounded: Dictionary = opts.get("wounded", {})
 	var ev: Array = []
 	for h in party:
 		if h.alive and heroes.size() < 4:
@@ -43,6 +46,8 @@ func setup(party: Array, enemy_ids: Array, opts: Dictionary = {}) -> Array:
 	for eid in enemy_ids:
 		if enemies.size() < 4 and DB.enemies.has(eid):
 			var c := Combatant.from_enemy(eid, _new_id(), tier, in_cave)
+			if wounded.has(eid):
+				c.hp = maxi(1, int(round(c.max_hp * int(wounded[eid]) / 100.0)))
 			enemies.append(c)
 			units[c.id] = c
 	# Buffs from camp and trail ("for the next fight").
@@ -67,7 +72,7 @@ func _new_id() -> int:
 
 
 func is_over() -> bool:
-	return state in ["victory", "defeat", "fled"]
+	return state in ["victory", "defeat", "fled", "scripted"]
 
 
 func awaiting_input() -> bool:
@@ -106,6 +111,9 @@ func step() -> Array:
 		if current == null or current.dead:
 			continue
 		break
+	_check_script(ev)
+	if is_over():
+		return ev
 	ev.append({"t": "turn", "actor": current.id})
 	ev.append_array(_start_turn(current))
 	_cleanup(ev)
@@ -778,7 +786,7 @@ func _cleanup(ev: Array) -> void:
 		if heroes.any(func(x): return not x.hero.alive):
 			_cleanup(ev)
 			return
-	if state in ["victory", "defeat", "fled"]:
+	if is_over():
 		return
 	if heroes.is_empty():
 		state = "defeat"
@@ -786,6 +794,25 @@ func _cleanup(ev: Array) -> void:
 	elif enemies.is_empty():
 		state = "victory"
 		ev.append({"t": "end", "result": "victory"})
+	else:
+		_check_script(ev)
+
+
+## A scripted ending: once its trigger is met (a round is reached, a hero is at Death's
+## Door, or the named enemy is worn down) the fight stops and the story takes over.
+func _check_script(ev: Array) -> void:
+	if story_script.is_empty() or is_over():
+		return
+	var fire := round_num >= int(story_script.get("round", 999))
+	if story_script.get("deaths_door", false) and heroes.any(func(x): return x.hero.deaths_door):
+		fire = true
+	for c in enemies:
+		if c.data.get("id", "") == story_script.get("unit", "") and c.hp * 100 < c.max_hp * int(story_script.get("hp_pct", 0)):
+			fire = true
+	if fire:
+		state = "scripted"
+		ev.append({"t": "scripted", "id": story_script.id})
+		ev.append({"t": "end", "result": "scripted"})
 
 
 # --- Enemy AI -------------------------------------------------------------------------

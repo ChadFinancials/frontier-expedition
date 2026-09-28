@@ -17,6 +17,8 @@ var beaten: Array = []          # region ids whose boss has fallen
 var run: RunState = null
 var next_uid: int = 1
 var victory_seen: bool = false
+var tutorial_done: bool = true
+var story_flags: Dictionary = {} # scripted story beats that have played (id -> true)
 var stats: Dictionary = {"expeditions": 0, "victories": 0, "deaths": 0, "kills": 0}
 var rng := RandomNumberGenerator.new()
 
@@ -33,7 +35,9 @@ func new_game(seed_value: int = -1) -> void:
 	iron = DB.cfg("start_iron", 5)
 	var start_site := site_by_index(0)
 	var st := {"index": 0, "site": start_site.id, "tier": start_site.get("start_tier", "outpost"),
-		"buildings": start_site.get("start_buildings", {}).duplicate(), "recruits": [], "stock": [], "used": {}}
+		"buildings": start_site.get("start_buildings", {}).duplicate(), "ruins": start_site.get("start_ruins", []).duplicate(),
+		"recruits": [], "stock": [], "used": {}}
+	tutorial_done = start_site.get("tutorial", "") == ""
 	settlements.append(st)
 	for cid in DB.cfg("start_heroes", []):
 		var h := make_hero(cid, 1)
@@ -223,7 +227,23 @@ func building_cost(i: int, bid: String) -> Dictionary:
 	var costs: Array = DB.buildings.get(bid, {}).get("costs", [])
 	if lvl >= costs.size():
 		return {}
+	if lvl == 0 and is_ruin(i, bid):
+		var pct := int(DB.cfg("ruin_rebuild_pct", 50))
+		var c := {}
+		for k in costs[0]:
+			c[k] = int(ceil(int(costs[0][k]) * pct / 100.0))
+		return c
 	return costs[lvl]
+
+
+## A burned building: it holds its plot and can be rebuilt at a discount.
+func is_ruin(i: int, bid: String) -> bool:
+	return bid in settlement(i).get("ruins", [])
+
+
+func plots_used(i: int) -> int:
+	var st := settlement(i)
+	return st.get("buildings", {}).size() + st.get("ruins", []).size()
 
 
 ## "" if allowed, otherwise the reason.
@@ -233,7 +253,7 @@ func can_build(i: int, bid: String) -> String:
 		return "Not founded"
 	var lvl := building_level(i, bid)
 	var tier := tier_info(st.tier)
-	if lvl == 0 and st.buildings.size() >= int(tier.get("slots", 3)):
+	if lvl == 0 and not is_ruin(i, bid) and plots_used(i) >= int(tier.get("slots", 3)):
 		return "No free building plots (upgrade the %s)" % tier.get("name", "settlement")
 	if lvl >= int(tier.get("max_level", 1)):
 		return "A %s can't support a bigger %s" % [tier.get("name", ""), DB.buildings[bid].name]
@@ -250,6 +270,7 @@ func build(i: int, bid: String) -> bool:
 		return false
 	pay(building_cost(i, bid))
 	settlement(i).buildings[bid] = building_level(i, bid) + 1
+	settlement(i).get("ruins", []).erase(bid)
 	return true
 
 
@@ -579,14 +600,24 @@ func dismiss(h: Hero) -> void:
 
 # Stage line ----------------------------------------------------------------------------
 
+## The stage runs from whichever end of the route has a Stage Line.
+func stage_for(from_i: int, to_i: int) -> int:
+	if building_level(from_i, "stage_line") > 0:
+		return from_i
+	if founded(to_i) and building_level(to_i, "stage_line") > 0:
+		return to_i
+	return -1
+
+
 func can_send(from_i: int, to_i: int, h: Hero) -> String:
-	if building_level(from_i, "stage_line") <= 0:
-		return "No Stage Line here"
 	if not founded(to_i) or to_i == from_i:
 		return "No destination"
+	var sl := stage_for(from_i, to_i)
+	if sl < 0:
+		return "No Stage Line at either end"
 	if h == null or not h.available() or h.location != from_i:
 		return "Hero not available"
-	if slots_left(from_i, "stage_line") <= 0:
+	if slots_left(sl, "stage_line") <= 0:
 		return "No seats left this week"
 	return ""
 
@@ -594,7 +625,7 @@ func can_send(from_i: int, to_i: int, h: Hero) -> String:
 func send_hero(from_i: int, to_i: int, h: Hero) -> bool:
 	if can_send(from_i, to_i, h) != "":
 		return false
-	_use_slot(from_i, "stage_line")
+	_use_slot(stage_for(from_i, to_i), "stage_line")
 	h.transit_to = to_i
 	h.transit_weeks = absi(to_i - from_i)
 	return true
@@ -663,10 +694,47 @@ func supply_cost(i: int, supplies: Dictionary) -> int:
 	return total
 
 
+## Where an expedition from settlement i goes: its tutorial first, if it has one.
+func expedition_region(i: int) -> String:
+	var site := site_by_index(i)
+	if not tutorial_done and site.get("tutorial", "") != "":
+		return site.tutorial
+	return site.get("region_west", "")
+
+
+func tutorial_pending(i: int = 0) -> bool:
+	return not tutorial_done and site_by_index(i).get("tutorial", "") != ""
+
+
+## The tutorial party sets out with the first four heroes and free supplies.
+func start_tutorial() -> RunState:
+	var uids: Array = []
+	for h in heroes_at(0):
+		if uids.size() < 4 and h.available():
+			uids.append(h.uid)
+	run = RunState.create(self, expedition_region(0), 0, uids, DB.cfg("tutorial_supplies", {"food": 10, "bandages": 2}))
+	stats.expeditions += 1
+	return run
+
+
+## Marks the tutorial won (or skipped) and rebuilds the ruin it restores. Returns story text.
+func complete_tutorial() -> String:
+	if tutorial_done:
+		return ""
+	tutorial_done = true
+	var site := site_by_index(0)
+	var bid: String = site.get("tutorial_rebuilds", "")
+	var st := settlement(0)
+	if bid != "" and building_level(0, bid) == 0:
+		st.get("ruins", []).erase(bid)
+		st.buildings[bid] = 1
+		return "Ma Delaney has the %s standing again by the end of the week: new planks, old piano, same watered whiskey. Heroes can shed Fatigue there now." % DB.buildings[bid].name
+	return ""
+
+
 ## "" if the party can set out, otherwise why not.
 func can_embark(i: int, party_uids: Array, supplies: Dictionary) -> String:
-	var site := site_by_index(i)
-	if site.get("region_west", "") == "":
+	if expedition_region(i) == "":
 		return "There is nowhere further west to go."
 	if party_uids.is_empty():
 		return "Choose at least one hero."
@@ -685,8 +753,7 @@ func start_run(i: int, party_uids: Array, supplies: Dictionary) -> RunState:
 	if can_embark(i, party_uids, supplies) != "":
 		return null
 	money -= supply_cost(i, supplies)
-	var region: String = site_by_index(i).region_west
-	run = RunState.create(self, region, i, party_uids, supplies)
+	run = RunState.create(self, expedition_region(i), i, party_uids, supplies)
 	stats.expeditions += 1
 	return run
 
@@ -698,6 +765,7 @@ func finish_run(status: String) -> Dictionary:
 		"recruits": [], "boss_won": r.boss_won, "found_site": -1, "week_msgs": []}
 	var survivors := r.party_heroes()
 	var won := status == "victory"
+	summary["story"] = ""
 	if status == "abandoned":
 		for h in survivors:
 			Fatigue.add(h, DB.cfg("turn_back_fatigue", 20), rng)
@@ -739,6 +807,9 @@ func finish_run(status: String) -> Dictionary:
 			if q != "":
 				entry.quirks.append(q)
 		summary.heroes.append(entry)
+	if r.boss_won and DB.regions.get(r.region_id, {}).get("tutorial", false) and summary.status != "defeat":
+		summary.story = complete_tutorial()
+		summary["tutorial"] = true
 	if r.boss_won:
 		var site := site_for_region(r.region_id)
 		if site >= 0 and not founded(site):
@@ -757,7 +828,8 @@ func to_dict() -> Dictionary:
 	return {"version": 1, "week": week, "money": money, "timber": timber, "iron": iron, "charters": charters,
 		"heroes": hs, "dead": dead.duplicate(true), "settlements": settlements.duplicate(true),
 		"stash": stash.duplicate(), "known_keys": known_keys.duplicate(true), "beaten": beaten.duplicate(),
-		"next_uid": next_uid, "victory_seen": victory_seen, "stats": stats.duplicate(),
+		"next_uid": next_uid, "victory_seen": victory_seen,
+		"tutorial_done": tutorial_done, "story_flags": story_flags.duplicate(), "stats": stats.duplicate(),
 		"rng_state": str(rng.state), "run": run.to_dict() if run != null else null}
 
 
@@ -777,6 +849,8 @@ static func from_dict(d: Dictionary) -> Company:
 	c.beaten = d.get("beaten", []).duplicate()
 	c.next_uid = int(d.get("next_uid", 1))
 	c.victory_seen = d.get("victory_seen", false)
+	c.tutorial_done = d.get("tutorial_done", true)
+	c.story_flags = d.get("story_flags", {}).duplicate()
 	c.stats = d.get("stats", c.stats).duplicate()
 	c.rng.randomize()
 	if d.has("rng_state"):

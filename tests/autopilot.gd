@@ -84,16 +84,27 @@ func _process(delta: float) -> void:
 				panels_opened[key] += 1
 				s.open_building("")
 				return
-			_press_text(s, ["Plan Expedition"])
+			for rid in st.get("ruins", []):
+				if Game.company.can_build(s.index, rid) == "" and Game.company.money > 500:
+					note("  rebuilding " + rid)
+					s.open_building(rid)
+					return
+			_press_text(s, ["Plan Expedition", "Ride to the Old Mill"])
 		"embark":
 			if m.screen.party.is_empty():
 				need_rest = true
 				_press_text(m.screen, ["<  Back"])
 				return
 			if not _press_text(m.screen, ["Hit the Trail!"]):
+				if not m.screen.has_meta("warned"):
+					m.screen.set_meta("warned", true)
+					note("  can't depart: " + m.screen.warn_label.text)
 				_press_text(m.screen, ["Clear"])
 				for i in 3:
 					_press_text(m.screen, ["+"])
+				if not m.screen.has_meta("warned2"):
+					m.screen.set_meta("warned2", true)
+					note("  after clear: %s cost %d money %d why '%s' party %s" % [m.screen.supplies, Game.company.supply_cost(m.screen.index, m.screen.supplies), Game.company.money, Game.company.can_embark(m.screen.index, m.screen.party, m.screen.supplies), m.screen.party])
 		"trail":
 			var t = m.screen
 			if t.travelling:
@@ -133,7 +144,7 @@ func _process(delta: float) -> void:
 		"results":
 			expeditions_done += 1
 			note("expedition %d finished; week %d, money $%d, heroes %d, dead %d" % [expeditions_done, Game.company.week, Game.company.money, Game.company.heroes.size(), Game.company.dead.size()])
-			_press_text(m.screen, ["Found ", "Return to"])
+			_press_text(m.screen, ["Found ", "Return to", "Ride into"])
 
 
 func _handle_modal(m: Main) -> void:
@@ -151,7 +162,7 @@ func _handle_modal(m: Main) -> void:
 		note("  declined the boss")
 		turn_back_next = true
 		return
-	var prefs := ["Ride On", "Fight!", "Continue", "Head Home", "Turn Back", "Go In", "Found It", "Build It", "Run!", "Rest", "Yes", "Build (", "Investigate", "Move On", "Leave", "Done", "Close", "Cancel"]
+	var prefs := ["Ride On", "Fight!", "Continue", "Head Home", "Turn Back", "Go In", "Found It", "Build It", "Rebuild", "Run!", "Rest", "Yes", "Build (", "Investigate", "Move On", "Leave", "Done", "Close", "Cancel"]
 	# Events: pick a random available option.
 	var buttons := _find_buttons(top)
 	var event_like := buttons.filter(func(b): return b.alignment == HORIZONTAL_ALIGNMENT_LEFT and not b.disabled)

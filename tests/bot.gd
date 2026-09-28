@@ -141,7 +141,7 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 		if r.party_heroes().is_empty():
 			r.status = "defeat"
 		elif r.is_final_node() and r.current_node().done:
-			r.status = "victory" if r.boss_won else "abandoned"
+			r.status = "victory" if r.boss_won else ("driven_back" if r.driven_back else "abandoned")
 	return co.finish_run(r.status)
 
 
@@ -166,7 +166,7 @@ func resolve_node(r: RunState) -> void:
 			if won:
 				r.complete_current()
 			elif n.type in ["boss", "crossing"]:
-				r.status = "abandoned" if not r.party_heroes().is_empty() else "defeat"
+				r.status = "defeat" if r.party_heroes().is_empty() else ("driven_back" if r.driven_back else "abandoned")
 			else:
 				r.complete_current()
 		"event", "homestead":

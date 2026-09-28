@@ -54,8 +54,26 @@ afterwards.
 
 - **Founding** needs that region's boss to be beaten. The victorious party can found it
   on the spot if the company can pay, or later from any settlement.
-- A new outpost starts with a free **Stage Line**. Fort Providence starts as a Town with
-  six level-1 buildings.
+- A new outpost starts with a free **Stage Line**. Fort Providence starts as a Town that
+  Silas Crane burned: only the **Hiring Board** stands, and the Saloon, General Store and
+  Smithy are **ruins**. A ruin keeps its plot and rebuilds at half the level-1 cost
+  (`ruin_rebuild_pct`). The Stage Line runs if either end of the route has one.
+
+### The tutorial: the Old Mill Road
+- A new game offers the tutorial (or skips it). It is a hand-authored map
+  (`fixed_map` in regions.json): departure, a fight, a choice of event or curios, a camp,
+  then the mini-boss **"Mad Dog" Mulligan** at the old mill. Each stop shows a short story
+  beat with one tip. It needs no supplies bought and has no random mishaps.
+- Winning rebuilds the **Saloon** for free (Ma Delaney returns) and opens the Tallgrass Sea.
+  Turning back or losing leaves it as the next expedition from Fort Providence.
+
+### Scripted boss meetings
+- A boss can carry a `first_script`: the first time you fight it, the battle stops when a
+  round is reached, a hero hits Death's Door, or the boss drops below a health share. A
+  cutscene plays and the run ends as **Driven Back** (loot and XP kept, no turn-back
+  Fatigue). Next time the boss starts **wounded** and has a new intro.
+- Silas Crane uses this: *Crane's Gambit* (round 3, a hero at Death's Door, or Silas
+  under 60%), then he starts at 85% health.
 
 ### Buildings
 | Building | Does | Scales with level |
@@ -180,8 +198,13 @@ Full skill lists are in `data/classes.json` and `data/skills.json`.
   beaten, a **Crossing** elite fight). Column 7 is always a **Camp**, and a camp appears
   around column 4.
 - **Node types**: Fight, Elite, Event, Curio Stop, Cave, Trading Post, Homestead, Camp,
-  Boss. Some nodes are **hidden (?)** until scouted; a party Scout reveals the next
-  column automatically.
+  Boss.
+- **Intel:** each stop is unknown (?), roughly read (red ? for trouble, green ? for quiet,
+  or a cave), known by type, or known in detail. Camps and the boss are landmarks and
+  always visible by type. After each leg the company looks ahead: the next column gets
+  at least a rough read, and the Scout survival skill, quirks and gear raise the odds of
+  identifying stops (the Tracker also reads who is waiting at fights). 15% of fights look
+  quiet from afar.
 
 ### Supplies (bought at the General Store)
 | Item | Use |

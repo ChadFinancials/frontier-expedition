@@ -107,6 +107,8 @@
     {"id": "city", "name": "City", "slots": 9, "max_level": 3,
       "cost": {"charters": 6, "money": 5000, "timber": 90, "iron": 60}}
   ],
+  "ruin_rebuild_pct": 50,
+  "tutorial_supplies": {"food": 10, "bandages": 2, "wagon_parts": 1},
   "found_cost": {"charters": 1, "money": 600, "timber": 15, "iron": 8},
 
   "gear_costs": {

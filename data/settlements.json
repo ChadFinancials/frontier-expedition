@@ -1,10 +1,12 @@
 {
-  "_comment": "The chain of settlement sites from east to west. index orders them. region_west: the region an expedition from here travels. founded_at: the region whose boss must fall before this site can be settled.",
+  "_comment": "The chain of settlement sites from east to west. index orders them. region_west: the region an expedition from here travels. founded_at: the region whose boss must fall before this site can be settled. start_ruins: burned buildings that take a plot and can be rebuilt at a discount. tutorial: the region the first expedition must travel; tutorial_rebuilds: the ruin rebuilt for free when it is won.",
 
   "fort_providence": {"index": 0, "name": "Fort Providence", "region_west": "tallgrass",
-    "desc": "Last real town before the edge of the map. Timber stockade, muddy streets, and every wagon heading west stops here first.",
+    "desc": "Last real town before the edge of the map, or it was, until Silas Crane burned it. Charred timbers, muddy streets, and a hiring board still nailed to the one wall left standing.",
     "start_tier": "town",
-    "start_buildings": {"saloon": 1, "general_store": 1, "hiring_board": 1, "stage_line": 1, "smithy": 1}},
+    "start_buildings": {"hiring_board": 1},
+    "start_ruins": ["saloon", "general_store", "smithy"],
+    "tutorial": "old_mill_road", "tutorial_rebuilds": "saloon"},
   "redwater_ford": {"index": 1, "name": "Redwater Ford", "region_west": "red_canyons", "founded_at": "tallgrass",
     "desc": "Where Silas Crane used to charge a toll to cross. Now it's your crossing, and the canyons rise red to the west."},
   "cloudbreak": {"index": 2, "name": "Cloudbreak", "region_west": "thunder_peaks", "founded_at": "red_canyons",

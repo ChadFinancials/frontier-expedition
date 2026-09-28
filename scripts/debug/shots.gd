@@ -46,6 +46,22 @@ static func run(main: Main, args: Dictionary) -> void:
 				root.add_child(l)
 		"settlement":
 			await main.goto("settlement", {"index": 0}, true)
+		"silas":
+			# Silas's gambit, triggered at once (in-memory tweak for the screenshot only).
+			Game.company.complete_tutorial()
+			DB.regions.tallgrass.boss.first_script.round = 1
+			var uids3: Array = []
+			for h in Game.company.heroes.slice(0, 4):
+				uids3.append(h.uid)
+			Game.company.start_run(0, uids3, {"food": 10})
+			await main.goto("combat", {"enemies": DB.regions.tallgrass.boss.enemies, "kind": "boss", "return": "trail"}, true)
+		"tutorial":
+			Game.company.start_tutorial()
+			await main.goto("trail", {}, true)
+			if args.has("node"):
+				main.close_all_modals()
+				Game.company.run.travel_to(int(args.node))
+				await main.goto("trail", {}, true)
 		"embark":
 			await main.goto("embark", {"index": 0}, true)
 		"trail", "combat", "camp", "cave", "event", "curio":

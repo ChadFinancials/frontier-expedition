@@ -80,7 +80,10 @@ func setup(params: Dictionary) -> void:
 	bh.add_child(action_row)
 	refresh()
 	Audio.play_music("music_town")
-	if params.get("intro", false):
+	var intro = params.get("intro", false)
+	if intro is String and intro == "home":
+		_intro_home()
+	elif intro:
 		_intro()
 	var msgs: Array = params.get("msgs", [])
 	for m in msgs:
@@ -92,7 +95,7 @@ func refresh() -> void:
 	var st := co.settlement(index)
 	var site := co.site_by_index(index)
 	var tier := co.tier_info(st.tier)
-	top.set_title(site.name, "%s  |  %d of %d building plots used" % [tier.name, st.buildings.size(), int(tier.slots)])
+	top.set_title(site.name, "%s  |  %d of %d building plots used" % [tier.name, co.plots_used(index), int(tier.slots)])
 	top.refresh()
 	# Chain.
 	UI.clear(chain_row)
@@ -117,7 +120,7 @@ func refresh() -> void:
 		if i < co.site_count() - 1:
 			chain_row.add_child(UI.lbl("→", 22, "Bold"))
 	# Town.
-	town.set_buildings(st.buildings, int(tier.slots))
+	town.set_buildings(st.buildings, int(tier.slots), st.get("ruins", []))
 	# Roster.
 	var here := co.heroes_at(index)
 	roster_title.text = "Company at %s (%d)" % [site.name, here.size()]
@@ -136,9 +139,11 @@ func refresh() -> void:
 			var where := "riding to %s (%d wk)" % [co.settlement_name(h.transit_to), h.transit_weeks] if h.transit_to >= 0 else "at %s" % co.settlement_name(h.location)
 			transit_box.add_child(UI.lbl("%s, Lv %d %s: %s" % [h.hero_name, h.level, h.class_name_text(), where], 17, "Ink"))
 	# Info & actions.
-	var region_id: String = site.get("region_west", "")
+	var region_id: String = co.expedition_region(index)
 	var txt := "[b]%s[/b]  %s" % [site.name, site.get("desc", "")]
-	if region_id != "":
+	if co.tutorial_pending(index):
+		txt += "\n[b]Unfinished business:[/b] Mulligan's gang still holds the old mill on %s, and Ma Delaney with it." % DB.regions[region_id].name
+	elif region_id != "":
 		var reg2: Dictionary = DB.regions[region_id]
 		txt += "\n[b]West:[/b] %s (recommended level %s). %s" % [reg2.name, reg2.rec_level,
 			"[color=#7fb069]Boss defeated.[/color]" if region_id in co.beaten else "Boss: %s." % reg2.boss.name]
@@ -153,7 +158,7 @@ func refresh() -> void:
 	rest.tooltip_text = "Let a week pass without an expedition. Heroes finish treatments, the stage line moves, new recruits arrive."
 	action_row.add_child(rest)
 	if region_id != "":
-		action_row.add_child(UI.btn("Plan Expedition  →", func(): Main.inst.goto("embark", {"index": index}), "Big"))
+		action_row.add_child(UI.btn("Ride to the Old Mill  →" if co.tutorial_pending(index) else "Plan Expedition  →", func(): Main.inst.goto("embark", {"index": index}), "Big"))
 	else:
 		action_row.add_child(UI.btn("The Great Casino", _victory_view, "Big"))
 
@@ -204,7 +209,15 @@ func _victory_view() -> void:
 
 
 func _intro() -> void:
-	Main.inst.message("Fort Providence", "Every wagon on the frontier is chasing the same rumor: far to the west, past the last mountain, stands [b]the Great Casino[/b], a paradise city where fortunes are made. Its chips are the only currency anyone trusts out here.\n\nFort Providence is the last real town before the edge of the map. Your company is six hard souls, a wagon, and a short stack of chips.\n\nWest lies [b]the Tallgrass Sea[/b], held by the outlaw [b]Silas Crane[/b]. Beat him, and you can raise a settlement on his river crossing and push the frontier further.\n\nClick buildings to use them. Click a hero to see their skills and quirks. When you're ready, [b]Plan Expedition[/b].\n\n[i](Esc opens the menu and How to Play.)[/i]")
+	Main.inst.message("Fort Providence", "Every wagon on the frontier is chasing the same rumor: far to the west, past the last mountain, stands [b]the Great Casino[/b], a paradise city where fortunes are made. Its chips are the only currency anyone trusts out here.\n\nFort Providence was the last real town before the edge of the map, until the outlaw [b]Silas Crane[/b] burned it for refusing his toll. Your company is six hard souls, a wagon, and a short stack of chips.\n\n" + _home_tips())
+
+
+func _intro_home() -> void:
+	Main.inst.message("Fort Providence", "Fort Providence is mostly ash. The stockade is half down, the store and the smithy are charred frames, and the townsfolk are camped in the mud. But Ma Delaney is already hauling planks, and the two members of your company who rode ahead are waiting at the hiring board.\n\nThis is home now. Rebuild it, and push west: [b]the Tallgrass Sea[/b] and Silas Crane's toll bridge lie beyond.\n\n" + _home_tips())
+
+
+func _home_tips() -> String:
+	return "[i]Tips: Click a building to use it. Burned buildings can be rebuilt at half price. Click a hero to see their skills, quirks and gear. When you're ready, [b]Plan Expedition[/b]. Esc opens the menu and How to Play.[/i]"
 
 
 func open_hero(h: Hero) -> void:

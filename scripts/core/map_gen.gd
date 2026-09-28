@@ -14,6 +14,8 @@ const TYPE_NAMES := {
 
 static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten: bool) -> Array:
 	var region: Dictionary = DB.regions[region_id]
+	if region.has("fixed_map"):
+		return _fixed(region)
 	var nodes: Array = []
 	var columns: Array = []
 	var used_events: Array = []
@@ -79,6 +81,53 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 		if n.type == "fight" and rng.randf() < 0.15:
 			n.decoy = true
 	return nodes
+
+
+## A hand-authored map (the tutorial): columns of nodes, each linking to every node in the
+## next column. Node entries carry type, content (enemies / event / curios), and optional
+## title, story (shown on arrival) and lane_y. Everything is fully scouted.
+static func _fixed(region: Dictionary) -> Array:
+	var nodes: Array = []
+	var cols: Array = region.fixed_map
+	var prev: Array = []
+	for c in cols.size():
+		var col: Array = cols[c]
+		var cur: Array = []
+		for l in col.size():
+			var src: Dictionary = col[l]
+			var n := {"id": nodes.size(), "col": c, "lane": l, "y": float(src.get("lane_y", (l + 0.5) / float(col.size()))),
+				"type": src.type, "intel": 3, "decoy": false, "next": [], "visited": c == 0, "done": c == 0, "data": {}}
+			match src.type:
+				"fight", "elite":
+					n.data = {"enemies": src.enemies.duplicate()}
+				"boss":
+					n.data = {"enemies": region.boss.enemies.duplicate()}
+				"event", "homestead":
+					n.data = {"event": src.event}
+				"curio":
+					var cs: Array = []
+					for cid in src.curios:
+						cs.append({"id": cid, "done": false})
+					n.data = {"curios": cs}
+			if src.has("title"):
+				n.data["title"] = src.title
+			if src.has("story"):
+				n.data["story"] = src.story
+			nodes.append(n)
+			cur.append(n)
+		for p in prev:
+			for n2 in cur:
+				p.next.append(n2.id)
+		prev = cur
+	return nodes
+
+
+## Number of map columns (fixed maps can be shorter).
+static func column_count(nodes: Array) -> int:
+	var m := 0
+	for n in nodes:
+		m = maxi(m, int(n.col))
+	return m + 1
 
 
 ## 0 unknown, 1 rough idea (trouble / quiet / cave), 2 known type, 3 known details.

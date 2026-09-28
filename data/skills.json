@@ -217,6 +217,12 @@
     "effects": [{"type": "knockback", "amount": 1, "chance": 100}, {"type": "stun", "chance": 60}], "ai": {"weight": 2}},
   "e_bull_stomp": {"name": "Trample", "desc": "Hooves the size of skillets.", "use_ranks": [1, 2], "target": "enemy", "target_ranks": [1, 2], "aoe": true, "acc": 85, "dmg": -0.3, "anim": "melee", "sfx": "stomp", "ai": {"weight": 2}},
 
+  "e_mull_haymaker": {"name": "Mad Dog Haymaker", "desc": "A fist like a ham hock. It rings bells.", "use_ranks": [1, 2], "target": "enemy", "target_ranks": [1, 2], "acc": 85, "dmg": 0.15, "anim": "melee", "sfx": "punch",
+    "effects": [{"type": "stun", "chance": 45}], "ai": {"weight": 3}},
+  "e_mull_bottle": {"name": "Busted Bottle", "desc": "The jagged end of a whiskey bottle.", "use_ranks": [1, 2, 3], "target": "enemy", "target_ranks": [1, 2, 3], "acc": 85, "dmg": -0.25, "anim": "throw", "sfx": "glass",
+    "effects": [{"type": "bleed", "amount": 2, "rounds": 3, "chance": 90}], "ai": {"weight": 2}},
+  "e_mull_whistle": {"name": "Where's My Boys?", "desc": "Mulligan hollers for another brawler.", "use_ranks": [1, 2, 3, 4], "target": "self", "anim": "cast", "sfx": "whistle",
+    "self_effects": [{"type": "summon", "enemy": "outlaw_brawler"}], "ai": {"weight": 1}},
   "e_crane_fan": {"name": "Crane's Fusillade", "desc": "Silas empties both revolvers.", "use_ranks": [1, 2, 3], "target": "enemy", "target_ranks": [1, 2, 3, 4], "random_hits": 3, "acc": 85, "dmg": -0.4, "anim": "shoot", "sfx": "gunshot", "ai": {"weight": 3}},
   "e_crane_dead_aim": {"name": "Dead Aim", "desc": "A slow, deliberate shot at the weakest link.", "use_ranks": [1, 2, 3], "target": "enemy", "target_ranks": [2, 3, 4], "acc": 92, "dmg": 0.4, "crit": 10, "anim": "shoot", "sfx": "rifle", "ai": {"weight": 2, "pref": "lowest_hp"}},
   "e_crane_call": {"name": "Boys, Get Over Here!", "desc": "Whistles for another gunhand.", "use_ranks": [1, 2, 3, 4], "target": "self", "anim": "cast", "sfx": "whistle",

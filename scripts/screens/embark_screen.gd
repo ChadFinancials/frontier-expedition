@@ -21,10 +21,11 @@ func setup(params: Dictionary) -> void:
 	index = int(params.get("index", 0))
 	var co: Company = Game.company
 	var site := co.site_by_index(index)
-	var region: Dictionary = DB.regions.get(site.get("region_west", ""), {})
+	var region_id := co.expedition_region(index)
+	var region: Dictionary = DB.regions.get(region_id, {})
 	var bd := Backdrop.new()
 	bd.ground_y = 1000
-	bd.setup(site.region_west, "trail", 9)
+	bd.setup(region_id, "trail", 9)
 	add_child(bd)
 	var shade := ColorRect.new()
 	shade.color = Color(0, 0, 0, 0.35)
@@ -79,7 +80,7 @@ func setup(params: Dictionary) -> void:
 	suph.add_child(UI.hdr("Supplies", 26, true))
 	suph.add_child(UI.spacer(0, 0, true))
 	suph.add_child(UI.btn("Recommended", func():
-		supplies = RECOMMENDED.duplicate()
+		supplies = _affordable(RECOMMENDED)
 		_refresh_supplies(), "Small"))
 	suph.add_child(UI.btn("Clear", func():
 		supplies = {}
@@ -108,7 +109,7 @@ func setup(params: Dictionary) -> void:
 	depart_btn = UI.btn("Hit the Trail!", _depart, "Big", 300)
 	depart_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	fh.add_child(depart_btn)
-	supplies = RECOMMENDED.duplicate()
+	supplies = _affordable(RECOMMENDED)
 	# Default party: the four healthiest ready heroes, in a sensible order.
 	var avail := co.heroes_at(index).filter(func(h): return h.available())
 	avail.sort_custom(func(a, b): return a.fatigue < b.fatigue)
@@ -238,6 +239,19 @@ func _refresh_supplies() -> void:
 	elif why == "" and food < 12:
 		warn_label.text = "That's not much food..."
 	depart_btn.disabled = why != ""
+
+
+## The recommended load, trimmed (extras first, then food) to what the company can pay for.
+func _affordable(want: Dictionary) -> Dictionary:
+	var co: Company = Game.company
+	var out := want.duplicate()
+	for k in ["crowbar", "shovel", "rope", "salt", "whiskey", "antivenom", "lamp_oil", "wagon_parts", "bandages"]:
+		if co.supply_cost(index, out) <= co.money:
+			break
+		out.erase(k)
+	while co.supply_cost(index, out) > co.money and int(out.get("food", 0)) > 0:
+		out.food = maxi(0, int(out.food) - 2)
+	return out
 
 
 func _depart() -> void:

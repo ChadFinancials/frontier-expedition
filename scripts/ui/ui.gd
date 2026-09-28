@@ -339,3 +339,36 @@ static func survival_tooltip(sid: String, rank: int) -> String:
 	for a in d.get("actions", []):
 		lines.append("Camp: %s (%dh): %s" % [a.name, int(a.hours), a.desc])
 	return "\n".join(lines)
+
+
+## The broad kind of a skill, for its icon: melee, ranged, debuff, heal or buff.
+static func skill_kind(sid: String) -> String:
+	var sk := DB.skill(sid)
+	var t: String = sk.get("target", "enemy")
+	if t == "enemy":
+		if sk.get("no_damage", false):
+			return "debuff"
+		return "melee" if sk.get("anim", "") in ["melee", "dog"] else "ranged"
+	for e in sk.get("effects", []) + sk.get("self_effects", []):
+		if e is Dictionary and e.get("type", "") == "heal":
+			return "heal"
+	return "buff"
+
+
+const SKILL_KIND_TEXT := {"melee": "Melee attack", "ranged": "Ranged attack", "debuff": "Hinders the enemy",
+	"heal": "Heals", "buff": "Helps your side"}
+
+
+## A row of stat icons with values and tooltips.
+static func stat_row(stats: Array, font_size: int = 16) -> HBoxContainer:
+	var row := hb(12)
+	for st in stats:
+		var cell := hb(3)
+		cell.tooltip_text = st[2]
+		cell.mouse_filter = Control.MOUSE_FILTER_PASS
+		cell.add_child(ResIcon.make(st[0], font_size + 2))
+		var l := lbl(str(st[1]), font_size)
+		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cell.add_child(l)
+		row.add_child(cell)
+	return row

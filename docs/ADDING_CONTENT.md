@@ -171,6 +171,20 @@ crossing, events and curios. Then add a settlement site in `data/settlements.jso
 `founded_at` is the region *before* it, and point the previous site's `region_west` at
 the new region.
 
+Optional region fields:
+- `fixed_map`: a hand-authored map instead of a random one (see `old_mill_road`). It is a list
+  of columns; each node has `type` plus its content (`enemies`, `event` or `curios`), and
+  optionally `title`, `story` (a dialog shown on arrival) and `lane_y` (0–1). Each node
+  links to every node in the next column. Mark it `"tutorial": true` to turn off mishaps.
+- `boss_rewards`: overrides the boss payout (`money`, `charters`, `timber`, `iron`).
+- `boss.first_script`: a scripted first meeting. Fields: `id` (story flag), `unit` (enemy
+  id), `round`, `hp_pct`, `deaths_door` (triggers), `wound_pct` (the boss's starting health
+  next time), `title` and `text` (the cutscene). Add `boss.intro_again` for the rematch.
+
+Settlement fields for a start town: `start_buildings`, `start_ruins` (burned buildings
+rebuilt at a discount), `tutorial` (region of the first expedition) and
+`tutorial_rebuilds` (the ruin that winning it restores).
+
 ---
 
 ## Checking your work

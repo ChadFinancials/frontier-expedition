@@ -80,4 +80,15 @@ func _new_game() -> void:
 
 
 func _intro() -> void:
-	Main.inst.goto("settlement", {"index": 0, "intro": true})
+	if not Game.company.tutorial_pending(0):
+		Main.inst.goto("settlement", {"index": 0, "intro": true})
+		return
+	Main.inst.dialog("The Road West", "Your story begins on the road to Fort Providence: three short stops and one hard fight that teach the basics of travel, camp and combat.\n\nYou can skip it if you already know the trail.",
+		[["Ride the Old Mill Road", func():
+			Game.company.start_tutorial()
+			Game.save_game()
+			Main.inst.goto("trail"), "Good"],
+		["Skip to Fort Providence", func():
+			Game.company.complete_tutorial()
+			Game.save_game()
+			Main.inst.goto("settlement", {"index": 0, "intro": true})]])
