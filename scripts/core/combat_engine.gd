@@ -443,10 +443,20 @@ func dmg_preview(a: Combatant, sid: String, t: Combatant) -> Array:
 	var sk := DB.skill(sid)
 	if sk.get("no_damage", false) or not is_hostile(sk):
 		return []
-	var r := a.dmg_range()
+	var r := skill_dmg_range(a, sid)
 	var m := dmg_mult(a, sid, t)
 	var prot := t.stat("prot", a) / 100.0
 	return [maxi(1, int(round(r[0] * m * (1.0 - prot)))), maxi(1, int(round(r[1] * m * (1.0 - prot))))]
+
+
+## Base damage for a move. An enemy move may set "dmg_range": [lo, hi], its tier-1 damage
+## as written (tier scaling still applies); otherwise it uses the attacker's own range.
+func skill_dmg_range(a: Combatant, sid: String) -> Array:
+	var d: Array = DB.skill(sid).get("dmg_range", [])
+	if d.size() < 2 or a.is_hero():
+		return a.dmg_range()
+	var mult: float = 1.0 if a.boss else 1.0 + DB.cfg("tier_dmg_pct", 30) / 100.0 * (a.tier - 1)
+	return [maxi(1, int(round(d[0] * mult))), maxi(1, int(round(d[1] * mult)))]
 
 
 func effect_chance(a: Combatant, sid: String, e: Dictionary, t: Combatant) -> int:
@@ -542,7 +552,7 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 	var crit := false
 	if not sk.get("no_damage", false):
 		crit = rng.randi_range(1, 100) <= crit_chance(a, sid, t)
-		var r := a.dmg_range()
+		var r := skill_dmg_range(a, sid)
 		var dmg := float(rng.randi_range(r[0], r[1])) * dmg_mult(a, sid, t)
 		var gamble_text := ""
 		if sk.get("gamble", false):
@@ -631,7 +641,8 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 			_heal(a, t, int(ceil(t.max_hp * float(e.get("value", 10)) / 100.0)), false, ev)
 		"fatigue":
 			if t.hero != null:
-				var amt := int(e.get("amount", 5))
+				var fa = e.get("amount", 5)
+				var amt: int = rng.randi_range(int(fa[0]), int(fa[1])) if fa is Array else int(fa)
 				if amt > 0 and not a.is_hero() and not a.boss:
 					amt = int(round(amt * (1.0 + 0.2 * (a.tier - 1))))
 				if crit and amt > 0:
@@ -685,6 +696,16 @@ func _apply_self_effect(a: Combatant, sid: String, e: Dictionary, ev: Array) -> 
 	match e.get("type", ""):
 		"move":
 			_shift(a, int(e.get("amount", 1)), ev)
+		"buff_kin":
+			# Buffs the user's living allies of the same kind (not itself). Refreshes, never stacks.
+			var bname: String = DB.skill(sid).get("name", "")
+			for o in side_of(a):
+				if o == a or o.dead or o.enemy_id != a.enemy_id:
+					continue
+				o.buffs = o.buffs.filter(func(b): return b.get("name", "") != bname)
+				for m in e.get("mods", []):
+					o.buffs.append({"stat": m.stat, "value": m.value, "rounds": e.get("rounds", 2), "name": bname})
+					ev.append({"t": "buff", "target": o.id, "stat": m.stat, "value": m.value})
 		"summon":
 			if side_of(a).size() < 4:
 				var c := Combatant.from_enemy(e.enemy, _new_id(), a.tier if not a.boss else tier, in_cave)
@@ -836,29 +857,48 @@ func _check_script(ev: Array) -> void:
 func _ai_turn(c: Combatant) -> Array:
 	var usable := usable_skills(c)
 	if usable.is_empty():
-		if c.rank > 1:
-			var ev: Array = [{"t": "swap", "actor": c.id}]
-			_shift(c, 1, ev)
-			return ev
-		return [{"t": "pass", "actor": c.id}]
+		return _ai_out_of_position(c)
 	var entries: Array = []
 	for sid in usable:
 		entries.append({"id": sid, "weight": DB.skill(sid).get("ai", {}).get("weight", 1)})
 	var sid: String = Stats.pick_weighted(rng, entries).id
 	var targets := valid_targets(c, sid)
-	var pref: String = DB.skill(sid).get("ai", {}).get("pref", "random")
-	var target_id: int = _pick_target(targets, pref)
+	var ai: Dictionary = DB.skill(sid).get("ai", {})
+	var target_id: int = _pick_target(targets, ai.get("pref", "random"), int(ai.get("pref_chance", -1)))
 	return use_skill(c, sid, target_id)
 
 
-func _pick_target(ids: Array, pref: String) -> int:
+## No move works from here: step to the nearest rank that has one, else a generic swing.
+func _ai_out_of_position(c: Combatant) -> Array:
+	var here := c.rank
+	var best := 0
+	for r in range(1, side_of(c).size() + 1):
+		if r == here or (best != 0 and absi(r - here) >= absi(best - here)):
+			continue
+		c.rank = r
+		if not usable_skills(c).is_empty():
+			best = r
+	c.rank = here
+	if best != 0:
+		var ev: Array = [{"t": "swap", "actor": c.id}]
+		_shift(c, here - best, ev)
+		return ev
+	var fb: String = DB.cfg("enemy_fallback_skill", "e_fallback_swing")
+	var fb_targets := valid_targets(c, fb)
+	if not fb_targets.is_empty():
+		return use_skill(c, fb, _pick_target(fb_targets, "random"))
+	return [{"t": "pass", "actor": c.id}]
+
+
+## chance: how often the preference wins, in percent (-1 = the preference's default).
+func _pick_target(ids: Array, pref: String, chance: int = -1) -> int:
 	var units_list: Array = []
 	for id in ids:
 		units_list.append(unit(id))
 	match pref:
 		"lowest_hp":
 			units_list.sort_custom(func(a, b): return a.hp_ratio() < b.hp_ratio())
-			if rng.randf() < 0.75:
+			if rng.randf() * 100.0 < (75 if chance < 0 else chance):
 				return units_list[0].id
 		"marked":
 			var marked := units_list.filter(func(x): return x.mark > 0)
@@ -866,14 +906,14 @@ func _pick_target(ids: Array, pref: String) -> int:
 				return Stats.pick(rng, marked).id
 		"back":
 			units_list.sort_custom(func(a, b): return a.rank > b.rank)
-			if rng.randf() < 0.7:
+			if rng.randf() * 100.0 < (70 if chance < 0 else chance):
 				return units_list[0].id
 		"front":
 			units_list.sort_custom(func(a, b): return a.rank < b.rank)
-			if rng.randf() < 0.7:
+			if rng.randf() * 100.0 < (70 if chance < 0 else chance):
 				return units_list[0].id
 		"deaths_door":
 			var dd := units_list.filter(func(x): return x.deaths_door())
-			if not dd.is_empty() and rng.randf() < 0.6:
+			if not dd.is_empty() and rng.randf() * 100.0 < (60 if chance < 0 else chance):
 				return Stats.pick(rng, dd).id
 	return Stats.pick(rng, units_list).id

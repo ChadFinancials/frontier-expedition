@@ -68,7 +68,12 @@ def effect_text(fx):
 	if t == "debuff":
 		return "%s %+d for %d rounds%s" % (fx.get("stat"), fx.get("value", 0), fx.get("rounds", 2), chance)
 	if t == "fatigue":
-		return "+%d fatigue" % fx.get("amount", 0)
+		a = fx.get("amount", 0)
+		return "+%d-%d fatigue" % tuple(a) if isinstance(a, list) else "+%d fatigue" % a
+	if t == "buff_kin":
+		return "other %s: %s for %d rounds" % (fx.get("kin", "kin"), ", ".join("%s %+d" % (m["stat"], m["value"]) for m in fx.get("mods", [])), fx.get("rounds", 2))
+	if t == "move":
+		return "user moves %s %d" % ("forward" if fx.get("amount", 1) > 0 else "back", abs(fx.get("amount", 1)))
 	if t == "stun":
 		return "stun%s" % chance
 	if t in ("knockback", "pull"):
@@ -113,6 +118,8 @@ def main():
 			else:
 				m = 1.0 + float(s.get("dmg", 0.0))
 				lo, hi = e["dmg"][0] * m * mult, e["dmg"][1] * m * mult
+				if s.get("dmg_range"):
+					lo, hi = s["dmg_range"]
 				dmg = "%d-%d" % (max(1, round(lo)), max(1, round(hi)))
 				if s.get("aoe"):
 					dmg += " each"
@@ -126,7 +133,7 @@ def main():
 			hits = "self" if s.get("target") == "self" else ranks(s.get("target_ranks")) + (" (all)" if s.get("aoe") else "")
 			ai = str(s.get("ai", {}).get("weight", 1))
 			if s.get("ai", {}).get("pref"):
-				ai += " (" + s["ai"]["pref"] + ")"
+				ai += " (" + s["ai"]["pref"] + (", always" if s["ai"].get("pref_chance") == 100 else "") + ")"
 			acc = str(s.get("acc", "-")) if s.get("target") != "self" else "-"
 			out.append("| **%s**: %s | %s | %s | %s | %s | %s | %s |" % (s.get("name", sid), s.get("desc", ""), ranks(s.get("use_ranks")), hits, acc, dmg, "; ".join(fx) or "-", ai))
 		out.append("")

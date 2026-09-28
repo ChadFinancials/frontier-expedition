@@ -787,6 +787,8 @@ func _result(e: Dictionary) -> void:
 			var c5 := engine.unit(e.actor)
 			if c5 != null and e.t == "pass":
 				_log("%s waits." % c5.display_name)
+			elif c5 != null and not c5.is_hero():
+				_log("%s moves into position." % c5.display_name)
 
 
 func _combatant_for_hero(uid: int) -> Combatant:
@@ -872,6 +874,13 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 		_:
 			av.figure.set_pose("cast")
 	Audio.play(e.get("sfx", ""))
+	# Multi-shot moves fire their sound (and muzzle flash) once per shot.
+	for k in int(sk.get("random_hits", sk.get("hits", 1))) - 1:
+		await _wait(0.16)
+		if anim == "shoot":
+			av.figure.muzzle = 1.0
+			create_tween().tween_property(av.figure, "muzzle", 0.0, 0.2 / speed)
+		Audio.play(e.get("sfx", ""))
 	if anim == "throw" and not targets.is_empty():
 		_projectile(av.position + Vector2(0, -160), targets[0].position + Vector2(0, -120))
 	await _wait(0.12)

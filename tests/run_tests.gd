@@ -31,6 +31,8 @@ func _ready() -> void:
 	test_heroes()
 	print("> test_combat_basics()")
 	test_combat_basics()
+	print("> test_enemy_moves()")
+	test_enemy_moves()
 	print("> test_deaths_door()")
 	test_deaths_door()
 	print("> test_fatigue()")
@@ -132,6 +134,49 @@ func test_combat_basics() -> void:
 	var party2 := _party(co, ["rail_driver", "wrangler", "prospector", "frontier_doctor"])
 	var e2 := bot.fight(party2, ["prairie_wolf", "coyote", "carrion_crows"], {"rng": rng})
 	check(e2.is_over(), "bot fight finishes")
+
+
+func test_enemy_moves() -> void:
+	var co := Company.new()
+	co.rng.seed = 12
+	var party := _party(co, ["marshal", "gunslinger", "sharpshooter", "preacher"])
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3
+	var e := CombatEngine.new()
+	e.setup(party, ["prairie_wolf", "prairie_wolf", "outlaw_rifleman", "outlaw_knifeman"], {"rng": rng})
+	var w1: Combatant = e.enemies[0]
+	var w2: Combatant = e.enemies[1]
+	var rifle: Combatant = e.enemies[2]
+	# Fixed per-move damage ranges (tier 1).
+	var dr := e.skill_dmg_range(w1, "e_wolf_bite")
+	check(dr[0] == 3 and dr[1] == 5, "wolf bite uses its own 3-5 range (got %s)" % str(dr))
+	# Howl for the Pack buffs the other wolf, not itself or the rifleman.
+	var ev := e.use_skill(w1, "e_wolf_howl", e.heroes[0].id)
+	check(w2.buff_total("acc") == 5 and w2.buff_total("speed") == 1, "howl buffs the other wolf")
+	check(w1.buff_total("acc") == 0 and rifle.buff_total("acc") == 0, "howl skips itself and non-wolves")
+	e.use_skill(w1, "e_wolf_howl", e.heroes[0].id)
+	check(w2.buff_total("acc") == 5, "repeated howls refresh instead of stacking")
+	# Rusty Shank always goes for the most wounded hero it can reach.
+	e.heroes[1].set_hp(1)
+	var picks := {}
+	for i in 20:
+		picks[e._pick_target([e.heroes[0].id, e.heroes[1].id, e.heroes[2].id], "lowest_hp", 100)] = true
+	check(picks.size() == 1 and picks.has(e.heroes[1].id), "pref_chance 100 always picks lowest HP")
+	# A rifleman shoved into rank 1 punches, and with no usable move it steps back into position.
+	e._shift(rifle, 2, ev)
+	check(rifle.rank == 1, "rifleman moved to rank 1")
+	check(e.usable_skills(rifle) == ["e_rifle_haymaker"], "rifleman can only punch from rank 1")
+	var lone := CombatEngine.new()
+	lone.setup(party, ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], {"rng": rng})
+	var r2: Combatant = lone.enemies[2]
+	r2.skills = ["e_rifle_snipe"]
+	lone._shift(r2, 2, ev)
+	var out := lone._ai_out_of_position(r2)
+	check(r2.rank == 3 and out[0].t == "swap", "out-of-position enemy steps to a usable rank")
+	lone.enemies = [r2]
+	lone._reindex()
+	out = lone._ai_out_of_position(r2)
+	check(out.any(func(x): return x.t == "action" and x.skill == "e_fallback_swing"), "no usable rank: fallback swing")
 
 
 func test_deaths_door() -> void:

@@ -6,79 +6,80 @@ Ranks: *from* is where the enemy must stand to use the move, *hits* is which her
 
 ## Outlaw Brawler  (Regular)
 
-`outlaw_brawler` | HP **16** | dodge 5 | prot 0 | speed 3 | acc +0 | crit 4% | dmg 3-6 | tags: outlaw, human
+`outlaw_brawler` | HP **16** | dodge 5 | prot 10 | speed 3 | acc +0 | crit 4% | dmg 3-6 | tags: outlaw, human
 Resists: stun 25, bleed 25, poison 25, move 30, debuff 25
 Found in: The Old Mill Road, The Crow's Nest, The Tallgrass Sea, Quests, summoned by "Mad Dog" Mulligan
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Haymaker**: A big, slow punch. | 12 | 12 | 85 | 3-5 | stun (40%) | 3 |
-| **Bottle Smash**: A whiskey bottle over the head. | 12 | 123 | 85 | 2-4 | +8 fatigue | 2 |
+| **Haymaker**: A big, slow punch. | 12 | 12 | 85 | 3-5 | stun (50%) | 3 |
+| **Bottle Toss**: A whiskey bottle, thrown hard. | 12 | 123 | 85 | 2-6 | +8 fatigue; bleed 2 x2 rounds (50%) | 2 |
 
 Notes: 
 
 ## Outlaw Gunhand  (Regular)
 
-`outlaw_gunhand` | HP **12** | dodge 10 | prot 0 | speed 5 | acc +0 | crit 5% | dmg 3-6 | tags: outlaw, human
+`outlaw_gunhand` | HP **12** | dodge 10 | prot 0 | speed 5 | acc +5 | crit 5% | dmg 3-6 | tags: outlaw, human
 Resists: stun 25, bleed 25, poison 25, move 25, debuff 25
 Found in: The Old Mill Road, Dry Gulch Mine, The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Six-Shooter**: A wild pistol shot. | 1234 | 1234 | 85 | 3-5 | - | 3 |
-| **Pinning Fire**: Shots that keep your head down. | 234 | 12 | 85 | 2-4 | dodge -10 for 2 rounds | 1 |
+| **Double Tap**: Two quick pistol shots at whoever is closest to hand. | 1234 | 1234 | 85 | 3-6 x2 hits | - | 3 |
+| **Pinning Fire**: Shots that keep your head down. | 234 | 12 | 85 | 2-4 | dodge -5 for 2 rounds; acc -5 for 2 rounds | 1 |
 
 Notes: 
 
 ## Outlaw Rifleman  (Regular)
 
-`outlaw_rifleman` | HP **11** | dodge 5 | prot 0 | speed 2 | acc +0 | crit 8% | dmg 4-7 | tags: outlaw, human
+`outlaw_rifleman` | HP **12** | dodge 5 | prot 0 | speed 2 | acc +0 | crit 8% | dmg 4-7 | tags: outlaw, human
 Resists: stun 20, bleed 25, poison 25, move 20, debuff 25
 Found in: The Crow's Nest, The Tallgrass Sea, The Red Canyons, The Thunder Peaks, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Snipe**: A careful rifle shot at the back line. | 34 | 234 | 85 | 4-7, +5% crit | - | 3 (back) |
-| **Volley**: Rifle fire across the line. | 34 | 1234 (all) | 80 | 1-3 each | - | 1 |
+| **Snipe**: A careful rifle shot at the back line. | 34 | 34 | 90 | 4-7, +5% crit | - | 3 (back) |
+| **Skeet Shot**: Rapid rifle fire sprayed down the whole line. | 34 | 1234 (all) | 80 | 1-3 each | - | 1 |
+| **Haymaker**: Caught up close, a rifleman still has fists. | 12 | 12 | 85 | 4-6 | stun (40%) | 1 |
 
 Notes: 
 
 ## Outlaw Cutthroat  (Regular)
 
-`outlaw_knifeman` | HP **13** | dodge 12 | prot 0 | speed 5 | acc +0 | crit 6% | dmg 3-5 | tags: outlaw, human
-Resists: stun 25, bleed 25, poison 25, move 25, debuff 25
+`outlaw_knifeman` | HP **14** | dodge 12 | prot 0 | speed 5 | acc +0 | crit 6% | dmg 3-5 | tags: outlaw, human
+Resists: stun 40, bleed 40, poison 25, move 25, debuff 25
 Found in: The Old Mill Road, The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Cutthroat Slash**: A quick knife across the arm. | 123 | 12 | 88 | 2-4 | bleed 2 x3 rounds | 3 |
-| **Low Blow**: A dirty stab at a wounded target. | 12 | 123 | 85 | 3-5 | - | 2 (lowest_hp) |
+| **Cutthroat Slash**: A quick knife across the arm, then pressing in. | 123 | 12 | 90 | 2-4 | bleed 2 x2 rounds; user moves forward 1 | 3 |
+| **Rusty Shank**: A rusty blade for whoever is bleeding worst. | 12 | 123 | 85 | 4-6 | - | 2 (lowest_hp, always) |
 
 Notes: 
 
 ## Prairie Wolf  (Regular)
 
-`prairie_wolf` | HP **13** | dodge 15 | prot 0 | speed 7 | acc +0 | crit 5% | dmg 3-5 | tags: beast
-Resists: stun 20, bleed 30, poison 30, move 35, debuff 25
+`prairie_wolf` | HP **10** | dodge 15 | prot 0 | speed 7 | acc +0 | crit 5% | dmg 3-5 | tags: beast
+Resists: stun 20, bleed 40, poison 40, move 35, debuff 25
 Found in: The Crow's Nest, The Tallgrass Sea, The Thunder Peaks, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Rending Bite**: Fangs that tear. | 12 | 12 | 88 | 3-4 | bleed 2 x3 rounds | 3 (lowest_hp) |
-| **Howl**: A howl that raises the hair on your neck. | 1234 | 1234 (all) | 90 | - | +5 fatigue | 1 |
+| **Rending Bite**: Fangs that tear. | 123 | 123 | 88 | 3-5 | bleed 2 x2 rounds (80%) | 3 |
+| **Howl for the Pack**: A howl that raises the hair on your neck and rallies the pack. | 1234 | 1234 (all) | 85 | - | +5-8 fatigue; other Prairie Wolves: acc +5, speed +1 for 2 rounds | 1 |
 
 Notes: 
 
 ## Rattlesnake  (Regular)
 
-`rattlesnake` | HP **8** | dodge 25 | prot 0 | speed 6 | acc +0 | crit 5% | dmg 2-4 | tags: beast, reptile
-Resists: stun 30, bleed 20, poison 60, move 30, debuff 25
+`rattlesnake` | HP **8** | dodge 20 | prot 0 | speed 6 | acc +0 | crit 3% | dmg 2-4 | tags: beast, reptile
+Resists: stun 30, bleed 20, poison 200, move 30, debuff 25
 Found in: Dry Gulch Mine, The Tallgrass Sea, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Venom Strike**: A lightning-fast venomous bite. | 123 | 12 | 90 | 1-3 | poison 3 x3 rounds | 3 |
-| **Rattle**: The dry buzz every traveler dreads. | 1234 | 1234 | 95 | - | +7 fatigue | 1 |
+| **Venom Strike**: A lightning-fast venomous bite. | 123 | 123 | 90 | 2-4 | poison 2 x3 rounds | 3 |
+| **Rattle**: The dry buzz every traveler dreads. | 1234 | 1234 | 95 | - | +12 fatigue; poison_res -10 for 2 rounds | 1 |
 
 Notes: 
 

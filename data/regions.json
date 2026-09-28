@@ -110,7 +110,8 @@
       {"enemies": ["outlaw_knifeman", "outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "weight": 2},
       {"enemies": ["prairie_wolf", "prairie_wolf", "coyote"], "weight": 3},
       {"enemies": ["rattlesnake", "rattlesnake", "carrion_crows"], "weight": 2},
-      {"enemies": ["prairie_wolf", "coyote", "carrion_crows"], "weight": 2},
+      {"enemies": ["prairie_wolf", "prairie_wolf", "prairie_wolf"], "weight": 2},
+      {"enemies": ["prairie_wolf", "coyote", "carrion_crows"], "weight": 1},
       {"enemies": ["outlaw_knifeman", "outlaw_gunhand", "carrion_crows"], "weight": 2},
       {"enemies": ["prairie_haint", "coyote", "carrion_crows"], "weight": 1},
       {"enemies": ["outlaw_brawler", "outlaw_knifeman", "outlaw_gunhand"], "weight": 2}
@@ -118,6 +119,7 @@
     "elites": [
       {"enemies": ["crane_lieutenant", "outlaw_gunhand", "murder_of_crows"], "weight": 2},
       {"enemies": ["buffalo_bull", "coyote", "coyote"], "weight": 2},
+      {"enemies": ["prairie_wolf", "prairie_wolf", "prairie_wolf", "prairie_wolf"], "weight": 1},
       {"enemies": ["prairie_haint", "prairie_haint", "carrion_crows"], "weight": 1}
     ],
     "cave_fights": [

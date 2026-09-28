@@ -277,7 +277,9 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 	if sk.get("target", "enemy") == "enemy":
 		var dm := int(round(float(sk.get("dmg", 0.0)) * 100))
 		var parts: Array = ["Accuracy %d" % int(sk.get("acc", 85))]
-		if not sk.get("no_damage", false):
+		if sk.has("dmg_range"):
+			parts.append("Damage %d-%d" % [int(sk.dmg_range[0]), int(sk.dmg_range[1])])
+		elif not sk.get("no_damage", false):
 			parts.append("Damage %s%d%%" % ["+" if dm >= 0 else "", dm])
 		if int(sk.get("crit", 0)) != 0:
 			parts.append("Crit +%d%%" % int(sk.crit))
@@ -322,6 +324,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 		"random_buff":
 			return "A random boon for %d rounds" % rounds
 		"fatigue":
+			if e.get("amount") is Array:
+				return "+%d-%d Fatigue" % [int(e.amount[0]), int(e.amount[1])]
 			var fa := int(e.get("amount", 5))
 			if fa < 0:
 				fa = int(round(fa * (1.0 + 0.15 * (level - 1))))
@@ -331,6 +335,11 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "Knocks back %d rank%s%s" % [int(e.get("amount", 1)), "" if int(e.get("amount", 1)) == 1 else "s", chance]
 		"pull":
 			return "Pulls forward %d rank%s%s" % [int(e.get("amount", 1)), "" if int(e.get("amount", 1)) == 1 else "s", chance]
+		"buff_kin":
+			var mods: Array = []
+			for m in e.get("mods", []):
+				mods.append(Stats.mod_text(m))
+			return "Other %s: %s for %d rounds" % [e.get("kin", "pack members"), ", ".join(mods), int(e.get("rounds", 2))]
 		"move":
 			var mv := int(e.get("amount", 1))
 			return "Moves %s %d rank%s" % ["forward" if mv > 0 else "back", absi(mv), "" if absi(mv) == 1 else "s"]

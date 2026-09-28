@@ -6,6 +6,7 @@ var id: int = 0
 var side: String = "hero"        # "hero" or "enemy"
 var hero: Hero = null
 var data: Dictionary = {}        # class data (hero) or enemy data
+var enemy_id := ""               # enemies.json key (empty for heroes)
 var display_name: String = ""
 var hp: int = 1
 var max_hp: int = 1
@@ -50,6 +51,7 @@ static func from_enemy(eid: String, uid: int, t: int, cave: bool) -> Combatant:
 	c.id = uid
 	c.side = "enemy"
 	c.data = d
+	c.enemy_id = eid
 	c.display_name = d.get("name", eid)
 	c.tier = t
 	c.in_cave = cave
