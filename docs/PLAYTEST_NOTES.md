@@ -1,0 +1,41 @@
+# Playtest Notes & Backlog
+
+## Round 1 (owner's first playthrough)
+
+### Keep
+- The Slay the Spire–style branching map, where taking one path locks out others. Works great.
+- Core gameplay and mechanics are decent for a first build.
+
+### Clarity / UI
+- [ ] Map nodes are 100% accurate about what's there. Add uncertainty (fog, "probably a fight",
+      unknown stops) and a real **scouting** layer. Some heroes, survival skills and quirks
+      should be better at it than others.
+- [ ] Fatigue relief on hero crits isn't explained (Fan the Hammer looked like it reduced
+      Fatigue; it was the crits). Make the cause visible.
+- [ ] Keepsakes: there's no obvious place to see or equip them, especially on the trail.
+- [ ] Wagon: no feedback on its condition. Did "Mend the Wagon" do anything? Show wagon
+      condition clearly, and what repaired or damaged it.
+- [ ] Combat readability: more time to register actions, and clearer attacker → target
+      (who is hitting whom). More animations and light QoL feedback when moves are used.
+
+### Economy / resources
+- [ ] Money supply feels too high.
+- [ ] Resources (supplies and materials) rarely matter. Add more encounters and random
+      events that force using them (broken wheel, rats in the food, spoilage...).
+- [ ] Currency → **chips**. Lore: the company heads west toward **the Great Casino**, a
+      utopian gambling-market paradise city.
+
+### Balance
+- [ ] Silas Crane at 165 HP is effectively impossible. Tune him down, or force a retreat the
+      first time.
+- [ ] Early-game damage and healing both feel a bit high.
+
+### New content
+- [ ] Side expeditions from each town: 2–3 short "sub-quest" regions per town, tangential to
+      the main westward trail. Used to train up, gain levels, items and upgrades before the
+      main-line expedition (like DD's multiple dungeon areas).
+
+### Workshops (to do together)
+- [ ] Enemy workshop: in-depth pass on enemies, move sets and enemy groupings. They
+      currently feel bland.
+- [ ] Class workshop: deep dive on each class and its moves for more interest and variety.
