@@ -13,10 +13,18 @@ push west into a frontier that grows stranger the farther you go.
 - **Settlement chain (persistent meta layer).** A line of settlements stretching west.
   - Tiers: **Outpost → Town → City**. Upgrading is expensive and slow; you can't found a
     big town every run.
-  - The easternmost (oldest) settlements are the most developed; new outposts are
-    founded occasionally as you push the frontier west, not after every win.
+  - Outposts can only be founded at **boss sites**: beat a region's boss and its
+    landmark becomes a place you can settle. From there it can grow to Town, then City.
+  - The easternmost (oldest) settlements are the most developed.
+  - Settlements hold **buildings** in the spirit of DD's Hamlet, reflavored for the
+    frontier: somewhere to shed Fatigue (saloon / chapel), a doctor to treat bad quirks
+    and ailments, a blacksmith/gunsmith for gear, a guild/trainer for skill upgrades,
+    a general store, etc. Not every settlement has every building.
   - Heroes can be **sent back east** to better-developed settlements to heal, recover,
     and train. Distance costs time: they're out of the roster for a while.
+  - A **stagecoach / stable** building moves heroes between settlements: sending them
+    back east, and bringing them back out west to rejoin the frontier.
+  - Heroes can be **recruited at settlements or found along the trail**.
 - **Runs (roguelite layer).** Pick four heroes and supplies, then travel west along a main
   trail with branching side spots: caves, abandoned towns, homesteads, trading posts,
   river crossings. Not strictly linear.
@@ -29,9 +37,12 @@ push west into a frontier that grows stranger the farther you go.
 - **Survival skills** give heroes of the same class different identities: one Gunslinger
   is a cook, another a forager or scout. They replace DD's camping skills and are used on
   the trail and at camp. They have their own move pool and rank up.
-- Positive/negative traits (DD's quirks, reflavored).
+- **Quirks**: positive and negative traits in the spirit of DD's. Examples: bonus damage
+  vs a creature type, better scouting, or a compulsion (e.g. a drinker who must
+  investigate every whiskey barrel, with a chance of trouble). Treatable in town.
+  General system first, refined later.
 
-## Stress equivalent (name TBD, e.g. "Strain")
+## Fatigue (the stress equivalent)
 - Works like DD stress: it builds up from hardship, and at the threshold a hero either
   **breaks** (a bad state that sometimes acts on its own) or gets a **second wind**
   (a heroic state). The tone is lighter than DD.
@@ -58,6 +69,13 @@ push west into a frontier that grows stranger the farther you go.
 - A **mythic layer** in the spirit of the Iliad/Odyssey: giants and other legendary
   creatures, more common the farther west you go. Original creatures, not borrowed
   sacred figures; Native peoples are not portrayed as enemies.
+
+## Audio
+- Basic generated clips: gunshots, slashes, impacts, animal noises, eerie stingers,
+  UI clicks. Real audio can replace them later.
+
+## Delivery
+- A Windows `.exe` you can double-click to play, plus the Godot project itself.
 
 ## Art
 - Stylized paper-cutout / woodcut-silhouette figures, layered parallax frontier
