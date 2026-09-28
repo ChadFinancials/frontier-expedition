@@ -357,6 +357,7 @@ func _fill_hero_info(c: Combatant) -> void:
 		["dodge", str(int(c.stat("dodge"))), "Dodge: lowers the chance enemies hit this hero"],
 		["prot", "%d%%" % int(c.stat("prot")), "Protection: blocks this share of incoming damage"],
 		["speed", str(int(c.stat("speed"))), "Speed: acts earlier in the round"]]))
+	_buff_line(c)
 	if h.fatigue_state != "":
 		var st: Dictionary = DB.fatigue_states[h.fatigue_state]
 		var l := UI.wrap(UI.lbl("%s: %s" % [st.name, st.desc], 15), 420)
@@ -378,8 +379,21 @@ func _fill_enemy_info(c: Combatant) -> void:
 	hero_info.add_child(UI.stat_row([
 		["dodge", str(int(c.stat("dodge"))), "Dodge"], ["prot", "%d%%" % int(c.stat("prot")), "Protection"],
 		["speed", str(int(c.stat("speed"))), "Speed"]]))
+	_buff_line(c)
 	hint_label.text = "[color=#e05a4a]Enemy turn[/color]: watch the arrow to see who they're targeting."
 	skill_row.add_child(UI.lbl("Enemy turn...", 22, "Bold"))
+
+
+## Active boosts and hindrances with how long they last ("Accuracy +3, 2 turns").
+func _buff_line(c: Combatant) -> void:
+	if c.buffs.is_empty():
+		return
+	var parts: Array = []
+	for b in c.buffs:
+		var dur := "this fight" if int(b.rounds) >= 99 else "%d turn%s" % [int(b.rounds), "" if int(b.rounds) == 1 else "s"]
+		var col := "#9fd07a" if float(b.value) >= 0 else "#f0a080"
+		parts.append("[color=%s]%s[/color] (%s)" % [col, Stats.mod_text({"stat": b.stat, "value": b.value}), dur])
+	hero_info.add_child(UI.rich(", ".join(parts), 15, false, 420))
 
 
 func _hide_controls() -> void:
@@ -684,8 +698,9 @@ func _result(e: Dictionary) -> void:
 		"resist":
 			var t5 := engine.unit(e.target)
 			if t5 != null:
-				_popup(t5, "Resisted", Color("#cccccc"), 22, 40)
-				_log("%s resists the %s." % [t5.display_name, e.status])
+				var st_name: String = {"stun": "Stun", "bleed": "Bleed", "poison": "Poison", "knockback": "Knockback", "pull": "Pull", "debuff": "Debuff"}.get(str(e.status), str(e.status).capitalize())
+				_popup(t5, "Resisted %s" % st_name, Color("#cccccc"), 22, 40)
+				_log("%s resists the %s (a status resistance; damage is unaffected)." % [t5.display_name, st_name.to_lower()])
 		"buff", "debuff":
 			var t6 := engine.unit(e.target)
 			if t6 != null:

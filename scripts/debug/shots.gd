@@ -71,6 +71,7 @@ static func run(main: Main, args: Dictionary) -> void:
 				await main.goto("trail", {}, true)
 		"embark":
 			Game.company.complete_tutorial()
+			Game.company.advance_week()
 			await main.goto("embark", {"index": 0, "dest": args.get("dest", "tallgrass")}, true)
 		"trail", "combat", "camp", "cave", "event", "curio":
 			var co: Company = Game.company

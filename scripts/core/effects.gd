@@ -59,12 +59,16 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 				out.msgs.append("Lost %d chips from the company purse." % lost)
 			"timber":
 				var t := amount + (int(run.party_passive("timber_bonus")) if amount > 0 else 0)
-				run.loot.timber = int(run.loot.timber) + t
-				out.msgs.append("+%d Timber." % t)
+				var tg: int = run.add_material("timber", t) if t > 0 else t
+				if t < 0:
+					run.loot.timber = maxi(0, int(run.loot.timber) + t)
+				out.msgs.append("+%d Timber." % tg if tg == t else "+%d Timber (no room in the wagon for %d more)." % [tg, t - tg])
 			"iron":
 				var ir := amount + (int(run.party_passive("iron_bonus")) if amount > 0 else 0)
-				run.loot.iron = int(run.loot.iron) + ir
-				out.msgs.append("+%d Iron." % ir)
+				var ig: int = run.add_material("iron", ir) if ir > 0 else ir
+				if ir < 0:
+					run.loot.iron = maxi(0, int(run.loot.iron) + ir)
+				out.msgs.append("+%d Iron." % ig if ig == ir else "+%d Iron (no room in the wagon for %d more)." % [ig, ir - ig])
 			"charters":
 				run.loot.charters = int(run.loot.charters) + amount
 				out.msgs.append("+%d Land Charter%s!" % [amount, "" if amount == 1 else "s"])

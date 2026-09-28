@@ -145,12 +145,16 @@ func refresh() -> void:
 		c.clicked.connect(func(_c): _open_hero(h))
 		party_row.add_child(c)
 	UI.clear(item_row)
-	item_row.add_child(UI.lbl("Wagon: %d of %d slots  (click to use)" % [Inventory.slots_used(run.supplies), Inventory.capacity()], 16, "Bold"))
-	var grid := InventoryGrid.make(run.supplies, 50.0, 8, func(it: String):
+	item_row.add_child(UI.lbl("Wagon: %d of %d slots  (click to use)" % [Inventory.slots_used(run.cargo()), Inventory.capacity()], 16, "Bold"))
+	var grid := InventoryGrid.make(run.cargo(), 50.0, 8, func(it: String):
+		if DB.items.get(it, {}).get("cargo", false):
+			return "Building material, carried home for your settlements."
 		return "Click to use." if run.can_use_item(it) else "Used by events, curios and camp, not directly.")
 	grid.slot_clicked.connect(func(it: String):
 		if run.can_use_item(it):
 			_use_item(it)
+		elif DB.items[it].get("cargo", false):
+			Main.inst.toast("%s is carried home to build with." % DB.items[it].name)
 		else:
 			Main.inst.toast("%s gets used by events, curios and camp actions." % DB.items[it].name))
 	item_row.add_child(grid)

@@ -154,48 +154,48 @@
 - Inventory: the wagon has 12 slots; items stack (Food 12, Bandages 6...). Embark is a store
   plus a wagon grid; the trail shows the wagon grid (click a slot to use it).
 
-## Round 3 (not started: waiting on the art-direction discussion)
+## Round 3
 
 ### Story & setup
-- [ ] Enemies may keep nicknames when they're uniques or bosses (heroes stay single-name).
-- [ ] Skipping the tutorial should start in town with exactly the post-tutorial setup.
-- [ ] Don't auto-add the Preacher and Sharpshooter after the tutorial. Put one on the hiring
+- [x] Enemies may keep nicknames when they're uniques or bosses (heroes stay single-name).
+- [x] Skipping the tutorial should start in town with exactly the post-tutorial setup.
+- [x] Don't auto-add the Preacher and Sharpshooter after the tutorial. Put one on the hiring
       board, and make the other a mysterious party member rescued in Dry Gulch Mine.
-- [ ] Starting company size cap is 5, not 24.
+- [x] Starting company size cap is 5, not 24.
 
 ### Store & supplies
-- [ ] Curio tools (rope, shovel, crowbar, etc.) can't be bought until the General Store is
+- [x] Curio tools (rope, shovel, crowbar, etc.) can't be bought until the General Store is
       built and upgraded.
-- [ ] Until then, the wagon starts pre-packed with food, bandages and a little wagon parts.
+- [x] Until then, the wagon starts pre-packed with food, bandages and a little wagon parts.
       More must be found or bought.
 
 ### Balance
-- [ ] Sermon on the Trail is too strong: halve its Fatigue relief and Accuracy buff.
-- [ ] Sharpshooter damage feels very strong early.
-- [ ] Question: does the Sermon's +5 Accuracy carry into the next fight? (Answer: no; see
+- [x] Sermon on the Trail is too strong: halve its Fatigue relief and Accuracy buff.
+- [x] Sharpshooter damage feels very strong early.
+- [x] Question: does the Sermon's +5 Accuracy carry into the next fight? (Answer: no; see
       the reply. Consider showing buff durations on units.)
 
 ### Side adventures & camp
-- [ ] Maybe side adventures have no campsite (a one-day trip). This leaves room for camp
+- [x] Maybe side adventures have no campsite (a one-day trip). This leaves room for camp
       skills to grow and fits scarce early resources. Undecided.
-- [ ] Scout Ahead at the campsite right before the boss is useless: nothing left to scout.
+- [x] Scout Ahead at the campsite right before the boss is useless: nothing left to scout.
 
 ### Art direction (to explore first)
-- [ ] The drawn-polygon look lacks wow factor. Explore AI image generation (ComfyUI or
+- [x] The drawn-polygon look lacks wow factor. Explore AI image generation (ComfyUI or
       similar) with consistent style prompting for characters, backgrounds, buildings and
       items. Keep the storybook / paper-cutout / papier-mâché feel.
 
 ### Round 3, part 2 (both side adventures)
-- [ ] Side adventures felt pretty easy. Give enemies a slight buff or more 4-enemy fights, but
+- [x] Side adventures felt pretty easy. Give enemies a slight buff or more 4-enemy fights, but
       early side quests should stay fairly easy.
-- [ ] Elite fights paid 5 Timber and 3 Iron (random 2-5 / 1-3), which feels like a lot.
+- [x] Elite fights paid 5 Timber and 3 Iron (random 2-5 / 1-3), which feels like a lot.
       Materials should depend on what the wagon can carry (tie into the inventory).
 - [ ] Find more places for the wagon to matter.
 - [ ] Ruby Blackwing needs cooler, better moves (enemy deep dive).
-- [ ] "Resisted" is unclear. It means a status (stun, bleed, poison, knockback, debuff)
+- [x] "Resisted" is unclear. It means a status (stun, bleed, poison, knockback, debuff)
       failed to stick against the target's resistance; damage is unaffected. Show which one,
       e.g. "Resisted Stun".
-- [ ] The Crow's Nest shouldn't give a hero, only the Blackwing Feather, as the first
+- [x] The Crow's Nest shouldn't give a hero, only the Blackwing Feather, as the first
       uncommon/rare trinket you can get.
 
 ### Plan
@@ -210,3 +210,12 @@
 - [x] Dev "DEV: Win" button in combat for fast testing (remove later).
 - [ ] Replace generated sound effects with a free (CC0) pack. The environment's network policy
       blocks the usual sites; either allow them or drop a pack into assets/audio.
+
+## Round 3, part 3
+- [x] Level-1 heroes start with 5 less HP.
+- [x] Weekly side quests from Saloon "chatter": random quests from a pool (data/quests.json),
+      each with a chance of a boss, a rare trinket or a recruit. The Saloon has two upgrade
+      tracks: Chatter (1 → 2 → 3 quests a week) and Loose Lips (better rewards).
+- [x] Company size starts at 5 and grows with settlements (town 5, city 8, each outpost +2).
+- [ ] Find more places for the wagon to matter (materials now take wagon space).
+- [ ] Ruby Blackwing and the rumor mini-bosses need their own moves (enemy deep dive).

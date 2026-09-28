@@ -90,6 +90,6 @@ func _intro() -> void:
 			Game.save_game()
 			Main.inst.goto("trail"), "Good"],
 		["Skip to Fort Providence", func():
-			Game.company.complete_tutorial()
+			Game.company.complete_tutorial(true)
 			Game.save_game()
 			Main.inst.goto("settlement", {"index": 0, "intro": true})]])

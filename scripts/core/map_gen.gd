@@ -44,8 +44,8 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 				n.visited = true
 				n.done = true
 			elif c == cols_n - 1:
-				n.type = "crossing" if boss_beaten else "boss"
-			elif c == cols_n - 2:
+				n.type = region.get("final", "crossing" if boss_beaten else "boss")
+			elif c == cols_n - 2 and not region.get("side", false):
 				n.type = "camp"
 			else:
 				n.type = _roll_type(c, rng, region.get("node_weights", {}))

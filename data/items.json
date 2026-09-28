@@ -1,14 +1,16 @@
 {
   "_comment": "Supplies bought at the General Store. use: what happens when used from the wagon (on a chosen hero, or on the wagon/lamp). Items are also curio keys.",
 
-  "food": {"name": "Food", "price": 5, "stack": 12, "desc": "Salt pork, hardtack and beans. The party eats 2 per trail stop, and more at camp.", "use": null, "icon": "food"},
-  "lamp_oil": {"name": "Lamp Oil", "price": 10, "stack": 6, "desc": "Restores 25 Lamplight in caves.", "use": {"type": "light", "amount": 25}, "icon": "oil"},
-  "bandages": {"name": "Bandages", "price": 12, "stack": 6, "desc": "Heals a hero 15% and stops bleeding.", "use": {"type": "heal_pct", "value": 15}, "icon": "bandage"},
-  "antivenom": {"name": "Antivenom", "price": 12, "stack": 6, "desc": "Cures poison. Useful on venomous things.", "use": {"type": "heal_pct", "value": 5}, "icon": "vial"},
-  "whiskey": {"name": "Whiskey", "price": 10, "stack": 4, "desc": "A hero sheds 10 Fatigue. Also loosens tongues.", "use": {"type": "fatigue", "amount": -10}, "icon": "bottle"},
-  "rope": {"name": "Rope", "price": 8, "stack": 4, "desc": "For wells, cliffs and crossings.", "use": null, "icon": "rope"},
-  "shovel": {"name": "Shovel", "price": 15, "stack": 4, "desc": "For graves, rubble and burrows.", "use": null, "icon": "shovel"},
-  "crowbar": {"name": "Crowbar", "price": 15, "stack": 4, "desc": "For crates, strongboxes and anything nailed shut.", "use": null, "icon": "crowbar"},
-  "salt": {"name": "Salt", "price": 15, "stack": 4, "desc": "Old wisdom says it keeps strange things at bay.", "use": null, "icon": "salt"},
-  "wagon_parts": {"name": "Wagon Parts", "price": 20, "stack": 4, "desc": "A spare axle, wheel spokes and pins. Repairs the wagon by 30.", "use": {"type": "wagon", "amount": 30}, "icon": "wheel"}
+  "food": {"name": "Food", "store_level": 1, "price": 5, "stack": 12, "desc": "Salt pork, hardtack and beans. The party eats 2 per trail stop, and more at camp.", "use": null, "icon": "food"},
+  "lamp_oil": {"name": "Lamp Oil", "store_level": 1, "price": 10, "stack": 6, "desc": "Restores 25 Lamplight in caves.", "use": {"type": "light", "amount": 25}, "icon": "oil"},
+  "bandages": {"name": "Bandages", "store_level": 1, "price": 12, "stack": 6, "desc": "Heals a hero 15% and stops bleeding.", "use": {"type": "heal_pct", "value": 15}, "icon": "bandage"},
+  "antivenom": {"name": "Antivenom", "store_level": 1, "price": 12, "stack": 6, "desc": "Cures poison. Useful on venomous things.", "use": {"type": "heal_pct", "value": 5}, "icon": "vial"},
+  "whiskey": {"name": "Whiskey", "store_level": 1, "price": 10, "stack": 4, "desc": "A hero sheds 10 Fatigue. Also loosens tongues.", "use": {"type": "fatigue", "amount": -10}, "icon": "bottle"},
+  "rope": {"name": "Rope", "store_level": 2, "price": 8, "stack": 4, "desc": "For wells, cliffs and crossings.", "use": null, "icon": "rope"},
+  "shovel": {"name": "Shovel", "store_level": 2, "price": 15, "stack": 4, "desc": "For graves, rubble and burrows.", "use": null, "icon": "shovel"},
+  "crowbar": {"name": "Crowbar", "store_level": 2, "price": 15, "stack": 4, "desc": "For crates, strongboxes and anything nailed shut.", "use": null, "icon": "crowbar"},
+  "salt": {"name": "Salt", "store_level": 2, "price": 15, "stack": 4, "desc": "Old wisdom says it keeps strange things at bay.", "use": null, "icon": "salt"},
+  "wagon_parts": {"name": "Wagon Parts", "store_level": 1, "price": 20, "stack": 4, "desc": "A spare axle, wheel spokes and pins. Repairs the wagon by 30.", "use": {"type": "wagon", "amount": 30}, "icon": "wheel"},
+  "timber": {"name": "Timber", "store_level": 99, "price": 0, "stack": 5, "cargo": true, "desc": "Building lumber for your settlements. Heavy: five to a wagon slot.", "use": null, "icon": "timber"},
+  "iron": {"name": "Iron", "store_level": 99, "price": 0, "stack": 5, "cargo": true, "desc": "Scrap and ore for your settlements. Heavy: five to a wagon slot.", "use": null, "icon": "iron"}
 }

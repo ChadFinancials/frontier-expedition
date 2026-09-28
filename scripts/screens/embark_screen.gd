@@ -66,16 +66,28 @@ func setup(params: Dictionary) -> void:
 	add_child(dp)
 	var drow := UI.hb(10)
 	dp.add_child(drow)
-	drow.add_child(UI.hdr("Where to?", 24))
+	var bw := minf(250.0, 950.0 / maxf(1, options.size()))
 	for r in options:
 		var rd: Dictionary = DB.regions[r]
-		var kind: String = "Tutorial" if rd.get("tutorial", false) else ("Side adventure" if rd.get("side", false) else "The trail west")
-		var done: bool = r in co.beaten
-		var b := UI.btn("%s\n%s, lvl %s%s" % [rd.name, kind, rd.get("rec_level", "?"), "  ✓" if done else ""], func():
+		var kind: String = "The trail west"
+		if rd.get("tutorial", false):
+			kind = "Tutorial"
+		elif rd.get("quest", false):
+			kind = "Saloon rumor"
+		elif rd.get("side", false):
+			kind = "Story"
+		var b := UI.btn("%s\n%s, lvl %s" % [rd.name, kind, rd.get("rec_level", "?")], func():
 			if r != dest:
 				Main.inst.goto("embark", {"index": index, "dest": r, "party": party.duplicate(), "supplies": supplies.duplicate()}), "Good" if r == dest else "Tab")
-		b.custom_minimum_size = Vector2(250, 76)
-		b.tooltip_text = rd.get("desc", "") + ("\n\nFirst clear: a new hero joins, plus a rare trinket." if rd.get("side", false) and not done else "")
+		b.custom_minimum_size = Vector2(bw, 76)
+		b.clip_text = true
+		b.add_theme_font_size_override("font_size", 17 if bw < 200 else 20)
+		var tip: String = rd.get("desc", "")
+		if rd.get("quest", false):
+			tip += "\n\n" + Company.quest_hints(rd) + "\nA short trip with no campsite. Taking the job takes it off the board."
+		elif rd.get("side", false):
+			tip += "\n\nA short trip with no campsite. It can only be done once."
+		b.tooltip_text = tip
 		drow.add_child(b)
 	# Formation stage.
 	var sp := UI.panel("Dark")
@@ -104,7 +116,7 @@ func setup(params: Dictionary) -> void:
 	suph.add_child(UI.lbl("Click store goods to load them; click a wagon slot to put one back.", 16, "Ink"))
 	suph.add_child(UI.spacer(0, 0, true))
 	suph.add_child(UI.btn("Recommended", func():
-		supplies = _affordable(RECOMMENDED)
+		supplies = _default_load()
 		_refresh_supplies(), "Small"))
 	suph.add_child(UI.btn("Clear", func():
 		supplies = {}
@@ -121,7 +133,8 @@ func setup(params: Dictionary) -> void:
 	var back := UI.btn("<  Back", func(): Main.inst.goto("settlement", {"index": index}), "", 160)
 	back.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	fh.add_child(back)
-	var info := UI.rich("[b]%s[/b]  (recommended level %s)\n%s" % [region.get("name", ""), region.get("rec_level", "?"), region.get("desc", "")], 19, false, 1000)
+	var info := UI.rich("[b]%s[/b]  (recommended level %s)\n%s%s" % [region.get("name", ""), region.get("rec_level", "?"), region.get("desc", ""),
+		("  " + Company.quest_hints(region)) if region.get("quest", false) else ""], 19, false, 1000)
 	fh.add_child(info)
 	var fv := UI.vb(4)
 	fh.add_child(fv)
@@ -133,7 +146,7 @@ func setup(params: Dictionary) -> void:
 	depart_btn = UI.btn("Hit the Trail!", _depart, "Big", 300)
 	depart_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	fh.add_child(depart_btn)
-	supplies = params.get("supplies", _affordable(RECOMMENDED))
+	supplies = params.get("supplies", _default_load())
 	if params.has("party"):
 		party = params.party
 	else:
@@ -254,7 +267,11 @@ func _refresh_supplies() -> void:
 		b.add_child(l)
 		b.tooltip_text = "%s: %s\n%d chips each. Stacks of %d per wagon slot." % [d.name, d.desc, price, Inventory.stack_size(it)]
 		var room := Inventory.room_for(supplies, it)
-		b.disabled = room <= 0 or co.supply_cost(index, supplies) + price * mini(step, room) > co.money
+		var sale := co.item_for_sale(index, it)
+		b.disabled = sale != "" or room <= 0 or co.supply_cost(index, supplies) + price * mini(step, room) > co.money
+		if sale != "":
+			b.tooltip_text = "%s: %s." % [d.name, sale]
+			b.modulate = Color(1, 1, 1, 0.5)
 		b.pressed.connect(func():
 			supplies[item] = int(supplies.get(item, 0)) + mini(step, Inventory.room_for(supplies, item))
 			Audio.play("coin", 0.4)
@@ -263,6 +280,8 @@ func _refresh_supplies() -> void:
 	# The wagon: its slots. Click a stack to put one step back.
 	var wv := UI.vb(6)
 	row.add_child(wv)
+	if not co.has_store(index):
+		wv.add_child(UI.wrap(UI.lbl("No General Store yet: the wagon goes out with a free basic kit. Rebuild the store to buy more.", 16, "InkBold"), 480))
 	wv.add_child(UI.lbl("Wagon: %d of %d slots" % [Inventory.slots_used(supplies), Inventory.capacity()], 19, "InkBold"))
 	var grid := InventoryGrid.make(supplies, 70.0, 6)
 	grid.slot_clicked.connect(func(item: String):
@@ -282,6 +301,18 @@ func _refresh_supplies() -> void:
 	elif why == "" and food < 12:
 		warn_label.text = "That's not much food..."
 	depart_btn.disabled = why != ""
+
+
+## The free kit without a store; otherwise the recommended load of what's for sale.
+func _default_load() -> Dictionary:
+	var co: Company = Game.company
+	if not co.has_store(index):
+		return co.free_kit()
+	var want := {}
+	for it in RECOMMENDED:
+		if co.item_for_sale(index, it) == "":
+			want[it] = RECOMMENDED[it]
+	return _affordable(want)
 
 
 ## The recommended load, trimmed (extras first, then food) to what the company can pay for.

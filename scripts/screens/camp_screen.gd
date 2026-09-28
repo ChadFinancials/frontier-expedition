@@ -131,6 +131,8 @@ func _refresh() -> void:
 			elif a.locked:
 				b.text = "%s (unlocks at rank %d)" % [ad.name, int(ad.get("unlock", 2))]
 				b.tooltip_text += "\n\nUnlocks when %s reaches rank %d." % [DB.survival[a.skill].name, int(ad.get("unlock", 2))]
+			elif a.get("pointless", false):
+				b.tooltip_text += "\n\nNothing left to scout: every stop ahead is already known."
 			elif not a.affordable:
 				b.tooltip_text += "\n\nNot enough supplies."
 			var uid: int = h.uid

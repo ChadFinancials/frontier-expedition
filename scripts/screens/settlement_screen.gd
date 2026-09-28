@@ -223,11 +223,22 @@ func _victory_view() -> void:
 
 
 func _intro() -> void:
-	Main.inst.message("Fort Providence", "Every wagon on the frontier is chasing the same rumor: far to the west, past the last mountain, stands [b]the Great Casino[/b], a paradise city where fortunes are made. Its chips are the only currency anyone trusts out here.\n\nFort Providence was the last real town before the edge of the map, until the outlaw [b]Silas Crane[/b] burned it for refusing his toll. Your company is four hard souls, a wagon, and a short stack of chips.\n\n" + _home_tips())
+	Main.inst.message("Fort Providence", "Every wagon on the frontier is chasing the same rumor: far to the west, past the last mountain, stands [b]the Great Casino[/b], a paradise city where fortunes are made. Its chips are the only currency anyone trusts out here.\n\nFort Providence was the last real town before the edge of the map, until the outlaw [b]Silas Crane[/b] burned it for refusing his toll. Ma Delaney has already raised a saloon from the ashes.\n\n" + _company_news() + "\n\n" + _home_tips())
 
 
 func _intro_home() -> void:
-	Main.inst.message("Fort Providence", "Fort Providence is mostly ash. The stockade is half down, the store and the smithy are charred frames, and the townsfolk are camped in the mud. But Ma Delaney is already hauling planks, and the two members of your company who rode ahead are waiting at the hiring board.\n\nThis is home now. Rebuild it, and push west: [b]the Tallgrass Sea[/b] and Silas Crane's toll bridge lie beyond.\n\n" + _home_tips())
+	Main.inst.message("Fort Providence", "Fort Providence is mostly ash. The stockade is half down, the store and the smithy are charred frames, and the townsfolk are camped in the mud. But Ma Delaney is already hauling planks.\n\n" + _company_news() + "\n\nThis is home now. Rebuild it, and push west: [b]the Tallgrass Sea[/b] and Silas Crane's toll bridge lie beyond.\n\n" + _home_tips())
+
+
+## What became of the two who rode ahead.
+func _company_news() -> String:
+	var co: Company = Game.company
+	var lines: Array = []
+	if co.promised_name() != "":
+		lines.append("[b]%s[/b], who rode ahead of the wagon, is waiting at the [b]Hiring Board[/b]. Hire them for free." % co.promised_name())
+	if co.missing_name() != "":
+		lines.append("[b]%s[/b] rode up to [b]Dry Gulch Mine[/b] looking for silver and never came back. You can go after them from Plan Expedition." % co.missing_name())
+	return "\n".join(lines)
 
 
 func _home_tips() -> String:

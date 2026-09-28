@@ -4,7 +4,10 @@
   "start_money": 750,
   "start_timber": 4,
   "start_iron": 1,
-  "start_heroes": ["marshal", "gunslinger", "preacher", "sharpshooter"],
+  "start_heroes": ["marshal", "gunslinger"],
+  "start_promised": ["preacher"],
+  "start_missing": ["sharpshooter"],
+  "roster_per_tier": {"outpost": 2, "town": 5, "city": 8},
   "roster_cap": 24,
   "grubstake_floor": 150,
 
@@ -95,8 +98,8 @@
   "xp_elite": 2,
 
   "enemy_money": [5, 12],
-  "elite_timber": [2, 5],
-  "elite_iron": [1, 3],
+  "elite_timber": [1, 3],
+  "elite_iron": [0, 2],
   "elite_keepsake_chance": 35,
   "boss_money": 250,
 
@@ -110,6 +113,7 @@
   "ruin_rebuild_pct": 100,
   "trade_markup": 2.2,
   "wagon_slots": 12,
+  "free_kit": {"food": 12, "bandages": 1, "wagon_parts": 1},
   "tutorial_party": ["marshal", "gunslinger"],
   "tutorial_supplies": {"food": 10, "bandages": 2, "wagon_parts": 1},
   "found_cost": {"charters": 1, "money": 600, "timber": 15, "iron": 8},

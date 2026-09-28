@@ -95,6 +95,12 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 	for h in party:
 		uids.append(h.uid)
 	var supplies := {"food": 20, "bandages": 2, "lamp_oil": 3, "wagon_parts": 1, "shovel": 1, "crowbar": 1, "salt": 1}
+	if not co.has_store(i):
+		supplies = co.free_kit()
+	else:
+		for k in supplies.keys():
+			if co.item_for_sale(i, k) != "":
+				supplies.erase(k)
 	while co.supply_cost(i, supplies) > co.money and supplies.food > 0:
 		supplies.food = maxi(0, supplies.food - 2)
 		for k in ["salt", "crowbar", "shovel", "wagon_parts", "lamp_oil", "bandages"]:

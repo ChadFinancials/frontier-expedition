@@ -107,6 +107,19 @@ func _slot_row(parent: Control, key: String, cap: int, on_empty: Callable, empty
 
 func _activities(body: VBoxContainer) -> void:
 	var co: Company = Game.company
+	if bid == "saloon":
+		var qs: Array = co.settlement(index).get("quests", [])
+		var ch := UI.panel("Card")
+		body.add_child(ch)
+		var cv := UI.vb(4)
+		ch.add_child(cv)
+		cv.add_child(UI.lbl("Chatter at the bar this week", 22, "InkBold"))
+		if qs.is_empty():
+			cv.add_child(UI.lbl("Nothing worth repeating. New talk comes in every week.", 17, "Ink"))
+		for q in qs:
+			var reg: Dictionary = DB.regions.get(q, {})
+			cv.add_child(UI.rich("[b]%s[/b]: %s  %s" % [reg.get("name", "?"), reg.get("desc", ""), Company.quest_hints(reg)], 17, true, 1100))
+		cv.add_child(UI.lbl("Take these jobs from Plan Expedition. Upgrade Chatter and Loose Lips below for more and better jobs.", 16, "Ink"))
 	body.add_child(UI.lbl("Click an empty slot to send a hero. They shed Fatigue and sit out the next expedition. Visiting also clears a Breaking Point.", 18, "InkBold"))
 	for a in DB.buildings[bid].get("activities", []):
 		var aid: String = a.id
@@ -281,7 +294,7 @@ func _store(body: VBoxContainer) -> void:
 func _hiring(body: VBoxContainer) -> void:
 	var co: Company = Game.company
 	var st := co.settlement(index)
-	body.add_child(UI.lbl("Hands looking for work this week (%d a week). Hiring is free. Company size: %d / %d" % [int(co.track_value(index, "hiring_board", "notices")), co.heroes.size(), DB.cfg("roster_cap", 24)], 19, "InkBold"))
+	body.add_child(UI.lbl("Hands looking for work this week (%d a week). Hiring is free. Company size: %d / %d" % [int(co.track_value(index, "hiring_board", "notices")), co.heroes.size(), co.roster_cap()], 19, "InkBold"))
 	if st.recruits.is_empty():
 		body.add_child(UI.lbl("Nobody's left. More will turn up next week.", 18, "Ink"))
 	var i := 0
@@ -307,7 +320,7 @@ func _hiring(body: VBoxContainer) -> void:
 				Audio.play("coin")
 				Main.inst.toast("%s joins the company!" % nh.hero_name, "good")
 				_changed(), "Good")
-		b.disabled = co.heroes.size() >= DB.cfg("roster_cap", 24)
+		b.disabled = co.heroes.size() >= co.roster_cap()
 		row.add_child(b)
 		body.add_child(row)
 		i += 1
@@ -378,7 +391,8 @@ func _upgrade_footer(v: VBoxContainer) -> void:
 			b.disabled = why != ""
 			b.tooltip_text = why
 			row.add_child(b)
-		return
+		if DB.buildings[bid].costs.size() <= 1:
+			return
 	var lvl := co.building_level(index, bid)
 	var costs: Array = DB.buildings[bid].costs
 	var row := UI.hb(12)

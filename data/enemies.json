@@ -42,7 +42,7 @@
     "look": {"body": "human", "build": "broad", "hat": "stetson_black", "coat": "long", "weapon": "pistols", "extra": "mustache", "feather": true, "pet": "crow", "scale": 1.15,
       "colors": {"coat": "#1f1a1d", "pants": "#26211f", "hat": "#0f0d0c", "accent": "#b8322a"}}},
 
-  "mad_dog_mulligan": {"name": "Mulligan", "title": "Crane's Enforcer", "tags": ["outlaw", "human"], "hp": 34, "dodge": 5, "prot": 10, "speed": 4, "acc": 2, "crit": 5, "dmg": [3, 6],
+  "mad_dog_mulligan": {"name": "\"Mad Dog\" Mulligan", "title": "Crane's Enforcer", "tags": ["outlaw", "human"], "hp": 34, "dodge": 5, "prot": 10, "speed": 4, "acc": 2, "crit": 5, "dmg": [3, 6],
     "res": {"stun": 50, "bleed": 30, "poison": 30, "move": 60, "debuff": 35}, "skills": ["e_mull_haymaker", "e_mull_bottle", "e_mull_whistle"], "boss": true,
     "look": {"body": "human", "build": "heavy", "hat": "flat_cap", "coat": "shirt", "weapon": "fists", "beard": true, "extra": "mustache", "feather": true, "scale": 1.18,
       "colors": {"coat": "#8b2e2e", "pants": "#2f2a26", "hat": "#1e1916", "accent": "#e0bd4f"}}},

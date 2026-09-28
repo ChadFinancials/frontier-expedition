@@ -193,6 +193,22 @@ rebuilt at a discount), `tutorial` (region of the first expedition) and
 `tutorial_rebuilds` (the ruin that winning it restores). Any settlement can list
 `side_regions`.
 
+Story side adventures take `"story": true` (done once, then gone). `side_reward` can
+`"rescue": true` a missing company member (config `start_missing`), with `{name}` in its text.
+
+## Add a weekly side-quest template
+
+`data/quests.json` holds the Saloon's rumor pool. Each template has `name` and `desc`
+(`{place}` is filled in), `node_weights`, `fights`, `elites`, `final` (the last fight when
+there's no boss) and `boss` (`name`, `intro`, `victory`, `enemies`). `chances` sets the odds of
+a boss, a trinket and a recruit per Loose Lips level. Quests borrow scenery, events and curios
+from the settlement's western region and scale to its tier.
+
+Items take `store_level` (the General Store level that sells them; 99 = never sold) and
+`cargo: true` for building materials that take wagon space. Config: `free_kit` (the wagon's
+load when there's no store), `start_heroes`, `start_promised` (waiting on the hiring board),
+`start_missing` (rescued in a story adventure), `roster_per_tier` (company size).
+
 Buildings can have upgrade `tracks` instead of plain levels (see the Hiring Board): each
 track has `name`, `desc`, `values` (per track level) and `costs`. Code reads a track with
 `Company.track_value(i, bid, track)`.

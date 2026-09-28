@@ -169,7 +169,7 @@
     "effects": [{"type": "heal", "min": 2, "max": 4}]},
   "pc_sermon": {"name": "Sermon on the Trail", "class": "preacher", "desc": "Words of comfort for weary souls. Party sheds Fatigue and gains Accuracy.",
     "use_ranks": [2, 3, 4], "target": "party", "anim": "buff", "sfx": "bell",
-    "effects": [{"type": "fatigue", "amount": -5}, {"type": "buff", "stat": "acc", "value": 5, "rounds": 2}]},
+    "effects": [{"type": "fatigue", "amount": -3}, {"type": "buff", "stat": "acc", "value": 3, "rounds": 2}]},
   "pc_brimstone": {"name": "Fire and Brimstone", "class": "preacher", "desc": "Lifts the brass lantern and blazes holy light. May Stun.",
     "use_ranks": [3, 4], "target": "enemy", "target_ranks": [1, 2, 3], "acc": 85, "dmg": -0.7, "anim": "cast", "sfx": "bell",
     "effects": [{"type": "stun", "chance": 100}]},

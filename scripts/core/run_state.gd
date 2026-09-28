@@ -294,9 +294,25 @@ func travel_to(id: int) -> Array:
 	return msgs
 
 
+## Everything in the wagon: supplies plus the Timber and Iron found on the trail.
+func cargo() -> Dictionary:
+	var c := supplies.duplicate()
+	c["timber"] = int(loot.get("timber", 0))
+	c["iron"] = int(loot.get("iron", 0))
+	return c
+
+
+## Loads Timber or Iron into the wagon, as much as fits. Returns how much was taken.
+func add_material(kind: String, n: int) -> int:
+	var got := mini(n, Inventory.room_for(cargo(), kind))
+	if got > 0:
+		loot[kind] = int(loot.get(kind, 0)) + got
+	return got
+
+
 ## Adds supplies up to what the wagon can hold. Returns how many were added.
 func add_supply(item: String, n: int) -> int:
-	var add := mini(n, Inventory.room_for(supplies, item))
+	var add := mini(n, Inventory.room_for(cargo(), item))
 	if add > 0:
 		supplies[item] = int(supplies.get(item, 0)) + add
 	return add
@@ -437,7 +453,23 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 			res.keepsakes.append(company.random_keepsake())
 		if rng.randf() < 0.12:
 			res.charters = 1
-	if kind == "boss":
+	var quest: bool = region().get("quest", false)
+	if quest and kind in ["boss", "crossing"]:
+		# A chatter quest: its rumored rewards, paid once the last fight is won.
+		xp += DB.cfg("xp_elite", 2) + (3 if kind == "boss" else 1)
+		var qr: Dictionary = region().get("quest_reward", {})
+		money += int(qr.get("money", 0))
+		res.timber += int(qr.get("timber", 0))
+		res.iron += int(qr.get("iron", 0))
+		if str(qr.get("trinket", "")) != "":
+			res.keepsakes.append(company.random_keepsake([qr.trinket]))
+		if int(qr.get("recruit", 0)) > 0:
+			var nh := company.make_hero(Stats.pick(company.rng, DB.classes.keys()), int(qr.recruit))
+			nh.location = origin
+			recruits.append(nh.to_dict())
+			res.msgs.append("%s the %s asks to ride with you, and will join when you return." % [nh.hero_name, nh.class_name_text()])
+		boss_won = true
+	elif kind == "boss":
 		xp += DB.cfg("xp_boss", 6)
 		var br: Dictionary = region().get("boss_rewards", {})
 		money += int(br.get("money", DB.cfg("boss_money", 400) * tier()))
@@ -453,6 +485,12 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 			# A side adventure's first clear: a new hand joins, plus its materials.
 			var sr: Dictionary = region().get("side_reward", {})
 			if not sr.is_empty():
+				if sr.get("rescue", false) and not company.missing.is_empty():
+					var md: Dictionary = company.missing.pop_front()
+					md.location = origin
+					recruits.append(md)
+					res.msgs.append(str(sr.get("text", "")).replace("{name}", str(md.hero_name)))
+					res.msgs.append("%s rejoins the company." % md.hero_name)
 				if sr.has("hero"):
 					var hd: Dictionary = sr.hero
 					var nh := company.make_hero(hd.get("class", "marshal"), int(hd.get("level", 1)))
@@ -465,7 +503,7 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 					res.msgs.append("%s the %s will join the company when you return." % [nh.hero_name, nh.class_name_text()])
 				res.timber += int(sr.get("timber", 0))
 				res.iron += int(sr.get("iron", 0))
-	if kind == "crossing":
+	if kind == "crossing" and not quest:
 		xp += DB.cfg("xp_elite", 2) + 2
 		money += int(DB.cfg("boss_money", 400) * tier() / 3.0)
 		res.charters = 1
@@ -477,8 +515,12 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		res.keepsakes.append(company.random_keepsake())
 	res.money = money
 	loot.money = int(loot.money) + money
-	loot.timber = int(loot.timber) + res.timber
-	loot.iron = int(loot.iron) + res.iron
+	for mat in ["timber", "iron"]:
+		var want := int(res[mat])
+		var got := add_material(mat, want)
+		res[mat] = got
+		if got < want:
+			res.msgs.append("No room in the wagon for %d more %s; it's left behind." % [want - got, mat.capitalize()])
 	loot.charters = int(loot.charters) + res.charters
 	for k in res.keepsakes:
 		if k != "":
@@ -697,10 +739,19 @@ func camp_actions() -> Array:
 				var rank := int(h.survival[sid].rank)
 				var locked := rank < int(a.get("unlock", 1))
 				var affordable := can_pay_camp_cost(a)
+				# Scouting when every stop ahead is already known does nothing.
+				var pointless: bool = a.get("effects", []).any(func(e): return e.type == "reveal") and unscouted_ahead() == 0 \
+					and not a.get("effects", []).any(func(e): return e.type != "reveal")
 				out.append({"uid": h.uid, "skill": sid, "action": a, "hours": int(a.hours), "rank": rank,
-					"available": not used and not locked and affordable and int(a.hours) <= int(camp.hours),
-					"used": used, "locked": locked, "affordable": affordable})
+					"available": not used and not locked and affordable and not pointless and int(a.hours) <= int(camp.hours),
+					"used": used, "locked": locked, "affordable": affordable, "pointless": pointless})
 	return out
+
+
+## Stops ahead that aren't fully scouted yet.
+func unscouted_ahead() -> int:
+	var c0 := int(current_node().get("col", 0))
+	return nodes.filter(func(n): return int(n.col) > c0 and MapGen.intel(n) < 3).size()
 
 
 func can_pay_camp_cost(action: Dictionary) -> bool:
@@ -818,8 +869,8 @@ func cave_treasure() -> Array:
 	loot.money = int(loot.money) + m
 	msgs.append("+%d chips." % m)
 	var ir := rng.randi_range(1, 3)
-	loot.iron = int(loot.iron) + ir
-	msgs.append("+%d Iron." % ir)
+	var ig := add_material("iron", ir)
+	msgs.append("+%d Iron." % ig if ig == ir else "+%d Iron (no room in the wagon for %d more)." % [ig, ir - ig])
 	if rng.randf() < 0.6:
 		var k := company.random_keepsake()
 		loot.keepsakes.append(k)
@@ -844,7 +895,7 @@ func trade_buy(item_id: String) -> bool:
 	if int(stock.get(item_id, 0)) <= 0:
 		return false
 	var price := trade_price(item_id)
-	if int(loot.money) + company.money < price or Inventory.room_for(supplies, item_id) < 1:
+	if int(loot.money) + company.money < price or Inventory.room_for(cargo(), item_id) < 1:
 		return false
 	var from_loot := mini(price, int(loot.money))
 	loot.money = int(loot.money) - from_loot

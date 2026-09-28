@@ -17,6 +17,8 @@ var beaten: Array = []          # region ids whose boss has fallen
 var run: RunState = null
 var next_uid: int = 1
 var victory_seen: bool = false
+var missing: Array = []         # hero dicts of company members lost somewhere, waiting for rescue
+var quest_regions: Dictionary = {} # generated side-quest regions (id -> region), registered into DB.regions
 var tutorial_done: bool = true
 var story_flags: Dictionary = {} # scripted story beats that have played (id -> true)
 var stats: Dictionary = {"expeditions": 0, "victories": 0, "deaths": 0, "kills": 0}
@@ -42,7 +44,35 @@ func new_game(seed_value: int = -1) -> void:
 	for cid in DB.cfg("start_heroes", []):
 		var h := make_hero(cid, 1)
 		heroes.append(h)
+	# One of the two who rode ahead waits at the hiring board; the other went missing.
+	st["promised"] = []
+	for cid in DB.cfg("start_promised", []):
+		var ph := make_hero(cid, 1)
+		ph.location = 0
+		st.promised.append(ph.to_dict())
+	for cid in DB.cfg("start_missing", []):
+		var mh := make_hero(cid, 1)
+		mh.location = 0
+		missing.append(mh.to_dict())
 	_refresh_week()
+
+
+## How many heroes the company can keep: each settlement houses some, more as it grows.
+func roster_cap() -> int:
+	var per: Dictionary = DB.cfg("roster_per_tier", {"outpost": 2, "town": 5, "city": 8})
+	var n := 0
+	for s in settlements:
+		n += int(per.get(s.tier, 2))
+	return maxi(1, n)
+
+
+func promised_name(i: int = 0) -> String:
+	var pr: Array = settlement(i).get("promised", [])
+	return str(pr[0].hero_name) if not pr.is_empty() else ""
+
+
+func missing_name() -> String:
+	return str(missing[0].hero_name) if not missing.is_empty() else ""
 
 
 func site_by_index(i: int) -> Dictionary:
@@ -650,10 +680,14 @@ func hire(i: int, index_in_list: int) -> Hero:
 	var st := settlement(i)
 	if index_in_list < 0 or index_in_list >= st.get("recruits", []).size():
 		return null
-	if heroes.size() >= DB.cfg("roster_cap", 24):
+	if heroes.size() >= roster_cap():
 		return null
 	var h := Hero.from_dict(st.recruits[index_in_list])
 	st.recruits.remove_at(index_in_list)
+	var pr: Array = st.get("promised", [])
+	for k in range(pr.size() - 1, -1, -1):
+		if int(pr[k].uid) == h.uid:
+			pr.remove_at(k)
 	h.location = i
 	heroes.append(h)
 	return h
@@ -731,7 +765,8 @@ func _refresh_week() -> void:
 func _refresh_settlement(st: Dictionary) -> void:
 	st.used = {}
 	st["assigned"] = {}
-	st.recruits = []
+	_roll_quests(st)
+	st.recruits = st.get("promised", []).duplicate(true)
 	var i := int(st.index)
 	if building_level(i, "hiring_board") > 0:
 		var count := int(track_value(i, "hiring_board", "notices"))
@@ -763,7 +798,29 @@ func _refresh_settlement(st: Dictionary) -> void:
 
 # --- Expeditions ---------------------------------------------------------------------
 
+## Without a General Store the wagon goes out with a free basic kit and nothing is sold.
+func has_store(i: int) -> bool:
+	return building_level(i, "general_store") > 0
+
+
+func free_kit() -> Dictionary:
+	return DB.cfg("free_kit", {"food": 12, "bandages": 1, "wagon_parts": 1}).duplicate()
+
+
+## "" if the store here sells the item, otherwise why not.
+func item_for_sale(i: int, item: String) -> String:
+	var need := int(DB.items.get(item, {}).get("store_level", 1))
+	var lvl := building_level(i, "general_store")
+	if lvl <= 0:
+		return "No General Store here yet"
+	if lvl < need:
+		return "Needs a level %d General Store" % need
+	return ""
+
+
 func supply_cost(i: int, supplies: Dictionary) -> int:
+	if not has_store(i):
+		return 0
 	var total := 0
 	for it in supplies:
 		total += item_price(i, it) * int(supplies[it])
@@ -780,9 +837,115 @@ func expedition_options(i: int) -> Array:
 	if site.get("region_west", "") != "":
 		out.append(site.region_west)
 	for r in site.get("side_regions", []):
-		if DB.regions.has(r):
+		# Story side adventures happen once; after that the weekly chatter takes over.
+		if DB.regions.has(r) and not (DB.regions[r].get("story", false) and r in beaten):
 			out.append(r)
+	for q in settlement(i).get("quests", []):
+		if DB.regions.has(q):
+			out.append(q)
 	return out
+
+
+# --- Weekly side quests ("chatter" at the Saloon) -------------------------------------
+
+## Rolls this week's side quests for a settlement from data/quests.json. The Saloon's
+## chatter track sets how many, its tips track how good the rewards can be.
+func _roll_quests(st: Dictionary) -> void:
+	var i := int(st.index)
+	st["quests"] = []
+	_prune_quests()
+	if building_level(i, "saloon") <= 0 or DB.quests.is_empty():
+		return
+	var west: String = site_by_index(i).get("region_west", "")
+	if west == "":
+		return
+	var count := int(track_value(i, "saloon", "chatter"))
+	var tier_l := int(track_value(i, "saloon", "tips"))
+	var templates: Array = DB.quests.get("templates", {}).keys()
+	var picks := Stats.shuffled(rng, templates)
+	for n in mini(count, picks.size()):
+		var qid := "q_%d_%d_%d" % [i, week, n]
+		var reg := _make_quest(picks[n], west, tier_l)
+		quest_regions[qid] = reg
+		DB.regions[qid] = reg
+		st.quests.append(qid)
+
+
+## Keeps only the quests still on offer somewhere or being played right now.
+func _prune_quests() -> void:
+	var keep := {}
+	for s in settlements:
+		for q in s.get("quests", []):
+			keep[q] = true
+	if run != null:
+		keep[run.region_id] = true
+	for q in quest_regions.keys():
+		if not keep.has(q):
+			quest_regions.erase(q)
+
+
+func _make_quest(tid: String, west: String, tier_l: int) -> Dictionary:
+	var t: Dictionary = DB.quests.templates[tid]
+	var base: Dictionary = DB.regions[west]
+	var place: String = Stats.pick(rng, DB.quests.get("places", ["the hills"]))
+	var ch: Dictionary = DB.quests.get("chances", {})
+	var tl := clampi(tier_l, 0, 2)
+	var has_boss := rng.randf() * 100.0 < float(ch.get("boss", [25, 40, 55])[tl])
+	var tier := int(base.get("tier", 1))
+	var mult := (1.0 + tl * 0.5) * tier
+	var reward := {
+		"money": int(rng.randi_range(60, 120) * mult),
+		"timber": rng.randi_range(1, 3) + tl,
+		"iron": rng.randi_range(0, 2) + tl,
+		"trinket": "",
+		"recruit": 0,
+	}
+	if rng.randf() * 100.0 < float(ch.get("trinket", [10, 22, 35])[tl]):
+		reward.trinket = "rare" if tl >= 1 else "uncommon"
+	if rng.randf() * 100.0 < float(ch.get("recruit", [8, 14, 20])[tl]):
+		reward.recruit = 1 + tl
+	var b: Dictionary = t.get("boss", {})
+	var reg := {
+		"name": str(t.name).replace("{place}", place), "tier": tier, "rec_level": base.get("rec_level", "1"),
+		"side": true, "quest": true, "template": tid, "columns": 5,
+		"desc": str(t.desc).replace("{place}", place),
+		"palette": base.get("palette", {}), "props": base.get("props", []), "cave_name": base.get("cave_name", "Cave"),
+		"node_weights": t.get("node_weights", {}),
+		"fights": t.fights, "elites": t.get("elites", base.get("elites", [])), "cave_fights": base.get("cave_fights", []),
+		"events": base.get("events", []), "homestead_events": base.get("homestead_events", []),
+		"curios": base.get("curios", []), "cave_curios": base.get("cave_curios", []),
+		"final": "boss" if has_boss else "crossing",
+		"boss": {"name": str(b.get("name", "The Boss")), "landmark": place,
+			"intro": str(b.get("intro", "")).replace("{place}", place),
+			"victory": str(b.get("victory", "")).replace("{place}", place),
+			"enemies": b.get("enemies", t.get("final", []))},
+		"crossing": {"name": str(t.name).replace("{place}", place), "enemies": t.get("final", [])},
+		"quest_reward": reward,
+	}
+	return reg
+
+
+## A short list of what a quest promises, for tooltips and the Saloon.
+static func quest_hints(reg: Dictionary) -> String:
+	var r: Dictionary = reg.get("quest_reward", {})
+	var parts: Array = ["%d chips" % int(r.get("money", 0))]
+	if int(r.get("timber", 0)) > 0:
+		parts.append("%d Timber" % int(r.timber))
+	if int(r.get("iron", 0)) > 0:
+		parts.append("%d Iron" % int(r.iron))
+	if str(r.get("trinket", "")) != "":
+		parts.append("a %s trinket" % r.trinket)
+	if int(r.get("recruit", 0)) > 0:
+		parts.append("a hand who wants to join")
+	var s := "Rumored reward: " + ", ".join(parts) + "."
+	if reg.get("final", "") == "boss":
+		s += " Word is there's a boss: " + str(reg.boss.name) + "."
+	return s
+
+
+func register_quest_regions() -> void:
+	for q in quest_regions:
+		DB.regions[q] = quest_regions[q]
 
 
 ## Where an expedition from settlement i goes by default: its tutorial first, if it has one.
@@ -820,10 +983,25 @@ func start_tutorial() -> RunState:
 
 
 ## Marks the tutorial won (or skipped) and rebuilds the ruin it restores. Returns story text.
-func complete_tutorial() -> String:
+## skipped: the player skipped the tutorial, so hand out what winning it would have given.
+func complete_tutorial(skipped: bool = false) -> String:
 	if tutorial_done:
 		return ""
 	tutorial_done = true
+	if skipped:
+		var reg: Dictionary = DB.regions.get(site_by_index(0).get("tutorial", ""), {})
+		var br: Dictionary = reg.get("boss_rewards", {})
+		money += int(br.get("money", 0))
+		timber += int(br.get("timber", 0))
+		iron += int(br.get("iron", 0))
+		var k: String = reg.get("boss", {}).get("keepsake", "")
+		if k != "":
+			stash.append(k)
+		var tid: String = site_by_index(0).get("tutorial", "")
+		if tid != "" and not tid in beaten:
+			beaten.append(tid)
+		for h in heroes:
+			h.add_xp(int(reg.get("xp_cap", 0)))
 	var site := site_by_index(0)
 	var bid: String = site.get("tutorial_rebuilds", "")
 	var st := settlement(0)
@@ -847,6 +1025,15 @@ func can_embark(i: int, party_uids: Array, supplies: Dictionary, region: String 
 		var h := hero(uid)
 		if h == null or not h.available() or h.location != i:
 			return "A chosen hero isn't available."
+	if not has_store(i):
+		var kit := free_kit()
+		for it in supplies:
+			if int(supplies[it]) > int(kit.get(it, 0)):
+				return "Without a General Store you only have the basic kit."
+	else:
+		for it in supplies:
+			if int(supplies[it]) > 0 and item_for_sale(i, it) != "":
+				return "%s: %s." % [DB.items[it].name, item_for_sale(i, it)]
 	if supply_cost(i, supplies) > money:
 		return "Can't afford those supplies."
 	if Inventory.slots_used(supplies) > Inventory.capacity():
@@ -858,7 +1045,10 @@ func start_run(i: int, party_uids: Array, supplies: Dictionary, region: String =
 	if can_embark(i, party_uids, supplies, region) != "":
 		return null
 	money -= supply_cost(i, supplies)
-	run = RunState.create(self, region if region != "" else expedition_region(i), i, party_uids, supplies)
+	var dest := region if region != "" else expedition_region(i)
+	# Taking a job from the chatter board takes it off the board.
+	settlement(i).get("quests", []).erase(dest)
+	run = RunState.create(self, dest, i, party_uids, supplies)
 	stats.expeditions += 1
 	return run
 
@@ -887,7 +1077,7 @@ func finish_run(status: String) -> Dictionary:
 			if k != "":
 				stash.append(k)
 		for rd in r.recruits:
-			if heroes.size() < DB.cfg("roster_cap", 24):
+			if heroes.size() < roster_cap():
 				var nh := Hero.from_dict(rd)
 				nh.location = r.origin
 				heroes.append(nh)
@@ -938,7 +1128,7 @@ func to_dict() -> Dictionary:
 		"heroes": hs, "dead": dead.duplicate(true), "settlements": settlements.duplicate(true),
 		"stash": stash.duplicate(), "known_keys": known_keys.duplicate(true), "beaten": beaten.duplicate(),
 		"next_uid": next_uid, "victory_seen": victory_seen,
-		"tutorial_done": tutorial_done, "story_flags": story_flags.duplicate(), "stats": stats.duplicate(),
+		"tutorial_done": tutorial_done, "story_flags": story_flags.duplicate(), "missing": missing.duplicate(true), "quest_regions": quest_regions.duplicate(true), "stats": stats.duplicate(),
 		"rng_state": str(rng.state), "run": run.to_dict() if run != null else null}
 
 
@@ -960,6 +1150,9 @@ static func from_dict(d: Dictionary) -> Company:
 	c.victory_seen = d.get("victory_seen", false)
 	c.tutorial_done = d.get("tutorial_done", true)
 	c.story_flags = d.get("story_flags", {}).duplicate()
+	c.missing = d.get("missing", []).duplicate(true)
+	c.quest_regions = d.get("quest_regions", {}).duplicate(true)
+	c.register_quest_regions()
 	c.stats = d.get("stats", c.stats).duplicate()
 	c.rng.randomize()
 	if d.has("rng_state"):

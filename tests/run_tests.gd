@@ -254,13 +254,14 @@ func test_region_fights() -> void:
 func test_settlement_services() -> void:
 	var co := Company.new()
 	co.new_game(5)
-	check(co.settlements.size() == 1 and co.heroes.size() == 4, "new game setup")
+	check(co.settlements.size() == 1 and co.heroes.size() == 2 and co.roster_cap() == 5, "new game setup: two heroes, room for five")
+	check(co.missing.size() == 1 and Hero.from_dict(co.missing[0]).class_id == "sharpshooter", "the sharpshooter is missing")
 	check(co.can_do_activity(0, "saloon", "bar", co.heroes[0]) != "", "saloon is a ruin until the tutorial")
 	co.complete_tutorial()
 	co.money += 3000
 	co.timber += 60
 	co.iron += 40
-	check(co.settlement(0).recruits.size() == 2, "hiring board offers two recruits a week")
+	check(co.settlement(0).recruits.size() == 3 and Hero.from_dict(co.settlement(0).recruits[0]).class_id == "preacher", "hiring board: the promised preacher plus two recruits")
 	var h: Hero = co.heroes[0]
 	h.fatigue = 80
 	var money0 := co.money
@@ -358,7 +359,12 @@ func test_tutorial_and_story() -> void:
 	check(co2.tutorial_done and co2.story_flags.has(sc.id), "tutorial and story flags survive save/load")
 	# Side adventures.
 	co.run = null
-	check(co.expedition_options(0) == ["tallgrass", "dry_gulch_mine", "crows_nest"], "Fort Providence offers the trail and two side adventures")
+	var opts2 := co.expedition_options(0)
+	check(opts2.slice(0, 3) == ["tallgrass", "dry_gulch_mine", "crows_nest"] and opts2.size() == 4 and DB.regions[opts2[3]].get("quest", false),
+		"Fort Providence offers the trail, two story adventures and this week's saloon rumor")
+	var qreg: Dictionary = DB.regions[opts2[3]]
+	check(qreg.final in ["boss", "crossing"] and not qreg.crossing.enemies.is_empty() and Company.quest_hints(qreg).begins_with("Rumored"), "a rumor is a playable quest")
+	var missing_name := co.missing_name()
 	var hs: Array = co.heroes_at(0).slice(0, 2)
 	var r2 := co.start_run(0, hs.map(func(h): return h.uid), {"food": 12}, "dry_gulch_mine")
 	check(r2 != null and MapGen.column_count(r2.nodes) == 6 and r2.nodes[r2.nodes.size() - 1].type == "boss", "side adventure: short map ending at its mini-boss")
@@ -366,8 +372,24 @@ func test_tutorial_and_story() -> void:
 	e3.setup(r2.party_heroes(), [], {})
 	e3.state = "victory"
 	var res3 := r2.after_combat(e3, "boss")
-	check(r2.recruits.size() == 1 and Hero.from_dict(r2.recruits[0]).hero_name == "Hollis", "first clear: a new hero joins")
+	check(r2.recruits.size() == 1 and Hero.from_dict(r2.recruits[0]).hero_name == missing_name and co.missing.is_empty(), "Dry Gulch Mine: the missing sharpshooter is rescued")
 	check("miners_lamp" in res3.keepsakes and int(res3.charters) == 0, "first clear: the rare trinket, no charters")
+	co.run = null
+	var r3 := co.start_run(0, hs.map(func(h): return h.uid), {"food": 12}, opts2[3])
+	check(r3 != null and not opts2[3] in co.expedition_options(0), "taking a rumor takes it off the board")
+	var e4 := CombatEngine.new()
+	e4.setup(r3.party_heroes(), [], {})
+	e4.state = "victory"
+	var money_before := int(r3.loot.money)
+	r3.after_combat(e4, qreg.final)
+	check(r3.boss_won and int(r3.loot.money) >= money_before + int(qreg.quest_reward.money), "finishing a rumor pays its reward")
+	co.run = null
+	co.money += 5000
+	co.timber += 50
+	co.iron += 50
+	check(co.upgrade_track(0, "saloon", "chatter"), "upgrade the saloon's chatter")
+	co.advance_week()
+	check(co.settlement(0).get("quests", []).size() == 2, "more chatter, more rumors each week")
 	check(Inventory.slots_used({"food": 13, "bandages": 1}) == 3 and Inventory.room_for({"food": 12}, "food", 1) == 0, "wagon slots and stacks")
 
 
@@ -403,7 +425,8 @@ func test_save_roundtrip() -> void:
 	var uids := []
 	for h in co.heroes.slice(0, 4):
 		uids.append(h.uid)
-	co.start_run(0, uids, {"food": 16, "bandages": 2})
+	check(co.can_embark(0, uids, {"food": 16, "bandages": 2}) != "", "no store: only the free kit")
+	co.start_run(0, uids, co.free_kit())
 	check(co.run != null and co.run.nodes.size() > 10, "run created")
 	var txt := JSON.stringify(co.to_dict())
 	var co2 := Company.from_dict(DB.normalize(JSON.parse_string(txt)))

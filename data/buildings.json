@@ -5,6 +5,12 @@
     "desc": "Whiskey, cards and a piano nobody's tuned since '49. Heroes shed Fatigue here, and sit out the next expedition.",
     "costs": [{"money": 400, "timber": 12, "iron": 2}, {"money": 1000, "timber": 25, "iron": 6}, {"money": 2200, "timber": 45, "iron": 12}],
     "slots": [2, 3, 4],
+    "tracks": {
+      "chatter": {"name": "Chatter", "desc": "More talk at the bar: more side quests to choose from each week.", "values": [1, 2, 3],
+        "costs": [{"money": 450, "timber": 8, "iron": 2}, {"money": 1100, "timber": 18, "iron": 6}]},
+      "tips": {"name": "Loose Lips", "desc": "Better leads: side quests with richer rewards, and more bosses and rare trinkets.", "values": [0, 1, 2],
+        "costs": [{"money": 600, "timber": 6, "iron": 5}, {"money": 1400, "timber": 14, "iron": 12}]}
+    },
     "activities": [
       {"id": "bar", "name": "Belly Up to the Bar", "cost": [150, 150, 150], "relief": [45, 60, 80],
         "side_effects": [{"chance": 12, "type": "quirk", "quirk": "drinker", "text": "%s develops a taste for rotgut."}]},

@@ -24,7 +24,7 @@
     "fights": [{"enemies": ["outlaw_knifeman", "outlaw_gunhand"], "weight": 1}],
     "elites": [{"enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_gunhand"], "weight": 1}],
     "cave_fights": [{"enemies": ["giant_bat", "giant_bat"], "weight": 1}],
-    "boss": {"name": "Mulligan", "landmark": "The Old Mill",
+    "boss": {"name": "\"Mad Dog\" Mulligan", "landmark": "The Old Mill",
       "intro": "The mill wheel creaks in the millrace. Barrels of flour and crates stamped FORT PROVIDENCE are stacked on the loading dock, and on top of them sits a woman in a green dress, tied at the wrists and swearing magnificently.\n\nA man the size of a woodstove steps out, cracking his knuckles, a black crow feather stuck in his cap: Mulligan, Silas Crane's enforcer.\n\n\"Boss says anybody heading west pays the toll. You look like you're heading west.\"",
       "victory": "Mulligan goes down like a felled oak, and his boys scatter into the orchard. You cut Ma Delaney loose.\n\n\"Took you long enough,\" she says, rubbing her wrists. \"Help me get these stores back to Providence and I'll pour you the first round myself. My saloon's a cinder, but I've rebuilt it twice before.\"\n\nAs you load the wagon, a rider watches from the far ridge: a long black coat, a black feather in his hat, a crow riding his shoulder. He touches his hat brim, turns, and is gone. [b]Silas Crane[/b] knows your name now.",
       "enemies": ["mad_dog_mulligan", "outlaw_gunhand"], "keepsake": "lucky_horseshoe"},
@@ -36,20 +36,21 @@
   },
 
   "dry_gulch_mine": {
-    "name": "Dry Gulch Mine", "tier": 1, "rec_level": "1-2", "side": true, "columns": 6,
-    "desc": "A played-out silver mine in the hills north of the fort. The miners left in a hurry, and they say the tapping in the walls never stopped. Lots of dark shafts: bring lamp oil.",
+    "name": "Dry Gulch Mine", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 6,
+    "desc": "A played-out silver mine in the hills north of the fort. One of your company rode up here and never came back. The miners left in a hurry, and they say the tapping in the walls never stopped. Lots of dark shafts: bring lamp oil.",
     "palette": {"sky_top": "#3b3350", "sky_bottom": "#d98c5f", "sun": "#ffd9a8", "far": "#7d5a4f", "mid": "#96694f", "near": "#6f4d3a", "ground": "#5a3f2f", "accent": "#e0a458"},
     "props": ["mesa", "rock", "skull", "cactus"],
     "cave_name": "Mine Shaft",
     "node_weights": {"fight": 28, "event": 16, "curio": 14, "cave": 30, "elite": 8, "homestead": 0, "trading_post": 4},
     "boss_rewards": {"money": 150, "charters": 0, "timber": 2, "iron": 6},
-    "side_reward": {"hero": {"class": "prospector", "level": 2, "name": "Hollis"}, "iron": 6, "text": "Hollis, a prospector who'd been hiding from the knockers in a side drift for a week, asks to ride with you."},
+    "side_reward": {"rescue": true, "iron": 6, "text": "Tied up behind Old Jeb's throne of ore carts is {name}: alive, filthy and absolutely furious. The knockers had been keeping them as a pet."},
     "fights": [
       {"enemies": ["tommyknocker", "tommyknocker", "giant_bat"], "weight": 3},
       {"enemies": ["claim_jumper", "outlaw_gunhand"], "weight": 2},
       {"enemies": ["giant_bat", "giant_bat", "giant_bat"], "weight": 2},
       {"enemies": ["claim_jumper", "tommyknocker", "giant_bat"], "weight": 2},
-      {"enemies": ["rattlesnake", "giant_bat"], "weight": 1}
+      {"enemies": ["rattlesnake", "giant_bat"], "weight": 1},
+      {"enemies": ["tommyknocker", "giant_bat", "tommyknocker", "giant_bat"], "weight": 2}
     ],
     "elites": [{"enemies": ["pale_crawler", "tommyknocker", "giant_bat"], "weight": 2}, {"enemies": ["claim_jumper", "claim_jumper", "dynamiter"], "weight": 1}],
     "cave_fights": [
@@ -69,20 +70,21 @@
   },
 
   "crows_nest": {
-    "name": "The Crow's Nest", "tier": 1, "rec_level": "1-2", "side": true, "columns": 6,
+    "name": "The Crow's Nest", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 6,
     "desc": "Silas Crane's supply camp in the cottonwoods south of the fort, run by his quartermaster Ruby Blackwing. The woods are full of lookouts and crows. Expect a lot of fighting.",
     "palette": {"sky_top": "#34465e", "sky_bottom": "#e8a86b", "sun": "#fff0c8", "far": "#6f7a5a", "mid": "#5d6d44", "near": "#465a30", "ground": "#3d4d28", "accent": "#c98e3e"},
     "props": ["tree", "grass", "fence", "rock"],
     "cave_name": "Root Cellar",
     "node_weights": {"fight": 46, "elite": 12, "event": 18, "curio": 12, "cave": 4, "homestead": 4, "trading_post": 4},
     "boss_rewards": {"money": 220, "charters": 0, "timber": 6, "iron": 2},
-    "side_reward": {"hero": {"class": "wrangler", "level": 2, "name": "Ned"}, "timber": 6, "text": "Among the prisoners in Ruby's stockade is Ned, a wrangler Crane's gang took for a horse thief. He'd like a word with Silas too."},
+    "side_reward": {"timber": 6},
     "fights": [
       {"enemies": ["outlaw_brawler", "outlaw_gunhand", "carrion_crows"], "weight": 3},
       {"enemies": ["outlaw_knifeman", "outlaw_rifleman"], "weight": 2},
       {"enemies": ["murder_of_crows", "carrion_crows"], "weight": 2},
       {"enemies": ["outlaw_brawler", "outlaw_knifeman", "outlaw_rifleman"], "weight": 2},
-      {"enemies": ["prairie_wolf", "coyote", "carrion_crows"], "weight": 1}
+      {"enemies": ["prairie_wolf", "coyote", "carrion_crows"], "weight": 1},
+      {"enemies": ["outlaw_knifeman", "outlaw_brawler", "outlaw_gunhand", "carrion_crows"], "weight": 2}
     ],
     "elites": [{"enemies": ["crane_lieutenant", "outlaw_gunhand", "murder_of_crows"], "weight": 2}, {"enemies": ["outlaw_brawler", "outlaw_brawler", "outlaw_rifleman", "carrion_crows"], "weight": 1}],
     "cave_fights": [{"enemies": ["giant_bat", "giant_bat"], "weight": 1}],
