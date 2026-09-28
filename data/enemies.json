@@ -1,7 +1,7 @@
 {
   "_comment": "Stats are the tier-1 baseline; regions of higher tier scale HP, damage, accuracy, dodge and resistances (see config tier_*). Bosses are not scaled. Tags are referenced by quirks, trinkets and skills (vs_tags).",
 
-  "outlaw_brawler": {"name": "Outlaw Brawler", "tags": ["outlaw", "human"], "hp": 16, "dodge": 5, "prot": 0, "speed": 3, "acc": 0, "crit": 5, "dmg": [3, 6],
+  "outlaw_brawler": {"name": "Outlaw Brawler", "tags": ["outlaw", "human"], "hp": 16, "dodge": 5, "prot": 0, "speed": 3, "acc": 0, "crit": 4, "dmg": [3, 6],
     "res": {"stun": 25, "bleed": 25, "poison": 25, "move": 30, "debuff": 25}, "skills": ["e_brawler_haymaker", "e_brawler_bottle"],
     "look": {"body": "human", "build": "heavy", "hat": "flat_cap", "coat": "shirt", "weapon": "fists", "beard": true, "colors": {"coat": "#7a4b3a", "pants": "#3e3a36", "hat": "#3a3027", "accent": "#8b2e2e"}}},
   "outlaw_gunhand": {"name": "Outlaw Gunhand", "tags": ["outlaw", "human"], "hp": 12, "dodge": 10, "prot": 0, "speed": 5, "acc": 0, "crit": 5, "dmg": [3, 6],

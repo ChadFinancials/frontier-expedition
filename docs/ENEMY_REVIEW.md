@@ -6,13 +6,13 @@ Ranks: *from* is where the enemy must stand to use the move, *hits* is which her
 
 ## Outlaw Brawler  (Regular)
 
-`outlaw_brawler` | HP **16** | dodge 5 | prot 0 | speed 3 | acc +0 | crit 5% | dmg 3-6 | tags: outlaw, human
+`outlaw_brawler` | HP **16** | dodge 5 | prot 0 | speed 3 | acc +0 | crit 4% | dmg 3-6 | tags: outlaw, human
 Resists: stun 25, bleed 25, poison 25, move 30, debuff 25
 Found in: The Old Mill Road, The Crow's Nest, The Tallgrass Sea, Quests, summoned by "Mad Dog" Mulligan
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Haymaker**: A big, slow punch. | 12 | 12 | 85 | 3-5 | - | 3 |
+| **Haymaker**: A big, slow punch. | 12 | 12 | 85 | 3-5 | stun (40%) | 3 |
 | **Bottle Smash**: A whiskey bottle over the head. | 12 | 123 | 85 | 2-4 | +8 fatigue | 2 |
 
 Notes: 

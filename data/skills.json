@@ -180,7 +180,8 @@
     "effects": [{"type": "debuff", "stat": "dmg_pct", "value": -15, "rounds": 2, "chance": 100}]},
 
 
-  "e_brawler_haymaker": {"name": "Haymaker", "desc": "A big, slow punch.", "use_ranks": [1, 2], "target": "enemy", "target_ranks": [1, 2], "acc": 85, "dmg": 0.0, "anim": "melee", "sfx": "punch", "ai": {"weight": 3}},
+  "e_brawler_haymaker": {"name": "Haymaker", "desc": "A big, slow punch.", "use_ranks": [1, 2], "target": "enemy", "target_ranks": [1, 2], "acc": 85, "dmg": 0.0, "anim": "melee", "sfx": "punch",
+    "effects": [{"type": "stun", "chance": 40}], "ai": {"weight": 3}},
   "e_brawler_bottle": {"name": "Bottle Smash", "desc": "A whiskey bottle over the head.", "use_ranks": [1, 2], "target": "enemy", "target_ranks": [1, 2, 3], "acc": 85, "dmg": -0.3, "anim": "throw", "sfx": "glass",
     "effects": [{"type": "fatigue", "amount": 8}], "ai": {"weight": 2}},
   "e_gunhand_shot": {"name": "Six-Shooter", "desc": "A wild pistol shot.", "use_ranks": [1, 2, 3, 4], "target": "enemy", "target_ranks": [1, 2, 3, 4], "acc": 85, "dmg": 0.0, "anim": "shoot", "sfx": "gunshot", "ai": {"weight": 3}},
