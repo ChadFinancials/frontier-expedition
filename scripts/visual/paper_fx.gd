@@ -8,6 +8,9 @@ const PAPER_SHADER := preload("res://scripts/visual/paper.gdshader")
 const SKY_SHADER := preload("res://scripts/visual/sky_wash.gdshader")
 const VIGNETTE_SHADER := preload("res://scripts/visual/vignette.gdshader")
 
+## The paper-theater look is on everywhere (set false to see the old flat drawings).
+static var enabled := true
+
 static var _grain: Texture2D
 static var _fiber: Texture2D
 static var _wash: Texture2D
@@ -77,6 +80,57 @@ static func sky_material(top: Color, bottom: Color) -> ShaderMaterial:
 	m.set_shader_parameter("wash_tex", wash())
 	m.set_shader_parameter("grain_tex", grain())
 	return m
+
+
+## A paper group added to parent, ready for drawn nodes (figures, the wagon...).
+static func stage(parent: Node, params: Dictionary = {}) -> Node:
+	if not enabled:
+		return parent
+	var g := group(params.merged({"shadow_offset": Vector2(9, 7), "shadow_alpha": 0.3, "bevel_strength": 1.0}), 30.0)
+	parent.add_child(g)
+	return g
+
+
+## Wraps a drawn Control (e.g. curio art) so it gets the paper material inside a container.
+static func framed(ctrl: Control, size: Vector2) -> Control:
+	var holder := Control.new()
+	holder.custom_minimum_size = size
+	if not enabled:
+		ctrl.size = size
+		holder.add_child(ctrl)
+		return holder
+	holder.clip_contents = false
+	var g := group({"shadow_offset": Vector2(5, 6), "shadow_alpha": 0.25, "bevel_strength": 0.9}, 12.0)
+	holder.add_child(g)
+	ctrl.size = size
+	ctrl.custom_minimum_size = size
+	g.add_child(ctrl)
+	return holder
+
+
+## A faint paper grain laid over the whole screen, UI included.
+static func grain_overlay() -> ColorRect:
+	var r := ColorRect.new()
+	r.set_anchors_preset(Control.PRESET_FULL_RECT)
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var m := ShaderMaterial.new()
+	var sh := Shader.new()
+	sh.code = """shader_type canvas_item;
+render_mode blend_mul;
+uniform sampler2D grain_tex : repeat_enable, filter_linear;
+uniform sampler2D fiber_tex : repeat_enable, filter_linear;
+uniform float strength = 0.07;
+void fragment() {
+	vec2 p = SCREEN_UV / SCREEN_PIXEL_SIZE;
+	float g = texture(grain_tex, p / 300.0).r - 0.5;
+	float f = texture(fiber_tex, p / 300.0 * vec2(0.35, 2.5)).r - 0.5;
+	COLOR = vec4(vec3(1.0 + (g + f * 0.6) * strength), 1.0);
+}"""
+	m.shader = sh
+	m.set_shader_parameter("grain_tex", grain())
+	m.set_shader_parameter("fiber_tex", fiber())
+	r.material = m
+	return r
 
 
 ## Full-screen warm lamp light and dark corners.

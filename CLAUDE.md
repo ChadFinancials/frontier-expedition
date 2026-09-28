@@ -48,5 +48,8 @@ In the cloud dev container: `GODOT=/home/user/tools/godot/Godot_v4.7.2-stable_li
   paper material (grain, fibers, papier-mache relief, cast shadow, depth haze/blur).
 - `Backdrop.paper = true` builds layered paper sheets, a watercolor sky and hanging sun/clouds.
 - `Figure.crafted = true` adds sculpted shading, hatching and storybook proportions.
-- Currently only the combat screen uses it (`CombatScreen.PAPER_LOOK`). Roll out to other
-  screens only after the owner approves the pilot.
+- `PaperFX.enabled` turns it on everywhere (approved by the owner). `PaperFX.stage(parent)`
+  gives a paper group for drawn nodes; `PaperFX.framed(control, size)` wraps drawn Controls
+  (curio and event art) so they can sit in containers. `TownView.paper` draws the layered
+  street; `EventArt` draws event illustrations by the event's `art` field.
+- Dev tools: `Game.settings.dev_tools` (default on) shows a "DEV: Win" button in combat.

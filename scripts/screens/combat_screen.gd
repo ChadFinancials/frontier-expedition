@@ -177,6 +177,8 @@ func _loop() -> void:
 					ev2 = engine.hero_pass()
 				"retreat":
 					ev2 = engine.retreat()
+				"dev_win":
+					ev2 = engine.dev_win()
 			await _play(ev2)
 	await _finish()
 
@@ -228,6 +230,11 @@ func _show_controls() -> void:
 	ret.disabled = not engine.can_retreat()
 	ret.tooltip_text = "You can't run from this fight." if not engine.can_retreat() else "Flee the fight."
 	action_row.add_child(ret)
+	if Game.settings.get("dev_tools", true):
+		var dev := UI.btn("DEV: Win", func(): chosen.emit("dev_win", null, null), "Small")
+		dev.tooltip_text = "Testing cheat: every enemy drops dead and the fight is won."
+		dev.modulate = Color(0.75, 0.85, 1.0)
+		action_row.add_child(dev)
 	# Auto-select the first usable skill so a click on an enemy just works.
 	for sid in c.skills:
 		if not engine.valid_targets(c, sid).is_empty() and engine.is_hostile(DB.skill(sid)):
@@ -521,8 +528,8 @@ func _update_preview() -> void:
 # --- Event playback -------------------------------------------------------------------
 
 const PACE := 1.3
-## Art pilot: the paper-theater look (layered paper backdrop, paper figures, lamp light).
-const PAPER_LOOK := true
+## The paper-theater look (layered paper backdrop, paper figures, lamp light).
+var PAPER_LOOK: bool = PaperFX.enabled
 
 
 func _wait(sec: float) -> void:

@@ -11,6 +11,7 @@ const PLOT_W := 250.0
 var plots: Array = []      # [{"id": building id or "", "rect": Rect2, "level": int}]
 var hover := -1
 var street_y := 700.0
+var paper := false         # paper-theater street: two staggered depths, props, palisade
 var _t := 0.0
 
 
@@ -26,6 +27,9 @@ func set_buildings(buildings: Dictionary, slots: int, ruins: Array = []) -> void
 
 
 func _layout() -> void:
+	if paper:
+		_layout_paper()
+		return
 	var n := plots.size()
 	var per_row := mini(n, 6) if n <= 6 else 5
 	var rows := int(ceil(n / float(maxi(1, per_row)))) if n > 0 else 1
@@ -38,6 +42,20 @@ func _layout() -> void:
 		var x0 := (size.x - total_w) / 2.0
 		var y := street_y - (rows - 1 - row) * 250.0
 		plots[i].rect = Rect2(x0 + col * pw + 6, y - 230, pw - 12, 230)
+
+
+## Plots alternate between a back row (smaller, up the street) and a front row, like a
+## little diorama town.
+func _layout_paper() -> void:
+	var n := plots.size()
+	for i in n:
+		var back := n > 1 and i % 2 == 0
+		var s := 0.8 if back else 1.0
+		var x := size.x * (i + 0.5) / maxf(1, n)
+		var base_y := street_y - (84.0 if back else 0.0)
+		plots[i]["scale"] = s
+		plots[i]["back"] = back
+		plots[i].rect = Rect2(x - 110 * s, base_y - 235 * s, 220 * s, 235 * s)
 
 
 func _notification(what: int) -> void:
@@ -120,6 +138,9 @@ func _window(p: Vector2, lit: bool = true) -> void:
 
 
 func _draw() -> void:
+	if paper:
+		_draw_paper()
+		return
 	# Boardwalk / street.
 	draw_rect(Rect2(0, street_y, size.x, 26), Color("#6b4a2e"))
 	for i in int(size.x / 40):
@@ -139,6 +160,113 @@ func _draw() -> void:
 			_draw_building(DB.buildings[bid].get("art", "store"), base, int(pl.level), DB.buildings[bid].name)
 		if i == hover:
 			draw_rect(r.grow(8), Color(1, 0.85, 0.4, 0.8), false, 3)
+
+
+func _draw_plot(i: int) -> void:
+	var pl: Dictionary = plots[i]
+	var r: Rect2 = pl.rect
+	var s: float = pl.get("scale", 1.0)
+	var base := Vector2(r.position.x + r.size.x / 2, r.end.y)
+	if i == hover:
+		draw_rect(r.grow(8), Color(1, 0.85, 0.4, 0.18))
+	draw_set_transform(base * (1.0 - s), 0.0, Vector2(s, s))
+	var bid: String = pl.id
+	if bid == "":
+		_draw_empty(base)
+	elif pl.get("ruin", false):
+		_draw_ruin(base, DB.buildings[bid].name, i)
+	else:
+		_draw_building(DB.buildings[bid].get("art", "store"), base, int(pl.level), DB.buildings[bid].name)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if i == hover:
+		draw_rect(r.grow(8), Color(1, 0.85, 0.4, 0.8), false, 3)
+
+
+func _draw_paper() -> void:
+	var w := size.x
+	# The fort's palisade and a few cottonwoods behind the town.
+	var pal_y := street_y - 190.0
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 17
+	# One cut sheet for the palisade, with the log seams drawn on it.
+	var top_pts: Array = [Vector2(-10, pal_y + 90)]
+	var seams: Array = []
+	var x := -10.0
+	var burnt_spans: Array = []
+	while x < w + 20:
+		var lw := rng.randf_range(34, 44)
+		var lh := rng.randf_range(80, 104)
+		top_pts.append(Vector2(x, pal_y + 90 - lh + 14))
+		top_pts.append(Vector2(x + lw / 2, pal_y + 90 - lh))
+		top_pts.append(Vector2(x + lw, pal_y + 90 - lh + 14))
+		seams.append(Vector2(x + lw, pal_y + 90 - lh + 14))
+		if rng.randf() < 0.2:
+			burnt_spans.append(Rect2(x, pal_y + 90 - lh, lw, lh))
+		x += lw
+	top_pts.append(Vector2(x, pal_y + 90))
+	_poly(top_pts, Color("#6d5236"))
+	for sp in seams:
+		draw_line(sp, Vector2(sp.x, pal_y + 90), Color("#4f3a26"), 2.5, true)
+	for br in burnt_spans:
+		draw_rect(br, Color(0.14, 0.1, 0.08, 0.55))
+	for k in 5:
+		var tx := rng.randf_range(40, w - 40)
+		draw_line(Vector2(tx, pal_y + 60), Vector2(tx, pal_y - 20), Color("#5a3f2a"), 9)
+		for j in 3:
+			_circle_paper(Vector2(tx + (j - 1) * 26, pal_y - 40 - (j % 2) * 20), 34, Color("#5e7440").darkened(rng.randf_range(0, 0.15)))
+	# Back row, then a light haze so it sits further away.
+	for i in plots.size():
+		if plots[i].get("back", false):
+			_draw_plot(i)
+	draw_rect(Rect2(0, pal_y - 60, w, street_y - pal_y - 10), Color(0.96, 0.9, 0.76, 0.16))
+	# The street: packed dirt with wheel ruts, and a boardwalk along the front row.
+	_poly([Vector2(-10, street_y - 64), Vector2(w + 10, street_y - 64), Vector2(w + 10, street_y + 40), Vector2(-10, street_y + 40)], Color("#8a6a45"))
+	for k in 2:
+		var ry := street_y - 40 + k * 22
+		draw_line(Vector2(0, ry), Vector2(w, ry + 6), Color("#6b5035"), 3, true)
+	for k in 40:
+		var px := rng.randf_range(0, w)
+		var py := rng.randf_range(street_y - 60, street_y + 30)
+		draw_line(Vector2(px, py), Vector2(px + rng.randf_range(8, 22), py), Color("#76593a"), 2, true)
+	for i in plots.size():
+		if not plots[i].get("back", false):
+			_draw_plot(i)
+	# Foreground props along the front edge of the stage.
+	rng.seed = 29
+	var props := ["barrel", "crate", "lamp", "barrel", "trough", "crate", "lamp", "hitch"]
+	for k in props.size():
+		var fx := w * (k + 0.5) / props.size() + rng.randf_range(-30, 30)
+		_prop(props[k], Vector2(fx, street_y + 34))
+
+
+func _circle_paper(p: Vector2, r: float, c: Color) -> void:
+	draw_circle(p + Vector2(4, 5), r, Color(0, 0, 0, 0.22))
+	draw_circle(p, r + 3, PAPER)
+	draw_circle(p, r, c)
+
+
+func _prop(kind: String, b: Vector2) -> void:
+	match kind:
+		"barrel":
+			_poly([b + Vector2(-16, 0), b + Vector2(16, 0), b + Vector2(19, -22), b + Vector2(16, -44), b + Vector2(-16, -44), b + Vector2(-19, -22)], Color("#8a5a32"))
+			draw_line(b + Vector2(-18, -12), b + Vector2(18, -12), Color("#3c3f44"), 3)
+			draw_line(b + Vector2(-18, -32), b + Vector2(18, -32), Color("#3c3f44"), 3)
+		"crate":
+			_rect(Rect2(b + Vector2(-22, -40), Vector2(44, 40)), Color("#a8834e"))
+			draw_line(b + Vector2(-22, -40), b + Vector2(22, 0), Color("#7a5a32"), 3)
+			draw_line(b + Vector2(22, -40), b + Vector2(-22, 0), Color("#7a5a32"), 3)
+		"lamp":
+			draw_line(b, b + Vector2(0, -110), Color("#2e2a26"), 6)
+			_rect(Rect2(b + Vector2(-11, -134), Vector2(22, 26)), Color("#f2c46b"))
+			var g := 0.5 + 0.5 * sin(_t * 3.0 + b.x)
+			draw_circle(b + Vector2(0, -121), 30, Color(1, 0.8, 0.4, 0.08 + 0.05 * g))
+		"trough":
+			_poly([b + Vector2(-34, 0), b + Vector2(34, 0), b + Vector2(40, -24), b + Vector2(-40, -24)], Color("#7a5a38"))
+			draw_rect(Rect2(b + Vector2(-34, -24), Vector2(68, 6)), Color("#6f9fbf"))
+		"hitch":
+			draw_line(b + Vector2(-40, 0), b + Vector2(-40, -36), Color("#6b4426"), 7)
+			draw_line(b + Vector2(40, 0), b + Vector2(40, -36), Color("#6b4426"), 7)
+			draw_line(b + Vector2(-46, -32), b + Vector2(46, -32), Color("#7a5232"), 7)
 
 
 func _draw_empty(b: Vector2) -> void:

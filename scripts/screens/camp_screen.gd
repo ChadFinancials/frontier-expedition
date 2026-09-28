@@ -20,9 +20,11 @@ func setup(_params: Dictionary) -> void:
 	wagon.position = Vector2(300, 700)
 	wagon.scale = Vector2(0.75, 0.75)
 	wagon.modulate = Color(0.55, 0.5, 0.6)
-	add_child(wagon)
+	var stage_node := PaperFX.stage(self)
+	stage_node.add_child(wagon)
 	var fire := Campfire.new()
 	fire.position = Vector2(620, 790)
+	fire.z_index = 2
 	add_child(fire)
 	var hs := run.party_heroes()
 	var spots := [Vector2(420, 800), Vector2(520, 850), Vector2(760, 850), Vector2(840, 800)]
@@ -32,7 +34,7 @@ func setup(_params: Dictionary) -> void:
 		f.position = spots[i]
 		f.scale *= 0.8
 		f.modulate = Color(1.0, 0.82, 0.62)
-		add_child(f)
+		stage_node.add_child(f)
 	var title := UI.hdr("Campsite", 48)
 	title.position = Vector2(40, 30)
 	add_child(title)

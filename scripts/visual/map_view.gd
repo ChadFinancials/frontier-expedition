@@ -17,6 +17,32 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
+## An old trail map: tea stains, a few hand-inked hills and a compass rose.
+func _draw_parchment() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7 + run.nodes.size()
+	var ink := Color(0.35, 0.24, 0.14)
+	for k in 5:
+		var c := Vector2(rng.randf_range(80, size.x - 80), rng.randf_range(40, size.y - 40))
+		var r := rng.randf_range(30, 70)
+		draw_circle(c, r, Color(0.6, 0.42, 0.2, 0.06))
+		draw_arc(c, r, 0, TAU, 40, Color(0.55, 0.38, 0.18, 0.12), 3.0, true)
+	for k in 14:
+		var hc := Vector2(rng.randf_range(40, size.x - 40), rng.randf_range(20, size.y - 20))
+		var hw := rng.randf_range(18, 34)
+		for j in 3:
+			var o := Vector2(j * hw * 0.7, (j % 2) * 4)
+			draw_arc(hc + o, hw * 0.5, PI, TAU, 10, Color(ink, 0.16), 2.0, true)
+	var cp := Vector2(size.x - 170, size.y - 70)
+	for k in 8:
+		var a := k * TAU / 8.0 - PI / 2
+		var ln := 38.0 if k % 2 == 0 else 20.0
+		var d := Vector2(cos(a), sin(a))
+		draw_colored_polygon(PackedVector2Array([cp + d * ln, cp + d.orthogonal() * 6, cp - d.orthogonal() * 6]), Color(ink, 0.35 if k % 2 == 0 else 0.2))
+	draw_circle(cp, 7, Color(ink, 0.4))
+	draw_string(UI.font_bold, cp + Vector2(-52, 6), "W", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ink, 0.5))
+
+
 func node_pos(n: Dictionary) -> Vector2:
 	var cols := MapGen.column_count(run.nodes) if run != null else MapGen.COLUMNS
 	var x := 90.0 + float(n.col) * (size.x - 180.0) / float(cols - 1)
@@ -81,6 +107,8 @@ func _tip(id: int) -> String:
 func _draw() -> void:
 	if run == null:
 		return
+	if PaperFX.enabled:
+		_draw_parchment()
 	# Paths.
 	for n in run.nodes:
 		for nx in n.next:

@@ -13,13 +13,14 @@ var ground_y: float = 770.0
 var light: float = 1.0          # cave lamplight 0..1
 var night: float = 0.0          # 0 day .. 1 night (camp)
 var seed_value: int = 1
-var paper: bool = false         # paper-theater look: layered paper sheets with the paper shader
+var paper: bool = PaperFX.enabled   # paper-theater look: layered paper sheets with the paper shader
 
 var _pal: Dictionary = {}
 var _layers: Array = []         # {factor, color, pts (for width 2W), props}
 var _t: float = 0.0
 var _paper_nodes: Array = []    # layer painters when paper is on
 var _grass_country := false
+var _lamp: ColorRect = null     # paper cave lamplight pool
 
 
 func setup(region: String, m: String = "trail", s: int = 1) -> void:
@@ -34,15 +35,30 @@ func setup(region: String, m: String = "trail", s: int = 1) -> void:
 		_pal = {"sky_top": Color("#3d5a80"), "sky_bottom": Color("#f6bd60"), "sun": Color("#fff1c1"), "far": Color("#8d7b68"),
 			"mid": Color("#a98f5f"), "near": Color("#6b7d3c"), "ground": Color("#4f5d2f"), "accent": Color("#d4a24c")}
 	_build_layers(r.get("props", ["grass"]))
-	if paper and mode != "cave":
+	if paper:
 		_build_paper()
 	queue_redraw()
 
 
 func _process(delta: float) -> void:
 	_t += delta
+	if paper:
+		if _lamp != null:
+			_update_lamp()
+		return
 	if mode in ["cave", "camp"]:
 		queue_redraw()
+
+
+## The lamp pool widens and the dark deepens with the lamplight level.
+func _update_lamp() -> void:
+	var flicker := 0.012 * sin(_t * 7.0) + 0.008 * sin(_t * 13.0)
+	var m: ShaderMaterial = _lamp.material
+	m.set_shader_parameter("center", Vector2(0.33, 0.62))
+	m.set_shader_parameter("radius", 0.35 + 0.45 * light + flicker)
+	m.set_shader_parameter("softness", 0.45)
+	m.set_shader_parameter("darkness", 0.93 - 0.25 * light)
+	m.set_shader_parameter("warmth", 0.1 + 0.08 * light)
 
 
 func set_scroll(v: float) -> void:
@@ -117,12 +133,12 @@ func _props(rng: RandomNumberGenerator, kinds: Array, base: float, size: float, 
 
 
 func _draw() -> void:
+	if paper:
+		return
 	match mode:
 		"cave":
 			_draw_cave()
 			return
-	if paper:
-		return
 	_draw_sky()
 	for i in _layers.size():
 		_draw_layer(self, i, false)
@@ -188,7 +204,7 @@ func _paper_detail(ci: CanvasItem, i: int, pts: PackedVector2Array, c: Color, sh
 				continue
 			var gtop := _ridge_y(rim, gx)
 			var gy := gtop + 8 + pow(rng.randf(), 1.6) * (ground_y - gtop) * 0.85
-			var gh := rng.randf_range(16, 44) * (0.45 + depth)
+			var gh := rng.randf_range(16, 44) * (0.45 + depth) * clampf(ground_y / 770.0, 0.55, 1.0)
 			var lean := rng.randf_range(-5, 8)
 			var gc := c.lightened(0.2) if k % 3 == 0 else c.darkened(0.2)
 			ci.draw_colored_polygon(PackedVector2Array([Vector2(gx - 3, gy), Vector2(gx + 3, gy), Vector2(gx + lean, gy - gh)]), Color(gc, 0.85))
@@ -254,6 +270,20 @@ func _build_paper() -> void:
 		c.queue_free()
 	_paper_nodes.clear()
 	_grass_country = "grass" in DB.regions.get(region_id, {}).get("props", [])
+	if mode == "cave":
+		# Rock cut from dark paper; the lamp is a pool of light laid over it.
+		var cg := PaperFX.group({"bevel_strength": 1.2, "shadow_alpha": 0.4, "shadow_offset": Vector2(0, 10), "grain_strength": 0.22}, 16.0)
+		var cp := _LayerPainter.new()
+		cp.bd = self
+		cp.idx = -1
+		cg.add_child(cp)
+		add_child(cg)
+		_paper_nodes.append(cp)
+		_lamp = PaperFX.vignette()
+		_lamp.material.set_shader_parameter("warm", Color(1.0, 0.72, 0.38))
+		add_child(_lamp)
+		_update_lamp()
+		return
 	# Stronger light-to-dark steps between the sheets than the flat painting uses.
 	for i in _layers.size():
 		var L: Dictionary = _layers[i]
@@ -278,10 +308,13 @@ func _build_paper() -> void:
 	var n := _layers.size()
 	for i in n + 1:
 		var depth := 1.0 - float(i) / n    # 1 = farthest, 0 = ground
+		var haze_c := pal("sky_bottom").lerp(Color("#f3e9d2"), 0.4)
+		if night > 0:
+			haze_c = haze_c.lerp(Color("#27304a"), night)
 		var params := {
 			"blur": 1.4 * depth * depth,
-			"haze": 0.38 * depth,
-			"haze_color": pal("sky_bottom").lerp(Color("#f3e9d2"), 0.4),
+			"haze": 0.38 * depth * (1.0 - 0.5 * night),
+			"haze_color": haze_c,
 			"bevel_strength": lerpf(1.0, 0.45, depth),
 			"bevel_radius": lerpf(3.5, 2.0, depth),
 			"shadow_offset": Vector2(-7, -12) * lerpf(1.6, 0.6, depth),
@@ -296,6 +329,12 @@ func _build_paper() -> void:
 		grp.add_child(painter)
 		add_child(grp)
 		_paper_nodes.append(painter)
+	if night > 0:
+		var nv := ColorRect.new()
+		nv.size = Vector2(W, H)
+		nv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		nv.color = Color(0.05, 0.07, 0.15, night * 0.3)
+		add_child(nv)
 
 
 class _LayerPainter extends Node2D:
@@ -303,7 +342,9 @@ class _LayerPainter extends Node2D:
 	var idx := 0
 
 	func _draw() -> void:
-		if idx < bd._layers.size():
+		if idx < 0:
+			bd._draw_cave_paper(self)
+		elif idx < bd._layers.size():
 			bd._draw_layer(self, idx, true)
 		else:
 			bd._draw_ground(self, true)
@@ -336,6 +377,24 @@ class _SkyProps extends Node2D:
 				var bl := sun + d * 78 + d.orthogonal() * 12
 				var br := sun + d * 78 - d.orthogonal() * 12
 				draw_colored_polygon(PackedVector2Array([tip, bl, br]), bd.pal("sun").darkened(0.06))
+		if bd.night > 0.5:
+			# A paper moon and a few tin stars, all on threads.
+			var moon := Vector2(420, 200 + sin(t * 0.5) * 3)
+			draw_line(Vector2(moon.x, 0), moon + Vector2(0, -52), string_c, 2.0, true)
+			var crescent := PackedVector2Array()
+			for k in 25:
+				var a := -PI * 0.5 + PI * k / 24.0
+				crescent.append(moon + Vector2(cos(a), sin(a)) * 54)
+			for k in 25:
+				var a2 := PI * 0.5 - PI * k / 24.0
+				crescent.append(moon + Vector2(-20 + cos(a2) * 40, sin(a2) * 46))
+			draw_colored_polygon(crescent, Color("#f4efd8"))
+			var srng := RandomNumberGenerator.new()
+			srng.seed = 99
+			for k in 9:
+				var sp := Vector2(srng.randf_range(80, W - 80), srng.randf_range(70, 330) + sin(t * 0.7 + k) * 3)
+				draw_line(Vector2(sp.x, 0), sp + Vector2(0, -12), Color(string_c, 0.35), 1.0, true)
+				draw_colored_polygon(PackedVector2Array(Figure.star_pts(sp, 12, 5, 5)), Color("#e8d9a0"))
 		var rng := RandomNumberGenerator.new()
 		rng.seed = bd.seed_value + 3
 		for i in 5:
@@ -432,9 +491,48 @@ func _draw_prop(ci: CanvasItem, kind: String, p: Vector2, s: float, c: Color) ->
 
 
 func _draw_cave() -> void:
+	_draw_cave_on(self)
+
+
+## The paper cave: rock sheets with cut edges, hanging stalactites, a stony floor.
+func _draw_cave_paper(ci: CanvasItem) -> void:
+	var edge := Color("#6a5a4a")
+	ci.draw_rect(Rect2(0, 0, W, H), Color("#1a1511"))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value
+	for i in 4:
+		var y := 200 + i * 130
+		var pts := PackedVector2Array()
+		pts.append(Vector2(-20, H))
+		for k in 14:
+			var x := k * 150.0 - fposmod(scroll * (0.2 + i * 0.15), 150.0)
+			pts.append(Vector2(x, y + sin(k * 1.7 + i * 2.1 + seed_value) * 36 + rng.randf_range(-10, 10)))
+		pts.append(Vector2(W + 20, H))
+		var rim := pts.slice(1, pts.size() - 1)
+		ci.draw_polyline(rim, edge.darkened(0.1 * i), 6.0, true)
+		ci.draw_colored_polygon(pts, Color("#2f2822").lerp(Color("#4a3e33"), i / 4.0))
+		for k in 16:
+			var sx := rng.randf() * W
+			var sy := y + 40 + rng.randf() * 120
+			ci.draw_line(Vector2(sx, sy), Vector2(sx + rng.randf_range(10, 30), sy + 3), Color(0.1, 0.08, 0.06, 0.35), 1.5, true)
+	for i in 16:
+		var x2 := fposmod(rng.randf() * W * 1.5 - scroll * 0.9, W * 1.5) - 100
+		var l := rng.randf_range(70, 230)
+		var w2 := rng.randf_range(20, 48)
+		var st := PackedVector2Array([Vector2(x2 - w2, -10), Vector2(x2 + w2, -10), Vector2(x2 + w2 * 0.3, l * 0.6), Vector2(x2 + 3, l)])
+		ci.draw_polyline(PackedVector2Array([st[0], st[3], st[1]]), edge, 5.0, true)
+		ci.draw_colored_polygon(st, Color("#3a3029"))
+	ci.draw_rect(Rect2(0, ground_y - 4, W, 8), edge)
+	ci.draw_rect(Rect2(0, ground_y, W, H - ground_y), Color("#3a3129"))
+	for k in 30:
+		var px := fposmod(rng.randf() * W - scroll, W)
+		ci.draw_circle(Vector2(px, ground_y + 10 + rng.randf() * 60), rng.randf_range(4, 12), Color("#4d4136"))
+
+
+func _draw_cave_on(ci: CanvasItem) -> void:
 	var rock := Color("#2a2420")
 	var rock2 := Color("#3a322b")
-	draw_rect(Rect2(0, 0, W, H), Color("#15110e"))
+	ci.draw_rect(Rect2(0, 0, W, H), Color("#15110e"))
 	# Back wall bands.
 	for i in 5:
 		var y := 120 + i * 120
@@ -447,7 +545,7 @@ func _draw_cave() -> void:
 		var sorted := Array(pts).slice(1, pts.size() - 1)
 		sorted.sort_custom(func(a, b): return a.x < b.x)
 		var poly := PackedVector2Array([Vector2(0, H)] + sorted + [Vector2(W, H)])
-		draw_colored_polygon(poly, rock.lerp(rock2, i / 5.0))
+		ci.draw_colored_polygon(poly, rock.lerp(rock2, i / 5.0))
 	# Stalactites.
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
@@ -455,14 +553,14 @@ func _draw_cave() -> void:
 		var x := fposmod(rng.randf() * W * 1.5 - scroll * 0.9, W * 1.5) - 100
 		var l := rng.randf_range(60, 220)
 		var w2 := rng.randf_range(18, 46)
-		draw_colored_polygon(PackedVector2Array([Vector2(x - w2, 0), Vector2(x + w2, 0), Vector2(x + 4, l)]), Color("#1d1814"))
-	draw_rect(Rect2(0, ground_y, W, H - ground_y), Color("#231d18"))
-	draw_rect(Rect2(0, ground_y, W, 5), Color("#3b3129"))
+		ci.draw_colored_polygon(PackedVector2Array([Vector2(x - w2, 0), Vector2(x + w2, 0), Vector2(x + 4, l)]), Color("#1d1814"))
+	ci.draw_rect(Rect2(0, ground_y, W, H - ground_y), Color("#231d18"))
+	ci.draw_rect(Rect2(0, ground_y, W, 5), Color("#3b3129"))
 	# Lamplight: a warm pool around the party, darkness everywhere else.
 	var glow_c := Vector2(640, ground_y - 150)
 	var r0 := 260.0 + 520.0 * light
 	for i in 8:
 		var f := i / 8.0
-		draw_circle(glow_c, r0 * (1.0 - f * 0.6), Color(1.0, 0.75, 0.4, 0.035 + 0.02 * light))
+		ci.draw_circle(glow_c, r0 * (1.0 - f * 0.6), Color(1.0, 0.75, 0.4, 0.035 + 0.02 * light))
 	var dark := 0.72 - 0.5 * light
-	draw_rect(Rect2(0, 0, W, H), Color(0, 0, 0, clampf(dark, 0.0, 0.85) * 0.6))
+	ci.draw_rect(Rect2(0, 0, W, H), Color(0, 0, 0, clampf(dark, 0.0, 0.85) * 0.6))

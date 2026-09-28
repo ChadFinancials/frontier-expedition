@@ -351,6 +351,8 @@ func test_tutorial_and_story() -> void:
 	e2.setup(party, DB.regions.tallgrass.boss.enemies, opts)
 	var silas: Combatant = e2.enemies.filter(func(x): return x.data.id == "silas_crane")[0]
 	check(silas.hp < silas.max_hp, "wounded Silas starts below full health")
+	e2.dev_win()
+	check(e2.state == "victory" and e2.killed.size() == DB.regions.tallgrass.boss.enemies.size(), "dev win clears the fight")
 	var txt := JSON.stringify(co.to_dict())
 	var co2 := Company.from_dict(DB.normalize(JSON.parse_string(txt)))
 	check(co2.tutorial_done and co2.story_flags.has(sc.id), "tutorial and story flags survive save/load")

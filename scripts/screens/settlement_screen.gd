@@ -37,8 +37,14 @@ func setup(params: Dictionary) -> void:
 	town.position = Vector2(0, 150)
 	town.size = Vector2(1340, 700)
 	town.street_y = 680
+	town.paper = PaperFX.enabled
 	town.building_clicked.connect(_on_building)
-	add_child(town)
+	if PaperFX.enabled:
+		var tg := PaperFX.group({"shadow_offset": Vector2(8, 9), "shadow_alpha": 0.3, "bevel_strength": 0.9}, 30.0)
+		tg.add_child(town)
+		add_child(tg)
+	else:
+		add_child(town)
 	# Roster.
 	var rp := UI.panel()
 	rp.position = Vector2(1350, 140)

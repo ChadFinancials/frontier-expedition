@@ -43,6 +43,10 @@ func _ready() -> void:
 	toast_layer.custom_minimum_size = Vector2(600, 0)
 	toast_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast_layer.z_index = 80
+	if PaperFX.enabled:
+		var grain := PaperFX.grain_overlay()
+		grain.z_index = 100
+		add_child.call_deferred(grain)
 	add_child(toast_layer)
 	fade = ColorRect.new()
 	fade.color = Color(0, 0, 0, 1)

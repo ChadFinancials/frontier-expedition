@@ -22,7 +22,7 @@ var flash_color: Color = Color.WHITE
 var muzzle: float = 0.0            # muzzle flash strength
 var idle_anim: bool = true
 var height_px: float = 200.0       # nominal height of a normal human at scale 1
-var crafted: bool = false          # paper-theater detail: sculpted shading and pencil hatching
+var crafted: bool = PaperFX.enabled   # paper-theater detail: sculpted shading and pencil hatching
 
 var _shapes: Array = []
 var _t: float = 0.0

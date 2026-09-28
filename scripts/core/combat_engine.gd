@@ -305,6 +305,22 @@ func hero_pass() -> Array:
 	return ev
 
 
+## Dev tool: every enemy drops dead on the spot and the fight is won.
+func dev_win() -> Array:
+	var ev: Array = []
+	for c in enemies:
+		if not c.dead:
+			c.hp = 0
+			c.dead = true
+			killed.append(c.data.get("id", ""))
+			ev.append({"t": "death", "target": c.id})
+	if state == "await":
+		state = "running"
+	current = null
+	_cleanup(ev)
+	return ev
+
+
 func can_retreat() -> bool:
 	return not boss_fight
 

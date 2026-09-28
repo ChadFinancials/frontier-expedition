@@ -22,12 +22,13 @@ func setup(_params: Dictionary) -> void:
 	backdrop.setup(run.region_id, "cave", 88 + int(run.cave.room))
 	add_child(backdrop)
 	var hs := run.party_heroes()
+	var stage_node := PaperFX.stage(self)
 	for i in hs.size():
 		var f := Figure.new()
 		f.setup(hs[i].cls().look, hs[i].look_seed, 1)
 		f.position = Vector2(820 - i * 150, 770)
 		f.scale *= 1.05
-		add_child(f)
+		stage_node.add_child(f)
 		walkers.append(f)
 	var hp := UI.panel("Dark")
 	hp.custom_minimum_size = Vector2(1920, 90)
@@ -149,8 +150,7 @@ func _curio_room() -> void:
 	v.add_child(UI.hdr(DB.curios[cid].name, 32, true))
 	var art := CurioArt.new()
 	art.kind = DB.curios[cid].get("art", "crate")
-	art.custom_minimum_size = Vector2(660, 160)
-	v.add_child(art)
+	v.add_child(PaperFX.framed(art, Vector2(660, 160)))
 	v.add_child(UI.wrap(UI.lbl(DB.curios[cid].desc, 19, "Ink"), 660))
 	var holder := {"wrap": null}
 	var go := func(item: String):

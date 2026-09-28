@@ -5,6 +5,7 @@ var run: RunState
 var backdrop: Backdrop
 var wagon: WagonArt
 var walkers: Array = []
+var caravan: Node   # paper group holding the wagon and walkers
 var map: MapView
 var hud_row: HBoxContainer
 var party_row: HBoxContainer
@@ -31,7 +32,8 @@ func setup(_params: Dictionary) -> void:
 	wagon.position = Vector2(960, 404)
 	wagon.scale = Vector2(0.7, 0.7)
 	wagon.damaged = run.wagon < 40
-	add_child(wagon)
+	caravan = PaperFX.stage(self)
+	caravan.add_child(wagon)
 	_make_walkers()
 	wagon_bar = UI.bar(run.wagon, DB.cfg("wagon_max", 100), Color("#d9a441"), 190, 18, true)
 	wagon_bar.position = Vector2(865, 180)
@@ -53,7 +55,12 @@ func setup(_params: Dictionary) -> void:
 	map.run = run
 	map.custom_minimum_size = Vector2(1860, 390)
 	map.node_clicked.connect(_travel)
-	mp.add_child(map)
+	var mg := PaperFX.stage(mp, {"shadow_offset": Vector2(4, 5), "shadow_alpha": 0.28, "bevel_strength": 0.8})
+	if mg != mp:
+		var sb := mp.get_theme_stylebox("panel")
+		map.position = Vector2(sb.get_margin(SIDE_LEFT), sb.get_margin(SIDE_TOP))
+		map.size = Vector2(1860, 390)
+	mg.add_child(map)
 	var legend := UI.rich("[color=#5e3f27]?[/color] unknown   [color=#a8392e]?[/color] signs of trouble   [color=#4f7a33]?[/color] looks quiet   Hover a stop for details.", 16, true, 700)
 	legend.position = Vector2(30, 818)
 	legend.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -106,7 +113,7 @@ func _make_walkers() -> void:
 		f.setup(hs[i].cls().look, hs[i].look_seed, 1)
 		f.position = Vector2(780 - i * 95, 408)
 		f.scale *= 0.62
-		add_child(f)
+		caravan.add_child(f)
 		walkers.append(f)
 
 
@@ -333,6 +340,10 @@ func show_event(event_id: String) -> void:
 	var v := UI.vb(12)
 	p.add_child(v)
 	v.add_child(UI.hdr(ev.get("title", "Event"), 38, true))
+	if ev.has("art"):
+		var art := EventArt.new()
+		art.kind = ev.art
+		v.add_child(PaperFX.framed(art, Vector2(940, 190)))
 	v.add_child(UI.rich(run.event_text(event_id), 23, true, 930))
 	var holder := {"wrap": null}
 	for o in run.event_options(event_id):
@@ -408,8 +419,7 @@ func _curio_card(cu: Dictionary, curios: Array, holder: Dictionary) -> Control:
 	card.add_child(v)
 	var art := CurioArt.new()
 	art.kind = d.get("art", "crate")
-	art.custom_minimum_size = Vector2(380, 150)
-	v.add_child(art)
+	v.add_child(PaperFX.framed(art, Vector2(380, 150)))
 	v.add_child(UI.hdr(d.name, 24, true))
 	v.add_child(UI.wrap(UI.lbl(d.desc, 17, "Ink"), 380))
 	var known: Array = Game.company.known_keys.get(cu.id, [])

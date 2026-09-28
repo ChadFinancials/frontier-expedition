@@ -202,3 +202,11 @@
 - Art: a "paper theater" pilot on one combat scene first, then roll out if approved. Kept
   separate from gameplay changes. ComfyUI (local, RTX 4070 Ti Super) stays an option for
   backgrounds later.
+
+### Art & tools (done)
+- [x] Paper-theater look rolled out everywhere: combat, trail and map (parchment), events
+      (new illustrations), curios, camp (paper moon and stars), cave (lamplight pool), town
+      (layered street, palisade, props), menu, and a light paper grain over the whole UI.
+- [x] Dev "DEV: Win" button in combat for fast testing (remove later).
+- [ ] Replace generated sound effects with a free (CC0) pack. The environment's network policy
+      blocks the usual sites; either allow them or drop a pack into assets/audio.

@@ -13,14 +13,15 @@ func setup(_params: Dictionary) -> void:
 	wagon = WagonArt.new()
 	wagon.position = Vector2(700, 772)
 	wagon.scale = Vector2(1.1, 1.1)
-	add_child(wagon)
+	var stage_node := PaperFX.stage(self)
+	stage_node.add_child(wagon)
 	for i in 3:
 		var f := Figure.new()
 		var cid: String = ["marshal", "preacher", "gunslinger"][i]
 		f.setup(DB.cls(cid).look, 100 + i, 1)
 		f.position = Vector2(1040 + i * 110, 776)
 		f.scale *= 0.82
-		add_child(f)
+		stage_node.add_child(f)
 	var title := UI.hdr("Frontier Expedition", 104)
 	title.position = Vector2(0, 120)
 	title.size = Vector2(1920, 140)
