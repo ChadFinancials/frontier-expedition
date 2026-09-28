@@ -1,5 +1,5 @@
 {
-  "_comment": "Two keepsake slots per hero. rarity: common / uncommon / rare / boss. price is used by the General Store. class: optional class restriction.",
+  "_comment": "Two trinket slots per hero. rarity: common / uncommon / rare / boss. price is used by the General Store. class: optional class restriction.",
 
   "lucky_horseshoe": {"name": "Lucky Horseshoe", "rarity": "common", "price": 250, "desc": "Bent iron, nailed over a hundred doors.", "mods": [{"stat": "crit", "value": 4}, {"stat": "speed", "value": -1}]},
   "rabbits_foot": {"name": "Rabbit's Foot", "rarity": "common", "price": 250, "desc": "Wasn't lucky for the rabbit.", "mods": [{"stat": "dodge", "value": 8}, {"stat": "acc", "value": -3}]},
@@ -15,6 +15,8 @@
   "tin_canteen": {"name": "Dented Canteen", "rarity": "common", "price": 200, "desc": "Always seems to have one more swallow.", "mods": [{"stat": "heal_pct", "value": 15}, {"stat": "food_pct", "value": -10}]},
   "iron_gorget": {"name": "Iron Gorget", "rarity": "uncommon", "price": 450, "desc": "Old cavalry armor for the throat.", "mods": [{"stat": "prot", "value": 8}, {"stat": "speed", "value": -1}]},
   "loaded_dice": {"name": "Loaded Dice", "rarity": "rare", "price": 700, "desc": "They always come up sevens. Almost always.", "mods": [{"stat": "crit", "value": 8}, {"stat": "resolve", "value": -5}]},
+  "miners_lamp": {"name": "Old Jeb's Lamp", "rarity": "rare", "price": 700, "desc": "It never quite goes out, even with no oil in it.", "mods": [{"stat": "scout", "value": 15}, {"stat": "acc", "value": 4}, {"stat": "fatigue_pct", "value": -6}]},
+  "crow_feather_charm": {"name": "Blackwing Feather", "rarity": "rare", "price": 700, "desc": "Ruby wore it in her hat. The crows still nod at it.", "mods": [{"stat": "dodge", "value": 8}, {"stat": "surprise", "value": 8}, {"stat": "crit", "value": 3}]},
   "wedding_ring": {"name": "Wedding Ring", "rarity": "rare", "price": 650, "desc": "Somebody's waiting back east.", "mods": [{"stat": "resolve", "value": 15}, {"stat": "deathblow", "value": 4}]},
   "miners_lamp": {"name": "Miner's Lamp", "rarity": "uncommon", "price": 350, "desc": "Never quite goes out.", "mods": [{"stat": "acc", "value": 6, "cond": "in_cave"}, {"stat": "fatigue_pct", "value": -15, "cond": "in_cave"}]},
   "war_paint": {"name": "Red Bandana", "rarity": "common", "price": 200, "desc": "Somebody's lucky color.", "mods": [{"stat": "dmg_pct", "value": 8}, {"stat": "fatigue_pct", "value": 8}]},

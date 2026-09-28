@@ -158,7 +158,15 @@ func refresh() -> void:
 	rest.tooltip_text = "Let a week pass without an expedition. Heroes finish treatments, the stage line moves, new recruits arrive."
 	action_row.add_child(rest)
 	if region_id != "":
-		action_row.add_child(UI.btn("Ride to the Old Mill  →" if co.tutorial_pending(index) else "Plan Expedition  →", func(): Main.inst.goto("embark", {"index": index}), "Big"))
+		if co.tutorial_pending(index):
+			action_row.add_child(UI.btn("Ride to the Old Mill  →", func():
+				if co.start_tutorial() != null:
+					Game.save_game()
+					Main.inst.goto("trail")
+				else:
+					Main.inst.message("Not Yet", "Nobody is rested and in town to ride out. Rest a week, or hire a hand at the Hiring Board."), "Big"))
+		else:
+			action_row.add_child(UI.btn("Plan Expedition  →", func(): Main.inst.goto("embark", {"index": index}), "Big"))
 	else:
 		action_row.add_child(UI.btn("The Great Casino", _victory_view, "Big"))
 
@@ -209,7 +217,7 @@ func _victory_view() -> void:
 
 
 func _intro() -> void:
-	Main.inst.message("Fort Providence", "Every wagon on the frontier is chasing the same rumor: far to the west, past the last mountain, stands [b]the Great Casino[/b], a paradise city where fortunes are made. Its chips are the only currency anyone trusts out here.\n\nFort Providence was the last real town before the edge of the map, until the outlaw [b]Silas Crane[/b] burned it for refusing his toll. Your company is six hard souls, a wagon, and a short stack of chips.\n\n" + _home_tips())
+	Main.inst.message("Fort Providence", "Every wagon on the frontier is chasing the same rumor: far to the west, past the last mountain, stands [b]the Great Casino[/b], a paradise city where fortunes are made. Its chips are the only currency anyone trusts out here.\n\nFort Providence was the last real town before the edge of the map, until the outlaw [b]Silas Crane[/b] burned it for refusing his toll. Your company is four hard souls, a wagon, and a short stack of chips.\n\n" + _home_tips())
 
 
 func _intro_home() -> void:
@@ -217,7 +225,7 @@ func _intro_home() -> void:
 
 
 func _home_tips() -> String:
-	return "[i]Tips: Click a building to use it. Burned buildings can be rebuilt at half price. Click a hero to see their skills, quirks and gear. When you're ready, [b]Plan Expedition[/b]. Esc opens the menu and How to Play.[/i]"
+	return "[i]Tips: Click a building to use it. Burned buildings can be rebuilt once you have the Timber and Iron. Click a hero to see their skills, quirks and gear. When you're ready, [b]Plan Expedition[/b]. Esc opens the menu and How to Play.[/i]"
 
 
 func open_hero(h: Hero) -> void:

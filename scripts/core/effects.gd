@@ -38,11 +38,13 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 						h.hp = maxi(1, h.hp - dmg)
 						out.msgs.append("%s takes %d damage." % [h.hero_name, dmg])
 			"food":
-				var before: int = run.supplies.get("food", 0)
-				run.supplies["food"] = maxi(0, before + amount)
-				var d: int = run.supplies.food - before
-				if d != 0:
-					out.msgs.append("%s%d Food." % ["+" if d > 0 else "", d])
+				if amount > 0:
+					var got := run.add_supply("food", amount)
+					out.msgs.append("+%d Food." % got if got == amount else "+%d Food (the wagon is full; %d left behind)." % [got, amount - got])
+				elif amount < 0:
+					var before: int = run.supplies.get("food", 0)
+					run.supplies["food"] = maxi(0, before + amount)
+					out.msgs.append("%d Food." % (int(run.supplies.food) - before))
 			"money":
 				var m := amount
 				if e.has("min"):
@@ -69,8 +71,9 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 			"item":
 				var it: String = e.get("item", "food")
 				var n := int(e.get("amount", 1)) if not e.has("base") else amount
-				run.supplies[it] = int(run.supplies.get(it, 0)) + n
-				out.msgs.append("+%d %s." % [n, DB.items.get(it, {}).get("name", it)])
+				var got2 := run.add_supply(it, n)
+				var iname: String = DB.items.get(it, {}).get("name", it)
+				out.msgs.append("+%d %s." % [got2, iname] if got2 == n else "+%d %s (no room in the wagon for %d more)." % [got2, iname, n - got2])
 			"item_loss":
 				var il: String = e.get("item", "food")
 				var have := int(run.supplies.get(il, 0))
@@ -78,10 +81,10 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 					run.supplies[il] = maxi(0, have - int(e.get("amount", 1)))
 					out.msgs.append("-%d %s." % [have - int(run.supplies[il]), DB.items.get(il, {}).get("name", il)])
 			"keepsake":
-				var k := c.random_keepsake()
+				var k := c.random_keepsake(e.get("rarity", ["common", "uncommon", "rare"]))
 				if k != "":
 					run.loot.keepsakes.append(k)
-					out.msgs.append("Found a keepsake: %s! (Click a hero's card to equip it.)" % DB.keepsakes[k].name)
+					out.msgs.append("Found a trinket: %s! (Click a hero's card to equip it.)" % DB.keepsakes[k].name)
 			"quirk":
 				for h in who:
 					var q := c.add_quirk(h, str(e.get("quirk", "random")))
@@ -121,7 +124,7 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 					Stats.mod_text({"stat": e.stat, "value": amount if (e.has("base") or e.has("amount")) else int(e.get("value", 5))})])
 			"reveal":
 				var cols := run.reveal_ahead(amount if amount > 0 else 1)
-				out.msgs.append("You get a good look at the trail ahead. (%d stops scouted)" % cols)
+				out.msgs.append("You get a good look at the trail ahead. (%d stop%s scouted)" % [cols, "" if cols == 1 else "s"])
 			"light":
 				if run.in_cave():
 					run.cave.light = clampi(int(run.cave.light) + amount, 0, 100)

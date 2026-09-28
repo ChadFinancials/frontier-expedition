@@ -17,6 +17,10 @@ func _ready() -> void:
 		full_campaign(int(args.campaign), int(args.get("weeks", "40")))
 		get_tree().quit(0)
 		return
+	if args.has("simtut"):
+		sim_tutorial(int(args.simtut))
+		get_tree().quit(0)
+		return
 	if args.has("balance"):
 		balance(int(args.balance), int(args.get("weeks", "6")))
 		get_tree().quit(0)
@@ -250,13 +254,13 @@ func test_region_fights() -> void:
 func test_settlement_services() -> void:
 	var co := Company.new()
 	co.new_game(5)
-	check(co.settlements.size() == 1 and co.heroes.size() == 6, "new game setup")
+	check(co.settlements.size() == 1 and co.heroes.size() == 4, "new game setup")
 	check(co.can_do_activity(0, "saloon", "bar", co.heroes[0]) != "", "saloon is a ruin until the tutorial")
 	co.complete_tutorial()
 	co.money += 3000
 	co.timber += 60
 	co.iron += 40
-	check(co.settlement(0).recruits.size() == 3, "hiring board offers recruits")
+	check(co.settlement(0).recruits.size() == 2, "hiring board offers two recruits a week")
 	var h: Hero = co.heroes[0]
 	h.fatigue = 80
 	var money0 := co.money
@@ -273,6 +277,14 @@ func test_settlement_services() -> void:
 	check(h.available(), "hero free after a week")
 	var hired := co.hire(0, 0)
 	check(hired != null and hired.location == 0, "hire recruit")
+	check(co.upgrade_track(0, "hiring_board", "notices") and co.track_level(0, "hiring_board", "notices") == 1, "upgrade the More Notices track")
+	co.advance_week()
+	check(co.settlement(0).recruits.size() == 3, "more notices means more recruits")
+	co.money += 3000
+	co.timber += 60
+	co.iron += 30
+	check(co.upgrade_track(0, "hiring_board", "notices"), "second notices upgrade in a town")
+	check(co.can_upgrade_track(0, "hiring_board", "notices") != "", "track is capped")
 	# Stage line needs a second settlement.
 	check(co.can_send(0, 1, co.heroes[1]) != "", "can't send to unfounded site")
 	co.beaten.append("tallgrass")
@@ -300,16 +312,20 @@ func test_tutorial_and_story() -> void:
 	check(co.tutorial_pending(0) and co.expedition_region(0) == "old_mill_road", "new game starts with the tutorial")
 	check(co.is_ruin(0, "saloon") and co.building_level(0, "saloon") == 0, "Fort Providence starts burned")
 	var full: Dictionary = DB.buildings.smithy.costs[0]
-	check(int(co.building_cost(0, "smithy").money) == int(ceil(int(full.money) / 2.0)), "ruins rebuild at half price")
+	check(int(co.building_cost(0, "smithy").money) == int(ceil(int(full.money) * DB.cfg("ruin_rebuild_pct", 100) / 100.0)), "ruins rebuild at the configured price")
+	check(co.can_build(0, "general_store") != "" and co.can_build(0, "smithy") != "", "nothing can be rebuilt at the start")
 	var money0 := co.money
 	var r := co.start_tutorial()
-	check(r != null and r.party.size() == 4 and co.money == money0, "tutorial sets out free with four heroes")
+	check(r != null and r.party.size() == 2 and co.money == money0, "tutorial sets out free with two heroes")
+	check(r.party_heroes().map(func(h): return h.class_id) == DB.cfg("tutorial_party"), "tutorial party is the Marshal and Gunslinger")
 	check(MapGen.column_count(r.nodes) == 5 and r.nodes.size() == 6, "tutorial map: start, 3 stops, boss")
 	check(r.choices() == [1] and r.node(1).type == "fight", "tutorial opens with a fight")
-	check(r.nodes.all(func(n): return MapGen.intel(n) == 3), "tutorial map fully scouted")
+	check(r.nodes.filter(func(n): return n.col == 2).all(func(n): return MapGen.intel(n) == 0), "tutorial fork is unscouted")
 	check(r.node(r.nodes.size() - 1).type == "boss" and "mad_dog_mulligan" in r.node(r.nodes.size() - 1).data.enemies, "tutorial ends at Mulligan")
 	r.boss_won = true
+	r.xp = 40
 	var sm := co.finish_run("victory")
+	check(co.heroes_at(0).all(func(h): return h.level == 1), "the tutorial can't level anyone up")
 	check(co.tutorial_done and co.building_level(0, "saloon") == 1 and not co.is_ruin(0, "saloon"), "winning the tutorial rebuilds the saloon")
 	check(sm.get("tutorial", false) and str(sm.story) != "", "tutorial summary tells the story")
 	check(co.expedition_region(0) == "tallgrass", "then the real trail opens")
@@ -338,6 +354,44 @@ func test_tutorial_and_story() -> void:
 	var txt := JSON.stringify(co.to_dict())
 	var co2 := Company.from_dict(DB.normalize(JSON.parse_string(txt)))
 	check(co2.tutorial_done and co2.story_flags.has(sc.id), "tutorial and story flags survive save/load")
+	# Side adventures.
+	co.run = null
+	check(co.expedition_options(0) == ["tallgrass", "dry_gulch_mine", "crows_nest"], "Fort Providence offers the trail and two side adventures")
+	var hs: Array = co.heroes_at(0).slice(0, 2)
+	var r2 := co.start_run(0, hs.map(func(h): return h.uid), {"food": 12}, "dry_gulch_mine")
+	check(r2 != null and MapGen.column_count(r2.nodes) == 6 and r2.nodes[r2.nodes.size() - 1].type == "boss", "side adventure: short map ending at its mini-boss")
+	var e3 := CombatEngine.new()
+	e3.setup(r2.party_heroes(), [], {})
+	e3.state = "victory"
+	var res3 := r2.after_combat(e3, "boss")
+	check(r2.recruits.size() == 1 and Hero.from_dict(r2.recruits[0]).hero_name == "Hollis", "first clear: a new hero joins")
+	check("miners_lamp" in res3.keepsakes and int(res3.charters) == 0, "first clear: the rare trinket, no charters")
+	check(Inventory.slots_used({"food": 13, "bandages": 1}) == 3 and Inventory.room_for({"food": 12}, "food", 1) == 0, "wagon slots and stacks")
+
+
+## Plays the tutorial N times with fresh companies and reports how it goes.
+func sim_tutorial(n: int) -> void:
+	var res := {}
+	var boss_hp_left := 0.0
+	var levels := {}
+	for i in n:
+		var co := Company.new()
+		co.new_game(1000 + i)
+		var bot := Bot.new(1000 + i)
+		var r := co.start_tutorial()
+		var party := r.party_heroes()
+		var s := bot.play_run(co, r)
+		res[s.status] = res.get(s.status, 0) + 1
+		boss_hp_left += bot.last_hp_ratio
+		for k in bot.stats:
+			if str(k).begins_with("deaths_") or str(k).begins_with("fights_"):
+				res[k] = res.get(k, 0) + int(bot.stats[k])
+		for h in party:
+			if h.alive:
+				levels[h.level] = levels.get(h.level, 0) + 1
+		if i == 0:
+			print("  sample xp: ", s.heroes.map(func(e): return e.xp))
+	print("TUTORIAL %d runs: %s  avg party hp at the end %.2f  levels %s" % [n, res, boss_hp_left / n, levels])
 
 
 func test_save_roundtrip() -> void:
@@ -361,6 +415,7 @@ func test_campaign(weeks: int, seed_value: int) -> void:
 	var co := Company.new()
 	co.new_game(seed_value)
 	var bot := Bot.new(seed_value)
+	bot.cautious = true
 	var results := {}
 	for w in weeks:
 		# Keep the roster topped up and rested, like a sensible player.

@@ -92,6 +92,45 @@ func _draw() -> void:
 			draw_arc(c, s * 0.4, 0, TAU, 20, Color("#e8dcc0"), s * 0.08)
 			draw_arc(c, s * 0.22, 0, TAU, 16, Color("#e05a4a"), s * 0.08)
 			draw_circle(c, s * 0.07, Color("#e8dcc0"))
+		"oil":
+			# A lamp-oil tin with a spout.
+			draw_rect(Rect2(s * 0.24, s * 0.3, s * 0.52, s * 0.58), Color("#7b8a8f"))
+			draw_rect(Rect2(s * 0.24, s * 0.3, s * 0.52, s * 0.1), Color("#a9b6ba"))
+			draw_line(Vector2(s * 0.62, s * 0.3), Vector2(s * 0.78, s * 0.1), Color("#5a6569"), s * 0.08)
+			draw_circle(Vector2(s * 0.5, s * 0.62), s * 0.1, Color("#f2c14e"))
+		"bandage":
+			draw_rect(Rect2(s * 0.14, s * 0.34, s * 0.72, s * 0.32), Color("#f3ecdc"))
+			draw_circle(Vector2(s * 0.3, s * 0.5), s * 0.2, Color("#e8dfcb"))
+			draw_arc(Vector2(s * 0.3, s * 0.5), s * 0.12, 0, TAU, 12, Color("#c8bda6"), s * 0.04)
+			draw_rect(Rect2(s * 0.56, s * 0.42, s * 0.16, s * 0.16), Color("#c0392b"))
+		"vial":
+			draw_rect(Rect2(s * 0.4, s * 0.1, s * 0.2, s * 0.12), Color("#8a5a32"))
+			draw_rect(Rect2(s * 0.34, s * 0.22, s * 0.32, s * 0.64), Color("#cfe3d4"))
+			draw_rect(Rect2(s * 0.34, s * 0.5, s * 0.32, s * 0.36), Color("#4f9a5a"))
+		"bottle":
+			draw_rect(Rect2(s * 0.42, s * 0.06, s * 0.16, s * 0.3), Color("#6b4a2e"))
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.42, s * 0.34), Vector2(s * 0.58, s * 0.34), Vector2(s * 0.72, s * 0.5), Vector2(s * 0.72, s * 0.94), Vector2(s * 0.28, s * 0.94), Vector2(s * 0.28, s * 0.5)]), Color("#a8672a"))
+			draw_rect(Rect2(s * 0.32, s * 0.58, s * 0.36, s * 0.2), Color("#efe3c8"))
+		"rope":
+			for i in 3:
+				draw_arc(Vector2(s * 0.5, s * 0.52), s * (0.18 + i * 0.1), 0, TAU, 20, Color("#c49a5c"), s * 0.08)
+		"shovel":
+			draw_line(Vector2(s * 0.3, s * 0.1), Vector2(s * 0.55, s * 0.62), Color("#8a5a32"), s * 0.09)
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.45, s * 0.6), Vector2(s * 0.7, s * 0.52), Vector2(s * 0.82, s * 0.86), Vector2(s * 0.62, s * 0.94)]), Color("#8c9096"))
+		"crowbar":
+			draw_line(Vector2(s * 0.2, s * 0.86), Vector2(s * 0.7, s * 0.2), Color("#6f7a80"), s * 0.1)
+			draw_arc(Vector2(s * 0.76, s * 0.26), s * 0.1, PI * 0.9, PI * 2.2, 8, Color("#6f7a80"), s * 0.1)
+			draw_line(Vector2(s * 0.12, s * 0.84), Vector2(s * 0.24, s * 0.92), Color("#6f7a80"), s * 0.1)
+		"salt":
+			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.3, s * 0.28), Vector2(s * 0.7, s * 0.28), Vector2(s * 0.78, s * 0.9), Vector2(s * 0.22, s * 0.9)]), Color("#d9c7a0"))
+			draw_rect(Rect2(s * 0.3, s * 0.18, s * 0.4, s * 0.12), Color("#8a5a32"))
+			draw_rect(Rect2(s * 0.3, s * 0.5, s * 0.4, s * 0.16), Color("#f7f4ec"))
+		"wheel":
+			draw_arc(c, s * 0.38, 0, TAU, 24, Color("#7a5232"), s * 0.1)
+			for i in 6:
+				var a := i * TAU / 6.0
+				draw_line(c, c + Vector2(cos(a), sin(a)) * s * 0.36, Color("#8a6040"), s * 0.06)
+			draw_circle(c, s * 0.1, Color("#5a3f2f"))
 		"skull":
 			draw_circle(Vector2(s * 0.5, s * 0.42), s * 0.3, Color("#e9e2cf"))
 			draw_rect(Rect2(s * 0.34, s * 0.6, s * 0.32, s * 0.2), Color("#e9e2cf"))

@@ -137,7 +137,7 @@ func _build() -> void:
 			tb.disabled = why != ""
 			tb.tooltip_text = why if why != "" else "The Doctor removes this quirk. The hero sits out the next expedition."
 			qflow.add_child(tb)
-	right.add_child(UI.hdr("Keepsakes", 22, true))
+	right.add_child(UI.hdr("Trinkets", 22, true))
 	var krow := UI.vb(4)
 	right.add_child(krow)
 	for k in h.keepsakes:
@@ -154,19 +154,19 @@ func _build() -> void:
 	var pool := _pool()
 	if h.keepsakes.size() < 2 and not pool.is_empty():
 		var where := "found this trip" if _on_trail() else "in stash"
-		var eq := UI.btn("Equip a keepsake (%d %s)" % [pool.size(), where], _pick_keepsake, "Good")
+		var eq := UI.btn("Equip a trinket (%d %s)" % [pool.size(), where], _pick_keepsake, "Good")
 		krow.add_child(eq)
 	elif h.keepsakes.is_empty():
-		krow.add_child(UI.lbl("None. Keepsakes turn up on the trail, and the General Store sells a few.", 16, "Ink"))
+		krow.add_child(UI.lbl("None. Trinkets turn up on the trail, and the General Store sells a few.", 16, "Ink"))
 	if _on_trail() and not co.stash.is_empty():
-		krow.add_child(UI.lbl("(%d more keepsakes wait in the stash back in town.)" % co.stash.size(), 15, "Ink"))
+		krow.add_child(UI.lbl("(%d more trinkets wait in the stash back in town.)" % co.stash.size(), 15, "Ink"))
 	right.add_child(UI.lbl("Expeditions: %d   Kills: %d" % [h.expeditions, h.kills], 17, "Ink"))
 	var brow := UI.hb(10)
 	right.add_child(brow)
 	brow.add_child(UI.btn("Close", func(): Main.inst.close_modal(wrap), ""))
 	if index >= 0 and co.run == null:
 		brow.add_child(UI.btn("Dismiss", func():
-			Main.inst.confirm("Dismiss %s?" % h.hero_name, "They'll leave the company for good. Their keepsakes go to the stash.", func():
+			Main.inst.confirm("Dismiss %s?" % h.hero_name, "They'll leave the company for good. Their trinkets go to the stash.", func():
 				co.dismiss(h)
 				Game.save_game()
 				Main.inst.close_modal(wrap)
@@ -252,7 +252,7 @@ func _pick_keepsake() -> void:
 	p.custom_minimum_size = Vector2(620, 0)
 	var v := UI.vb(8)
 	p.add_child(v)
-	v.add_child(UI.hdr("Keepsakes Found This Trip" if _on_trail() else "Keepsake Stash", 28, true))
+	v.add_child(UI.hdr("Trinkets Found This Trip" if _on_trail() else "Trinket Stash", 28, true))
 	var holder := {"wrap": null}
 	for k in _pool():
 		var row := UI.hb(10)

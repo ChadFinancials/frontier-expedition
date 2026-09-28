@@ -2,9 +2,9 @@
   "_note": "Global balance constants. Percent values are whole numbers (10 = 10%).",
 
   "start_money": 750,
-  "start_timber": 20,
-  "start_iron": 8,
-  "start_heroes": ["marshal", "gunslinger", "preacher", "sharpshooter", "mountain_man", "frontier_doctor"],
+  "start_timber": 4,
+  "start_iron": 1,
+  "start_heroes": ["marshal", "gunslinger", "preacher", "sharpshooter"],
   "roster_cap": 24,
   "grubstake_floor": 150,
 
@@ -107,7 +107,10 @@
     {"id": "city", "name": "City", "slots": 9, "max_level": 3,
       "cost": {"charters": 6, "money": 5000, "timber": 90, "iron": 60}}
   ],
-  "ruin_rebuild_pct": 50,
+  "ruin_rebuild_pct": 100,
+  "trade_markup": 2.2,
+  "wagon_slots": 12,
+  "tutorial_party": ["marshal", "gunslinger"],
   "tutorial_supplies": {"food": 10, "bandages": 2, "wagon_parts": 1},
   "found_cost": {"charters": 1, "money": 600, "timber": 15, "iron": 8},
 

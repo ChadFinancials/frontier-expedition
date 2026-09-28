@@ -286,6 +286,113 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 		if sk.get("random_hits", 0) > 0:
 			parts.append("%d random hits" % int(sk.random_hits))
 		lines.append(", ".join(parts))
+	for e in sk.get("effects", []):
+		var t := effect_text(e, level)
+		if t != "":
+			lines.append("• " + t)
+	for e in sk.get("self_effects", []):
+		var t2 := effect_text(e, level)
+		if t2 != "":
+			lines.append("• Self: " + t2)
+	return "\n".join(lines)
+
+
+## One combat effect as plain words with its actual numbers at this skill level.
+static func effect_text(e: Dictionary, level: int = 1) -> String:
+	var chance := (" (%d%% base chance)" % int(e.chance)) if e.has("chance") and int(e.chance) < 100 else ""
+	var rounds := int(e.get("rounds", 3))
+	match str(e.get("type", "")):
+		"heal":
+			var m: float = float(DB.cfg("heal_mult", 1.0)) * (1.0 + DB.cfg("skill_level_heal_pct", 15) / 100.0 * (level - 1))
+			return "Heals %d-%d HP" % [int(round(float(e.get("min", 3)) * m)), int(round(float(e.get("max", 6)) * m))]
+		"heal_pct":
+			return "Heals %d%% of max HP" % int(e.get("value", 10))
+		"bleed", "poison":
+			var amt: float = float(e.get("amount", 2)) * (1.0 + DB.cfg("skill_level_dot_pct", 15) / 100.0 * (level - 1))
+			return "%s: %d damage a turn for %d turns%s" % [str(e.type).capitalize(), maxi(1, int(round(amt))), rounds, chance]
+		"stun":
+			return "Stun: loses their next turn" + chance
+		"mark":
+			return "Marks the target for %d rounds (some moves hit marked foes harder)" % rounds
+		"debuff":
+			return "%s for %d rounds%s" % [Stats.mod_text({"stat": e.stat, "value": e.value}), rounds, chance]
+		"buff":
+			var v := float(e.value) * (1.0 + 0.1 * (level - 1))
+			return "%s for %d rounds" % [Stats.mod_text({"stat": e.stat, "value": int(round(v))}), rounds]
+		"random_buff":
+			return "A random boon for %d rounds" % rounds
+		"fatigue":
+			var fa := int(e.get("amount", 5))
+			if fa < 0:
+				fa = int(round(fa * (1.0 + 0.15 * (level - 1))))
+				return "Relieves %d Fatigue" % -fa
+			return "+%d Fatigue" % fa
+		"knockback":
+			return "Knocks back %d rank%s%s" % [int(e.get("amount", 1)), "" if int(e.get("amount", 1)) == 1 else "s", chance]
+		"pull":
+			return "Pulls forward %d rank%s%s" % [int(e.get("amount", 1)), "" if int(e.get("amount", 1)) == 1 else "s", chance]
+		"move":
+			var mv := int(e.get("amount", 1))
+			return "Moves %s %d rank%s" % ["forward" if mv > 0 else "back", absi(mv), "" if absi(mv) == 1 else "s"]
+		"guard":
+			return "Guards the ally for %d rounds (takes their hits)" % int(e.get("rounds", 2))
+		"taunt":
+			return "Draws enemy attacks for %d rounds" % int(e.get("rounds", 2))
+		"cure":
+			return "Cures %s" % " and ".join(e.get("kinds", ["bleed", "poison"]))
+		"clear_shaken":
+			return "Cures Shaken"
+		"light":
+			return "Lamplight %+d" % int(e.get("amount", 10))
+		"summon":
+			return "Calls in %s" % DB.enemies.get(e.get("enemy", ""), {}).get("name", "help")
+	return ""
+
+
+## A camp action's effects in words, with numbers at this rank. party: heroes, for HP ranges.
+static func camp_effects_text(action: Dictionary, rank: int, party: Array = []) -> String:
+	var lines: Array = []
+	for e in action.get("effects", []):
+		var v := int(e.get("base", e.get("amount", 0))) + int(e.get("per_rank", 0)) * (rank - 1)
+		var who := {"self": "this hero", "ally": "one hero", "party": "each hero"}.get(action.get("target", "party"), "each hero")
+		match str(e.get("type", "")):
+			"heal_pct":
+				var hp_txt := ""
+				if not party.is_empty():
+					var lo := 999
+					var hi := 0
+					for h in party:
+						var amt := int(ceil(h.max_hp() * v / 100.0))
+						lo = mini(lo, amt)
+						hi = maxi(hi, amt)
+					hp_txt = " (%d HP)" % lo if lo == hi else " (%d-%d HP)" % [lo, hi]
+				lines.append("Heals %s %d%% of max HP%s" % [who, v, hp_txt])
+			"fatigue":
+				lines.append("%s %s %d Fatigue" % [who.capitalize(), "sheds" if v < 0 else "gains", absi(v)])
+			"fatigue_self":
+				lines.append("This hero sheds %d Fatigue" % absi(v))
+			"food":
+				lines.append("+%d Food%s" % [v, (" (%d%% chance of nothing)" % int(e.fail)) if e.has("fail") else ""])
+			"money":
+				lines.append("+%d chips%s" % [v, (" (%d%% chance)" % int(e.chance)) if e.has("chance") else ""])
+			"timber":
+				lines.append("+%d Timber" % v)
+			"iron":
+				lines.append("+%d Iron%s" % [v, (" (%d%% chance)" % int(e.chance)) if e.has("chance") else ""])
+			"item":
+				lines.append("%d%% chance of %s" % [int(e.get("chance", 100)), DB.items.get(e.get("item", ""), {}).get("name", "an item")])
+			"wagon":
+				lines.append("Repairs the wagon by %d" % v)
+			"reveal":
+				lines.append("Scouts the %d nearest unknown stops" % v)
+			"no_ambush":
+				lines.append("No ambush tonight")
+			"next_fight_buff":
+				lines.append("Next fight: %s" % Stats.mod_text({"stat": e.stat, "value": v}) if e.stat != "surprise" else "Next fight: +%d%% chance to surprise the enemy" % v)
+			"clear_shaken":
+				lines.append("Cures Shaken")
+			"craft_parts":
+				lines.append("Turns 2 Timber into 1 Wagon Parts (free at rank 3)")
 	return "\n".join(lines)
 
 
@@ -335,9 +442,16 @@ static func survival_tooltip(sid: String, rank: int) -> String:
 	var lines := ["%s (rank %d)" % [d.get("name", sid), rank], d.get("desc", "")]
 	var p: Dictionary = d.get("passive", {})
 	if not p.is_empty():
-		lines.append("On the trail: " + p.get("text", ""))
+		var pv := int(p.get("base", 0)) + int(p.get("per_rank", 0)) * (rank - 1)
+		var unit := "%" if str(p.get("type", "")).ends_with("_pct") or p.get("type", "") in ["scout", "forage", "wagon_guard", "surprise"] else ""
+		lines.append("On the trail: %s (%+d%s)" % [p.get("text", ""), pv, unit])
 	for a in d.get("actions", []):
-		lines.append("Camp: %s (%dh): %s" % [a.name, int(a.hours), a.desc])
+		var unlock := int(a.get("unlock", 1))
+		var head := "Camp: %s (%dh)" % [a.name, int(a.hours)]
+		if rank < unlock:
+			lines.append("%s: unlocks at rank %d" % [head, unlock])
+		else:
+			lines.append("%s: %s" % [head, camp_effects_text(a, rank).replace("\n", "; ")])
 	return "\n".join(lines)
 
 

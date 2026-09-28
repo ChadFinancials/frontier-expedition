@@ -91,6 +91,11 @@ func _process(delta: float) -> void:
 					return
 			_press_text(s, ["Plan Expedition", "Ride to the Old Mill"])
 		"embark":
+			# Alternate between the trail west and the side adventures.
+			if expeditions_done % 2 == 1 and m.screen.dest == "tallgrass":
+				note("  choosing a side adventure")
+				_press_text(m.screen, ["Dry Gulch Mine" if expeditions_done % 4 == 1 else "The Crow's Nest"])
+				return
 			if m.screen.party.is_empty():
 				need_rest = true
 				_press_text(m.screen, ["<  Back"])

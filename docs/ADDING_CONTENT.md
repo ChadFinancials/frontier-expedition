@@ -181,9 +181,25 @@ Optional region fields:
   id), `round`, `hp_pct`, `deaths_door` (triggers), `wound_pct` (the boss's starting health
   next time), `title` and `text` (the cutscene). Add `boss.intro_again` for the rematch.
 
+- `side: true` makes a side adventure (listed by a settlement's `side_regions`); its boss is
+  fought every time. `columns` sets the map length (default 9). `node_weights` overrides how
+  often each stop type appears (`fight`, `elite`, `event`, `curio`, `cave`, `homestead`,
+  `trading_post`). `side_reward` is paid on the first clear: `hero {class, level, name}`,
+  `timber`, `iron`, `text`.
+- `xp_cap`: the most XP a hero can earn from one run here (the tutorial uses 3).
+
 Settlement fields for a start town: `start_buildings`, `start_ruins` (burned buildings
 rebuilt at a discount), `tutorial` (region of the first expedition) and
-`tutorial_rebuilds` (the ruin that winning it restores).
+`tutorial_rebuilds` (the ruin that winning it restores). Any settlement can list
+`side_regions`.
+
+Buildings can have upgrade `tracks` instead of plain levels (see the Hiring Board): each
+track has `name`, `desc`, `values` (per track level) and `costs`. Code reads a track with
+`Company.track_value(i, bid, track)`.
+
+Survival (camp) actions take `unlock` (the skill rank that unlocks them) and `cost`
+(supplies used, `{item: count}`). Items take `stack` (how many share one wagon slot); the
+wagon has `wagon_slots` slots (config.json).
 
 ---
 

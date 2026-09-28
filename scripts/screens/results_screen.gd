@@ -46,7 +46,7 @@ func setup(params: Dictionary) -> void:
 		lr.add_child(h)
 	var ks: Array = loot.get("keepsakes", [])
 	if not ks.is_empty():
-		v.add_child(UI.rich("[center]Keepsakes: [b]%s[/b][/center]" % ", ".join(ks.filter(func(k): return k != "").map(func(k): return DB.keepsakes[k].name)), 21, true, 1360))
+		v.add_child(UI.rich("[center]Trinkets: [b]%s[/b][/center]" % ", ".join(ks.filter(func(k): return k != "").map(func(k): return DB.keepsakes[k].name)), 21, true, 1360))
 	# Heroes.
 	var grid := GridContainer.new()
 	grid.columns = 2

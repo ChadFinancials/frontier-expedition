@@ -524,15 +524,23 @@ func _wait(sec: float) -> void:
 
 ## A curved arrow from the actor to a target that fades away.
 func _arrow(from: UnitView, to: UnitView, hostile: bool) -> void:
+	# The arrow drops from above straight onto the target's head, then bobs there.
+	# It rides on the target's view so it follows them when they step forward.
 	var arr := _Arrow.new()
-	arr.a = from.position + Vector2(0, from.top_local() * 0.6)
-	arr.b = to.position + Vector2(0, to.top_local() * 0.6)
+	var head := Vector2(0, to.top_local() - 14)
+	arr.a = head + Vector2(0, -150)
+	arr.b = head
 	arr.color = Color("#e05a4a") if hostile else Color("#7ee07a")
 	arr.z_index = 32
-	add_child(arr)
+	arr.z_as_relative = false
+	to.add_child(arr)
 	var tw := create_tween()
-	tw.tween_property(arr, "t", 1.0, 0.3 * PACE / speed)
-	tw.tween_interval(0.4 * PACE / speed)
+	tw.tween_property(arr, "t", 1.0, 0.22 * PACE / speed).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_property(arr, "position:y", -12.0, 0.12 * PACE / speed).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(arr, "position:y", 0.0, 0.12 * PACE / speed).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(arr, "position:y", -8.0, 0.1 * PACE / speed).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(arr, "position:y", 0.0, 0.1 * PACE / speed).set_trans(Tween.TRANS_SINE)
+	tw.tween_interval(0.3 * PACE / speed)
 	tw.tween_property(arr, "modulate:a", 0.0, 0.3)
 	tw.tween_callback(arr.queue_free)
 
@@ -986,7 +994,7 @@ func _finish() -> void:
 			lines.append("+%d Land Charter%s!" % [res.charters, "s" if res.charters > 1 else ""])
 		for k in res.keepsakes:
 			if k != "":
-				lines.append("Keepsake: %s  (click a hero's card on the trail to equip it)" % DB.keepsakes[k].name)
+				lines.append("Trinket: %s  (click a hero's card on the trail to equip it)" % DB.keepsakes[k].name)
 	lines.append_array(res.msgs)
 	var ret: String = params.get("return", "trail")
 	if run.party_heroes().is_empty():
@@ -1064,20 +1072,23 @@ class _Arrow extends Node2D:
 			queue_redraw()
 
 	func _draw() -> void:
-		var mid := (a + b) / 2.0 + Vector2(0, -90 - absf(b.x - a.x) * 0.08)
-		var pts := PackedVector2Array()
-		var n := 24
-		for i in n + 1:
-			var f := t * i / float(n)
-			pts.append(a.lerp(mid, f).lerp(mid.lerp(b, f), f))
-		if pts.size() < 2:
+		# A straight, fat arrow falling from a toward b; t grows it in from the top.
+		var tail := a
+		var tip := a.lerp(b, t)
+		if tip.distance_to(tail) < 4.0:
 			return
-		draw_polyline(pts, Color(0, 0, 0, 0.5), 9.0, true)
-		draw_polyline(pts, color, 5.0, true)
-		var tip := pts[pts.size() - 1]
-		var dir := (tip - pts[pts.size() - 2]).normalized()
+		var dir := (tip - tail).normalized()
 		var n2 := dir.orthogonal()
-		draw_colored_polygon(PackedVector2Array([tip + dir * 16, tip - dir * 8 + n2 * 11, tip - dir * 8 - n2 * 11]), color)
+		var shaft_end := tip - dir * 22
+		draw_line(tail, shaft_end, Color(0, 0, 0, 0.5), 18.0, true)
+		draw_line(tail, shaft_end, color, 12.0, true)
+		var head := PackedVector2Array([tip, shaft_end + n2 * 24 - dir * 6, shaft_end - n2 * 24 - dir * 6])
+		var shadow := PackedVector2Array()
+		for q in head:
+			shadow.append(q + Vector2(3, 4))
+		draw_colored_polygon(shadow, Color(0, 0, 0, 0.45))
+		draw_colored_polygon(head, color)
+		draw_polyline(PackedVector2Array([head[0], head[1], head[2], head[0]]), Color("#f3e9d2"), 2.5, true)
 
 
 class _Burst extends Node2D:

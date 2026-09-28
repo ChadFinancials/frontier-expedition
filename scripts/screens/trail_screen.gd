@@ -8,7 +8,7 @@ var walkers: Array = []
 var map: MapView
 var hud_row: HBoxContainer
 var party_row: HBoxContainer
-var item_row: HFlowContainer
+var item_row: VBoxContainer
 var log_label: RichTextLabel
 var scroll := 0.0
 var travelling := false
@@ -70,8 +70,7 @@ func setup(_params: Dictionary) -> void:
 	var mid := UI.vb(6)
 	mid.custom_minimum_size.x = 470
 	bh.add_child(mid)
-	mid.add_child(UI.lbl("Supplies (click to use)", 17, "Bold"))
-	item_row = HFlowContainer.new()
+	item_row = UI.vb(4)
 	item_row.custom_minimum_size.x = 470
 	mid.add_child(item_row)
 	var turn_back := UI.btn("Turn Back", _turn_back, "Danger")
@@ -124,7 +123,7 @@ func refresh() -> void:
 		["xp", "%d XP" % run.xp, "Experience each survivor earns."],
 		["eye", "Scouting %d" % int(run.scout_score()), _scout_tip()]]
 	if not run.loot.keepsakes.is_empty():
-		items.append(["xp", "%d keepsake%s" % [run.loot.keepsakes.size(), "s" if run.loot.keepsakes.size() > 1 else ""], ", ".join(run.loot.keepsakes.map(func(k): return DB.keepsakes[k].name))])
+		items.append(["xp", "%d trinket%s" % [run.loot.keepsakes.size(), "s" if run.loot.keepsakes.size() > 1 else ""], ", ".join(run.loot.keepsakes.map(func(k): return DB.keepsakes[k].name))])
 	for it in items:
 		var h := UI.hb(6)
 		h.add_child(ResIcon.make(it[0], 26))
@@ -139,19 +138,15 @@ func refresh() -> void:
 		c.clicked.connect(func(_c): _open_hero(h))
 		party_row.add_child(c)
 	UI.clear(item_row)
-	for it in EmbarkOrder.ORDER:
-		var n := int(run.supplies.get(it, 0))
-		if n <= 0:
-			continue
-		var b := UI.btn("%s ×%d" % [DB.items[it].name, n], Callable(), "Small")
-		b.tooltip_text = DB.items[it].desc
-		var item: String = it
+	item_row.add_child(UI.lbl("Wagon: %d of %d slots  (click to use)" % [Inventory.slots_used(run.supplies), Inventory.capacity()], 16, "Bold"))
+	var grid := InventoryGrid.make(run.supplies, 50.0, 8, func(it: String):
+		return "Click to use." if run.can_use_item(it) else "Used by events, curios and camp, not directly.")
+	grid.slot_clicked.connect(func(it: String):
 		if run.can_use_item(it):
-			b.pressed.connect(func(): _use_item(item))
+			_use_item(it)
 		else:
-			b.disabled = it != "food"
-			b.mouse_filter = Control.MOUSE_FILTER_STOP
-		item_row.add_child(b)
+			Main.inst.toast("%s gets used by events, curios and camp actions." % DB.items[it].name))
+	item_row.add_child(grid)
 	var lines: Array = run.log.slice(maxi(0, run.log.size() - 30))
 	log_label.text = "\n".join(lines)
 	map.queue_redraw()
@@ -176,7 +171,7 @@ func _scout_tip() -> String:
 	for h in run.party_heroes():
 		var v: float = h.stat("scout")
 		if v != 0:
-			lines.append("%s: %+d (quirks/keepsakes)" % [h.hero_name, int(v)])
+			lines.append("%s: %+d (quirks/trinkets)" % [h.hero_name, int(v)])
 		for sid in h.survival:
 			if DB.survival[sid].get("passive", {}).get("type", "") == "scout":
 				lines.append("%s: Scout skill" % h.hero_name)

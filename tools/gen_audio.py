@@ -328,11 +328,24 @@ def s_whoosh():
     return mul(sweep_lowpass(noise(0.35), 300, 3000), env(n, 0.15, 0.1, curve=5))
 
 
+def _formants(x, peaks):
+    """Sum of band-passed copies: a crude vocal tract, so beasts sound throaty, not buzzy."""
+    return mix(*[gain(bandpass(x, f * 0.8, f * 1.25), g) for f, g in peaks])
+
+
 def s_roar():
-    base = osc(lambda t: 95 + 30 * math.sin(t * 7) - 20 * t, 1.2, "saw")
-    grit = mul(lowpass(noise(1.2), 700), [0.6 + 0.4 * math.sin(i / SR * 40) for i in range(int(1.2 * SR))])
-    x = bandpass(mix(base, gain(grit, 0.8)), 60, 1400)
-    return mul(x, env(len(x), 0.08, 0.6, 0.0, 0.3, curve=3))
+    # A big animal roar: breathy noise through throat formants, a rough voice under it,
+    # swelling and falling. Low end is cut so it doesn't turn into a buzz.
+    sec = 1.3
+    n = int(sec * SR)
+    pitch = lambda t: 150 + 70 * math.sin(min(1.0, t / sec) * math.pi) + 6 * math.sin(t * 60)
+    voice = osc(pitch, sec, "saw")
+    breath = noise(sec)
+    rough = [0.55 + 0.45 * abs(math.sin(i / SR * 2 * math.pi * 23)) for i in range(n)]
+    x = mix(gain(voice, 0.5), gain(breath, 0.9))
+    x = mul(_formants(x, [(420, 1.0), (900, 0.8), (2100, 0.35)]), rough)
+    x = highpass(x, 180)
+    return mul(x, env(n, 0.12, 0.7, 0.0, 0.35, curve=2.5))
 
 
 def s_howl():
@@ -364,10 +377,27 @@ def s_caw():
 
 
 def s_growl():
-    x = osc(lambda t: 80 + 10 * math.sin(t * 13), 0.8, "saw")
-    am = [0.6 + 0.4 * abs(math.sin(i / SR * 25)) for i in range(len(x))]
-    x = bandpass(mul(x, am), 60, 900)
-    return mul(x, env(len(x), 0.05, 0.4, 0.0, 0.2))
+    # A snarl: a rolling "rrr" of breathy noise and a mid voice through two formants.
+    sec = 0.7
+    n = int(sec * SR)
+    voice = osc(lambda t: 190 + 25 * math.sin(t * 9) + rnd.uniform(-4, 4), sec, "saw")
+    breath = noise(sec)
+    roll = [0.35 + 0.65 * abs(math.sin(i / SR * 2 * math.pi * 28)) for i in range(n)]
+    x = mul(mix(gain(voice, 0.45), gain(breath, 1.0)), roll)
+    x = highpass(_formants(x, [(650, 1.0), (1500, 0.7), (2800, 0.25)]), 250)
+    return mul(x, env(n, 0.03, 0.35, 0.0, 0.2, curve=2.5))
+
+
+def s_bite():
+    # A short snarl, then jaws snapping shut.
+    out = silence(0.55)
+    sn = s_growl()[: int(0.28 * SR)]
+    place(out, mul(sn, env(len(sn), 0.01, 0.2, curve=2)), 0.0, 0.7)
+    snap = mix(mul(highpass(noise(0.05), 2500), env(int(0.05 * SR), 0.0005, 0.015)),
+               gain(mul(osc(lambda t: 900 * math.exp(-t * 60) + 300, 0.05), env(int(0.05 * SR), 0.0005, 0.02)), 0.6))
+    place(out, snap, 0.22, 1.0)
+    place(out, gain(snap, 0.5), 0.27, 1.0)
+    return out
 
 
 def s_stomp():
@@ -501,13 +531,18 @@ def s_breaking():
 
 
 def s_fanfare():
-    out = silence(1.6)
-    seq = [(392, 0.0, 0.16), (523.25, 0.16, 0.16), (659.25, 0.32, 0.16), (783.99, 0.48, 0.8)]
-    for f, at, dur in seq:
-        t = mix(osc(f, dur + 0.2, "square"), gain(osc(f * 2, dur + 0.2, "saw"), 0.3))
-        t = lowpass(t, 2500)
-        place(out, mul(t, env(len(t), 0.01, dur + 0.1, 0.0, dur * 0.6, curve=3)), at, 0.5)
-    return out
+    # Victory: a quick picked run up the chord on a steel-string guitar, then two warm
+    # strums (C then G) and a ringing high note. No square waves.
+    out = silence(2.6)
+    run = ["G3", "B3", "D4", "G4"]
+    for i, n in enumerate(run):
+        place(out, pluck(note_freq(n), 1.2, 0.45, 0.996), i * 0.09, 0.55)
+    place(out, strum("C", 0.8, 0.018, 1.2, 0.35), 0.40, 0.8)
+    place(out, strum("G", 0.9, 0.022, 2.0, 0.35), 0.78, 0.9)
+    place(out, bass_note("G2", 1.6), 0.78, 0.7)
+    place(out, pluck(note_freq("B4"), 1.6, 0.55, 0.997), 0.80, 0.35)
+    place(out, pluck(note_freq("D5"), 1.8, 0.55, 0.997), 0.86, 0.3)
+    return lowpass(out, 5000)
 
 
 def s_eat():

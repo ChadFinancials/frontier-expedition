@@ -102,7 +102,7 @@ func _refresh() -> void:
 			panel_box.add_child(b)
 		return
 	hours_label.text = "Hours until dawn: %d" % int(run.camp.hours)
-	panel_box.add_child(UI.lbl("Each hero can use each of their survival actions once. Hover for details.", 18, "Ink"))
+	panel_box.add_child(UI.lbl("Each hero can use each of their survival actions once. More unlock as survival skills rank up with use. Hover for details.", 18, "Ink"))
 	var acts := run.camp_actions()
 	for h in run.party_heroes():
 		var hv := UI.vb(4)
@@ -118,11 +118,19 @@ func _refresh() -> void:
 			if a.uid != h.uid:
 				continue
 			var ad: Dictionary = a.action
-			var b := UI.btn("%s: %s (%dh)" % [DB.survival[a.skill].name, ad.name, int(ad.hours)], Callable(), "Small")
-			b.tooltip_text = "%s\n%s\nRank %d %s" % [ad.name, ad.desc, a.rank, DB.survival[a.skill].name]
+			var cost_txt := ""
+			for it in ad.get("cost", {}):
+				cost_txt += ", %d %s" % [int(ad.cost[it]), DB.items.get(it, {}).get("name", it)]
+			var b := UI.btn("%s: %s (%dh%s)" % [DB.survival[a.skill].name, ad.name, int(ad.hours), cost_txt], Callable(), "Small")
+			b.tooltip_text = "%s  (rank %d %s)\n%s\n\n%s" % [ad.name, a.rank, DB.survival[a.skill].name, ad.desc, UI.camp_effects_text(ad, a.rank, run.party_heroes())]
 			b.disabled = not a.available
 			if a.used:
 				b.text = "✔ " + b.text
+			elif a.locked:
+				b.text = "%s (unlocks at rank %d)" % [ad.name, int(ad.get("unlock", 2))]
+				b.tooltip_text += "\n\nUnlocks when %s reaches rank %d." % [DB.survival[a.skill].name, int(ad.get("unlock", 2))]
+			elif not a.affordable:
+				b.tooltip_text += "\n\nNot enough supplies."
 			var uid: int = h.uid
 			var aid: String = ad.id
 			var target_kind: String = ad.get("target", "party")

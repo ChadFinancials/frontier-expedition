@@ -5,6 +5,7 @@ const ITEM_ORDER := ["food", "bandages", "antivenom", "whiskey", "lamp_oil", "wa
 const RECOMMENDED := {"food": 18, "bandages": 2, "antivenom": 1, "whiskey": 1, "lamp_oil": 2, "wagon_parts": 1, "rope": 1, "shovel": 1, "crowbar": 1, "salt": 1}
 
 var index: int = 0
+var dest: String = ""          # region id of the chosen destination
 var party: Array = []          # uids, index 0 = rank 1
 var supplies: Dictionary = {}
 var top: TopBar
@@ -21,7 +22,11 @@ func setup(params: Dictionary) -> void:
 	index = int(params.get("index", 0))
 	var co: Company = Game.company
 	var site := co.site_by_index(index)
-	var region_id := co.expedition_region(index)
+	var options := co.expedition_options(index)
+	dest = params.get("dest", co.expedition_region(index))
+	if not dest in options and not options.is_empty():
+		dest = options[0]
+	var region_id := dest
 	var region: Dictionary = DB.regions.get(region_id, {})
 	var bd := Backdrop.new()
 	bd.ground_y = 1000
@@ -33,7 +38,7 @@ func setup(params: Dictionary) -> void:
 	add_child(shade)
 	top = TopBar.new()
 	add_child(top)
-	top.set_title("Plan Expedition", "From %s into %s" % [site.name, region.get("name", "?")])
+	top.set_title("Plan Expedition", "From %s to %s" % [site.name, region.get("name", "?")])
 	top.refresh()
 	# Roster.
 	var rp := UI.panel()
@@ -54,10 +59,28 @@ func setup(params: Dictionary) -> void:
 	roster_grid.add_theme_constant_override("h_separation", 10)
 	roster_grid.add_theme_constant_override("v_separation", 8)
 	sc.add_child(roster_grid)
+	# Destinations: the trail west and any side adventures.
+	var dp := UI.panel("Dark")
+	dp.position = Vector2(920, 90)
+	dp.custom_minimum_size = Vector2(980, 96)
+	add_child(dp)
+	var drow := UI.hb(10)
+	dp.add_child(drow)
+	drow.add_child(UI.hdr("Where to?", 24))
+	for r in options:
+		var rd: Dictionary = DB.regions[r]
+		var kind: String = "Tutorial" if rd.get("tutorial", false) else ("Side adventure" if rd.get("side", false) else "The trail west")
+		var done: bool = r in co.beaten
+		var b := UI.btn("%s\n%s, lvl %s%s" % [rd.name, kind, rd.get("rec_level", "?"), "  ✓" if done else ""], func():
+			if r != dest:
+				Main.inst.goto("embark", {"index": index, "dest": r, "party": party.duplicate(), "supplies": supplies.duplicate()}), "Good" if r == dest else "Tab")
+		b.custom_minimum_size = Vector2(250, 76)
+		b.tooltip_text = rd.get("desc", "") + ("\n\nFirst clear: a new hero joins, plus a rare trinket." if rd.get("side", false) and not done else "")
+		drow.add_child(b)
 	# Formation stage.
 	var sp := UI.panel("Dark")
-	sp.position = Vector2(920, 90)
-	sp.custom_minimum_size = Vector2(980, 400)
+	sp.position = Vector2(920, 196)
+	sp.custom_minimum_size = Vector2(980, 300)
 	add_child(sp)
 	var sv := UI.vb(6)
 	sp.add_child(sv)
@@ -66,18 +89,19 @@ func setup(params: Dictionary) -> void:
 	sh.add_child(UI.hdr("Formation", 26))
 	sh.add_child(UI.lbl("Rank 4 (back)  ←  →  Rank 1 (front). Enemies will be on the right.", 18))
 	stage_row = UI.hb(6)
-	stage_row.custom_minimum_size = Vector2(950, 320)
+	stage_row.custom_minimum_size = Vector2(950, 250)
 	sv.add_child(stage_row)
 	# Supplies.
 	var sup := UI.panel()
-	sup.position = Vector2(920, 505)
-	sup.custom_minimum_size = Vector2(980, 415)
+	sup.position = Vector2(920, 506)
+	sup.custom_minimum_size = Vector2(980, 420)
 	add_child(sup)
 	var supv := UI.vb(4)
 	sup.add_child(supv)
 	var suph := UI.hb(10)
 	supv.add_child(suph)
-	suph.add_child(UI.hdr("Supplies", 26, true))
+	suph.add_child(UI.hdr("Store & Wagon", 26, true))
+	suph.add_child(UI.lbl("Click store goods to load them; click a wagon slot to put one back.", 16, "Ink"))
 	suph.add_child(UI.spacer(0, 0, true))
 	suph.add_child(UI.btn("Recommended", func():
 		supplies = _affordable(RECOMMENDED)
@@ -109,14 +133,17 @@ func setup(params: Dictionary) -> void:
 	depart_btn = UI.btn("Hit the Trail!", _depart, "Big", 300)
 	depart_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	fh.add_child(depart_btn)
-	supplies = _affordable(RECOMMENDED)
-	# Default party: the four healthiest ready heroes, in a sensible order.
-	var avail := co.heroes_at(index).filter(func(h): return h.available())
-	avail.sort_custom(func(a, b): return a.fatigue < b.fatigue)
-	var pick := avail.slice(0, 4)
-	pick.sort_custom(func(a, b): return a.cls().get("ranks", [2]).min() < b.cls().get("ranks", [2]).min())
-	for h in pick:
-		party.append(h.uid)
+	supplies = params.get("supplies", _affordable(RECOMMENDED))
+	if params.has("party"):
+		party = params.party
+	else:
+		# Default party: the four healthiest ready heroes, in a sensible order.
+		var avail := co.heroes_at(index).filter(func(h): return h.available())
+		avail.sort_custom(func(a, b): return a.fatigue < b.fatigue)
+		var pick := avail.slice(0, 4)
+		pick.sort_custom(func(a, b): return a.cls().get("ranks", [2]).min() < b.cls().get("ranks", [2]).min())
+		for h in pick:
+			party.append(h.uid)
 	_refresh()
 
 
@@ -136,13 +163,13 @@ func _refresh() -> void:
 	UI.clear(stage_row)
 	for slot in [3, 2, 1, 0]:
 		var col := UI.vb(2)
-		col.custom_minimum_size = Vector2(232, 320)
+		col.custom_minimum_size = Vector2(232, 250)
 		stage_row.add_child(col)
 		col.add_child(UI.lbl("Rank %d" % (slot + 1), 18, "Bold"))
 		if slot < party.size():
 			var h: Hero = co.hero(party[slot])
 			var fb := FigureBox.new()
-			fb.custom_minimum_size = Vector2(220, 200)
+			fb.custom_minimum_size = Vector2(220, 140)
 			fb.frame_color = Color(0.25, 0.18, 0.12)
 			fb.show_hero(h)
 			fb.tooltip_text = "Click to remove"
@@ -168,7 +195,7 @@ func _refresh() -> void:
 			col.add_child(arrows)
 		else:
 			var empty := Panel.new()
-			empty.custom_minimum_size = Vector2(220, 200)
+			empty.custom_minimum_size = Vector2(220, 140)
 			empty.add_theme_stylebox_override("panel", UI.box(Color(0, 0, 0, 0.25), UI.WOOD_LIGHT, 2, 6))
 			col.add_child(empty)
 			col.add_child(UI.lbl("(empty)", 16))
@@ -200,39 +227,55 @@ func _swap(a: int, b: int) -> void:
 func _refresh_supplies() -> void:
 	var co: Company = Game.company
 	UI.clear(supply_box)
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 30)
-	supply_box.add_child(grid)
+	var row := UI.hb(18)
+	supply_box.add_child(row)
+	# The store: click to load one step into the wagon.
+	var store := GridContainer.new()
+	store.columns = 2
+	store.add_theme_constant_override("h_separation", 6)
+	store.add_theme_constant_override("v_separation", 4)
+	store.custom_minimum_size.x = 440
+	row.add_child(store)
 	for it in ITEM_ORDER:
 		var d: Dictionary = DB.items[it]
-		var row := UI.hb(6)
-		var nl := UI.lbl(d.name, 19, "InkBold")
-		nl.custom_minimum_size.x = 130
-		nl.tooltip_text = d.desc
-		nl.mouse_filter = Control.MOUSE_FILTER_STOP
-		row.add_child(nl)
-		var price := co.item_price(index, it)
-		row.add_child(UI.lbl("%d" % price, 17, "Ink"))
-		var n := int(supplies.get(it, 0))
 		var step := 4 if it == "food" else 1
+		var price := co.item_price(index, it)
 		var item: String = it
-		row.add_child(UI.btn("-", func():
-			supplies[item] = maxi(0, int(supplies.get(item, 0)) - step)
-			_refresh_supplies(), "Small"))
-		var cl := UI.lbl(str(n), 20, "InkBold")
-		cl.custom_minimum_size.x = 34
-		cl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		row.add_child(cl)
-		row.add_child(UI.btn("+", func():
-			supplies[item] = mini(int(d.stack), int(supplies.get(item, 0)) + step)
-			_refresh_supplies(), "Small"))
-		grid.add_child(row)
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(216, 50)
+		b.theme_type_variation = "Tab"
+		b.focus_mode = Control.FOCUS_NONE
+		var ic := ResIcon.make(d.get("icon", it), 34)
+		ic.position = Vector2(6, 8)
+		b.add_child(ic)
+		var l := UI.lbl("%s%s  %d" % [d.name, " x4" if step > 1 else "", price * step], 17, "Bold")
+		l.position = Vector2(46, 12)
+		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(l)
+		b.tooltip_text = "%s: %s\n%d chips each. Stacks of %d per wagon slot." % [d.name, d.desc, price, Inventory.stack_size(it)]
+		var room := Inventory.room_for(supplies, it)
+		b.disabled = room <= 0 or co.supply_cost(index, supplies) + price * mini(step, room) > co.money
+		b.pressed.connect(func():
+			supplies[item] = int(supplies.get(item, 0)) + mini(step, Inventory.room_for(supplies, item))
+			Audio.play("coin", 0.4)
+			_refresh_supplies())
+		store.add_child(b)
+	# The wagon: its slots. Click a stack to put one step back.
+	var wv := UI.vb(6)
+	row.add_child(wv)
+	wv.add_child(UI.lbl("Wagon: %d of %d slots" % [Inventory.slots_used(supplies), Inventory.capacity()], 19, "InkBold"))
+	var grid := InventoryGrid.make(supplies, 70.0, 6)
+	grid.slot_clicked.connect(func(item: String):
+		var step2 := 4 if item == "food" else 1
+		supplies[item] = maxi(0, int(supplies.get(item, 0)) - step2)
+		_refresh_supplies())
+	wv.add_child(grid)
 	var cost := co.supply_cost(index, supplies)
 	var food := int(supplies.get("food", 0))
-	supply_box.add_child(UI.lbl("Food lasts about %d stops for this party (a trail is 8 stops plus camp meals)." % int(food / maxf(1.0, ceil(2.0 * party.size() / 4.0))), 17, "Ink"))
+	var stops := int(DB.regions.get(dest, {}).get("columns", 9)) - 1
+	wv.add_child(UI.wrap(UI.lbl("Food lasts about %d stops for this party (this trip is %d stops plus camp meals)." % [int(food / maxf(1.0, ceil(2.0 * party.size() / 4.0))), stops], 16, "Ink"), 480))
 	total_label.text = "Supplies: %d chips   (you have %d)" % [cost, co.money]
-	var why := co.can_embark(index, party, supplies)
+	var why := co.can_embark(index, party, supplies, dest)
 	warn_label.text = why
 	if why == "" and party.size() < 4:
 		warn_label.text = "Going with fewer than four heroes is risky."
@@ -260,9 +303,9 @@ func _depart() -> void:
 	for k in supplies:
 		if int(supplies[k]) > 0:
 			clean[k] = int(supplies[k])
-	var r := co.start_run(index, party, clean)
+	var r := co.start_run(index, party, clean, dest)
 	if r == null:
-		Main.inst.message("Can't Depart", co.can_embark(index, party, clean))
+		Main.inst.message("Can't Depart", co.can_embark(index, party, clean, dest))
 		return
 	Game.save_game()
 	Audio.play("whip")

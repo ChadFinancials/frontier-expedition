@@ -1,76 +1,64 @@
 {
-  "_comment": "Each hero rolls two survival skills. Rank 1-3, gained by use (rank_xp). passive: applies while any living party member has the skill; value = base + per_rank * (rank - 1). Camp actions cost hours from the camp budget; each hero may use each action once per camp. Camp effect types: heal_pct, fatigue, food, money, timber, iron, item, wagon, reveal, no_ambush, next_fight_buff, clear_shaken, recruit_chance. target: self, ally, party. Numbers scale per rank via per_rank.",
+  "_comment": "Each hero rolls two survival skills. Rank 1-3, gained by use (rank_xp). passive: applies while any living party member has the skill; value = base + per_rank * (rank - 1). Camp actions cost hours from the camp budget; each hero may use each action once per camp. Camp effect types: heal_pct, fatigue, food, money, timber, iron, item, wagon, reveal, no_ambush, next_fight_buff, clear_shaken, recruit_chance. target: self, ally, party. Numbers scale per rank via per_rank. unlock: the survival rank needed to use the action (a new hero has one action per skill). cost: supplies used ({item: count}).",
 
-  "cook": {"name": "Cook", "desc": "Makes beans and bacon taste like Sunday dinner.",
-    "passive": {"type": "food_pct", "base": -15, "per_rank": -10, "text": "Party eats less food"},
+  "cook": {"name": "Cook", "desc": "Makes beans and bacon taste like Sunday dinner.", "passive": {"type": "food_pct", "base": -15, "per_rank": -10, "text": "Party eats less food"},
     "actions": [
-      {"id": "hearty_stew", "name": "Hearty Stew", "hours": 3, "target": "party", "desc": "Heals the whole party.", "effects": [{"type": "heal_pct", "base": 10, "per_rank": 5}]},
-      {"id": "trail_coffee", "name": "Trail Coffee", "hours": 2, "target": "party", "desc": "Party sheds Fatigue and gains Speed for the next fight.", "effects": [{"type": "fatigue", "base": -6, "per_rank": -3}, {"type": "next_fight_buff", "stat": "speed", "base": 1, "per_rank": 1}]}
+      {"id": "hearty_stew", "name": "Hearty Stew", "hours": 3, "target": "party", "desc": "A big pot of beans, bacon and whatever's handy. Uses Food.", "effects": [{"type": "heal_pct", "base": 12, "per_rank": 5}], "unlock": 1, "cost": {"food": 3}},
+      {"id": "trail_coffee", "name": "Trail Coffee", "hours": 2, "target": "party", "desc": "Strong, bitter and hot. Uses Food (the coffee ration).", "effects": [{"type": "fatigue", "base": -6, "per_rank": -3}, {"type": "next_fight_buff", "stat": "speed", "base": 1, "per_rank": 1}], "unlock": 2, "cost": {"food": 1}}
     ]},
-  "hunter": {"name": "Hunter", "desc": "Can bring down a pronghorn at three hundred yards.",
-    "passive": {"type": "hunt_bonus", "base": 1, "per_rank": 1, "text": "Hunting events yield more food"},
+  "hunter": {"name": "Hunter", "desc": "Can bring down a pronghorn at three hundred yards.", "passive": {"type": "hunt_bonus", "base": 1, "per_rank": 1, "text": "Hunting events yield more food"},
     "actions": [
-      {"id": "go_hunting", "name": "Go Hunting", "hours": 4, "target": "self", "desc": "Brings back food. Might come back empty-handed.", "effects": [{"type": "food", "base": 4, "per_rank": 2, "fail": 20}]},
-      {"id": "stalk_prey", "name": "Stalker's Eye", "hours": 2, "target": "party", "desc": "Party gains Accuracy for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "acc", "base": 5, "per_rank": 3}]}
+      {"id": "go_hunting", "name": "Go Hunting", "hours": 4, "target": "self", "desc": "Brings back food. Might come back empty-handed.", "effects": [{"type": "food", "base": 4, "per_rank": 2, "fail": 20}], "unlock": 1},
+      {"id": "stalk_prey", "name": "Stalker's Eye", "hours": 2, "target": "party", "desc": "Party gains Accuracy for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "acc", "base": 5, "per_rank": 3}], "unlock": 2}
     ]},
-  "forager": {"name": "Forager", "desc": "Knows which roots feed you and which kill you.",
-    "passive": {"type": "forage", "base": 20, "per_rank": 10, "text": "Chance to find food at trail stops"},
+  "forager": {"name": "Forager", "desc": "Knows which roots feed you and which kill you.", "passive": {"type": "forage", "base": 20, "per_rank": 10, "text": "Chance to find food at trail stops"},
     "actions": [
-      {"id": "forage", "name": "Forage", "hours": 3, "target": "self", "desc": "Gathers food, and sometimes herbs for bandages or antivenom.", "effects": [{"type": "food", "base": 2, "per_rank": 1}, {"type": "item", "item": "bandages", "chance": 40}, {"type": "item", "item": "antivenom", "chance": 30}]},
-      {"id": "wild_herbs", "name": "Wild Herb Poultice", "hours": 2, "target": "ally", "desc": "Heals one hero.", "effects": [{"type": "heal_pct", "base": 20, "per_rank": 8}]}
+      {"id": "forage", "name": "Forage", "hours": 3, "target": "self", "desc": "Gathers food, and sometimes herbs for bandages or antivenom.", "effects": [{"type": "food", "base": 2, "per_rank": 1}, {"type": "item", "item": "bandages", "chance": 40}, {"type": "item", "item": "antivenom", "chance": 30}], "unlock": 1},
+      {"id": "wild_herbs", "name": "Wild Herb Poultice", "hours": 2, "target": "ally", "desc": "Heals one hero.", "effects": [{"type": "heal_pct", "base": 20, "per_rank": 8}], "unlock": 2}
     ]},
-  "scout": {"name": "Scout", "desc": "Rides ahead and comes back with news.",
-    "passive": {"type": "scout", "base": 35, "per_rank": 15, "text": "Much better odds of seeing what lies ahead on the map"},
+  "scout": {"name": "Scout", "desc": "Rides ahead and comes back with news.", "passive": {"type": "scout", "base": 35, "per_rank": 15, "text": "Much better odds of seeing what lies ahead on the map"},
     "actions": [
-      {"id": "scout_ahead", "name": "Scout Ahead", "hours": 2, "target": "self", "desc": "Reveals the next stretches of trail.", "effects": [{"type": "reveal", "base": 2, "per_rank": 1}]},
-      {"id": "night_watch", "name": "Night Watch", "hours": 2, "target": "self", "desc": "No ambush tonight; better odds of surprising the next enemies.", "effects": [{"type": "no_ambush"}, {"type": "next_fight_buff", "stat": "surprise", "base": 15, "per_rank": 10}]}
+      {"id": "scout_ahead", "name": "Scout Ahead", "hours": 2, "target": "self", "desc": "Rides ahead and identifies the nearest unscouted stops.", "effects": [{"type": "reveal", "base": 2, "per_rank": 1}], "unlock": 1},
+      {"id": "night_watch", "name": "Night Watch", "hours": 2, "target": "self", "desc": "No ambush tonight; better odds of surprising the next enemies.", "effects": [{"type": "no_ambush"}, {"type": "next_fight_buff", "stat": "surprise", "base": 15, "per_rank": 10}], "unlock": 2}
     ]},
-  "tracker": {"name": "Tracker", "desc": "Reads bent grass and broken twigs like a printed page.",
-    "passive": {"type": "surprise", "base": 8, "per_rank": 4, "text": "Harder to surprise, surprises enemies more often, and reads who's waiting at spotted fights"},
+  "tracker": {"name": "Tracker", "desc": "Reads bent grass and broken twigs like a printed page.", "passive": {"type": "surprise", "base": 8, "per_rank": 4, "text": "Harder to surprise, surprises enemies more often, and reads who's waiting at spotted fights"},
     "actions": [
-      {"id": "read_sign", "name": "Read the Sign", "hours": 2, "target": "party", "desc": "Party gains Damage for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "dmg_pct", "base": 8, "per_rank": 4}]},
-      {"id": "cover_tracks", "name": "Cover Tracks", "hours": 3, "target": "party", "desc": "No ambush tonight, and the party rests easier.", "effects": [{"type": "no_ambush"}, {"type": "fatigue", "base": -5, "per_rank": -3}]}
+      {"id": "read_sign", "name": "Read the Sign", "hours": 2, "target": "party", "desc": "Studies the tracks ahead: identifies the nearest unknown stops, and the party knows what to aim for in the next fight.", "effects": [{"type": "reveal", "base": 1, "per_rank": 1}, {"type": "next_fight_buff", "stat": "acc", "base": 4, "per_rank": 2}], "unlock": 1},
+      {"id": "cover_tracks", "name": "Cover Tracks", "hours": 3, "target": "party", "desc": "No ambush tonight, and the party rests easier.", "effects": [{"type": "no_ambush"}, {"type": "fatigue", "base": -5, "per_rank": -3}], "unlock": 2}
     ]},
-  "wheelwright": {"name": "Wheelwright", "desc": "Can build a wagon wheel from a fence and a prayer.",
-    "passive": {"type": "wagon_guard", "base": 30, "per_rank": 15, "text": "Wagon takes less damage"},
+  "wheelwright": {"name": "Wheelwright", "desc": "Can build a wagon wheel from a fence and a prayer.", "passive": {"type": "wagon_guard", "base": 30, "per_rank": 15, "text": "Wagon takes less damage"},
     "actions": [
-      {"id": "mend_wagon", "name": "Mend the Wagon", "hours": 3, "target": "self", "desc": "Repairs the wagon.", "effects": [{"type": "wagon", "base": 20, "per_rank": 10}]},
-      {"id": "salvage_parts", "name": "Salvage Parts", "hours": 3, "target": "self", "desc": "Turns 2 Timber into Wagon Parts (free at rank 3).", "effects": [{"type": "craft_parts"}]}
+      {"id": "mend_wagon", "name": "Mend the Wagon", "hours": 3, "target": "self", "desc": "Repairs the wagon.", "effects": [{"type": "wagon", "base": 20, "per_rank": 10}], "unlock": 1},
+      {"id": "salvage_parts", "name": "Salvage Parts", "hours": 3, "target": "self", "desc": "Turns 2 Timber into Wagon Parts (free at rank 3).", "effects": [{"type": "craft_parts"}], "unlock": 2}
     ]},
-  "medic": {"name": "Medic", "desc": "Sewed up soldiers in the war. Steady hands.",
-    "passive": {"type": "heal_pct", "base": 10, "per_rank": 5, "text": "Party receives more healing"},
+  "medic": {"name": "Medic", "desc": "Sewed up soldiers in the war. Steady hands.", "passive": {"type": "heal_pct", "base": 10, "per_rank": 5, "text": "Party receives more healing"},
     "actions": [
-      {"id": "field_dressing", "name": "Field Dressing", "hours": 2, "target": "ally", "desc": "Heals one hero well.", "effects": [{"type": "heal_pct", "base": 25, "per_rank": 10}]},
-      {"id": "set_the_bone", "name": "Set the Bone", "hours": 3, "target": "ally", "desc": "Cures Shaken (Death's Door recovery) and heals a little.", "effects": [{"type": "clear_shaken"}, {"type": "heal_pct", "base": 10, "per_rank": 5}]}
+      {"id": "field_dressing", "name": "Field Dressing", "hours": 2, "target": "ally", "desc": "Clean, stitch and bind a wound. Uses a Bandage.", "effects": [{"type": "heal_pct", "base": 30, "per_rank": 10}], "unlock": 1, "cost": {"bandages": 1}},
+      {"id": "set_the_bone", "name": "Set the Bone", "hours": 3, "target": "ally", "desc": "Cures Shaken (Death's Door recovery) and heals a little.", "effects": [{"type": "clear_shaken"}, {"type": "heal_pct", "base": 10, "per_rank": 5}], "unlock": 2}
     ]},
-  "storyteller": {"name": "Storyteller", "desc": "Knows a tale for every campfire, and most of them are even true.",
-    "passive": {"type": "fatigue_pct", "base": -5, "per_rank": -3, "text": "Party takes less Fatigue"},
+  "storyteller": {"name": "Storyteller", "desc": "Knows a tale for every campfire, and most of them are even true.", "passive": {"type": "fatigue_pct", "base": -5, "per_rank": -3, "text": "Party takes less Fatigue"},
     "actions": [
-      {"id": "tall_tales", "name": "Tall Tales", "hours": 3, "target": "party", "desc": "Party sheds Fatigue.", "effects": [{"type": "fatigue", "base": -10, "per_rank": -4}]},
-      {"id": "rousing_tune", "name": "Rousing Tune", "hours": 2, "target": "party", "desc": "Harmonica by the fire. Party gains Dodge for the next fight and sheds a little Fatigue.", "effects": [{"type": "next_fight_buff", "stat": "dodge", "base": 6, "per_rank": 3}, {"type": "fatigue", "base": -3, "per_rank": -1}]}
+      {"id": "tall_tales", "name": "Tall Tales", "hours": 3, "target": "party", "desc": "Party sheds Fatigue.", "effects": [{"type": "fatigue", "base": -10, "per_rank": -4}], "unlock": 1},
+      {"id": "rousing_tune", "name": "Rousing Tune", "hours": 2, "target": "party", "desc": "Harmonica by the fire. Party gains Dodge for the next fight and sheds a little Fatigue.", "effects": [{"type": "next_fight_buff", "stat": "dodge", "base": 6, "per_rank": 3}, {"type": "fatigue", "base": -3, "per_rank": -1}], "unlock": 2}
     ]},
-  "trapper": {"name": "Trapper", "desc": "Runs a trap line and knows what a good pelt is worth.",
-    "passive": {"type": "loot_pct", "base": 8, "per_rank": 6, "text": "More money from fights"},
+  "trapper": {"name": "Trapper", "desc": "Runs a trap line and knows what a good pelt is worth.", "passive": {"type": "loot_pct", "base": 8, "per_rank": 6, "text": "More money from fights"},
     "actions": [
-      {"id": "set_snares", "name": "Set Snares", "hours": 3, "target": "self", "desc": "Catches food overnight.", "effects": [{"type": "food", "base": 3, "per_rank": 1}]},
-      {"id": "pelt_trade", "name": "Tan Pelts", "hours": 3, "target": "self", "desc": "Prepares pelts to sell.", "effects": [{"type": "money", "base": 25, "per_rank": 20}]}
+      {"id": "set_snares", "name": "Set Snares", "hours": 3, "target": "self", "desc": "Catches food overnight.", "effects": [{"type": "food", "base": 3, "per_rank": 1}], "unlock": 1},
+      {"id": "pelt_trade", "name": "Tan Pelts", "hours": 3, "target": "self", "desc": "Prepares pelts to sell.", "effects": [{"type": "money", "base": 25, "per_rank": 20}], "unlock": 2}
     ]},
-  "angler": {"name": "Angler", "desc": "Can find a fish in a mud puddle.",
-    "passive": {"type": "river_bonus", "base": 1, "per_rank": 1, "text": "Knows the fords: river crossings go better"},
+  "angler": {"name": "Angler", "desc": "Can find a fish in a mud puddle.", "passive": {"type": "river_bonus", "base": 1, "per_rank": 1, "text": "Knows the fords: river crossings go better"},
     "actions": [
-      {"id": "go_fishing", "name": "Go Fishing", "hours": 3, "target": "self", "desc": "Catches food. Relaxing, too.", "effects": [{"type": "food", "base": 3, "per_rank": 2}, {"type": "fatigue_self", "base": -5, "per_rank": -2}]},
-      {"id": "quiet_water", "name": "Quiet Water", "hours": 2, "target": "ally", "desc": "Takes a friend fishing. They shed a lot of Fatigue.", "effects": [{"type": "fatigue", "base": -12, "per_rank": -5}]}
+      {"id": "go_fishing", "name": "Go Fishing", "hours": 3, "target": "self", "desc": "Catches food. Relaxing, too.", "effects": [{"type": "food", "base": 3, "per_rank": 2}, {"type": "fatigue_self", "base": -5, "per_rank": -2}], "unlock": 1},
+      {"id": "quiet_water", "name": "Quiet Water", "hours": 2, "target": "ally", "desc": "Takes a friend fishing. They shed a lot of Fatigue.", "effects": [{"type": "fatigue", "base": -12, "per_rank": -5}], "unlock": 2}
     ]},
-  "woodcutter": {"name": "Woodcutter", "desc": "Fells a cottonwood in twenty swings.",
-    "passive": {"type": "timber_bonus", "base": 1, "per_rank": 1, "text": "Find extra Timber"},
+  "woodcutter": {"name": "Woodcutter", "desc": "Fells a cottonwood in twenty swings.", "passive": {"type": "timber_bonus", "base": 1, "per_rank": 1, "text": "Find extra Timber"},
     "actions": [
-      {"id": "fell_timber", "name": "Fell Timber", "hours": 4, "target": "self", "desc": "Cuts Timber for the settlements.", "effects": [{"type": "timber", "base": 2, "per_rank": 2}]},
-      {"id": "big_fire", "name": "Big Bonfire", "hours": 2, "target": "party", "desc": "A roaring fire. Party heals a little and sheds Fatigue.", "effects": [{"type": "heal_pct", "base": 5, "per_rank": 3}, {"type": "fatigue", "base": -4, "per_rank": -2}]}
+      {"id": "fell_timber", "name": "Fell Timber", "hours": 4, "target": "self", "desc": "Cuts Timber for the settlements.", "effects": [{"type": "timber", "base": 2, "per_rank": 2}], "unlock": 1},
+      {"id": "big_fire", "name": "Big Bonfire", "hours": 2, "target": "party", "desc": "A roaring fire. Party heals a little and sheds Fatigue.", "effects": [{"type": "heal_pct", "base": 5, "per_rank": 3}, {"type": "fatigue", "base": -4, "per_rank": -2}], "unlock": 2}
     ]},
-  "miner": {"name": "Miner", "desc": "Can smell ore through six feet of rock.",
-    "passive": {"type": "iron_bonus", "base": 1, "per_rank": 1, "text": "Find extra Iron"},
+  "miner": {"name": "Miner", "desc": "Can smell ore through six feet of rock.", "passive": {"type": "iron_bonus", "base": 1, "per_rank": 1, "text": "Find extra Iron"},
     "actions": [
-      {"id": "prospect", "name": "Prospect", "hours": 4, "target": "self", "desc": "Digs for Iron, sometimes finds a little gold.", "effects": [{"type": "iron", "base": 1, "per_rank": 1}, {"type": "money", "base": 20, "per_rank": 20, "chance": 35}]},
-      {"id": "dig_in", "name": "Dig In", "hours": 2, "target": "party", "desc": "Dig foxholes and breastworks. Party gains Protection for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "prot", "base": 8, "per_rank": 4}]}
+      {"id": "prospect", "name": "Prospect", "hours": 4, "target": "self", "desc": "Digs for Iron, sometimes finds a little gold.", "effects": [{"type": "iron", "base": 1, "per_rank": 1}, {"type": "money", "base": 20, "per_rank": 20, "chance": 35}], "unlock": 1},
+      {"id": "dig_in", "name": "Dig In", "hours": 2, "target": "party", "desc": "Dig foxholes and breastworks. Party gains Protection for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "prot", "base": 8, "per_rank": 4}], "unlock": 2}
     ]}
 }

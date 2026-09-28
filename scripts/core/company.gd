@@ -102,13 +102,17 @@ func make_hero(class_id: String, lvl: int = 1) -> Hero:
 	return h
 
 
+## A single first name, not already used by a living hero or a recruit on offer.
 func random_name() -> String:
-	var n: Dictionary = DB.names
-	var first: String = Stats.pick(rng, n.get("first", ["Sam"]))
-	var last: String = Stats.pick(rng, n.get("last", ["Smith"]))
-	if rng.randf() < 0.15:
-		return "%s \"%s\" %s" % [first, Stats.pick(rng, n.get("nick", ["Kid"])), last]
-	return "%s %s" % [first, last]
+	var pool: Array = DB.names.get("first", ["Sam"])
+	var used := {}
+	for h in heroes:
+		used[h.hero_name] = true
+	for st in settlements:
+		for rd in st.get("recruits", []):
+			used[str(rd.get("hero_name", ""))] = true
+	var free := pool.filter(func(x): return not used.has(x))
+	return Stats.pick(rng, free if not free.is_empty() else pool)
 
 
 func hero(uid: int) -> Hero:
@@ -265,6 +269,52 @@ func can_build(i: int, bid: String) -> String:
 	return ""
 
 
+# Upgrade tracks: some buildings improve along separate lines (the Hiring Board's number
+# of recruits and their quality). A track can rise as far as the settlement tier's
+# max building level.
+
+func track_level(i: int, bid: String, tid: String) -> int:
+	return int(settlement(i).get("tracks", {}).get(bid, {}).get(tid, 0))
+
+
+func track_value(i: int, bid: String, tid: String) -> Variant:
+	var vals: Array = DB.buildings.get(bid, {}).get("tracks", {}).get(tid, {}).get("values", [0])
+	return vals[clampi(track_level(i, bid, tid), 0, vals.size() - 1)]
+
+
+func track_cost(i: int, bid: String, tid: String) -> Dictionary:
+	var costs: Array = DB.buildings.get(bid, {}).get("tracks", {}).get(tid, {}).get("costs", [])
+	var lvl := track_level(i, bid, tid)
+	return costs[lvl] if lvl < costs.size() else {}
+
+
+func can_upgrade_track(i: int, bid: String, tid: String) -> String:
+	if building_level(i, bid) <= 0:
+		return "Build it first"
+	var cost := track_cost(i, bid, tid)
+	if cost.is_empty():
+		return "Fully upgraded"
+	var tier := tier_info(settlement(i).tier)
+	if track_level(i, bid, tid) >= int(tier.get("max_level", 1)):
+		return "A %s can't support more (grow the settlement)" % tier.get("name", "")
+	if not can_afford(cost):
+		return "Can't afford: " + cost_text(cost)
+	return ""
+
+
+func upgrade_track(i: int, bid: String, tid: String) -> bool:
+	if can_upgrade_track(i, bid, tid) != "":
+		return false
+	pay(track_cost(i, bid, tid))
+	var st := settlement(i)
+	if not st.has("tracks"):
+		st["tracks"] = {}
+	if not st.tracks.has(bid):
+		st.tracks[bid] = {}
+	st.tracks[bid][tid] = track_level(i, bid, tid) + 1
+	return true
+
+
 func build(i: int, bid: String) -> bool:
 	if can_build(i, bid) != "":
 		return false
@@ -327,22 +377,39 @@ func found(i: int) -> bool:
 	return true
 
 
-func slots_left(i: int, bid: String) -> int:
+## Slots a building offers per week. Activity buildings (Saloon, Chapel, Boot Hill) have
+## this many slots for *each* activity; `key` is "bid/activity" for those, else the bid.
+func slot_cap(i: int, bid: String) -> int:
 	var lvl := building_level(i, bid)
 	if lvl <= 0:
 		return 0
 	var b: Dictionary = DB.buildings.get(bid, {})
-	var cap := 99
 	if b.has("slots"):
-		cap = int(b.slots[lvl - 1])
-	elif b.has("seats"):
-		cap = int(b.seats[lvl - 1])
-	return cap - int(settlement(i).get("used", {}).get(bid, 0))
+		return int(b.slots[mini(lvl, b.slots.size()) - 1])
+	if b.has("seats"):
+		return int(b.seats[mini(lvl, b.seats.size()) - 1])
+	return 99
 
 
-func _use_slot(i: int, bid: String) -> void:
+func slots_left(i: int, bid: String, key: String = "") -> int:
+	return slot_cap(i, bid) - int(settlement(i).get("used", {}).get(key if key != "" else bid, 0))
+
+
+## Heroes placed in a building's slots this week (uids), for showing them in the slots.
+func slot_heroes(i: int, key: String) -> Array:
+	return settlement(i).get("assigned", {}).get(key, [])
+
+
+func _use_slot(i: int, bid: String, key: String = "", uid: int = -1) -> void:
 	var st := settlement(i)
-	st.used[bid] = int(st.used.get(bid, 0)) + 1
+	var k := key if key != "" else bid
+	st.used[k] = int(st.used.get(k, 0)) + 1
+	if uid >= 0:
+		if not st.has("assigned"):
+			st["assigned"] = {}
+		if not st.assigned.has(k):
+			st.assigned[k] = []
+		st.assigned[k].append(uid)
 
 
 ## Heroes at settlement i who could use a building right now.
@@ -374,7 +441,7 @@ func can_do_activity(i: int, bid: String, act_id: String, h: Hero) -> String:
 		return "No %s here" % DB.buildings[bid].name
 	if h == null or not h.available() or h.location != i:
 		return "Hero not available"
-	if slots_left(i, bid) <= 0:
+	if slots_left(i, bid, bid + "/" + act_id) <= 0:
 		return "No room this week"
 	if money < activity_cost(i, bid, act_id):
 		return "Not enough money"
@@ -388,7 +455,7 @@ func do_activity(i: int, bid: String, act_id: String, h: Hero) -> Array:
 		return msgs
 	var act := activity(bid, act_id)
 	money -= activity_cost(i, bid, act_id)
-	_use_slot(i, bid)
+	_use_slot(i, bid, bid + "/" + act_id, h.uid)
 	var relief := activity_relief(i, bid, act_id)
 	var amt := rng.randi_range(int(relief * 0.8), relief)
 	var before := h.fatigue
@@ -438,7 +505,7 @@ func treat_quirk(i: int, h: Hero, q: String) -> bool:
 	if can_treat_quirk(i, h, q) != "":
 		return false
 	money -= doctor_cost(i, h)
-	_use_slot(i, "doctor")
+	_use_slot(i, "doctor", "", h.uid)
 	h.quirks.erase(q)
 	h.busy_weeks = 1
 	h.busy_reason = "At the Doctor"
@@ -625,7 +692,7 @@ func can_send(from_i: int, to_i: int, h: Hero) -> String:
 func send_hero(from_i: int, to_i: int, h: Hero) -> bool:
 	if can_send(from_i, to_i, h) != "":
 		return false
-	_use_slot(stage_for(from_i, to_i), "stage_line")
+	_use_slot(stage_for(from_i, to_i), "stage_line", "", h.uid)
 	h.transit_to = to_i
 	h.transit_weeks = absi(to_i - from_i)
 	return true
@@ -663,17 +730,26 @@ func _refresh_week() -> void:
 
 func _refresh_settlement(st: Dictionary) -> void:
 	st.used = {}
+	st["assigned"] = {}
 	st.recruits = []
 	var i := int(st.index)
-	var hb := building_level(i, "hiring_board")
-	if hb > 0:
-		var count := int(DB.buildings.hiring_board.recruits[hb - 1])
-		var max_lvl := int(DB.buildings.hiring_board.recruit_level[hb - 1])
+	if building_level(i, "hiring_board") > 0:
+		var count := int(track_value(i, "hiring_board", "notices"))
+		var rep := int(track_value(i, "hiring_board", "reputation"))
 		for n in count:
 			var lvl := 1
-			if max_lvl > 1 and rng.randf() < 0.35:
-				lvl = rng.randi_range(2, max_lvl)
+			var roll := rng.randf()
+			if rep >= 2 and roll < 0.2:
+				lvl = 3
+			elif rep >= 1 and roll < (0.5 if rep >= 2 else 0.4):
+				lvl = 2
 			var h := make_hero(Stats.pick(rng, DB.classes.keys()), lvl)
+			# Word of mouth brings steadier folk: fewer bad habits, more good ones.
+			if rep >= 1 and (rep >= 2 or rng.randf() < 0.5):
+				for q in h.negative_quirks():
+					h.quirks.erase(q)
+			if rep >= 2:
+				add_random_quirk(h, true)
 			h.location = i
 			st.recruits.append(h.to_dict())
 	st.stock = []
@@ -694,7 +770,22 @@ func supply_cost(i: int, supplies: Dictionary) -> int:
 	return total
 
 
-## Where an expedition from settlement i goes: its tutorial first, if it has one.
+## Every destination from settlement i: the tutorial while it's pending, otherwise the
+## trail west plus the settlement's side adventures.
+func expedition_options(i: int) -> Array:
+	var site := site_by_index(i)
+	if tutorial_pending(i):
+		return [site.tutorial]
+	var out: Array = []
+	if site.get("region_west", "") != "":
+		out.append(site.region_west)
+	for r in site.get("side_regions", []):
+		if DB.regions.has(r):
+			out.append(r)
+	return out
+
+
+## Where an expedition from settlement i goes by default: its tutorial first, if it has one.
 func expedition_region(i: int) -> String:
 	var site := site_by_index(i)
 	if not tutorial_done and site.get("tutorial", "") != "":
@@ -709,9 +800,20 @@ func tutorial_pending(i: int = 0) -> bool:
 ## The tutorial party sets out with the first four heroes and free supplies.
 func start_tutorial() -> RunState:
 	var uids: Array = []
+	for cid in DB.cfg("tutorial_party", ["marshal", "gunslinger"]):
+		for h in heroes_at(0):
+			if h.class_id == cid and h.available() and not h.uid in uids:
+				uids.append(h.uid)
+				break
+	# If one of them has fallen, any rested hero takes their place.
+	var size: int = DB.cfg("tutorial_party", []).size()
 	for h in heroes_at(0):
-		if uids.size() < 4 and h.available():
+		if uids.size() >= maxi(2, size):
+			break
+		if h.available() and not h.uid in uids:
 			uids.append(h.uid)
+	if uids.is_empty():
+		return null
 	run = RunState.create(self, expedition_region(0), 0, uids, DB.cfg("tutorial_supplies", {"food": 10, "bandages": 2}))
 	stats.expeditions += 1
 	return run
@@ -733,8 +835,9 @@ func complete_tutorial() -> String:
 
 
 ## "" if the party can set out, otherwise why not.
-func can_embark(i: int, party_uids: Array, supplies: Dictionary) -> String:
-	if expedition_region(i) == "":
+func can_embark(i: int, party_uids: Array, supplies: Dictionary, region: String = "") -> String:
+	var dest := region if region != "" else expedition_region(i)
+	if dest == "" or not dest in expedition_options(i):
 		return "There is nowhere further west to go."
 	if party_uids.is_empty():
 		return "Choose at least one hero."
@@ -746,14 +849,16 @@ func can_embark(i: int, party_uids: Array, supplies: Dictionary) -> String:
 			return "A chosen hero isn't available."
 	if supply_cost(i, supplies) > money:
 		return "Can't afford those supplies."
+	if Inventory.slots_used(supplies) > Inventory.capacity():
+		return "The wagon can't carry that much (%d of %d slots)." % [Inventory.slots_used(supplies), Inventory.capacity()]
 	return ""
 
 
-func start_run(i: int, party_uids: Array, supplies: Dictionary) -> RunState:
-	if can_embark(i, party_uids, supplies) != "":
+func start_run(i: int, party_uids: Array, supplies: Dictionary, region: String = "") -> RunState:
+	if can_embark(i, party_uids, supplies, region) != "":
 		return null
 	money -= supply_cost(i, supplies)
-	run = RunState.create(self, expedition_region(i), i, party_uids, supplies)
+	run = RunState.create(self, region if region != "" else expedition_region(i), i, party_uids, supplies)
 	stats.expeditions += 1
 	return run
 
@@ -789,10 +894,14 @@ func finish_run(status: String) -> Dictionary:
 				summary.recruits.append("%s (%s)" % [nh.hero_name, nh.class_name_text()])
 	if won:
 		stats.victories += 1
+	var xp_gain := r.xp
+	var region_data: Dictionary = DB.regions.get(r.region_id, {})
+	if region_data.has("xp_cap"):
+		xp_gain = mini(xp_gain, int(region_data.xp_cap))
 	for h in survivors:
 		var entry := {"uid": h.uid, "name": h.hero_name, "class": h.class_name_text(), "level_before": h.level,
-			"xp": r.xp, "quirks": []}
-		h.add_xp(r.xp)
+			"xp": xp_gain, "quirks": []}
+		h.add_xp(xp_gain)
 		entry["level_after"] = h.level
 		h.expeditions += 1
 		h.deaths_door = false

@@ -63,9 +63,11 @@ static func run(main: Main, args: Dictionary) -> void:
 				Game.company.run.travel_to(int(args.node))
 				await main.goto("trail", {}, true)
 		"embark":
-			await main.goto("embark", {"index": 0}, true)
+			Game.company.complete_tutorial()
+			await main.goto("embark", {"index": 0, "dest": args.get("dest", "tallgrass")}, true)
 		"trail", "combat", "camp", "cave", "event", "curio":
 			var co: Company = Game.company
+			co.complete_tutorial()
 			var uids: Array = []
 			for h in co.heroes.slice(0, 4):
 				uids.append(h.uid)
@@ -103,6 +105,13 @@ static func run(main: Main, args: Dictionary) -> void:
 			await main.goto("settlement", {"index": 0}, true)
 			main.screen.open_hero(Game.company.heroes[0])
 		"building":
+			var cb: Company = Game.company
+			cb.complete_tutorial()
+			cb.money += 500
+			for h in cb.heroes:
+				h.fatigue = 55
+			var acts: Array = DB.buildings.saloon.activities
+			cb.do_activity(0, "saloon", acts[0].id, cb.heroes[0])
 			await main.goto("settlement", {"index": 0}, true)
 			main.screen.open_building(args.get("id", "saloon"))
 	for i in wait:

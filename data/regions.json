@@ -2,20 +2,20 @@
   "_comment": "A region is one expedition map. tier scales enemies. fights/elites/cave_fights are weighted enemy groups (front rank first). boss.enemies is the boss formation; crossing is the fight at the map's end once the boss is beaten. palette/props drive the painted backdrop.",
 
   "old_mill_road": {
-    "name": "The Old Mill Road", "tier": 1, "rec_level": "1", "tutorial": true,
+    "name": "The Old Mill Road", "tier": 1, "rec_level": "1", "tutorial": true, "xp_cap": 3,
     "desc": "The last stretch of road east of Fort Providence, through orchards and wheat gone to seed. Crane's gang rode through here three days ago.",
     "palette": {"sky_top": "#4a6f8f", "sky_bottom": "#f2c57c", "sun": "#fff4d6", "far": "#8f8a6a", "mid": "#9aa05a", "near": "#6e8a3a", "ground": "#55692e", "accent": "#d9a441"},
     "props": ["fence", "tree", "grass", "rock"],
     "cave_name": "Root Cellar",
-    "boss_rewards": {"money": 180, "charters": 0, "timber": 6, "iron": 2},
+    "boss_rewards": {"money": 120, "charters": 0, "timber": 3, "iron": 1},
     "fixed_map": [
       [{"type": "start", "title": "The Old Mill Road",
-        "story": "Your company has ridden a month from back east, chasing the same rumor as everyone else: past the last mountain stands [b]the Great Casino[/b], a paradise city where a fortune waits on every table. Its chips are the only coin anyone trusts out here.\n\nFort Providence, the last real town, is two days ahead. But there's smoke on the western horizon, and nobody has passed you coming east.\n\n[i]Tip: This is the trail map. Your wagon is on the left. Click a stop you can reach (it glows) to travel there. Each leg of travel eats Food and wears the wagon.[/i]"}],
+        "story": "Your company has ridden a month from back east, chasing the same rumor as everyone else: past the last mountain stands [b]the Great Casino[/b], a paradise city where a fortune waits on every table. Its chips are the only coin anyone trusts out here.\n\nTwo of you are bringing the wagon; the other two rode ahead to Fort Providence, the last real town, two days west. But there's smoke on the western horizon, and nobody has passed you coming east.\n\n[i]Tip: This is the trail map. Your wagon is on the left. Click a stop you can reach (it glows) to travel there. Stops marked ? haven't been scouted yet. Each leg of travel eats Food and wears the wagon.[/i]"}],
       [{"type": "fight", "enemies": ["outlaw_knifeman", "outlaw_gunhand"], "title": "Looters",
         "story": "A merchant's wagon lies in the ditch, sacks slit open and flour everywhere. Two men in red bandanas are picking it over. One of them looks up and grins.\n\n\"Silas said we'd get stragglers. Get 'em, Dutch!\"\n\n[i]Tip: In a fight, heroes and enemies stand in four ranks. Each move can only be used from certain ranks and can only reach certain ranks: the dots under each move show this. Hover an enemy to see your chance to hit, the damage, and the crit chance before you commit.[/i]"}],
-      [{"type": "event", "event": "broken_axle", "lane_y": 0.3, "title": "The Low Road",
-        "story": "The low road follows the creek. It's shorter, but the ruts are deep.\n\n[i]Tip: Trail events ask you to choose. Some choices need a supply (like Wagon Parts) or a hero with the right survival skill. Your supplies are listed at the bottom of the trail screen.[/i]"},
-       {"type": "curio", "curios": ["abandoned_wagon", "whiskey_barrel"], "lane_y": 0.7, "title": "The Orchard",
+      [{"type": "event", "event": "broken_axle", "lane_y": 0.3, "intel": 0, "title": "The Low Road",
+        "story": "The low road follows the creek. The ruts are deep.\n\n[i]Tip: Trail events ask you to choose. Some choices need a supply (like Wagon Parts) or a hero with the right survival skill. Your supplies are listed at the bottom of the trail screen.[/i]"},
+       {"type": "curio", "curios": ["abandoned_wagon"], "lane_y": 0.7, "intel": 0, "title": "The Orchard",
         "story": "The orchard road winds past a looted homestead. Something's left behind, if you care to look.\n\n[i]Tip: Curiosities can be searched by hand, which is a gamble, or with the right supply for a better result. Some quirks make heroes compelled to touch things they shouldn't.[/i]"}],
       [{"type": "camp", "title": "Creekside Camp",
         "story": "At dusk you find a boy hiding in the reeds: Tobias, nephew of Ma Delaney, who keeps the saloon in Fort Providence.\n\n\"Crane's gang burned the fort,\" he says. \"The Marshal wouldn't pay the toll, so Silas set it alight. His man Mulligan took my aunt and the fort's stores up to the old mill. Please.\"\n\n[i]Tip: At camp, eat a meal and spend the evening's hours on your heroes' survival skills: healing, easing Fatigue, scouting, hunting. Fatigue is the frontier's slow killer. At 100 a hero hits a Breaking Point; at 200 they collapse.[/i]"}],
@@ -24,15 +24,77 @@
     "fights": [{"enemies": ["outlaw_knifeman", "outlaw_gunhand"], "weight": 1}],
     "elites": [{"enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_gunhand"], "weight": 1}],
     "cave_fights": [{"enemies": ["giant_bat", "giant_bat"], "weight": 1}],
-    "boss": {"name": "\"Mad Dog\" Mulligan", "landmark": "The Old Mill",
-      "intro": "The mill wheel creaks in the millrace. Barrels of flour and crates stamped FORT PROVIDENCE are stacked on the loading dock, and on top of them sits a woman in a green dress, tied at the wrists and swearing magnificently.\n\nA man the size of a woodstove steps out, cracking his knuckles. \"Mad Dog\" Mulligan, Silas Crane's enforcer.\n\n\"Boss says anybody heading west pays the toll. You look like you're heading west.\"",
-      "victory": "Mulligan goes down like a felled oak, and his boys scatter into the orchard. You cut Ma Delaney loose.\n\n\"Took you long enough,\" she says, rubbing her wrists. \"Help me get these stores back to Providence and I'll pour you the first round myself. My saloon's a cinder, but I've rebuilt it twice before.\"\n\nAs you load the wagon, a rider watches from the far ridge: a long black coat, a black hat, two silver revolvers. He touches his hat brim, turns, and is gone. [b]Silas Crane[/b] knows your name now.",
-      "enemies": ["outlaw_brawler", "mad_dog_mulligan", "outlaw_gunhand"], "keepsake": "lucky_horseshoe"},
+    "boss": {"name": "Mulligan", "landmark": "The Old Mill",
+      "intro": "The mill wheel creaks in the millrace. Barrels of flour and crates stamped FORT PROVIDENCE are stacked on the loading dock, and on top of them sits a woman in a green dress, tied at the wrists and swearing magnificently.\n\nA man the size of a woodstove steps out, cracking his knuckles, a black crow feather stuck in his cap: Mulligan, Silas Crane's enforcer.\n\n\"Boss says anybody heading west pays the toll. You look like you're heading west.\"",
+      "victory": "Mulligan goes down like a felled oak, and his boys scatter into the orchard. You cut Ma Delaney loose.\n\n\"Took you long enough,\" she says, rubbing her wrists. \"Help me get these stores back to Providence and I'll pour you the first round myself. My saloon's a cinder, but I've rebuilt it twice before.\"\n\nAs you load the wagon, a rider watches from the far ridge: a long black coat, a black feather in his hat, a crow riding his shoulder. He touches his hat brim, turns, and is gone. [b]Silas Crane[/b] knows your name now.",
+      "enemies": ["mad_dog_mulligan", "outlaw_gunhand"], "keepsake": "lucky_horseshoe"},
     "crossing": {"name": "Mulligan's Boys", "enemies": ["outlaw_brawler", "outlaw_gunhand"]},
     "events": ["broken_axle"],
     "homestead_events": ["homestead_family"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "berry_bushes"],
     "cave_curios": ["miners_cache"]
+  },
+
+  "dry_gulch_mine": {
+    "name": "Dry Gulch Mine", "tier": 1, "rec_level": "1-2", "side": true, "columns": 6,
+    "desc": "A played-out silver mine in the hills north of the fort. The miners left in a hurry, and they say the tapping in the walls never stopped. Lots of dark shafts: bring lamp oil.",
+    "palette": {"sky_top": "#3b3350", "sky_bottom": "#d98c5f", "sun": "#ffd9a8", "far": "#7d5a4f", "mid": "#96694f", "near": "#6f4d3a", "ground": "#5a3f2f", "accent": "#e0a458"},
+    "props": ["mesa", "rock", "skull", "cactus"],
+    "cave_name": "Mine Shaft",
+    "node_weights": {"fight": 28, "event": 16, "curio": 14, "cave": 30, "elite": 8, "homestead": 0, "trading_post": 4},
+    "boss_rewards": {"money": 150, "charters": 0, "timber": 2, "iron": 6},
+    "side_reward": {"hero": {"class": "prospector", "level": 2, "name": "Hollis"}, "iron": 6, "text": "Hollis, a prospector who'd been hiding from the knockers in a side drift for a week, asks to ride with you."},
+    "fights": [
+      {"enemies": ["tommyknocker", "tommyknocker", "giant_bat"], "weight": 3},
+      {"enemies": ["claim_jumper", "outlaw_gunhand"], "weight": 2},
+      {"enemies": ["giant_bat", "giant_bat", "giant_bat"], "weight": 2},
+      {"enemies": ["claim_jumper", "tommyknocker", "giant_bat"], "weight": 2},
+      {"enemies": ["rattlesnake", "giant_bat"], "weight": 1}
+    ],
+    "elites": [{"enemies": ["pale_crawler", "tommyknocker", "giant_bat"], "weight": 2}, {"enemies": ["claim_jumper", "claim_jumper", "dynamiter"], "weight": 1}],
+    "cave_fights": [
+      {"enemies": ["tommyknocker", "tommyknocker"], "weight": 3},
+      {"enemies": ["pale_crawler", "giant_bat"], "weight": 2},
+      {"enemies": ["giant_bat", "giant_bat"], "weight": 2}
+    ],
+    "boss": {"name": "Old Jeb, King Under the Hill", "landmark": "The Deep Drift",
+      "intro": "At the bottom of the deepest drift the tapping stops. A little old man in a miner's hat sits on a throne of ore carts, a tin crown on his head and a pick across his knees.\n\n\"You're standing in my mine,\" says Old Jeb. Every wall around you starts to knock.",
+      "victory": "Old Jeb crumbles into a heap of pale dust and a tin crown. The knocking fades, one wall at a time, and the mine is only a mine again.",
+      "enemies": ["tommyknocker", "knocker_king", "giant_bat"], "keepsake": "miners_lamp"},
+    "crossing": {"name": "Deep Drift", "enemies": ["tommyknocker", "knocker_king", "giant_bat"]},
+    "events": ["broken_axle", "lost_trail", "wagon_stuck", "gravesite", "peddler", "trinket_peddler", "torn_canvas", "fever_camp", "rattler_in_bedroll", "haint_lights"],
+    "homestead_events": ["homestead_drifter"],
+    "curios": ["miners_cache", "strongbox", "abandoned_wagon", "dead_horse", "standing_stone", "cattle_skull"],
+    "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "ore_vein", "strongbox"]
+  },
+
+  "crows_nest": {
+    "name": "The Crow's Nest", "tier": 1, "rec_level": "1-2", "side": true, "columns": 6,
+    "desc": "Silas Crane's supply camp in the cottonwoods south of the fort, run by his quartermaster Ruby Blackwing. The woods are full of lookouts and crows. Expect a lot of fighting.",
+    "palette": {"sky_top": "#34465e", "sky_bottom": "#e8a86b", "sun": "#fff0c8", "far": "#6f7a5a", "mid": "#5d6d44", "near": "#465a30", "ground": "#3d4d28", "accent": "#c98e3e"},
+    "props": ["tree", "grass", "fence", "rock"],
+    "cave_name": "Root Cellar",
+    "node_weights": {"fight": 46, "elite": 12, "event": 18, "curio": 12, "cave": 4, "homestead": 4, "trading_post": 4},
+    "boss_rewards": {"money": 220, "charters": 0, "timber": 6, "iron": 2},
+    "side_reward": {"hero": {"class": "wrangler", "level": 2, "name": "Ned"}, "timber": 6, "text": "Among the prisoners in Ruby's stockade is Ned, a wrangler Crane's gang took for a horse thief. He'd like a word with Silas too."},
+    "fights": [
+      {"enemies": ["outlaw_brawler", "outlaw_gunhand", "carrion_crows"], "weight": 3},
+      {"enemies": ["outlaw_knifeman", "outlaw_rifleman"], "weight": 2},
+      {"enemies": ["murder_of_crows", "carrion_crows"], "weight": 2},
+      {"enemies": ["outlaw_brawler", "outlaw_knifeman", "outlaw_rifleman"], "weight": 2},
+      {"enemies": ["prairie_wolf", "coyote", "carrion_crows"], "weight": 1}
+    ],
+    "elites": [{"enemies": ["crane_lieutenant", "outlaw_gunhand", "murder_of_crows"], "weight": 2}, {"enemies": ["outlaw_brawler", "outlaw_brawler", "outlaw_rifleman", "carrion_crows"], "weight": 1}],
+    "cave_fights": [{"enemies": ["giant_bat", "giant_bat"], "weight": 1}],
+    "boss": {"name": "Ruby Blackwing", "landmark": "The Stockade",
+      "intro": "The stockade gate stands open. Inside, crates stamped with a black crow and a woman in a black duster sitting on them, cleaning her nails with a throwing knife. Crows line the palisade.\n\n\"Silas said you'd come sniffing,\" says Ruby Blackwing. \"He also said I could keep whatever's left of you.\"",
+      "victory": "Ruby Blackwing goes over the palisade and is gone into the cottonwoods, leaving her feather charm in the mud. The stockade's stores are yours, and Crane's gang will be a little hungrier this winter.",
+      "enemies": ["outlaw_knifeman", "ruby_blackwing", "murder_of_crows"], "keepsake": "crow_feather_charm"},
+    "crossing": {"name": "The Stockade", "enemies": ["outlaw_knifeman", "ruby_blackwing", "murder_of_crows"]},
+    "events": ["stranger_on_road", "outlaw_ambush_warning", "outlaw_toll", "wolf_tracks", "abandoned_homestead", "peddler", "trinket_peddler", "hunting_grounds", "fork_in_trail", "torn_canvas"],
+    "homestead_events": ["homestead_family", "homestead_widow"],
+    "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "scarecrow", "berry_bushes", "dead_horse"],
+    "cave_curios": ["miners_cache", "bone_pile", "strongbox"]
   },
 
   "tallgrass": {
@@ -52,7 +114,7 @@
       {"enemies": ["outlaw_brawler", "outlaw_knifeman", "outlaw_gunhand"], "weight": 2}
     ],
     "elites": [
-      {"enemies": ["crane_lieutenant", "outlaw_gunhand", "outlaw_rifleman"], "weight": 2},
+      {"enemies": ["crane_lieutenant", "outlaw_gunhand", "murder_of_crows"], "weight": 2},
       {"enemies": ["buffalo_bull", "coyote", "coyote"], "weight": 2},
       {"enemies": ["prairie_haint", "prairie_haint", "carrion_crows"], "weight": 1}
     ],
@@ -62,16 +124,16 @@
       {"enemies": ["pale_crawler", "giant_bat"], "weight": 2},
       {"enemies": ["rattlesnake", "rattlesnake", "giant_bat"], "weight": 1}
     ],
-    "boss": {"name": "Silas Crane's Gang", "landmark": "Crane's Crossing",
-      "intro": "The trail ends at a rope-and-plank toll bridge over the Redwater. Silas Crane leans on the post, twirling a silver revolver. \"Toll's everything you got, pilgrims.\"",
-      "victory": "Silas Crane falls into the Redwater and the current takes him. His toll bridge is yours, and the river crossing is the perfect place for a settlement.",
-      "enemies": ["crane_lieutenant", "silas_crane", "outlaw_gunhand", "outlaw_rifleman"], "keepsake": "cranes_revolver",
+    "boss": {"name": "Silas Crane and the Crows", "landmark": "Crane's Crossing",
+      "intro": "The trail ends at a rope-and-plank toll bridge over the Redwater. Crows line every rail and rope of it, hundreds of them, silent. Silas Crane leans on the toll post in a long black coat, a big crow on his shoulder and a silver revolver turning in his hand. \"Toll's everything you got, pilgrims.\"",
+      "victory": "Silas Crane falls into the Redwater and the current takes him. His crows rise off the bridge in one black cloud and scatter east. His toll bridge is yours, and the river crossing is the perfect place for a settlement.",
+      "enemies": ["crane_lieutenant", "silas_crane", "murder_of_crows", "outlaw_rifleman"], "keepsake": "cranes_revolver",
       "intro_again": "The toll bridge again. Silas Crane is waiting at the post, a fresh bandage under his black coat and no smile at all this time.\n\n\"Pilgrims. I let you walk away once. That was a courtesy.\"",
       "first_script": {"id": "silas_turnaround", "unit": "silas_crane", "round": 3, "hp_pct": 60, "deaths_door": true, "wound_pct": 85,
         "title": "Crane's Gambit",
         "text": "Silas Crane laughs and fires both revolvers into the air. On the far bank, one of his boys touches a match to a fuse.\n\nThe charge under the near end of the bridge goes up with a roar. Planks and river water rain down, the oxen bolt, and when the smoke clears the gang is across the Redwater and the bridge is burning between you.\n\n\"Toll's gone up, pilgrims!\" Silas calls across the water. \"Come back when you can afford it!\"\n\nThere's no way across tonight. The company gathers what it can and turns for home. But Silas took a bullet in the scramble, and he'll be carrying that wound the next time you meet."}},
-    "crossing": {"name": "Toll Bridge Holdouts", "enemies": ["crane_lieutenant", "outlaw_knifeman", "outlaw_gunhand", "outlaw_rifleman"]},
-    "events": ["river_crossing", "broken_axle", "prairie_fire", "stranger_on_road", "buffalo_herd", "sick_traveler", "rattler_in_bedroll", "thunderstorm", "lost_trail", "wolf_tracks", "abandoned_homestead", "haint_lights", "peddler", "wagon_stuck", "gravesite", "hunting_grounds", "outlaw_ambush_warning", "fork_in_trail", "swollen_creek", "fever_camp", "outlaw_toll", "torn_canvas"],
+    "crossing": {"name": "Crane's Last Crows", "enemies": ["crane_lieutenant", "outlaw_knifeman", "murder_of_crows", "outlaw_rifleman"]},
+    "events": ["river_crossing", "broken_axle", "prairie_fire", "stranger_on_road", "buffalo_herd", "sick_traveler", "rattler_in_bedroll", "thunderstorm", "lost_trail", "wolf_tracks", "abandoned_homestead", "haint_lights", "peddler", "wagon_stuck", "gravesite", "hunting_grounds", "outlaw_ambush_warning", "fork_in_trail", "swollen_creek", "fever_camp", "outlaw_toll", "torn_canvas", "trinket_peddler"],
     "homestead_events": ["homestead_family", "homestead_widow", "homestead_drifter"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "prairie_well", "scarecrow", "berry_bushes", "cattle_skull", "dead_horse", "standing_stone"],
     "cave_curios": ["miners_cache", "whiskey_barrel", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox"]
@@ -108,7 +170,7 @@
       "victory": "The Cyclops crashes down the side of the mesa like a rockslide. Its stone rams crumble into gravel. Deadeye Mesa is quiet, and it has fresh water. A fine spot to build.",
       "enemies": ["stone_ram", "cyclops", "canyon_siren"], "keepsake": "cyclops_eye_stone"},
     "crossing": {"name": "Mesa Guardians", "enemies": ["stone_ram", "stone_ram", "hired_gun", "canyon_siren"]},
-    "events": ["river_crossing", "broken_axle", "stranger_on_road", "rattler_in_bedroll", "thunderstorm", "lost_trail", "peddler", "wagon_stuck", "gravesite", "flash_flood", "railroad_survey", "siren_song", "heat_wave", "claim_dispute", "fork_in_trail", "outlaw_ambush_warning", "fever_camp", "outlaw_toll", "torn_canvas"],
+    "events": ["river_crossing", "broken_axle", "stranger_on_road", "rattler_in_bedroll", "thunderstorm", "lost_trail", "peddler", "wagon_stuck", "gravesite", "flash_flood", "railroad_survey", "siren_song", "heat_wave", "claim_dispute", "fork_in_trail", "outlaw_ambush_warning", "fever_camp", "outlaw_toll", "torn_canvas", "trinket_peddler"],
     "homestead_events": ["homestead_family", "homestead_drifter", "homestead_widow"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "cattle_skull", "standing_stone", "miners_cache", "petroglyph_wall", "dead_horse", "railroad_crate"],
     "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox", "ore_vein"]
@@ -143,7 +205,7 @@
       "victory": "The Titan sinks to its knees and is still, and the snow begins to cover it. Beyond the pass the valley glitters: a thousand lamps, a roar of voices, the spinning wheels of the Great Casino.",
       "enemies": ["stone_giant_youth", "titan", "storm_hawk"], "keepsake": "titan_shard"},
     "crossing": {"name": "Children of the Titan", "enemies": ["stone_giant_youth", "frost_wight", "storm_hawk", "storm_hawk"]},
-    "events": ["broken_axle", "stranger_on_road", "thunderstorm", "lost_trail", "wolf_tracks", "peddler", "wagon_stuck", "gravesite", "avalanche", "blizzard", "frozen_traveler", "giant_footprints", "fork_in_trail", "hunting_grounds", "swollen_creek", "fever_camp", "torn_canvas"],
+    "events": ["broken_axle", "stranger_on_road", "thunderstorm", "lost_trail", "wolf_tracks", "peddler", "wagon_stuck", "gravesite", "avalanche", "blizzard", "frozen_traveler", "giant_footprints", "fork_in_trail", "hunting_grounds", "swollen_creek", "fever_camp", "torn_canvas", "trinket_peddler"],
     "homestead_events": ["homestead_drifter", "homestead_trapper_cabin"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "standing_stone", "frozen_pack", "cairn", "dead_horse", "giant_bones", "hot_spring"],
     "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "ore_vein", "frozen_pack"]

@@ -377,6 +377,18 @@ func _build_human() -> void:
 		_circle(head + Vector2(9, -4), 5.0, Color(0.8, 0.85, 0.9, 0.5), {"no_edge": true})
 		_line([head + Vector2(4, -4), head + Vector2(14, -4)], 1.5, DARK_METAL, {"no_edge": true})
 	_hat(head)
+	# Crow gang markings: a black feather in the hat band, a crow on the shoulder.
+	if look.get("feather", false):
+		var fy := head.y - 14
+		_poly([Vector2(-12, fy), Vector2(-17, fy - 14), Vector2(-26, fy - 34), Vector2(-20, fy - 36), Vector2(-12, fy - 20), Vector2(-8, fy - 2)], Color("#15131a"))
+		_line([Vector2(-10, fy), Vector2(-22, fy - 34)], 1.5, Color("#4a4652"), {"no_edge": true})
+	if look.get("pet", "") == "crow":
+		var cp := Vector2(-w / 2 + 6, sh - 4)
+		_poly(ellipse(cp + Vector2(0, -8), 13, 9, 12), Color("#17161c"))
+		_poly([cp + Vector2(-10, -6), cp + Vector2(-26, 2), cp + Vector2(-22, -10)], Color("#17161c"))
+		_circle(cp + Vector2(10, -18), 7.0, Color("#1d1c22"))
+		_poly([cp + Vector2(15, -21), cp + Vector2(26, -17), cp + Vector2(15, -15)], Color("#3a3530"), {"no_edge": true})
+		_circle(cp + Vector2(12, -20), 1.6, Color("#d9d2c0"), {"no_edge": true})
 	# Badge on the chest.
 	if extra == "badge":
 		_poly(star_pts(Vector2(w / 2 - 12, sh + 24), 7, 3, 5), col("accent", "#d9b44a"))

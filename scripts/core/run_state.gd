@@ -180,15 +180,21 @@ func choices() -> Array:
 	return current_node().get("next", [])
 
 
-## Scout the next `cols` columns up to `level` (2 = type, 3 = details). Returns how many
-## stops became clearer.
-func reveal_ahead(cols: int, level: int = 3) -> int:
+## Scout up to `count` stops ahead to `level` (2 = type, 3 = details), nearest first:
+## stops you can ride to next, then the ones beyond. Returns how many became clearer.
+func reveal_ahead(count: int, level: int = 3) -> int:
 	var c0 := int(current_node().get("col", 0))
+	var y0 := float(current_node().get("y", 0.5))
+	var reach := choices()
+	var cands: Array = nodes.filter(func(n): return int(n.col) > c0 and MapGen.intel(n) < level)
+	cands.sort_custom(func(a, b):
+		var ka := [0 if a.id in reach else 1, int(a.col), absf(float(a.y) - y0)]
+		var kb := [0 if b.id in reach else 1, int(b.col), absf(float(b.y) - y0)]
+		return ka < kb)
 	var n_rev := 0
-	for n in nodes:
-		if n.col > c0 and n.col <= c0 + cols and MapGen.intel(n) < level:
-			n.intel = level
-			n_rev += 1
+	for n in cands.slice(0, maxi(0, count)):
+		n.intel = level
+		n_rev += 1
 	return n_rev
 
 
@@ -267,8 +273,9 @@ func travel_to(id: int) -> Array:
 	var forage := party_passive("forage")
 	if forage > 0 and company.rng.randf() * 100.0 < forage:
 		var f := company.rng.randi_range(1, 3)
-		supplies.food = int(supplies.get("food", 0)) + f
-		msgs.append("Your forager gathers %d food along the way." % f)
+		f = add_supply("food", f)
+		if f > 0:
+			msgs.append("Your forager gathers %d food along the way." % f)
 	# Wear and tear on the wagon.
 	var wear := company.rng.randi_range(int(DB.cfg("wagon_wear", [2, 5])[0]), int(DB.cfg("wagon_wear", [2, 5])[1]))
 	wear = int(round(wear * (1.0 - party_passive("wagon_guard") / 100.0)))
@@ -285,6 +292,14 @@ func travel_to(id: int) -> Array:
 	msgs.append_array(look_ahead())
 	add_log(msgs)
 	return msgs
+
+
+## Adds supplies up to what the wagon can hold. Returns how many were added.
+func add_supply(item: String, n: int) -> int:
+	var add := mini(n, Inventory.room_for(supplies, item))
+	if add > 0:
+		supplies[item] = int(supplies.get(item, 0)) + add
+	return add
 
 
 ## Small misfortunes of the road. A hero with the right skill or class prevents them;
@@ -435,6 +450,21 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		boss_won = true
 		if first:
 			company.beaten.append(region_id)
+			# A side adventure's first clear: a new hand joins, plus its materials.
+			var sr: Dictionary = region().get("side_reward", {})
+			if not sr.is_empty():
+				if sr.has("hero"):
+					var hd: Dictionary = sr.hero
+					var nh := company.make_hero(hd.get("class", "marshal"), int(hd.get("level", 1)))
+					if hd.has("name"):
+						nh.hero_name = hd.name
+					company.add_random_quirk(nh, true)
+					nh.location = origin
+					recruits.append(nh.to_dict())
+					res.msgs.append(str(sr.get("text", "")))
+					res.msgs.append("%s the %s will join the company when you return." % [nh.hero_name, nh.class_name_text()])
+				res.timber += int(sr.get("timber", 0))
+				res.iron += int(sr.get("iron", 0))
 	if kind == "crossing":
 		xp += DB.cfg("xp_elite", 2) + 2
 		money += int(DB.cfg("boss_money", 400) * tier() / 3.0)
@@ -655,7 +685,8 @@ func camp_meal(meal_id: String) -> Array:
 	return msgs
 
 
-## Every camp action the party can still take: {uid, skill, action, hours, rank, available}
+## Every camp action of the party: {uid, skill, action, hours, rank, available, used, locked,
+## affordable}. An action unlocks at its survival rank; some use up supplies.
 func camp_actions() -> Array:
 	var out: Array = []
 	for h in party_heroes():
@@ -663,9 +694,21 @@ func camp_actions() -> Array:
 			var sk: Dictionary = DB.survival.get(sid, {})
 			for a in sk.get("actions", []):
 				var used: bool = a.id in camp.used.get(str(h.uid), [])
-				out.append({"uid": h.uid, "skill": sid, "action": a, "hours": int(a.hours),
-					"rank": int(h.survival[sid].rank), "available": not used and int(a.hours) <= int(camp.hours), "used": used})
+				var rank := int(h.survival[sid].rank)
+				var locked := rank < int(a.get("unlock", 1))
+				var affordable := can_pay_camp_cost(a)
+				out.append({"uid": h.uid, "skill": sid, "action": a, "hours": int(a.hours), "rank": rank,
+					"available": not used and not locked and affordable and int(a.hours) <= int(camp.hours),
+					"used": used, "locked": locked, "affordable": affordable})
 	return out
+
+
+func can_pay_camp_cost(action: Dictionary) -> bool:
+	var cost: Dictionary = action.get("cost", {})
+	for it in cost:
+		if int(supplies.get(it, 0)) < int(cost[it]):
+			return false
+	return true
 
 
 func camp_act(uid: int, action_id: String, target_uid: int = -1) -> Array:
@@ -680,6 +723,8 @@ func camp_act(uid: int, action_id: String, target_uid: int = -1) -> Array:
 				action = a
 				sid = s
 	if action.is_empty() or int(action.hours) > int(camp.hours):
+		return []
+	if int(h.survival[sid].rank) < int(action.get("unlock", 1)) or not can_pay_camp_cost(action):
 		return []
 	var key := str(uid)
 	if not camp.used.has(key):
@@ -703,6 +748,10 @@ func camp_act(uid: int, action_id: String, target_uid: int = -1) -> Array:
 		effects.append(e2)
 	var rank := int(h.survival[sid].rank)
 	var msgs: Array = ["%s: %s." % [h.hero_name, action.name]]
+	var cost: Dictionary = action.get("cost", {})
+	for it in cost:
+		supplies[it] = int(supplies.get(it, 0)) - int(cost[it])
+		msgs.append("(-%d %s)" % [int(cost[it]), DB.items.get(it, {}).get("name", it)])
 	var res := Effects.apply(effects, self, h, target, rank)
 	msgs.append_array(res.msgs)
 	# Survival skills rank up with use.
@@ -774,7 +823,7 @@ func cave_treasure() -> Array:
 	if rng.randf() < 0.6:
 		var k := company.random_keepsake()
 		loot.keepsakes.append(k)
-		msgs.append("Found a keepsake: %s! (Click a hero's card to equip it.)" % DB.keepsakes[k].name)
+		msgs.append("Found a trinket: %s! (Click a hero's card to equip it.)" % DB.keepsakes[k].name)
 	add_log(msgs)
 	return msgs
 
@@ -787,7 +836,7 @@ func cave_exit() -> void:
 # --- Trading post ---------------------------------------------------------------------
 
 func trade_price(item_id: String) -> int:
-	return int(ceil(int(DB.items[item_id].price) * float(current_node().data.get("markup", 1.5))))
+	return int(ceil(int(DB.items[item_id].price) * float(current_node().data.get("markup", DB.cfg("trade_markup", 2.2)))))
 
 
 func trade_buy(item_id: String) -> bool:
@@ -795,13 +844,13 @@ func trade_buy(item_id: String) -> bool:
 	if int(stock.get(item_id, 0)) <= 0:
 		return false
 	var price := trade_price(item_id)
-	if int(loot.money) + company.money < price:
+	if int(loot.money) + company.money < price or Inventory.room_for(supplies, item_id) < 1:
 		return false
 	var from_loot := mini(price, int(loot.money))
 	loot.money = int(loot.money) - from_loot
 	company.money -= price - from_loot
 	stock[item_id] = int(stock[item_id]) - 1
-	supplies[item_id] = int(supplies.get(item_id, 0)) + 1
+	add_supply(item_id, 1)
 	return true
 
 

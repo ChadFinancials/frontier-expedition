@@ -83,3 +83,73 @@
   selected-move clarity and icons.
 - **Next (batch 3):** wagon as a fifth combatant, visual depth pass. Then side expeditions and
   the enemy and class workshops.
+
+## Round 2 (tutorial + first Tallgrass expedition)
+
+### Keep
+- The red targeting arrow. The opening town scene looks much better. The expedition map is good.
+- Saloon cost after the tutorial feels right (just shy of level 2).
+
+### Combat & presentation
+- [x] Targeting arrow should come **top-down** onto the target instead of arcing over the middle.
+- [x] Victory fanfare ("do do do do") is tinny and awful. Replace it.
+- [x] Some animal attack sounds sound like farts. Rework them.
+- [x] Descriptions like "heals well" should show actual number ranges.
+
+### Tutorial
+- [x] The fork (Broken Axle vs. curiosities) is an obvious choice. Hide what's ahead there too.
+- [x] Start with **2 heroes** (Marshal + Gunslinger), not 4. Tune the fights so the mini-boss
+      is fairly easy but not trivial.
+- [x] No one should reach level 2 from the tutorial: about 1/4 of the way at most.
+
+### Heroes & naming
+- [x] Single names only, no "nickname" quotes.
+- [x] Silas Crane: crows as minions, an overall bird/crow theme.
+- [x] Rename keepsakes to **trinkets**.
+
+### Camp
+- [x] Camp skills need a pass. Some don't make sense (does Hearty Stew use ingredients?).
+- [x] At level 1 a hero should only have 1–2 camp actions, not 4.
+
+### Town
+- [x] Hiring board: 2 recruits per week to start. Two upgrade tracks: more recruits per week,
+      and better recruits (higher level or better quirks).
+- [x] Building activities: click a slot (Belly Up to the Bar, Card Table...) to open a hero
+      list and assign. Same for every similar mechanic in town.
+- [x] Rebuilding the burned Smithy and Store is too cheap. After the tutorial you shouldn't be
+      able to upgrade or rebuild anything; watch the scaling.
+- [x] Side adventures from town: 2 short side paths (e.g. explore the mine, chase down a
+      bandit camp) with a theme and a mini-boss. Rewards: a new hero, a rarer trinket.
+
+### Trail
+- [x] Scouting revealed 6 stops at level 1; tone down to about 2.
+- [x] Curio stops: one curio to interact with, not a choice of several.
+- [x] Trading post and traveling merchant prices should be higher.
+- [x] A trinket-seller merchant as an event.
+- [x] Supplies should be a configurable **inventory screen** (like DD) with slots, upgradable
+      later with wagon slots.
+
+### What shipped for round 2
+- Arrow drops top-down onto the target. New guitar-strum victory sting; throatier growls and
+  roars; a new bite sound for wolves, coyotes, gila monsters and crawlers.
+- Tutorial: Marshal + Gunslinger only, fork stops unscouted, XP capped at 3 (a quarter of
+  level 2), Mulligan with one gunhand and softer stats (bot wins ~96%, ends at ~40% health).
+- Single first names (unique in the roster). Keepsakes are called trinkets everywhere you
+  see them (data files still say keepsakes).
+- Silas Crane, King of the Crows: crow on his shoulder, feather in his hat, summons a Murder
+  of Crows, "Carrion Omen". His lieutenant and Mulligan wear crow feathers.
+- Combat tooltips list every effect with real numbers; camp actions show numbers per rank.
+  Each survival skill starts with one camp action; the second unlocks at rank 2. Hearty
+  Stew and Trail Coffee use Food; Field Dressing uses a Bandage; Read the Sign now scouts.
+- Hiring Board: 2 recruits a week; two upgrade tracks (More Notices, Word of Mouth).
+- Buildings: click an empty slot to assign a hero (Saloon, Chapel, Boot Hill, Doctor, Stage
+  Line); Smithy and Drill Hall use a workbench slot.
+- Economy: start with 750 chips but only 4 Timber and 1 Iron; ruins cost full price; the
+  tutorial pays 120 chips, 3 Timber, 1 Iron. Nothing can be built right after it.
+- Side adventures from Fort Providence: Dry Gulch Mine (caves, tommyknockers, mini-boss Old
+  Jeb) and The Crow's Nest (lots of fights, mini-boss Ruby Blackwing). Six columns long.
+  First clear: a new level-2 hero, a rare trinket, Timber/Iron. Repeatable for training.
+- Scouting reveals individual stops (Scout Ahead: 2 at rank 1). Curio stops hold one curio.
+  Trading posts mark up 2.2x; peddler prices up; new Trinket Peddler event.
+- Inventory: the wagon has 12 slots; items stack (Food 12, Bandages 6...). Embark is a store
+  plus a wagon grid; the trail shows the wagon grid (click a slot to use it).

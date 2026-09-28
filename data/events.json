@@ -72,7 +72,7 @@
     "text": "A family's wagon sits by the trail. The father is burning with fever. \"Please. Anything you can spare.\"",
     "options": [
       {"text": "Give Bandages and your time.", "requires": {"item": "bandages"}, "consume": {"item": 1}, "outcomes": [
-        {"weight": 1, "good": true, "text": "The fever breaks by morning. They press a keepsake on you and refuse to take it back.", "effects": [{"type": "keepsake"}, {"type": "fatigue", "amount": -8, "target": "party"}]}]},
+        {"weight": 1, "good": true, "text": "The fever breaks by morning. They press a trinket on you and refuse to take it back.", "effects": [{"type": "keepsake"}, {"type": "fatigue", "amount": -8, "target": "party"}]}]},
       {"text": "Tend them properly.", "requires": {"skill": "medic"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} works through the night. The father lives. The family sings your names as you leave.", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "quirk", "quirk": "random_positive", "target": "actor", "chance": 50}]}]},
       {"text": "Give them some food.", "requires": {"item": "food"}, "consume": {"item": 4}, "outcomes": [
@@ -114,7 +114,7 @@
       {"text": "Read the land.", "requires": {"skill": "tracker"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} finds the old wheel ruts under the grass, and a shortcut besides.", "effects": [{"type": "reveal", "amount": 2}]}]},
       {"text": "Ride ahead and look.", "requires": {"skill": "scout"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} rides to a ridge and spots the trail, and more.", "effects": [{"type": "reveal", "amount": 3}]}]}
+        {"weight": 1, "good": true, "text": "{hero} rides to a ridge and spots the trail, and more.", "effects": [{"type": "reveal", "amount": 4}]}]}
     ]},
 
   "wolf_tracks": {"title": "Wolf Tracks", "art": "tracks",
@@ -156,14 +156,27 @@
   "peddler": {"title": "Traveling Peddler", "art": "peddler",
     "text": "A painted wagon rattles up. \"Tonics! Tinctures! Rope, nails, and genuine lucky charms!\"",
     "options": [
-      {"text": "Buy a lucky charm (120 chips).", "requires": {"money": 120}, "consume": {"money": 120}, "outcomes": [
+      {"text": "Buy a lucky charm (150 chips).", "requires": {"money": 150}, "consume": {"money": 150}, "outcomes": [
         {"weight": 3, "good": true, "text": "It seems genuine enough.", "effects": [{"type": "keepsake"}]},
         {"weight": 1, "text": "It's a painted rock.", "effects": []}]},
-      {"text": "Buy supplies (40 chips).", "requires": {"money": 40}, "consume": {"money": 40}, "outcomes": [
+      {"text": "Buy supplies (70 chips).", "requires": {"money": 70}, "consume": {"money": 70}, "outcomes": [
         {"weight": 1, "good": true, "text": "Bandages and a bottle of something.", "effects": [{"type": "item", "item": "bandages", "amount": 2}, {"type": "item", "item": "whiskey", "amount": 1}]}]},
       {"text": "Out-hustle the hustler.", "requires": {"class": "gambler"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} wins the peddler's stock in a hand of poker.", "effects": [{"type": "item", "item": "bandages", "amount": 2}, {"type": "item", "item": "salt", "amount": 1}, {"type": "money", "min": 20, "max": 50}]}]},
       {"text": "No thank you.", "outcomes": [{"weight": 1, "text": "The peddler shrugs and rattles on.", "effects": []}]}
+    ]},
+
+  "trinket_peddler": {"title": "The Trinket Peddler", "art": "peddler",
+    "text": "A tiny woman on a mule, her coat sewn all over with little pockets. \"Charms, tokens, keepsakes of the famous dead. Every one of 'em lucky, or your chips back.\" She has never once given anyone their chips back.",
+    "options": [
+      {"text": "Buy something from the top pocket (90 chips).", "requires": {"money": 90}, "consume": {"money": 90}, "outcomes": [
+        {"weight": 1, "good": true, "text": "She presses it into your hand and closes your fingers over it.", "effects": [{"type": "keepsake", "rarity": ["common", "uncommon"]}]}]},
+      {"text": "Ask about the inside pocket (260 chips).", "requires": {"money": 260}, "consume": {"money": 260}, "outcomes": [
+        {"weight": 3, "good": true, "text": "She glances both ways before she shows you. It's the real thing.", "effects": [{"type": "keepsake", "rarity": ["uncommon", "rare"]}]},
+        {"weight": 1, "text": "It's a nice rock. A very nice rock. She's already riding away.", "effects": []}]},
+      {"text": "Read her palm instead.", "requires": {"class": "gambler"}, "outcomes": [
+        {"weight": 1, "good": true, "text": "{hero} tells her fortune so well she pays in trinkets.", "effects": [{"type": "keepsake", "rarity": ["common", "uncommon"]}]}]},
+      {"text": "Keep your chips.", "outcomes": [{"weight": 1, "text": "\"Your loss, pilgrim.\"", "effects": []}]}
     ]},
 
   "wagon_stuck": {"title": "Stuck in the Mud", "art": "wagon",

@@ -59,10 +59,18 @@ afterwards.
   Smithy are **ruins**. A ruin keeps its plot and rebuilds at half the level-1 cost
   (`ruin_rebuild_pct`). The Stage Line runs if either end of the route has one.
 
+### Side adventures
+- Each settlement can offer short side adventures next to the trail west (Fort Providence:
+  Dry Gulch Mine and The Crow's Nest). Six columns, themed stop mix, a mini-boss every time.
+- First clear: a new level-2 hero joins, a rare trinket, Timber and Iron. Later clears pay
+  chips and materials. They're the place to train, and the main source of building
+  materials early on.
+
 ### The tutorial: the Old Mill Road
-- A new game offers the tutorial (or skips it). It is a hand-authored map
+- A new game offers the tutorial (or skips it). The Marshal and Gunslinger ride it alone;
+  the other two heroes wait in town. XP from it is capped at 3. It is a hand-authored map
   (`fixed_map` in regions.json): departure, a fight, a choice of event or curios, a camp,
-  then the mini-boss **"Mad Dog" Mulligan** at the old mill. Each stop shows a short story
+  then the mini-boss **Mulligan** at the old mill. Each stop shows a short story
   beat with one tip. It needs no supplies bought and has no random mishaps.
 - Winning rebuilds the **Saloon** for free (Ma Delaney returns) and opens the Tallgrass Sea.
   Turning back or losing leaves it as the next expedition from Fort Providence.
@@ -272,7 +280,7 @@ Full skill lists are in `data/classes.json` and `data/skills.json`.
 
 ## 9. Economy (starting values, to be tuned)
 
-- Currency is **chips**, the Great Casino's own coin. Start with 750 chips, 20 Timber, 8 Iron, and 6 heroes at Fort Providence.
+- Currency is **chips**, the Great Casino's own coin. Start with 750 chips, 4 Timber, 1 Iron, and 4 heroes (Marshal, Gunslinger, Preacher, Sharpshooter). Timber and Iron gate building: side adventures and the trail supply them.
 - Fights pay 5–12 chips per enemy × region tier. Elites also drop Timber, Iron and a 35%
   keepsake chance. Bosses drop a **Charter**, a keepsake and 250 chips × tier.
 - Buildings cost roughly 400 chips / 1000 chips / 2200 chips plus Timber and Iron, rising by level.

@@ -16,12 +16,17 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 	var region: Dictionary = DB.regions[region_id]
 	if region.has("fixed_map"):
 		return _fixed(region)
+	# Side adventures are shorter and always end at their mini-boss.
+	var cols_n := int(region.get("columns", COLUMNS))
+	if region.get("side", false):
+		boss_beaten = false
+	var mid_camp := cols_n / 2 if cols_n >= 8 else -1
 	var nodes: Array = []
 	var columns: Array = []
 	var used_events: Array = []
-	for c in COLUMNS:
+	for c in cols_n:
 		var count := 1
-		if c > 0 and c < COLUMNS - 2:
+		if c > 0 and c < cols_n - 2:
 			count = rng.randi_range(2, 4) if c != 1 else rng.randi_range(2, 3)
 		var col: Array = []
 		for l in count:
@@ -32,27 +37,27 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 		columns.append(col)
 
 	# Types.
-	for c in COLUMNS:
+	for c in cols_n:
 		for n in columns[c]:
 			if c == 0:
 				n.type = "start"
 				n.visited = true
 				n.done = true
-			elif c == COLUMNS - 1:
+			elif c == cols_n - 1:
 				n.type = "crossing" if boss_beaten else "boss"
-			elif c == COLUMNS - 2:
+			elif c == cols_n - 2:
 				n.type = "camp"
 			else:
-				n.type = _roll_type(c, rng)
+				n.type = _roll_type(c, rng, region.get("node_weights", {}))
 		# Guarantee a mid-trail camp and at least one plain fight early.
-		if c == 4 and not columns[c].any(func(x): return x.type == "camp"):
+		if c == mid_camp and not columns[c].any(func(x): return x.type == "camp"):
 			Stats.pick(rng, columns[c]).type = "camp"
 		if c == 1 and not columns[c].any(func(x): return x.type == "fight"):
 			columns[c][0].type = "fight"
 
 	# Edges: each node links to the nearest node(s) in the next column; every node gets
 	# at least one incoming link.
-	for c in COLUMNS - 1:
+	for c in cols_n - 1:
 		var cur: Array = columns[c]
 		var nxt: Array = columns[c + 1]
 		for n in cur:
@@ -96,7 +101,7 @@ static func _fixed(region: Dictionary) -> Array:
 		for l in col.size():
 			var src: Dictionary = col[l]
 			var n := {"id": nodes.size(), "col": c, "lane": l, "y": float(src.get("lane_y", (l + 0.5) / float(col.size()))),
-				"type": src.type, "intel": 3, "decoy": false, "next": [], "visited": c == 0, "done": c == 0, "data": {}}
+				"type": src.type, "intel": int(src.get("intel", 3)), "decoy": false, "next": [], "visited": c == 0, "done": c == 0, "data": {}}
 			match src.type:
 				"fight", "elite":
 					n.data = {"enemies": src.enemies.duplicate()}
@@ -154,17 +159,20 @@ static func _closest(col: Array, y: float) -> Dictionary:
 	return best
 
 
-static func _roll_type(c: int, rng: RandomNumberGenerator) -> String:
-	var table := [
-		{"id": "fight", "weight": 40}, {"id": "event", "weight": 24}, {"id": "curio", "weight": 14},
-		{"id": "homestead", "weight": 5},
-	]
+## weights: optional per-region overrides ({type: weight}), e.g. a mine full of caves.
+static func _roll_type(c: int, rng: RandomNumberGenerator, weights: Dictionary = {}) -> String:
+	var w := {"fight": 40, "event": 24, "curio": 14, "homestead": 5, "cave": 7, "elite": 7, "trading_post": 5}
+	for k in weights:
+		w[k] = int(weights[k])
+	var table: Array = []
+	for k in ["fight", "event", "curio", "homestead"]:
+		table.append({"id": k, "weight": w[k]})
 	if c >= 2:
-		table.append({"id": "cave", "weight": 7})
-		table.append({"id": "elite", "weight": 7})
+		table.append({"id": "cave", "weight": w.cave})
+		table.append({"id": "elite", "weight": w.elite})
 	if c >= 3:
-		table.append({"id": "trading_post", "weight": 5})
-	return Stats.pick_weighted(rng, table).id
+		table.append({"id": "trading_post", "weight": w.trading_post})
+	return Stats.pick_weighted(rng, table.filter(func(x): return int(x.weight) > 0)).id
 
 
 static func roll_group(rng: RandomNumberGenerator, groups: Array) -> Array:
@@ -194,8 +202,7 @@ static func _fill(n: Dictionary, region: Dictionary, rng: RandomNumberGenerator,
 		"curio":
 			var cs: Array = []
 			var pool: Array = Stats.shuffled(rng, region.curios)
-			for i in rng.randi_range(2, 3):
-				cs.append({"id": pool[i], "done": false})
+			cs.append({"id": pool[0], "done": false})
 			n.data = {"curios": cs}
 		"cave":
 			var rooms: Array = []
@@ -216,6 +223,6 @@ static func _fill(n: Dictionary, region: Dictionary, rng: RandomNumberGenerator,
 			for it in ["food", "bandages", "antivenom", "whiskey", "lamp_oil", "wagon_parts", "rope", "salt"]:
 				if it == "food" or rng.randf() < 0.7:
 					stock[it] = rng.randi_range(2, 6) if it != "food" else rng.randi_range(8, 16)
-			n.data = {"stock": stock, "markup": 1.5}
+			n.data = {"stock": stock, "markup": float(DB.cfg("trade_markup", 2.2))}
 		"camp":
 			n.data = {}

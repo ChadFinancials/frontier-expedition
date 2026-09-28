@@ -5,6 +5,7 @@ extends RefCounted
 
 var rng := RandomNumberGenerator.new()
 var cautious := false
+var last_hp_ratio := 0.0   # party health share just before the last expedition ended
 var stats := {"fights": 0, "wins": 0, "losses": 0, "fled": 0, "rounds": 0, "max_rounds": 0, "deaths": 0,
 	"events": 0, "curios": 0, "camps": 0, "caves": 0, "errors": []}
 
@@ -102,6 +103,11 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 	var r := co.start_run(i, uids, supplies)
 	if r == null:
 		return {"status": "no_run", "reason": co.can_embark(i, uids, supplies)}
+	return play_run(co, r)
+
+
+## Plays an expedition that has already set out (e.g. the tutorial).
+func play_run(co: Company, r: RunState) -> Dictionary:
 	var guard := 0
 	while r.status == "active":
 		guard += 1
@@ -142,6 +148,11 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 			r.status = "defeat"
 		elif r.is_final_node() and r.current_node().done:
 			r.status = "victory" if r.boss_won else ("driven_back" if r.driven_back else "abandoned")
+	var hs := r.party_heroes()
+	last_hp_ratio = 0.0
+	for h in hs:
+		last_hp_ratio += float(h.hp) / h.max_hp()
+	last_hp_ratio /= maxf(1.0, hs.size())
 	return co.finish_run(r.status)
 
 
