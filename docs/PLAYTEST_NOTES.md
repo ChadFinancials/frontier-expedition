@@ -39,3 +39,26 @@
 - [ ] Enemy workshop: in-depth pass on enemies, move sets and enemy groupings. They
       currently feel bland.
 - [ ] Class workshop: deep dive on each class and its moves for more interest and variety.
+
+## Round 1, part 2
+
+### Decisions
+- **Chips replace money now.** Sub-currencies for special items or shops can come later.
+- **Silas Crane:** the first meeting is a **scripted turnaround cutscene**: he drives the
+  company off, and you come back later to beat him.
+
+### Visuals
+- [ ] Lean harder into the **storybook paper-cutout / papier-mâché** look (the owner likes it).
+- [ ] Forms are very basic; add more 3D feel and depth of field. The town is just 5
+      buildings side by side. Look at DD's Hamlet screens: layered, angled buildings,
+      foreground and background, depth. Don't go overboard.
+
+### Onboarding
+- [ ] **Tutorial adventure** that starts automatically: a short map with 3 stops, then a
+      mini-boss, with some storyline.
+- [ ] The town should **start barebones**. Starting with a Saloon, Smithy and General Store
+      feels wrong. The tutorial's win unlocks or rebuilds the first building.
+
+### Wagon
+- [ ] Wagon as a **"5th member" in battles**: some enemies attack or sabotage it directly.
+      Also wear and tear from travel.
