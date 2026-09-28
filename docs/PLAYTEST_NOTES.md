@@ -184,3 +184,21 @@
 - [ ] The drawn-polygon look lacks wow factor. Explore AI image generation (ComfyUI or
       similar) with consistent style prompting for characters, backgrounds, buildings and
       items. Keep the storybook / paper-cutout / papier-mâché feel.
+
+### Round 3, part 2 (both side adventures)
+- [ ] Side adventures felt pretty easy. Give enemies a slight buff or more 4-enemy fights, but
+      early side quests should stay fairly easy.
+- [ ] Elite fights paid 5 Timber and 3 Iron (random 2-5 / 1-3), which feels like a lot.
+      Materials should depend on what the wagon can carry (tie into the inventory).
+- [ ] Find more places for the wagon to matter.
+- [ ] Ruby Blackwing needs cooler, better moves (enemy deep dive).
+- [ ] "Resisted" is unclear. It means a status (stun, bleed, poison, knockback, debuff)
+      failed to stick against the target's resistance; damage is unaffected. Show which one,
+      e.g. "Resisted Stun".
+- [ ] The Crow's Nest shouldn't give a hero, only the Blackwing Feather, as the first
+      uncommon/rare trinket you can get.
+
+### Plan
+- Art: a "paper theater" pilot on one combat scene first, then roll out if approved. Kept
+  separate from gameplay changes. ComfyUI (local, RTX 4070 Ti Super) stays an option for
+  backgrounds later.
