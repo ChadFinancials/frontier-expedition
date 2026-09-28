@@ -1,0 +1,341 @@
+class_name UI
+extends RefCounted
+## Theme and widget helpers. Screens are built in code with these so the look stays
+## consistent: parchment panels, dark wood buttons, Rye for headings, Alegreya for text.
+
+const PAPER := Color("#ecdfc2")
+const PAPER_DARK := Color("#d9c7a0")
+const INK := Color("#2a1d14")
+const INK_SOFT := Color("#5a4632")
+const WOOD := Color("#5e3f27")
+const WOOD_LIGHT := Color("#83593a")
+const WOOD_DARK := Color("#3a2618")
+const CREAM := Color("#f3e9d2")
+const ACCENT := Color("#c8742c")
+const GOLD := Color("#d9b44a")
+const RED := Color("#a8392e")
+const GREEN := Color("#5f8a3a")
+const BLUE := Color("#3f6f96")
+const FATIGUE := Color("#9b7fc6")
+const HP := Color("#b8372d")
+const NIGHT := Color("#1b1510")
+
+static var _theme: Theme
+static var font_body: Font
+static var font_bold: Font
+static var font_head: Font
+
+
+static func fonts() -> void:
+	if font_head != null:
+		return
+	font_head = load("res://assets/fonts/Rye-Regular.ttf")
+	var base: Font = load("res://assets/fonts/Alegreya.ttf")
+	var fv := FontVariation.new()
+	fv.base_font = base
+	fv.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 480}
+	font_body = fv
+	var fb := FontVariation.new()
+	fb.base_font = base
+	fb.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 760}
+	font_bold = fb
+
+
+static func box(bg: Color, border: Color = Color.TRANSPARENT, bw: int = 0, radius: int = 6, pad: int = 12, shadow: int = 0) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = bg
+	s.border_color = border
+	s.set_border_width_all(bw)
+	s.set_corner_radius_all(radius)
+	s.content_margin_left = pad
+	s.content_margin_right = pad
+	s.content_margin_top = pad * 0.75
+	s.content_margin_bottom = pad * 0.75
+	if shadow > 0:
+		s.shadow_color = Color(0, 0, 0, 0.35)
+		s.shadow_size = shadow
+		s.shadow_offset = Vector2(3, 4)
+	s.anti_aliasing = true
+	return s
+
+
+static func theme() -> Theme:
+	if _theme != null:
+		return _theme
+	fonts()
+	var t := Theme.new()
+	t.default_font = font_body
+	t.default_font_size = 22
+	# Labels: cream by default (most screens are dark); "Ink" variations for parchment.
+	t.set_color("font_color", "Label", CREAM)
+	t.set_color("font_shadow_color", "Label", Color(0, 0, 0, 0.0))
+	t.set_type_variation("Ink", "Label")
+	t.set_color("font_color", "Ink", INK)
+	t.set_type_variation("Header", "Label")
+	t.set_font("font", "Header", font_head)
+	t.set_color("font_color", "Header", CREAM)
+	t.set_color("font_shadow_color", "Header", Color(0, 0, 0, 0.55))
+	t.set_constant("shadow_offset_x", "Header", 2)
+	t.set_constant("shadow_offset_y", "Header", 3)
+	t.set_type_variation("InkHeader", "Label")
+	t.set_font("font", "InkHeader", font_head)
+	t.set_color("font_color", "InkHeader", INK)
+	t.set_type_variation("Bold", "Label")
+	t.set_font("font", "Bold", font_bold)
+	t.set_color("font_color", "Bold", CREAM)
+	t.set_type_variation("InkBold", "Label")
+	t.set_font("font", "InkBold", font_bold)
+	t.set_color("font_color", "InkBold", INK)
+	# Rich text.
+	t.set_color("default_color", "RichTextLabel", CREAM)
+	t.set_font("bold_font", "RichTextLabel", font_bold)
+	t.set_font("normal_font", "RichTextLabel", font_body)
+	t.set_type_variation("InkRich", "RichTextLabel")
+	t.set_color("default_color", "InkRich", INK)
+	# Panels.
+	t.set_stylebox("panel", "PanelContainer", box(PAPER, WOOD, 3, 8, 16, 6))
+	t.set_type_variation("Dark", "PanelContainer")
+	t.set_stylebox("panel", "Dark", box(Color(0.12, 0.08, 0.05, 0.92), WOOD_LIGHT, 2, 8, 14, 6))
+	t.set_type_variation("Card", "PanelContainer")
+	t.set_stylebox("panel", "Card", box(PAPER_DARK, WOOD, 2, 6, 10, 3))
+	t.set_type_variation("Clear", "PanelContainer")
+	t.set_stylebox("panel", "Clear", box(Color(0, 0, 0, 0), Color.TRANSPARENT, 0, 0, 0))
+	t.set_stylebox("panel", "Panel", box(PAPER, WOOD, 3, 8, 0, 6))
+	# Buttons.
+	for v in ["Button", "Big", "Small", "Tab", "Danger", "Good"]:
+		if v != "Button":
+			t.set_type_variation(v, "Button")
+		var base := WOOD
+		if v == "Danger":
+			base = Color("#7a2a22")
+		elif v == "Good":
+			base = Color("#3f6128")
+		elif v == "Tab":
+			base = Color("#4a3322")
+		var pad := 18 if v == "Big" else (8 if v == "Small" else 12)
+		t.set_stylebox("normal", v, box(base, WOOD_DARK, 2, 6, pad, 2))
+		t.set_stylebox("hover", v, box(base.lightened(0.18), GOLD, 2, 6, pad, 3))
+		t.set_stylebox("pressed", v, box(base.darkened(0.2), GOLD, 2, 6, pad, 0))
+		t.set_stylebox("disabled", v, box(Color(0.35, 0.3, 0.26, 0.65), Color(0.25, 0.2, 0.16, 0.6), 2, 6, pad, 0))
+		t.set_stylebox("focus", v, StyleBoxEmpty.new())
+		t.set_color("font_color", v, CREAM)
+		t.set_color("font_hover_color", v, Color.WHITE)
+		t.set_color("font_pressed_color", v, GOLD)
+		t.set_color("font_disabled_color", v, Color(0.75, 0.7, 0.62, 0.7))
+		t.set_font("font", v, font_head if v == "Big" else font_bold)
+		t.set_font_size("font_size", v, 30 if v == "Big" else (18 if v == "Small" else 21))
+	t.set_stylebox("normal", "Tab", box(Color("#4a3322"), WOOD_DARK, 2, 6, 12, 0))
+	# Tooltips.
+	t.set_stylebox("panel", "TooltipPanel", box(Color(0.1, 0.07, 0.05, 0.96), GOLD, 2, 6, 12, 4))
+	t.set_color("font_color", "TooltipLabel", CREAM)
+	t.set_font("font", "TooltipLabel", font_body)
+	t.set_font_size("font_size", "TooltipLabel", 19)
+	# Scrollbars.
+	t.set_stylebox("scroll", "VScrollBar", box(Color(0, 0, 0, 0.15), Color.TRANSPARENT, 0, 4, 4))
+	t.set_stylebox("grabber", "VScrollBar", box(WOOD_LIGHT, Color.TRANSPARENT, 0, 4, 4))
+	t.set_stylebox("grabber_highlight", "VScrollBar", box(ACCENT, Color.TRANSPARENT, 0, 4, 4))
+	t.set_stylebox("grabber_pressed", "VScrollBar", box(GOLD, Color.TRANSPARENT, 0, 4, 4))
+	# Sliders & checkboxes.
+	t.set_stylebox("slider", "HSlider", box(WOOD_DARK, Color.TRANSPARENT, 0, 4, 4))
+	t.set_color("font_color", "CheckBox", CREAM)
+	_theme = t
+	return t
+
+
+# --- Widgets --------------------------------------------------------------------------
+
+static func lbl(text: String, size: int = 22, variation: String = "", color: Variant = null) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", size)
+	if variation != "":
+		l.theme_type_variation = variation
+	if color != null:
+		l.add_theme_color_override("font_color", color)
+	return l
+
+
+static func hdr(text: String, size: int = 40, ink: bool = false) -> Label:
+	return lbl(text, size, "InkHeader" if ink else "Header")
+
+
+static func wrap(l: Label, width: float = 0.0) -> Label:
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if width > 0:
+		l.custom_minimum_size.x = width
+	return l
+
+
+static func btn(text: String, cb: Callable = Callable(), variation: String = "", min_w: float = 0.0) -> Button:
+	var b := Button.new()
+	b.text = text
+	if variation != "":
+		b.theme_type_variation = variation
+	if min_w > 0:
+		b.custom_minimum_size.x = min_w
+	if cb.is_valid():
+		b.pressed.connect(cb)
+	b.pressed.connect(func(): Audio.play("click", 0.6))
+	b.mouse_entered.connect(func(): if not b.disabled: Audio.play("hover", 0.25, 0.02))
+	return b
+
+
+static func panel(variation: String = "") -> PanelContainer:
+	var p := PanelContainer.new()
+	if variation != "":
+		p.theme_type_variation = variation
+	return p
+
+
+static func vb(sep: int = 8) -> VBoxContainer:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", sep)
+	return v
+
+
+static func hb(sep: int = 8) -> HBoxContainer:
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", sep)
+	return h
+
+
+static func spacer(w: float = 0, h: float = 0, expand: bool = false) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = Vector2(w, h)
+	if expand:
+		c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		c.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	return c
+
+
+static func rich(bbcode: String, size: int = 21, ink: bool = false, width: float = 0.0) -> RichTextLabel:
+	var r := RichTextLabel.new()
+	r.bbcode_enabled = true
+	r.fit_content = true
+	r.scroll_active = false
+	r.text = bbcode
+	r.add_theme_font_size_override("normal_font_size", size)
+	r.add_theme_font_size_override("bold_font_size", size)
+	if ink:
+		r.theme_type_variation = "InkRich"
+	if width > 0:
+		r.custom_minimum_size.x = width
+	r.mouse_filter = Control.MOUSE_FILTER_PASS
+	return r
+
+
+static func chip(text: String, kind: String = "neutral", size: int = 16) -> PanelContainer:
+	var c := {"good": GREEN, "bad": RED, "neutral": WOOD_LIGHT, "gold": Color("#8a6d1f"), "blue": BLUE, "purple": Color("#6b4f96")}.get(kind, WOOD_LIGHT)
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", box(c, c.darkened(0.3), 1, 4, 6, 0))
+	var l := lbl(text, size, "Bold")
+	p.add_child(l)
+	return p
+
+
+static func bar(value: float, max_value: float, color: Color, w: float = 160, h: float = 14, show_text: bool = false) -> StatBar:
+	var b := StatBar.new()
+	b.value = value
+	b.max_value = max_value
+	b.fill = color
+	b.show_text = show_text
+	b.custom_minimum_size = Vector2(w, h)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return b
+
+
+static func clear(n: Node) -> void:
+	for c in n.get_children():
+		n.remove_child(c)
+		c.queue_free()
+
+
+static func stat_color(good: bool) -> String:
+	return "#7fb069" if good else "#e0685a"
+
+
+static func money_text(v: int) -> String:
+	return "$%d" % v
+
+
+## Text block describing a skill for tooltips.
+static func skill_tooltip(sid: String, level: int = 1) -> String:
+	var sk := DB.skill(sid)
+	var lines: Array = [sk.get("name", sid) + ("  (Lv %d)" % level if level > 1 else ""), sk.get("desc", "")]
+	var ur: Array = sk.get("use_ranks", [])
+	var line := "Use from: %s" % _ranks_text(ur)
+	match sk.get("target", "enemy"):
+		"enemy":
+			line += "   Target: %s%s" % ["ALL " if sk.get("aoe", false) else "", _ranks_text(sk.get("target_ranks", []))]
+		"ally":
+			line += "   Target: an ally"
+		"self":
+			line += "   Target: self"
+		"party":
+			line += "   Target: whole party"
+	lines.append(line)
+	if sk.get("target", "enemy") == "enemy":
+		var dm := int(round(float(sk.get("dmg", 0.0)) * 100))
+		var parts: Array = ["Accuracy %d" % int(sk.get("acc", 85))]
+		if not sk.get("no_damage", false):
+			parts.append("Damage %s%d%%" % ["+" if dm >= 0 else "", dm])
+		if int(sk.get("crit", 0)) != 0:
+			parts.append("Crit +%d%%" % int(sk.crit))
+		if sk.get("hits", 1) > 1:
+			parts.append("%d hits" % int(sk.hits))
+		if sk.get("random_hits", 0) > 0:
+			parts.append("%d random hits" % int(sk.random_hits))
+		lines.append(", ".join(parts))
+	return "\n".join(lines)
+
+
+static func _ranks_text(r: Array) -> String:
+	var s: Array = []
+	for i in [1, 2, 3, 4]:
+		s.append("●" if i in r else "○")
+	return " ".join(s)
+
+
+static func hero_tooltip(h: Hero) -> String:
+	var lines := ["%s: Level %d %s" % [h.hero_name, h.level, h.class_name_text()],
+		"HP %d/%d   Fatigue %d/200" % [h.hp, h.max_hp(), h.fatigue]]
+	if h.fatigue_state != "":
+		lines.append(DB.fatigue_states[h.fatigue_state].name + ": " + DB.fatigue_states[h.fatigue_state].desc)
+	var sv: Array = []
+	for s in h.survival:
+		sv.append("%s %d" % [DB.survival[s].name, int(h.survival[s].rank)])
+	lines.append("Survival: " + ", ".join(sv))
+	var qs: Array = []
+	for q in h.quirks:
+		qs.append(("+" if DB.quirks[q].positive else "-") + DB.quirks[q].name)
+	lines.append("Quirks: " + ", ".join(qs))
+	return "\n".join(lines)
+
+
+static func quirk_tooltip(q: String) -> String:
+	var d: Dictionary = DB.quirks.get(q, {})
+	var lines := [d.get("name", q) + (" (good)" if d.get("positive", false) else " (bad)"), d.get("desc", "")]
+	for m in d.get("mods", []):
+		lines.append(Stats.mod_text(m))
+	if d.has("compulsion"):
+		lines.append("Compelled to handle %s things." % d.compulsion.tag)
+	return "\n".join(lines)
+
+
+static func keepsake_tooltip(k: String) -> String:
+	var d: Dictionary = DB.keepsakes.get(k, {})
+	var lines := ["%s (%s)" % [d.get("name", k), d.get("rarity", "")], d.get("desc", "")]
+	for m in d.get("mods", []):
+		lines.append(Stats.mod_text(m))
+	return "\n".join(lines)
+
+
+static func survival_tooltip(sid: String, rank: int) -> String:
+	var d: Dictionary = DB.survival.get(sid, {})
+	var lines := ["%s (rank %d)" % [d.get("name", sid), rank], d.get("desc", "")]
+	var p: Dictionary = d.get("passive", {})
+	if not p.is_empty():
+		lines.append("On the trail: " + p.get("text", ""))
+	for a in d.get("actions", []):
+		lines.append("Camp: %s (%dh): %s" % [a.name, int(a.hours), a.desc])
+	return "\n".join(lines)

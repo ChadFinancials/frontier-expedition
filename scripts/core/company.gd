@@ -690,7 +690,7 @@ func start_run(i: int, party_uids: Array, supplies: Dictionary) -> RunState:
 ## Settle the finished expedition. status: victory / abandoned / defeat.
 func finish_run(status: String) -> Dictionary:
 	var r := run
-	var summary := {"status": status, "region": r.region_id, "heroes": [], "loot": r.loot.duplicate(true),
+	var summary := {"status": status, "region": r.region_id, "origin": r.origin, "heroes": [], "loot": r.loot.duplicate(true),
 		"recruits": [], "boss_won": r.boss_won, "found_site": -1, "week_msgs": []}
 	var survivors := r.party_heroes()
 	var won := status == "victory"

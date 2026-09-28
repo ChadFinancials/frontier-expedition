@@ -65,7 +65,7 @@
     "look": {"body": "human", "build": "slim", "hat": "stetson_black", "coat": "duster", "weapon": "pistols", "extra": "mustache", "colors": {"coat": "#262a33", "pants": "#1e2027", "hat": "#101114", "accent": "#b39b4a"}}},
   "cyclops": {"name": "The Cyclops of Deadeye Mesa", "title": "Shepherd of Stone", "tags": ["mythic", "giant"], "hp": 230, "dodge": 0, "prot": 25, "speed": 3, "acc": 8, "crit": 6, "dmg": [10, 16],
     "res": {"stun": 70, "bleed": 40, "poison": 40, "move": 90, "debuff": 45}, "skills": ["e_cyc_club", "e_cyc_boulder", "e_cyc_glare", "e_cyc_call"], "boss": true,
-    "look": {"body": "giant", "eye": "one", "scale": 1.75, "colors": {"fur": "#9a7b62", "belly": "#6e5846", "eye": "#f2e8cf", "coat": "#5a4a3a", "accent": "#3a2e24"}}},
+    "look": {"body": "giant", "eye": "one", "scale": 1.45, "colors": {"fur": "#9a7b62", "belly": "#6e5846", "eye": "#f2e8cf", "coat": "#5a4a3a", "accent": "#3a2e24"}}},
 
   "mountain_bandit": {"name": "Mountain Bandit", "tags": ["outlaw", "human"], "hp": 16, "dodge": 10, "prot": 5, "speed": 5, "acc": 0, "crit": 6, "dmg": [3, 6],
     "res": {"stun": 30, "bleed": 30, "poison": 30, "move": 30, "debuff": 30}, "skills": ["e_bandit_blade", "e_bandit_rifle"],
@@ -81,10 +81,10 @@
     "look": {"body": "ghost", "colors": {"fur": "#d7e8f2", "belly": "#8fb3c9", "eye": "#2a4a6b"}}},
   "stone_giant_youth": {"name": "Stone Giant Youth", "tags": ["mythic", "giant"], "hp": 44, "dodge": 0, "prot": 20, "speed": 2, "acc": 0, "crit": 5, "dmg": [6, 10],
     "res": {"stun": 55, "bleed": 60, "poison": 60, "move": 80, "debuff": 35}, "skills": ["e_giant_rock", "e_giant_stomp"], "elite": true,
-    "look": {"body": "giant", "eye": "two", "scale": 1.35, "colors": {"fur": "#8a8378", "belly": "#6b655c", "eye": "#f2a93b", "coat": "#6b655c", "accent": "#4a4640"}}},
+    "look": {"body": "giant", "eye": "two", "scale": 1.12, "colors": {"fur": "#8a8378", "belly": "#6b655c", "eye": "#f2a93b", "coat": "#6b655c", "accent": "#4a4640"}}},
   "titan": {"name": "The Titan of the Pass", "title": "Older than the Mountains", "tags": ["mythic", "giant"], "hp": 330, "dodge": 0, "prot": 30, "speed": 4, "acc": 10, "crit": 7, "dmg": [13, 20],
     "res": {"stun": 80, "bleed": 50, "poison": 50, "move": 95, "debuff": 50}, "skills": ["e_titan_sweep", "e_titan_quake", "e_titan_voice", "e_titan_call", "e_titan_crush"], "boss": true,
-    "look": {"body": "giant", "eye": "glow", "crown": true, "scale": 2.0, "colors": {"fur": "#6f7a82", "belly": "#4c555c", "eye": "#9ee6ff", "coat": "#3e464c", "accent": "#b8c6cf"}}},
+    "look": {"body": "giant", "eye": "glow", "crown": true, "scale": 1.6, "colors": {"fur": "#6f7a82", "belly": "#4c555c", "eye": "#9ee6ff", "coat": "#3e464c", "accent": "#b8c6cf"}}},
 
   "giant_bat": {"name": "Giant Bat", "tags": ["beast", "cave"], "hp": 8, "dodge": 30, "prot": 0, "speed": 8, "acc": 0, "crit": 5, "dmg": [2, 4],
     "res": {"stun": 30, "bleed": 20, "poison": 25, "move": 50, "debuff": 25}, "skills": ["e_bat_bite", "e_bat_screech"],
