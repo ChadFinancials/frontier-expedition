@@ -367,7 +367,7 @@ func test_tutorial_and_story() -> void:
 	var missing_name := co.missing_name()
 	var hs: Array = co.heroes_at(0).slice(0, 2)
 	var r2 := co.start_run(0, hs.map(func(h): return h.uid), {"food": 12}, "dry_gulch_mine")
-	check(r2 != null and MapGen.column_count(r2.nodes) == 6 and r2.nodes[r2.nodes.size() - 1].type == "boss", "side adventure: short map ending at its mini-boss")
+	check(r2 != null and MapGen.column_count(r2.nodes) == int(DB.regions.dry_gulch_mine.columns) and r2.nodes[r2.nodes.size() - 1].type == "boss", "side adventure: short map ending at its mini-boss")
 	var e3 := CombatEngine.new()
 	e3.setup(r2.party_heroes(), [], {})
 	e3.state = "victory"

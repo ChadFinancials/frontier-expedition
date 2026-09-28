@@ -8,6 +8,7 @@ Karplus-Strong plucked string. Output: assets/audio/*.wav (22.05 kHz, 16-bit mon
     python3 tools/gen_audio.py gunshot    # just one sound
 """
 import math
+import glob
 import os
 import random
 import struct
@@ -182,6 +183,9 @@ def fade(x, fin=0.003, fout=0.02):
 
 def write(name, x, peak=0.9):
     os.makedirs(OUT, exist_ok=True)
+    if glob.glob(os.path.join(OUT, name + "_[0-9]*.ogg")):
+        print("  skipped", name, "(recorded sound from tools/import_sfx.py)")
+        return
     x = fade(normalize(x, peak))
     path = os.path.join(OUT, name + ".wav")
     with wave.open(path, "w") as w:

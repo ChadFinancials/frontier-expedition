@@ -18,7 +18,7 @@
   "armor_hp_pct": 8,
   "armor_dodge": 2,
   "weapon_dmg_pct": 12,
-  "xp_levels": [0, 12, 32, 60, 100],
+  "xp_levels": [0, 15, 45, 90, 150],
   "max_level": 5,
   "max_tier": 4,
   "max_skill_level": 4,
@@ -93,8 +93,8 @@
   "max_positive_quirks": 4,
   "max_negative_quirks": 4,
 
-  "xp_per_node": 2,
-  "xp_boss": 6,
+  "xp_per_node": 1,
+  "xp_boss": 5,
   "xp_elite": 2,
 
   "enemy_money": [5, 12],
@@ -113,7 +113,7 @@
   "ruin_rebuild_pct": 100,
   "trade_markup": 2.2,
   "wagon_slots": 12,
-  "free_kit": {"food": 12, "bandages": 1, "wagon_parts": 1},
+  "free_kit": {"food": 16, "bandages": 1, "wagon_parts": 1},
   "tutorial_party": ["marshal", "gunslinger"],
   "tutorial_supplies": {"food": 10, "bandages": 2, "wagon_parts": 1},
   "found_cost": {"charters": 1, "money": 600, "timber": 15, "iron": 8},

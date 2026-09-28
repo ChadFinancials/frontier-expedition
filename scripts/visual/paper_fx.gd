@@ -69,7 +69,15 @@ static func group(params: Dictionary = {}, margin: float = 28.0) -> CanvasGroup:
 	g.clear_margin = margin
 	g.use_mipmaps = true
 	g.material = material(params)
+	# A CanvasGroup is not a Control, so the game's theme stops here: without this,
+	# Controls inside it fall back to Godot's default font and grey tooltips.
+	g.child_entered_tree.connect(_rethemed)
 	return g
+
+
+static func _rethemed(n: Node) -> void:
+	if n is Control and n.theme == null:
+		n.theme = UI.theme()
 
 
 static func sky_material(top: Color, bottom: Color) -> ShaderMaterial:

@@ -208,7 +208,7 @@
       (new illustrations), curios, camp (paper moon and stars), cave (lamplight pool), town
       (layered street, palisade, props), menu, and a light paper grain over the whole UI.
 - [x] Dev "DEV: Win" button in combat for fast testing (remove later).
-- [ ] Replace generated sound effects with a free (CC0) pack. The environment's network policy
+- [x] Replace generated sound effects with a free (CC0) pack (see Round 4). The network policy
       blocks the usual sites; either allow them or drop a pack into assets/audio.
 
 ## Round 3, part 3
@@ -219,3 +219,18 @@
 - [x] Company size starts at 5 and grows with settlements (town 5, city 8, each outpost +2).
 - [ ] Find more places for the wagon to matter (materials now take wagon space).
 - [ ] Ruby Blackwing and the rumor mini-bosses need their own moves (enemy deep dive).
+
+## Round 4
+- [x] Sound effects: recorded CC0 sounds (Kenney packs, OpenGameArt) replace the generated
+      ones for gunshots, impacts, blades, glass, coins/chips, cards, paper, footsteps and all
+      the animals (crows, dogs, growls, roars, bats, bites, howl, ghosts). Built by
+      tools/import_sfx.py; sources in assets/audio/CREDITS.md. Music is unchanged.
+- [x] Map hover text looked odd: the paper layer broke the UI theme, so the map fell back to
+      Godot's default grey tooltip. Fixed for everything inside a paper layer.
+- [x] Longer trips: main trails 9 → 12 stops (two camps), story side adventures 6 → 8,
+      Saloon quests 5 → 7. Free kit food 12 → 16, recommended food 18 → 24.
+- [x] Slower levelling: XP per stop 2 → 1, boss 6 → 5; levels at 15 / 45 / 90 / 150
+      (was 12 / 32 / 60 / 100). Roughly: a side quest ≈ 13 XP, a main trail ≈ 20.
+- [ ] Jagged edges on circles and cutouts (aliasing). Later.
+- [ ] Cave lamplight is too easy to ignore. Expand later.
+- [ ] Enemy deep dive: docs/ENEMY_REVIEW.md (tools/enemy_sheet.py) lists every enemy and move.

@@ -60,7 +60,7 @@ static func run(main: Main, args: Dictionary) -> void:
 			var uids3: Array = []
 			for h in Game.company.heroes.slice(0, 4):
 				uids3.append(h.uid)
-			Game.company.start_run(0, uids3, {"food": 10})
+			Game.company.start_run(0, uids3, Game.company.free_kit())
 			await main.goto("combat", {"enemies": DB.regions.tallgrass.boss.enemies, "kind": "boss", "return": "trail"}, true)
 		"tutorial":
 			Game.company.start_tutorial()
@@ -79,10 +79,18 @@ static func run(main: Main, args: Dictionary) -> void:
 			var uids: Array = []
 			for h in co.heroes.slice(0, 4):
 				uids.append(h.uid)
-			co.start_run(0, uids, {"food": 16, "bandages": 2, "lamp_oil": 2, "shovel": 1, "salt": 1})
+			# The first settlement has no store yet: start with the free kit, then pack extras.
+			co.start_run(0, uids, co.free_kit())
+			co.run.supplies.merge({"bandages": 2, "lamp_oil": 2, "shovel": 1, "salt": 1}, true)
 			match scenario:
 				"trail":
 					await main.goto("trail", {}, true)
+					if args.has("hover"):
+						# Hover the first stop you can travel to, to check the map tooltip.
+						var mv: MapView = main.screen.map
+						var id: int = mv.run.choices()[0]
+						Input.warp_mouse(mv.get_global_transform_with_canvas() * mv.node_pos(mv.run.node(id)))
+						await main.get_tree().create_timer(2.0).timeout
 				"combat":
 					var enemies: Array = args.get("enemies", "outlaw_brawler,outlaw_gunhand,prairie_wolf,outlaw_rifleman").split(",")
 					await main.goto("combat", {"enemies": enemies, "kind": args.get("kind", "fight"), "return": "trail"}, true)
@@ -102,7 +110,7 @@ static func run(main: Main, args: Dictionary) -> void:
 			var uids2: Array = []
 			for h in co2.heroes.slice(0, 4):
 				uids2.append(h.uid)
-			co2.start_run(0, uids2, {"food": 16})
+			co2.start_run(0, uids2, co2.free_kit())
 			co2.run.loot = {"money": 320, "timber": 6, "iron": 3, "charters": 2, "keepsakes": ["lucky_horseshoe"]}
 			co2.run.xp = 12
 			co2.run.boss_won = true

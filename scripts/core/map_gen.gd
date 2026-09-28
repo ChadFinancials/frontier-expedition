@@ -4,7 +4,7 @@ extends RefCounted
 ## Every node's content (enemy group, event, curios, cave rooms...) is rolled up front so
 ## saving and loading mid-expedition is deterministic.
 
-const COLUMNS := 9
+const COLUMNS := 12
 const TYPE_NAMES := {
 	"start": "Departure", "fight": "Trouble", "elite": "Dangerous Foes", "event": "Trail Event",
 	"curio": "Curiosities", "cave": "Cave", "trading_post": "Trading Post", "homestead": "Homestead",
@@ -20,7 +20,7 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 	var cols_n := int(region.get("columns", COLUMNS))
 	if region.get("side", false):
 		boss_beaten = false
-	var mid_camp := cols_n / 2 if cols_n >= 8 else -1
+	var mid_camp := cols_n / 2 if cols_n >= 8 and not region.get("side", false) else -1
 	var nodes: Array = []
 	var columns: Array = []
 	var used_events: Array = []

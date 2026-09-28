@@ -907,7 +907,7 @@ func _make_quest(tid: String, west: String, tier_l: int) -> Dictionary:
 	var b: Dictionary = t.get("boss", {})
 	var reg := {
 		"name": str(t.name).replace("{place}", place), "tier": tier, "rec_level": base.get("rec_level", "1"),
-		"side": true, "quest": true, "template": tid, "columns": 5,
+		"side": true, "quest": true, "template": tid, "columns": 7,
 		"desc": str(t.desc).replace("{place}", place),
 		"palette": base.get("palette", {}), "props": base.get("props", []), "cave_name": base.get("cave_name", "Cave"),
 		"node_weights": t.get("node_weights", {}),

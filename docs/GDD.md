@@ -200,7 +200,7 @@ Full skill lists are in `data/classes.json` and `data/skills.json`.
 ## 7. Expeditions (the Trail)
 
 ### Map
-- A procedurally generated node graph, **9 columns** east → west, 3–4 lanes. Each node
+- A procedurally generated node graph, **12 columns** east → west, 3–4 lanes. Each node
   connects to 1–2 nodes in the next column.
 - Column 0 is the departure point and column 8 is the **boss** (or, once the boss is
   beaten, a **Crossing** elite fight). Column 7 is always a **Camp**, and a camp appears

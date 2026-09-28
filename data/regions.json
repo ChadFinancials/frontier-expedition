@@ -36,7 +36,7 @@
   },
 
   "dry_gulch_mine": {
-    "name": "Dry Gulch Mine", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 6,
+    "name": "Dry Gulch Mine", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 8,
     "desc": "A played-out silver mine in the hills north of the fort. One of your company rode up here and never came back. The miners left in a hurry, and they say the tapping in the walls never stopped. Lots of dark shafts: bring lamp oil.",
     "palette": {"sky_top": "#3b3350", "sky_bottom": "#d98c5f", "sun": "#ffd9a8", "far": "#7d5a4f", "mid": "#96694f", "near": "#6f4d3a", "ground": "#5a3f2f", "accent": "#e0a458"},
     "props": ["mesa", "rock", "skull", "cactus"],
@@ -70,7 +70,7 @@
   },
 
   "crows_nest": {
-    "name": "The Crow's Nest", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 6,
+    "name": "The Crow's Nest", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 8,
     "desc": "Silas Crane's supply camp in the cottonwoods south of the fort, run by his quartermaster Ruby Blackwing. The woods are full of lookouts and crows. Expect a lot of fighting.",
     "palette": {"sky_top": "#34465e", "sky_bottom": "#e8a86b", "sun": "#fff0c8", "far": "#6f7a5a", "mid": "#5d6d44", "near": "#465a30", "ground": "#3d4d28", "accent": "#c98e3e"},
     "props": ["tree", "grass", "fence", "rock"],
