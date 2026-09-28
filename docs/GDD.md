@@ -15,7 +15,7 @@ older and stranger: first outlaws and wolves, then canyon things that shouldn't 
 then mountains where giants walk. Each region is held by something dangerous. Beat it and
 you can raise a settlement on its ground, and the frontier moves west.
 
-**v1 goal:** conquer the three regions and reach the Sundown Sea. The game continues
+**v1 goal:** conquer the three regions and reach the Great Casino, a gambler's paradise city at the end of the western trail. The game continues
 afterwards.
 
 ---
@@ -43,14 +43,14 @@ afterwards.
 | 0 | Fort Providence (start, Town) | The Tallgrass Sea | Silas Crane's Gang |
 | 1 | Redwater Ford (Crane's Crossing) | The Red Canyons | The Cyclops of Deadeye Mesa |
 | 2 | Cloudbreak (Titan's Pass) | The Thunder Peaks | The Titan of the Pass |
-| — | The Sundown Sea | *(victory)* | — |
+| — | The Great Casino | *(victory)* | — |
 
 ### Tiers
 | Tier | Building slots | Max building level | Upgrade cost |
 |---|---|---|---|
-| Outpost | 3 | 1 | Founding: 1 Charter, $600, 15 Timber, 8 Iron |
-| Town | 6 | 2 | 3 Charters, $2000, 40 Timber, 25 Iron |
-| City | 9 (all) | 3 | 6 Charters, $5000, 90 Timber, 60 Iron |
+| Outpost | 3 | 1 | Founding: 1 Charter, 600, chips 15 Timber, 8 Iron |
+| Town | 6 | 2 | 3 Charters, 2000, chips 40 Timber, 25 Iron |
+| City | 9 (all) | 3 | 6 Charters, 5000, chips 90 Timber, 60 Iron |
 
 - **Founding** needs that region's boss to be beaten. The victorious party can found it
   on the spot if the company can pay, or later from any settlement.
@@ -60,7 +60,7 @@ afterwards.
 ### Buildings
 | Building | Does | Scales with level |
 |---|---|---|
-| **Saloon** | Fatigue relief: *Belly Up to the Bar* (big relief, may pick up Drinker), *Card Table* (relief, may win or lose money) | slots, relief amount |
+| **Saloon** | Fatigue relief: *Belly Up to the Bar* (big relief, may pick up Drinker), *Card Table* (relief, may win or lose chips) | slots, relief amount |
 | **Chapel** | Fatigue relief: *Quiet Prayer* (steady), *Hymn Singing* (relief, may gain a positive quirk) | slots, relief amount |
 | **Doctor's Office** | Remove a negative quirk; cure a Breaking Point | slots, lower cost |
 | **Smithy** | Upgrade weapon and armor tier | max tier |
@@ -221,7 +221,7 @@ Full skill lists are in `data/classes.json` and `data/skills.json`.
   whiskey barrels).
 
 ### Events
-- Oregon Trail-style text events with options. Options can require an item, money, a
+- Oregon Trail-style text events with options. Options can require an item, chips, a
   class, a survival skill or a quirk, and a party skill unlocks special options (the
   Angler knows the ford, the Wheelwright caulks the wagon). Outcomes are weighted and
   apply generic effects.
@@ -249,10 +249,10 @@ Full skill lists are in `data/classes.json` and `data/skills.json`.
 
 ## 9. Economy (starting values, to be tuned)
 
-- Start with $750, 10 Timber, 5 Iron, and 6 heroes at Fort Providence.
-- Fights pay $8–20 per enemy × region tier. Elites also drop Timber, Iron and a 35%
-  keepsake chance. Bosses drop a **Charter**, a keepsake and $400 × tier.
-- Buildings cost roughly $400 / $1000 / $2200 plus Timber and Iron, rising by level.
+- Start with 750, chips 10 Timber, 5 Iron, and 6 heroes at Fort Providence.
+- Fights pay 8 chips–20 per enemy × region tier. Elites also drop Timber, Iron and a 35%
+  keepsake chance. Bosses drop a **Charter**, a keepsake and 400 chips × tier.
+- Buildings cost roughly 400 chips / 1000 chips / 2200 chips plus Timber and Iron, rising by level.
 
 ---
 

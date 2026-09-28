@@ -38,7 +38,7 @@ static func create(c: Company, region: String, origin_index: int, party_uids: Ar
 	r.wagon = DB.cfg("wagon_max", 100)
 	r.nodes = MapGen.generate(region, c.rng, region in c.beaten)
 	r.current = 0
-	r.reveal_ahead(1)
+	r.look_ahead()
 	for h in r.party_heroes():
 		h.deaths_door = false
 		h.shaken = false
@@ -162,6 +162,8 @@ func heal_hero(h: Hero, pct: int, msgs: Array) -> void:
 func change_wagon(amount: int, msgs: Array) -> void:
 	var before := wagon
 	wagon = clampi(wagon + amount, 0, DB.cfg("wagon_max", 100))
+	if amount > 0 and before >= DB.cfg("wagon_max", 100):
+		msgs.append("The wagon is already in good repair.")
 	if wagon != before:
 		msgs.append("Wagon %s%d (now %d)." % ["+" if amount > 0 else "", wagon - before, wagon])
 	if wagon == 0 and before > 0:
@@ -174,15 +176,44 @@ func choices() -> Array:
 	return current_node().get("next", [])
 
 
-## Reveal hidden nodes in the next `cols` columns. Returns how many were revealed.
-func reveal_ahead(cols: int) -> int:
+## Scout the next `cols` columns up to `level` (2 = type, 3 = details). Returns how many
+## stops became clearer.
+func reveal_ahead(cols: int, level: int = 3) -> int:
 	var c0 := int(current_node().get("col", 0))
 	var n_rev := 0
 	for n in nodes:
-		if n.col > c0 and n.col <= c0 + cols and n.hidden:
-			n.hidden = false
+		if n.col > c0 and n.col <= c0 + cols and MapGen.intel(n) < level:
+			n.intel = level
 			n_rev += 1
 	return n_rev
+
+
+## The party's eye for the trail: quirks, keepsakes and survival skills.
+func scout_score() -> float:
+	return party_stat_sum("scout") + party_passive("scout")
+
+
+## Called on arrival: the next stops come into view, more clearly with good scouts.
+func look_ahead() -> Array:
+	var msgs: Array = []
+	var c0 := int(current_node().get("col", 0))
+	var score := scout_score()
+	var tracker := party_passive("surprise") > 0
+	var spotted := 0
+	for n in nodes:
+		var d := int(n.col) - c0
+		if d == 1:
+			n.intel = maxi(MapGen.intel(n), 1)
+			if MapGen.intel(n) < 2 and company.rng.randf() * 100.0 < 20.0 + score:
+				n.intel = 2
+				spotted += 1
+			if MapGen.intel(n) == 2 and tracker and n.type in ["fight", "elite"]:
+				n.intel = 3
+		elif d == 2 and MapGen.intel(n) < 1 and company.rng.randf() * 100.0 < score / 2.0:
+			n.intel = 1
+	if spotted > 0 and score >= 30:
+		msgs.append("Your scouts get a good look at what lies ahead.")
+	return msgs
 
 
 func food_need() -> int:
@@ -205,8 +236,11 @@ func travel_to(id: int) -> Array:
 	current = id
 	day += 1
 	var n := current_node()
+	var surprised_by_decoy: bool = n.get("decoy", false) and MapGen.intel(n) < 2
 	n.visited = true
-	n.hidden = false
+	n.intel = 3
+	if surprised_by_decoy:
+		msgs.append("It looked quiet from a distance. It wasn't.")
 	xp += DB.cfg("xp_per_node", 1)
 	# Rations.
 	var need := food_need()
@@ -231,10 +265,47 @@ func travel_to(id: int) -> Array:
 		var f := company.rng.randi_range(1, 3)
 		supplies.food = int(supplies.get("food", 0)) + f
 		msgs.append("Your forager gathers %d food along the way." % f)
-	# Scout passive.
-	if party_passive("scout") > 0 or party_stat_sum("scout") >= 20:
-		reveal_ahead(1)
+	# Wear and tear on the wagon.
+	var wear := company.rng.randi_range(int(DB.cfg("wagon_wear", [2, 5])[0]), int(DB.cfg("wagon_wear", [2, 5])[1]))
+	wear = int(round(wear * (1.0 - party_passive("wagon_guard") / 100.0)))
+	if wear > 0 and wagon > 0:
+		var wmsgs: Array = []
+		change_wagon(-wear, wmsgs)
+		if wagon < 40:
+			msgs.append_array(wmsgs)
+		else:
+			log.append("Rough trail: the wagon takes %d wear." % wear)
+	# Mishaps on the road.
+	if company.rng.randf() * 100.0 < DB.cfg("mishap_chance", 15):
+		msgs.append_array(_mishap())
+	msgs.append_array(look_ahead())
 	add_log(msgs)
+	return msgs
+
+
+## Small misfortunes of the road. A hero with the right skill or class prevents them;
+## otherwise the listed supply is used up if you have it, or the company pays the price.
+func _mishap() -> Array:
+	var m: Dictionary = Stats.pick_weighted(company.rng, DB.cfg("mishaps", []))
+	if m == null or m.is_empty():
+		return []
+	var msgs: Array = []
+	var prevent: Dictionary = m.get("prevent", {})
+	var saver: Hero = null
+	if prevent.has("skill") or prevent.has("class"):
+		saver = event_actor(prevent)
+	if saver != null:
+		msgs.append(str(m.get("saved", "")).replace("{hero}", saver.hero_name))
+		return msgs
+	var item: String = m.get("item", "")
+	if item != "" and int(supplies.get(item, 0)) > 0:
+		supplies[item] = int(supplies[item]) - 1
+		msgs.append(str(m.get("used_item", "")).replace("{item}", DB.items[item].name))
+		return msgs
+	var victim: Hero = Stats.pick(company.rng, party_heroes())
+	msgs.append(str(m.text).replace("{hero}", victim.hero_name if victim != null else "someone"))
+	var res := Effects.apply(m.get("effects", []), self, victim)
+	msgs.append_array(res.msgs)
 	return msgs
 
 
@@ -667,14 +738,14 @@ func cave_treasure() -> Array:
 	var rng := company.rng
 	var m := int(round(rng.randi_range(60, 120) * tier() * (1.0 + party_loot_pct() / 100.0)))
 	loot.money = int(loot.money) + m
-	msgs.append("+$%d." % m)
+	msgs.append("+%d chips." % m)
 	var ir := rng.randi_range(1, 3)
 	loot.iron = int(loot.iron) + ir
 	msgs.append("+%d Iron." % ir)
 	if rng.randf() < 0.6:
 		var k := company.random_keepsake()
 		loot.keepsakes.append(k)
-		msgs.append("Found a keepsake: %s!" % DB.keepsakes[k].name)
+		msgs.append("Found a keepsake: %s! (Click a hero's card to equip it.)" % DB.keepsakes[k].name)
 	add_log(msgs)
 	return msgs
 

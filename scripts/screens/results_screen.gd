@@ -35,7 +35,7 @@ func setup(params: Dictionary) -> void:
 	var lr := UI.hb(30)
 	lr.alignment = BoxContainer.ALIGNMENT_CENTER
 	v.add_child(lr)
-	for it in [["money", "$%d" % int(loot.get("money", 0))], ["timber", "%d Timber" % int(loot.get("timber", 0))], ["iron", "%d Iron" % int(loot.get("iron", 0))], ["charter", "%d Charters" % int(loot.get("charters", 0))]]:
+	for it in [["money", "%d chips" % int(loot.get("money", 0))], ["timber", "%d Timber" % int(loot.get("timber", 0))], ["iron", "%d Iron" % int(loot.get("iron", 0))], ["charter", "%d Charters" % int(loot.get("charters", 0))]]:
 		var h := UI.hb(6)
 		h.add_child(ResIcon.make(it[0], 34))
 		h.add_child(UI.lbl(it[1], 26, "InkBold"))
@@ -100,4 +100,4 @@ func setup(params: Dictionary) -> void:
 	if status == "victory" and s.get("boss_won", false) and s.get("region", "") == "thunder_peaks" and not co.victory_seen:
 		co.victory_seen = true
 		Game.save_game()
-		Main.inst.message("The Sundown Sea", "Beyond the Titan's pass the land falls away to a shining sea. The trail west is complete. Your company has carved a road across the frontier, from Fort Providence to the edge of the world.\n\n[b]Thank you for playing.[/b] Found Sundown Landing to see the end of the trail, and keep playing as long as you like.")
+		Main.inst.message("The Great Casino", "Beyond the Titan's pass the valley blazes with light: the Great Casino, at last. Your company has carved a road across the frontier, from Fort Providence to the end of the trail.\n\n[b]Thank you for playing.[/b] Found a claim at the Great Casino to see the end of the trail, and keep playing as long as you like.")

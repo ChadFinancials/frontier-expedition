@@ -50,11 +50,11 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 				if m >= 0:
 					m = int(round(m * (1.0 + run.party_loot_pct() / 100.0)))
 				run.loot.money = maxi(0, int(run.loot.money) + m)
-				out.msgs.append("%s$%d." % ["+" if m >= 0 else "-", absi(m)])
+				out.msgs.append("%s%d chips." % ["+" if m >= 0 else "-", absi(m)])
 			"money_pct":
 				var lost := int(round(c.money * absf(amount) / 100.0))
 				c.money = maxi(0, c.money - lost)
-				out.msgs.append("Lost $%d from the company purse." % lost)
+				out.msgs.append("Lost %d chips from the company purse." % lost)
 			"timber":
 				var t := amount + (int(run.party_passive("timber_bonus")) if amount > 0 else 0)
 				run.loot.timber = int(run.loot.timber) + t
@@ -71,11 +71,17 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 				var n := int(e.get("amount", 1)) if not e.has("base") else amount
 				run.supplies[it] = int(run.supplies.get(it, 0)) + n
 				out.msgs.append("+%d %s." % [n, DB.items.get(it, {}).get("name", it)])
+			"item_loss":
+				var il: String = e.get("item", "food")
+				var have := int(run.supplies.get(il, 0))
+				if have > 0:
+					run.supplies[il] = maxi(0, have - int(e.get("amount", 1)))
+					out.msgs.append("-%d %s." % [have - int(run.supplies[il]), DB.items.get(il, {}).get("name", il)])
 			"keepsake":
 				var k := c.random_keepsake()
 				if k != "":
 					run.loot.keepsakes.append(k)
-					out.msgs.append("Found a keepsake: %s!" % DB.keepsakes[k].name)
+					out.msgs.append("Found a keepsake: %s! (Click a hero's card to equip it.)" % DB.keepsakes[k].name)
 			"quirk":
 				for h in who:
 					var q := c.add_quirk(h, str(e.get("quirk", "random")))
@@ -115,7 +121,7 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 					Stats.mod_text({"stat": e.stat, "value": amount if (e.has("base") or e.has("amount")) else int(e.get("value", 5))})])
 			"reveal":
 				var cols := run.reveal_ahead(amount if amount > 0 else 1)
-				out.msgs.append("The trail ahead is clearer. (%d stops revealed)" % cols)
+				out.msgs.append("You get a good look at the trail ahead. (%d stops scouted)" % cols)
 			"light":
 				if run.in_cave():
 					run.cave.light = clampi(int(run.cave.light) + amount, 0, 100)

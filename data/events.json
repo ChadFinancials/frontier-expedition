@@ -12,7 +12,7 @@
         {"weight": 1, "good": true, "text": "{hero} seals every seam with pitch. The wagon floats like a riverboat.", "effects": [{"type": "fatigue", "amount": -4, "target": "party"}]}]},
       {"text": "Look for the shallow ford.", "requires": {"skill": "angler"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} reads the ripples and finds the shallows. You also catch dinner on the way.", "effects": [{"type": "food", "amount": 4}]}]},
-      {"text": "Pay the ferryman ($40).", "requires": {"money": 40}, "consume": {"money": 40}, "outcomes": [
+      {"text": "Pay the ferryman (40 chips).", "requires": {"money": 40}, "consume": {"money": 40}, "outcomes": [
         {"weight": 1, "good": true, "text": "The ferryman poles you across and tells stories the whole way.", "effects": [{"type": "fatigue", "amount": -5, "target": "party"}]}]}
     ]},
 
@@ -156,10 +156,10 @@
   "peddler": {"title": "Traveling Peddler", "art": "peddler",
     "text": "A painted wagon rattles up. \"Tonics! Tinctures! Rope, nails, and genuine lucky charms!\"",
     "options": [
-      {"text": "Buy a lucky charm ($120).", "requires": {"money": 120}, "consume": {"money": 120}, "outcomes": [
+      {"text": "Buy a lucky charm (120 chips).", "requires": {"money": 120}, "consume": {"money": 120}, "outcomes": [
         {"weight": 3, "good": true, "text": "It seems genuine enough.", "effects": [{"type": "keepsake"}]},
         {"weight": 1, "text": "It's a painted rock.", "effects": []}]},
-      {"text": "Buy supplies ($40).", "requires": {"money": 40}, "consume": {"money": 40}, "outcomes": [
+      {"text": "Buy supplies (40 chips).", "requires": {"money": 40}, "consume": {"money": 40}, "outcomes": [
         {"weight": 1, "good": true, "text": "Bandages and a bottle of something.", "effects": [{"type": "item", "item": "bandages", "amount": 2}, {"type": "item", "item": "whiskey", "amount": 1}]}]},
       {"text": "Out-hustle the hustler.", "requires": {"class": "gambler"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} wins the peddler's stock in a hand of poker.", "effects": [{"type": "item", "item": "bandages", "amount": 2}, {"type": "item", "item": "salt", "amount": 1}, {"type": "money", "min": 20, "max": 50}]}]},
@@ -322,7 +322,7 @@
     "options": [
       {"text": "Stay for supper.", "outcomes": [
         {"weight": 1, "good": true, "text": "Fresh bread, butter and a real bed. Everyone rests easy.", "effects": [{"type": "heal_pct", "value": 20, "target": "party"}, {"type": "fatigue", "amount": -12, "target": "party"}]}]},
-      {"text": "Trade for supplies ($30).", "requires": {"money": 30}, "consume": {"money": 30}, "outcomes": [
+      {"text": "Trade for supplies (30 chips).", "requires": {"money": 30}, "consume": {"money": 30}, "outcomes": [
         {"weight": 1, "good": true, "text": "Sacks of potatoes and salt pork.", "effects": [{"type": "food", "amount": 10}]}]},
       {"text": "Help with chores in exchange for lumber.", "outcomes": [
         {"weight": 1, "text": "A day of hard work, a wagon full of boards.", "effects": [{"type": "timber", "amount": 5}, {"type": "fatigue", "amount": 6, "target": "party"}]}]}
@@ -354,9 +354,56 @@
     "options": [
       {"text": "Rest by the fire.", "outcomes": [
         {"weight": 1, "good": true, "text": "Warm at last.", "effects": [{"type": "heal_pct", "value": 20, "target": "party"}, {"type": "fatigue", "amount": -12, "target": "party"}]}]},
-      {"text": "Buy furs and provisions ($50).", "requires": {"money": 50}, "consume": {"money": 50}, "outcomes": [
+      {"text": "Buy furs and provisions (50 chips).", "requires": {"money": 50}, "consume": {"money": 50}, "outcomes": [
         {"weight": 1, "good": true, "text": "Furs, pemmican and good advice.", "effects": [{"type": "food", "amount": 8}, {"type": "reveal", "amount": 2}]}]},
       {"text": "Ask the trapper to join you.", "outcomes": [
         {"weight": 1, "good": true, "text": "\"Been meaning to see the ocean before I die.\"", "effects": [{"type": "recruit", "class": "mountain_man"}]}]}
+    ]},
+  "swollen_creek": {"title": "Swollen Creek", "art": "river",
+    "text": "Last night's rain turned a trickle into a torrent. The banks are slick and the current is quick.",
+    "options": [
+      {"text": "Rope the wagon to a tree and ease it across.", "requires": {"item": "rope"}, "consume": {"item": 1}, "outcomes": [
+        {"weight": 1, "good": true, "text": "Slow going, but the rope holds and nothing is lost.", "effects": []}]},
+      {"text": "Wait for the water to drop.", "outcomes": [
+        {"weight": 1, "text": "A day and a half of waiting and eating into the stores.", "effects": [{"type": "food", "amount": -4}, {"type": "fatigue", "amount": 3, "target": "party"}]}]},
+      {"text": "Chance it.", "outcomes": [
+        {"weight": 2, "text": "The wagon slews sideways and a wheel cracks on the rocks.", "effects": [{"type": "wagon", "amount": -18}]},
+        {"weight": 1, "text": "Supplies wash off the back of the wagon.", "effects": [{"type": "food", "amount": -5}, {"type": "item_loss", "item": "bandages", "amount": 1}]},
+        {"weight": 1, "good": true, "text": "Soaked, but across.", "effects": [{"type": "fatigue", "amount": 4, "target": "party"}]}]}
+    ]},
+
+  "fever_camp": {"title": "Fever in the Camp", "art": "stranger",
+    "text": "{hero} wakes up shivering and burning hot. By noon two others are coughing.",
+    "options": [
+      {"text": "Treat them with bandages and cool water.", "requires": {"item": "bandages"}, "consume": {"item": 2}, "outcomes": [
+        {"weight": 1, "good": true, "text": "The fever breaks by nightfall.", "effects": [{"type": "fatigue", "amount": 3, "target": "party"}]}]},
+      {"text": "Let the Medic take charge.", "requires": {"skill": "medic"}, "outcomes": [
+        {"weight": 1, "good": true, "text": "{hero} isolates the sick and brews willow-bark tea. Everyone pulls through.", "effects": []}]},
+      {"text": "Push on and hope it passes.", "outcomes": [
+        {"weight": 2, "text": "It doesn't pass quickly.", "effects": [{"type": "damage_pct", "value": 12, "target": "party"}, {"type": "fatigue", "amount": 8, "target": "party"}]},
+        {"weight": 1, "text": "{hero} gets the worst of it and may never quite shake it.", "effects": [{"type": "damage_pct", "value": 20, "target": "actor"}, {"type": "quirk", "quirk": "sickly", "target": "actor"}]}]}
+    ]},
+
+  "outlaw_toll": {"title": "Outlaw Toll", "art": "stranger",
+    "text": "Three riders block the trail, rifles across their saddles. \"Road tax. Forty chips, or we take it out of your hide.\"",
+    "options": [
+      {"text": "Pay the toll (40 chips).", "requires": {"money": 40}, "consume": {"money": 40}, "outcomes": [
+        {"weight": 1, "text": "They count the chips twice and ride off laughing.", "effects": [{"type": "fatigue", "amount": 4, "target": "party"}]}]},
+      {"text": "Flash the badge.", "requires": {"class": "marshal"}, "outcomes": [
+        {"weight": 2, "good": true, "text": "{hero} names each of them from the wanted posters. They decide the road is free today.", "effects": [{"type": "fatigue", "amount": -4, "target": "party"}]},
+        {"weight": 1, "text": "\"Badge don't mean much out here.\"", "effects": [{"type": "fight", "enemies": ["outlaw_gunhand", "outlaw_gunhand", "outlaw_rifleman"]}]}]},
+      {"text": "Refuse.", "outcomes": [
+        {"weight": 1, "text": "Guns come out.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"]}]}]}
+    ]},
+
+  "torn_canvas": {"title": "Torn Canvas", "art": "wagon",
+    "text": "A gust rips the wagon's canvas open end to end. Dust and grit pour over everything inside.",
+    "options": [
+      {"text": "Lash it down with rope.", "requires": {"item": "rope"}, "consume": {"item": 1}, "outcomes": [
+        {"weight": 1, "good": true, "text": "Patched and tied down tight.", "effects": []}]},
+      {"text": "Rebuild the bows with spare parts.", "requires": {"item": "wagon_parts"}, "consume": {"item": 1}, "outcomes": [
+        {"weight": 1, "good": true, "text": "Better than new.", "effects": [{"type": "wagon", "amount": 10}]}]},
+      {"text": "Leave it.", "outcomes": [
+        {"weight": 1, "text": "Grit gets into the food and the gear.", "effects": [{"type": "food", "amount": -3}, {"type": "wagon", "amount": -8}]}]}
     ]}
 }

@@ -500,6 +500,7 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 		_apply_self_effect(a, sid, e, ev)
 	# Fatigue from crits.
 	if crit_any and a.is_hero():
+		ev.append({"t": "crit_relief", "actor": a.id})
 		ev.append_array(Fatigue.add(a.hero, -DB.cfg("crit_relief_self", 4), rng))
 		for h in heroes:
 			if h != a:
@@ -596,7 +597,7 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 		"heal":
 			var hmin := float(e.get("min", 3))
 			var hmax := float(e.get("max", 6))
-			var amt := float(rng.randi_range(int(hmin), int(hmax)))
+			var amt := float(rng.randi_range(int(hmin), int(hmax))) * float(DB.cfg("heal_mult", 1.0))
 			amt *= 1.0 + DB.cfg("skill_level_heal_pct", 15) / 100.0 * (lvl - 1)
 			var hcrit := a.is_hero() and rng.randi_range(1, 100) <= int(a.stat("crit"))
 			if hcrit:

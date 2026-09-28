@@ -155,7 +155,7 @@ func refresh() -> void:
 	if region_id != "":
 		action_row.add_child(UI.btn("Plan Expedition  →", func(): Main.inst.goto("embark", {"index": index}), "Big"))
 	else:
-		action_row.add_child(UI.btn("The Sundown Sea", _victory_view, "Big"))
+		action_row.add_child(UI.btn("The Great Casino", _victory_view, "Big"))
 
 
 func _switch(i: int) -> void:
@@ -200,11 +200,11 @@ func _rest_week() -> void:
 
 
 func _victory_view() -> void:
-	Main.inst.message("The Sundown Sea", "Your company stands on the shore of the Sundown Sea. Wagons roll down the long trail behind you, bound for the towns you built. The frontier is yours.\n\nYou can keep playing: strengthen your settlements and send expeditions back into the regions for glory and loot.")
+	Main.inst.message("The Great Casino", "Your company rides under the Casino's golden arch with the whole frontier at its back. Wagons roll down the long trail behind you, bound for the towns you built, and the house has never seen a crew like yours.\n\nYou can keep playing: strengthen your settlements and send expeditions back into the regions for glory and chips.")
 
 
 func _intro() -> void:
-	Main.inst.message("Fort Providence", "Fort Providence is the last real town before the edge of the map. Your company is six hard souls, a wagon, and not much money.\n\nWest lies [b]the Tallgrass Sea[/b], held by the outlaw [b]Silas Crane[/b]. Beat him, and you can raise a settlement on his river crossing and push the frontier further.\n\nClick buildings to use them. Click a hero to see their skills and quirks. When you're ready, [b]Plan Expedition[/b].\n\n[i](Esc opens the menu and How to Play.)[/i]")
+	Main.inst.message("Fort Providence", "Every wagon on the frontier is chasing the same rumor: far to the west, past the last mountain, stands [b]the Great Casino[/b], a paradise city where fortunes are made. Its chips are the only currency anyone trusts out here.\n\nFort Providence is the last real town before the edge of the map. Your company is six hard souls, a wagon, and a short stack of chips.\n\nWest lies [b]the Tallgrass Sea[/b], held by the outlaw [b]Silas Crane[/b]. Beat him, and you can raise a settlement on his river crossing and push the frontier further.\n\nClick buildings to use them. Click a hero to see their skills and quirks. When you're ready, [b]Plan Expedition[/b].\n\n[i](Esc opens the menu and How to Play.)[/i]")
 
 
 func open_hero(h: Hero) -> void:

@@ -33,7 +33,7 @@
       "victory": "Silas Crane falls into the Redwater and the current takes him. His toll bridge is yours, and the river crossing is the perfect place for a settlement.",
       "enemies": ["crane_lieutenant", "silas_crane", "outlaw_gunhand", "outlaw_rifleman"], "keepsake": "cranes_revolver"},
     "crossing": {"name": "Toll Bridge Holdouts", "enemies": ["crane_lieutenant", "outlaw_knifeman", "outlaw_gunhand", "outlaw_rifleman"]},
-    "events": ["river_crossing", "broken_axle", "prairie_fire", "stranger_on_road", "buffalo_herd", "sick_traveler", "rattler_in_bedroll", "thunderstorm", "lost_trail", "wolf_tracks", "abandoned_homestead", "haint_lights", "peddler", "wagon_stuck", "gravesite", "hunting_grounds", "outlaw_ambush_warning", "fork_in_trail"],
+    "events": ["river_crossing", "broken_axle", "prairie_fire", "stranger_on_road", "buffalo_herd", "sick_traveler", "rattler_in_bedroll", "thunderstorm", "lost_trail", "wolf_tracks", "abandoned_homestead", "haint_lights", "peddler", "wagon_stuck", "gravesite", "hunting_grounds", "outlaw_ambush_warning", "fork_in_trail", "swollen_creek", "fever_camp", "outlaw_toll", "torn_canvas"],
     "homestead_events": ["homestead_family", "homestead_widow", "homestead_drifter"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "prairie_well", "scarecrow", "berry_bushes", "cattle_skull", "dead_horse", "standing_stone"],
     "cave_curios": ["miners_cache", "whiskey_barrel", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox"]
@@ -70,7 +70,7 @@
       "victory": "The Cyclops crashes down the side of the mesa like a rockslide. Its stone rams crumble into gravel. Deadeye Mesa is quiet, and it has fresh water. A fine spot to build.",
       "enemies": ["stone_ram", "cyclops", "canyon_siren"], "keepsake": "cyclops_eye_stone"},
     "crossing": {"name": "Mesa Guardians", "enemies": ["stone_ram", "stone_ram", "hired_gun", "canyon_siren"]},
-    "events": ["river_crossing", "broken_axle", "stranger_on_road", "rattler_in_bedroll", "thunderstorm", "lost_trail", "peddler", "wagon_stuck", "gravesite", "flash_flood", "railroad_survey", "siren_song", "heat_wave", "claim_dispute", "fork_in_trail", "outlaw_ambush_warning"],
+    "events": ["river_crossing", "broken_axle", "stranger_on_road", "rattler_in_bedroll", "thunderstorm", "lost_trail", "peddler", "wagon_stuck", "gravesite", "flash_flood", "railroad_survey", "siren_song", "heat_wave", "claim_dispute", "fork_in_trail", "outlaw_ambush_warning", "fever_camp", "outlaw_toll", "torn_canvas"],
     "homestead_events": ["homestead_family", "homestead_drifter", "homestead_widow"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "cattle_skull", "standing_stone", "miners_cache", "petroglyph_wall", "dead_horse", "railroad_crate"],
     "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox", "ore_vein"]
@@ -78,7 +78,7 @@
 
   "thunder_peaks": {
     "name": "The Thunder Peaks", "tier": 3, "rec_level": "4-5",
-    "desc": "Snow and granite and storms that never end. The giants here are old, and the oldest of them all sits in the pass to the Sundown Sea.",
+    "desc": "Snow and granite and storms that never end. The giants here are old, and the oldest of them all sits in the last pass before the Great Casino.",
     "palette": {"sky_top": "#1b263b", "sky_bottom": "#8d99ae", "sun": "#e0e1dd", "far": "#6c7a89", "mid": "#4f5d6b", "near": "#3a4652", "ground": "#e0e6ea", "accent": "#9ee6ff"},
     "props": ["pine", "snowrock", "rock", "cairn"],
     "cave_name": "Ice Cave",
@@ -102,10 +102,10 @@
     ],
     "boss": {"name": "The Titan of the Pass", "landmark": "Titan's Pass",
       "intro": "What you took for the mountain's shoulder turns its head. Lightning crawls across a crown of granite. The Titan of the Pass has blocked the way west since before there were people to go west.",
-      "victory": "The Titan sinks to its knees and is still, and the snow begins to cover it. Beyond the pass, the land slopes down and down to a shining sea.",
+      "victory": "The Titan sinks to its knees and is still, and the snow begins to cover it. Beyond the pass the valley glitters: a thousand lamps, a roar of voices, the spinning wheels of the Great Casino.",
       "enemies": ["stone_giant_youth", "titan", "storm_hawk"], "keepsake": "titan_shard"},
     "crossing": {"name": "Children of the Titan", "enemies": ["stone_giant_youth", "frost_wight", "storm_hawk", "storm_hawk"]},
-    "events": ["broken_axle", "stranger_on_road", "thunderstorm", "lost_trail", "wolf_tracks", "peddler", "wagon_stuck", "gravesite", "avalanche", "blizzard", "frozen_traveler", "giant_footprints", "fork_in_trail", "hunting_grounds"],
+    "events": ["broken_axle", "stranger_on_road", "thunderstorm", "lost_trail", "wolf_tracks", "peddler", "wagon_stuck", "gravesite", "avalanche", "blizzard", "frozen_traveler", "giant_footprints", "fork_in_trail", "hunting_grounds", "swollen_creek", "fever_camp", "torn_canvas"],
     "homestead_events": ["homestead_drifter", "homestead_trapper_cabin"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "standing_stone", "frozen_pack", "cairn", "dead_horse", "giant_bones", "hot_spring"],
     "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "ore_vein", "frozen_pack"]

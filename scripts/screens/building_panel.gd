@@ -103,7 +103,7 @@ func _activities(body: VBoxContainer) -> void:
 		var side: Array = []
 		for se in a.get("side_effects", []):
 			side.append("%d%% chance: %s" % [int(se.chance), str(se.text).replace("%s ", "").replace("%s", "")])
-		var desc := UI.lbl("Sheds up to %d Fatigue. $%d.%s" % [relief, cost, ("  " + " ".join(side)) if not side.is_empty() else ""], 17, "Ink")
+		var desc := UI.lbl("Sheds up to %d Fatigue. %d chips.%s" % [relief, cost, ("  " + " ".join(side)) if not side.is_empty() else ""], 17, "Ink")
 		desc.custom_minimum_size.x = 620
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(desc)
@@ -138,7 +138,7 @@ func _doctor(body: VBoxContainer) -> void:
 		for q in negs:
 			var qq: String = q
 			var hh: Hero = h
-			var b := UI.btn("Treat %s ($%d)" % [DB.quirks[q].name, co.doctor_cost(index, h)], func():
+			var b := UI.btn("Treat %s (%d chips)" % [DB.quirks[q].name, co.doctor_cost(index, h)], func():
 				if co.treat_quirk(index, hh, qq):
 					Audio.play("heal")
 					Main.inst.toast("%s is cured of %s." % [hh.hero_name, DB.quirks[qq].name], "good")
@@ -197,7 +197,7 @@ func _drill(body: VBoxContainer) -> void:
 		row.add_child(UI.lbl("Level %d" % h.skill_level(sid), 18, "Ink"))
 		if h.skill_level(sid) < DB.cfg("max_skill_level", 4):
 			var s2: String = sid
-			var b := UI.btn("Train to %d ($%d)" % [h.skill_level(sid) + 1, co.skill_cost(index, h.skill_level(sid) + 1)], func():
+			var b := UI.btn("Train to %d (%d chips)" % [h.skill_level(sid) + 1, co.skill_cost(index, h.skill_level(sid) + 1)], func():
 				if co.upgrade_skill(index, h, s2):
 					Audio.play("buff")
 					_changed(), "Small")
@@ -224,7 +224,7 @@ func _store(body: VBoxContainer) -> void:
 		ml.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(ml)
 		var kk: String = k
-		var b := UI.btn("Buy $%d" % co.keepsake_price(index, k), func():
+		var b := UI.btn("Buy (%d chips)" % co.keepsake_price(index, k), func():
 			if co.buy_keepsake(index, kk):
 				Audio.play("coin")
 				Main.inst.toast("Bought %s. Equip it from a hero's sheet." % DB.keepsakes[kk].name, "good")

@@ -49,12 +49,24 @@ func _node_at(p: Vector2) -> int:
 
 func _tip(id: int) -> String:
 	var n := run.node(id)
-	if n.hidden:
-		return "Unknown\nSomething lies this way. A Scout would know what."
+	var lvl := MapGen.intel(n)
+	var go := "\n(Click to travel here)" if id in run.choices() else ""
+	if lvl == 0:
+		return "Unknown\nToo far to make out. Scouts (the Scout skill, a spyglass, a Trailwise hero) see further and clearer." + go
+	if lvl == 1:
+		match MapGen.vague_kind(n):
+			"danger":
+				return "Signs of Trouble\nTracks, smoke, a glint of metal. Probably a fight, but you can't be sure." + go
+			"cave":
+				return "A Dark Opening\nLooks like a cave in the hillside." + go
+		return "Looks Quiet\nNothing obvious this way. Could be anything." + go
 	var t: String = MapGen.TYPE_NAMES.get(n.type, n.type)
 	match n.type:
 		"fight", "elite":
-			t += "\n" + ", ".join(n.data.enemies.map(func(e): return DB.enemy(e).get("name", e)))
+			if lvl >= 3:
+				t += "\n" + ", ".join(n.data.enemies.map(func(e): return DB.enemy(e).get("name", e)))
+			else:
+				t += "\nYou can't tell who's waiting. (A Tracker reads the signs.)"
 		"boss":
 			t += ": " + run.region().boss.name + "\nRecommended level " + str(run.region().get("rec_level", "?")) + ". No retreat."
 		"crossing":
@@ -63,9 +75,7 @@ func _tip(id: int) -> String:
 			t += ": " + n.data.get("name", "")
 		"event", "homestead":
 			t += ": " + DB.events.get(n.data.event, {}).get("title", "")
-	if id in run.choices():
-		t += "\n(Click to travel here)"
-	return t
+	return t + go
 
 
 func _draw() -> void:
@@ -100,7 +110,13 @@ func _draw() -> void:
 			bg = Color("#a89878")
 		draw_circle(p, r, bg)
 		draw_arc(p, r, 0, TAU, 32, Color("#5e3f27"), 2.5)
-		_icon("hidden" if n.hidden else n.type, p, r, n.visited and n.id != run.current)
+		var lvl := MapGen.intel(n)
+		var kind: String = n.type
+		if lvl == 0:
+			kind = "hidden"
+		elif lvl == 1:
+			kind = "vague_" + MapGen.vague_kind(n)
+		_icon(kind, p, r, n.visited and n.id != run.current)
 		if n.id == run.current:
 			draw_arc(p, r + 6, 0, TAU, 40, Color("#e0bd4f"), 4.0)
 	# Column legend: west arrow.
@@ -136,7 +152,17 @@ func _icon(kind: String, p: Vector2, r: float, faded: bool) -> void:
 		"event":
 			draw_string(UI.font_head, p + Vector2(-7, 13) * s, "!", HORIZONTAL_ALIGNMENT_LEFT, -1, int(36 * s), ink)
 		"hidden":
-			draw_string(UI.font_head, p + Vector2(-10, 13) * s, "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(36 * s), ink)
+			draw_string(UI.font_head, p + Vector2(-10, 13) * s, "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(36 * s), Color(ink, 0.55))
+		"vague_danger":
+			draw_line(p + Vector2(-12, -12) * s, p + Vector2(12, 12) * s, Color(red, 0.3), 4 * s)
+			draw_line(p + Vector2(12, -12) * s, p + Vector2(-12, 12) * s, Color(red, 0.3), 4 * s)
+			draw_string(UI.font_head, p + Vector2(-10, 13) * s, "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(34 * s), red)
+		"vague_quiet":
+			draw_string(UI.font_head, p + Vector2(-10, 13) * s, "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(34 * s), Color("#4f7a33"))
+		"vague_cave":
+			draw_circle(p + Vector2(0, 6) * s, 16 * s, Color(ink, 0.4))
+			draw_rect(Rect2(p + Vector2(-16, 6) * s, Vector2(32, 10) * s), Color(ink, 0.4))
+			draw_string(UI.font_head, p + Vector2(-8, 10) * s, "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(26 * s), Color("#f3e9d2"))
 		"curio":
 			draw_rect(Rect2(p + Vector2(-15, -4) * s, Vector2(30, 18) * s), Color("#8a5a32") if not faded else Color("#8a5a32", 0.5))
 			draw_rect(Rect2(p + Vector2(-15, -14) * s, Vector2(30, 10) * s), Color("#6b4426") if not faded else Color("#6b4426", 0.5))
@@ -145,7 +171,11 @@ func _icon(kind: String, p: Vector2, r: float, faded: bool) -> void:
 			draw_circle(p + Vector2(0, 6) * s, 16 * s, ink)
 			draw_rect(Rect2(p + Vector2(-16, 6) * s, Vector2(32, 10) * s), ink)
 		"trading_post":
-			draw_string(UI.font_head, p + Vector2(-9, 12) * s, "$", HORIZONTAL_ALIGNMENT_LEFT, -1, int(32 * s), Color("#6b4f10"))
+			draw_circle(p, 15 * s, Color("#b8322a"))
+			for i in 6:
+				var a := i * TAU / 6.0
+				draw_line(p + Vector2(cos(a), sin(a)) * 9 * s, p + Vector2(cos(a), sin(a)) * 15 * s, Color("#f3e9d2"), 3 * s)
+			draw_circle(p, 7 * s, Color("#f3e9d2"))
 		"homestead":
 			draw_colored_polygon(PackedVector2Array([p + Vector2(-16, -2) * s, p + Vector2(0, -18) * s, p + Vector2(16, -2) * s]), red)
 			draw_rect(Rect2(p + Vector2(-12, -2) * s, Vector2(24, 18) * s), ink)

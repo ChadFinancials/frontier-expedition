@@ -12,6 +12,7 @@ var item_row: HFlowContainer
 var log_label: RichTextLabel
 var scroll := 0.0
 var travelling := false
+var wagon_bar: StatBar
 var _walk_t := 0.0
 
 
@@ -32,6 +33,10 @@ func setup(_params: Dictionary) -> void:
 	wagon.damaged = run.wagon < 40
 	add_child(wagon)
 	_make_walkers()
+	wagon_bar = UI.bar(run.wagon, DB.cfg("wagon_max", 100), Color("#d9a441"), 190, 18, true)
+	wagon_bar.position = Vector2(865, 180)
+	wagon_bar.tooltip_text = "Wagon condition. The trail wears it down a little every stop; events and some enemies damage it. Wagon Parts or a Wheelwright repair it. At 0 every stop adds Fatigue."
+	add_child(wagon_bar)
 	# HUD strip.
 	var hp := UI.panel("Dark")
 	hp.custom_minimum_size = Vector2(1920, 64)
@@ -49,6 +54,10 @@ func setup(_params: Dictionary) -> void:
 	map.custom_minimum_size = Vector2(1860, 390)
 	map.node_clicked.connect(_travel)
 	mp.add_child(map)
+	var legend := UI.rich("[color=#5e3f27]?[/color] unknown   [color=#a8392e]?[/color] signs of trouble   [color=#4f7a33]?[/color] looks quiet   Hover a stop for details.", 16, true, 700)
+	legend.position = Vector2(30, 818)
+	legend.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(legend)
 	# Bottom bar.
 	var bp := UI.panel("Dark")
 	bp.position = Vector2(0, 860)
@@ -105,11 +114,12 @@ func refresh() -> void:
 	var items := [["week", "Day %d" % run.day, "Days on the trail."],
 		["food", "Food %d" % int(run.supplies.get("food", 0)), "The party eats %d per stop." % run.food_need()],
 		["wagon", "Wagon %d" % run.wagon, "Wagon condition. At 0 every stop adds Fatigue until repaired."],
-		["money", "+$%d" % int(run.loot.money), "Money found this expedition."],
+		["money", "+%d" % int(run.loot.money), "Chips won this expedition."],
 		["timber", "+%d" % int(run.loot.timber), "Timber found."],
 		["iron", "+%d" % int(run.loot.iron), "Iron found."],
 		["charter", "+%d" % int(run.loot.charters), "Land Charters found."],
-		["xp", "%d XP" % run.xp, "Experience each survivor earns."]]
+		["xp", "%d XP" % run.xp, "Experience each survivor earns."],
+		["eye", "Scouting %d" % int(run.scout_score()), _scout_tip()]]
 	if not run.loot.keepsakes.is_empty():
 		items.append(["xp", "%d keepsake%s" % [run.loot.keepsakes.size(), "s" if run.loot.keepsakes.size() > 1 else ""], ", ".join(run.loot.keepsakes.map(func(k): return DB.keepsakes[k].name))])
 	for it in items:
@@ -143,6 +153,9 @@ func refresh() -> void:
 	log_label.text = "\n".join(lines)
 	map.queue_redraw()
 	wagon.damaged = run.wagon < 40
+	wagon_bar.value = run.wagon
+	wagon_bar.text_override = "Wagon %d/%d" % [run.wagon, DB.cfg("wagon_max", 100)]
+	wagon_bar.fill = Color("#d9a441") if run.wagon >= 40 else (Color("#c0392b") if run.wagon > 0 else Color("#555555"))
 
 
 func _process(delta: float) -> void:
@@ -153,6 +166,20 @@ func _process(delta: float) -> void:
 			w.position.y = 408 - absf(sin(_walk_t * 8 + i)) * 6
 		else:
 			w.position.y = 408
+
+
+func _scout_tip() -> String:
+	var lines := ["Scouting: how well the company sees the trail ahead.", "Each stop, nearby stops come into rough view; a higher score reveals exactly what they are."]
+	for h in run.party_heroes():
+		var v: float = h.stat("scout")
+		if v != 0:
+			lines.append("%s: %+d (quirks/keepsakes)" % [h.hero_name, int(v)])
+		for sid in h.survival:
+			if DB.survival[sid].get("passive", {}).get("type", "") == "scout":
+				lines.append("%s: Scout skill" % h.hero_name)
+			if sid == "tracker":
+				lines.append("%s: Tracker (reads who's waiting at fights)" % h.hero_name)
+	return "\n".join(lines)
 
 
 func _open_hero(h: Hero) -> void:
@@ -427,7 +454,7 @@ func show_trade() -> void:
 	var v := UI.vb(10)
 	p.add_child(v)
 	v.add_child(UI.hdr("Trading Post", 36, true))
-	v.add_child(UI.lbl("A lonely store at a crossroads. Prices are steep out here. Money found on this trip is spent first.", 18, "Ink"))
+	v.add_child(UI.lbl("A lonely store at a crossroads. Prices are steep out here. Chips won on this trip are spent first.", 18, "Ink"))
 	var holder := {"wrap": null}
 	var stock: Dictionary = run.current_node().data.get("stock", {})
 	var funds := UI.lbl("", 20, "InkBold")
@@ -436,14 +463,14 @@ func show_trade() -> void:
 	v.add_child(list)
 	var fn := {"rebuild": null}
 	fn.rebuild = func():
-		funds.text = "Funds: $%d (company) + $%d (found)" % [Game.company.money, int(run.loot.money)]
+		funds.text = "Chips: %d (company) + %d (this trip)" % [Game.company.money, int(run.loot.money)]
 		UI.clear(list)
 		for it in stock:
 			var row := UI.hb(10)
 			var nl := UI.lbl("%s (%d left)" % [DB.items[it].name, int(stock[it])], 19, "InkBold")
 			nl.custom_minimum_size.x = 300
 			row.add_child(nl)
-			row.add_child(UI.lbl("$%d" % run.trade_price(it), 19, "Ink"))
+			row.add_child(UI.lbl("%d chips" % run.trade_price(it), 19, "Ink"))
 			var item: String = it
 			var b := UI.btn("Buy", func():
 				if run.trade_buy(item):

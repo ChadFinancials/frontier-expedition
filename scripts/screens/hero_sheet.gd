@@ -129,7 +129,7 @@ func _build() -> void:
 		qflow.add_child(chip)
 		if not pos and doc_here:
 			var qq: String = q
-			var tb := UI.btn("Treat $%d" % co.doctor_cost(index, h), func():
+			var tb := UI.btn("Treat (%d chips)" % co.doctor_cost(index, h), func():
 				if co.treat_quirk(index, h, qq):
 					Audio.play("heal")
 					_changed(), "Small")
@@ -148,14 +148,18 @@ func _build() -> void:
 		row.add_child(kc)
 		var kk: String = k
 		row.add_child(UI.btn("Unequip", func():
-			co.unequip_keepsake(h, kk)
+			_unequip(kk)
 			_changed(), "Small"))
 		krow.add_child(row)
-	if h.keepsakes.size() < 2 and not co.stash.is_empty() and (index >= 0 or co.run == null):
-		var eq := UI.btn("Equip a keepsake (%d in stash)" % co.stash.size(), _pick_keepsake, "Small")
+	var pool := _pool()
+	if h.keepsakes.size() < 2 and not pool.is_empty():
+		var where := "found this trip" if _on_trail() else "in stash"
+		var eq := UI.btn("Equip a keepsake (%d %s)" % [pool.size(), where], _pick_keepsake, "Good")
 		krow.add_child(eq)
 	elif h.keepsakes.is_empty():
-		krow.add_child(UI.lbl("None. Find keepsakes on the trail or buy them at the General Store.", 16, "Ink"))
+		krow.add_child(UI.lbl("None. Keepsakes turn up on the trail, and the General Store sells a few.", 16, "Ink"))
+	if _on_trail() and not co.stash.is_empty():
+		krow.add_child(UI.lbl("(%d more keepsakes wait in the stash back in town.)" % co.stash.size(), 15, "Ink"))
 	right.add_child(UI.lbl("Expeditions: %d   Kills: %d" % [h.expeditions, h.kills], 17, "Ink"))
 	var brow := UI.hb(10)
 	right.add_child(brow)
@@ -204,7 +208,7 @@ func _skill_row(sid: String) -> Control:
 	if index >= 0 and co.building_level(index, "drill_hall") > 0 and h.skill_level(sid) < DB.cfg("max_skill_level", 4):
 		var nl := h.skill_level(sid) + 1
 		var why := co.can_upgrade_skill(index, h, sid)
-		var b := UI.btn("Train $%d" % co.skill_cost(index, nl), func():
+		var b := UI.btn("Train (%d chips)" % co.skill_cost(index, nl), func():
 			if co.upgrade_skill(index, h, sid):
 				Audio.play("buff")
 				_changed(), "Small")
@@ -214,15 +218,43 @@ func _skill_row(sid: String) -> Control:
 	return p
 
 
+func _on_trail() -> bool:
+	return index < 0 and Game.company.run != null
+
+
+## Keepsakes this hero can equip right now: the town stash, or finds from this trip.
+func _pool() -> Array:
+	return Game.company.run.loot.keepsakes.filter(func(k): return k != "") if _on_trail() else Game.company.stash
+
+
+func _equip(k: String) -> void:
+	if hero.keepsakes.size() >= 2:
+		return
+	if _on_trail():
+		Game.company.run.loot.keepsakes.erase(k)
+		hero.keepsakes.append(k)
+	else:
+		Game.company.equip_keepsake(hero, k)
+	Audio.play("badge")
+
+
+func _unequip(k: String) -> void:
+	if _on_trail():
+		hero.keepsakes.erase(k)
+		Game.company.run.loot.keepsakes.append(k)
+	else:
+		Game.company.unequip_keepsake(hero, k)
+
+
 func _pick_keepsake() -> void:
 	var co: Company = Game.company
 	var p := UI.panel()
 	p.custom_minimum_size = Vector2(620, 0)
 	var v := UI.vb(8)
 	p.add_child(v)
-	v.add_child(UI.hdr("Keepsake Stash", 28, true))
+	v.add_child(UI.hdr("Keepsakes Found This Trip" if _on_trail() else "Keepsake Stash", 28, true))
 	var holder := {"wrap": null}
-	for k in co.stash:
+	for k in _pool():
 		var row := UI.hb(10)
 		var l := UI.lbl(DB.keepsakes[k].name, 20, "InkBold")
 		l.custom_minimum_size.x = 260
@@ -230,7 +262,7 @@ func _pick_keepsake() -> void:
 		row.add_child(UI.lbl(", ".join(DB.keepsakes[k].get("mods", []).map(func(m): return Stats.mod_text(m))), 16, "Ink"))
 		var kk: String = k
 		row.add_child(UI.btn("Equip", func():
-			co.equip_keepsake(hero, kk)
+			_equip(kk)
 			Main.inst.close_modal(holder.wrap)
 			_changed(), "Small"))
 		v.add_child(row)

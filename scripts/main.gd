@@ -280,7 +280,7 @@ func help_panel() -> void:
 	holder.wrap = modal(p)
 
 
-const HELP_TEXT := """[b]The Company.[/b] You lead a pioneer company pushing west from Fort Providence. Each week you send up to four heroes on an [b]expedition[/b] along the trail into the region west of a settlement.
+const HELP_TEXT := """[b]The Company.[/b] Somewhere past the last mountain stands [b]the Great Casino[/b], a paradise city where fortunes are made, and whose chips are the currency of the whole frontier. You lead a pioneer company pushing west toward it from Fort Providence. Each week you send up to four heroes on an [b]expedition[/b] along the trail into the region west of a settlement.
 
 [b]The Trail.[/b] Pick a path across the map: fights, trail events, curiosities, camps, caves, trading posts and homesteads. Every stop eats [b]Food[/b] (2 for a full party). Run out and the company starves. Rough going damages the [b]Wagon[/b]; a broken wagon wears everyone down until repaired with Wagon Parts.
 
@@ -294,7 +294,7 @@ const HELP_TEXT := """[b]The Company.[/b] You lead a pioneer company pushing wes
 
 [b]Curios.[/b] Investigate odd finds by hand for a random result, or use the right supply (a crowbar on a strongbox, salt on something strange) for a sure reward. Some quirks make heroes grab things on their own.
 
-[b]Settlements.[/b] Heroes return at full health, but Fatigue and quirks come home with them. Build and upgrade buildings with Money, Timber and Iron. Beat a region's boss to found an Outpost on its ground; grow it into a Town and City with Land Charters. Use the Stage Line to move heroes between settlements: the oldest towns have the best facilities, but the trip takes weeks.
+[b]Settlements.[/b] Heroes return at full health, but Fatigue and quirks come home with them. Build and upgrade buildings with chips, Timber and Iron. Beat a region's boss to found an Outpost on its ground; grow it into a Town and City with Land Charters. Use the Stage Line to move heroes between settlements: the oldest towns have the best facilities, but the trip takes weeks.
 
 [b]Permadeath.[/b] Fallen heroes are gone for good. New hands arrive at the Hiring Board every week.
 

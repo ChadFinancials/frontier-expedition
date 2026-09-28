@@ -9,6 +9,6 @@
     "desc": "Where Silas Crane used to charge a toll to cross. Now it's your crossing, and the canyons rise red to the west."},
   "cloudbreak": {"index": 2, "name": "Cloudbreak", "region_west": "thunder_peaks", "founded_at": "red_canyons",
     "desc": "Built in the shadow of Deadeye Mesa, where the Cyclops kept its flock. The mountains beyond are full of thunder."},
-  "sundown_landing": {"index": 3, "name": "Sundown Landing", "region_west": "", "founded_at": "thunder_peaks", "victory": true,
-    "desc": "Past the Titan's pass the land slopes down to the Sundown Sea. The trail ends here. A new life begins."}
+  "sundown_landing": {"index": 3, "name": "The Great Casino", "region_west": "", "founded_at": "thunder_peaks", "victory": true,
+    "desc": "Past the Titan's pass, lights blaze in the valley: the Great Casino, the paradise city at the end of the trail, where every chip on the frontier was minted and every fortune is waiting to be won."}
 }

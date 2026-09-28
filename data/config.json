@@ -27,7 +27,9 @@
   "skill_level_dot_pct": 15,
 
   "enemy_hp_mult": 1.0,
-  "enemy_dmg_mult": 1.0,
+  "enemy_dmg_mult": 0.9,
+  "hero_dmg_mult": 0.9,
+  "heal_mult": 0.8,
   "tier_hp_pct": 20,
   "tier_dmg_pct": 12,
   "tier_acc": 3,
@@ -92,11 +94,11 @@
   "xp_boss": 6,
   "xp_elite": 2,
 
-  "enemy_money": [8, 20],
+  "enemy_money": [5, 12],
   "elite_timber": [2, 5],
   "elite_iron": [1, 3],
   "elite_keepsake_chance": 35,
-  "boss_money": 400,
+  "boss_money": 250,
 
   "tiers": [
     {"id": "outpost", "name": "Outpost", "slots": 3, "max_level": 1},
@@ -117,6 +119,30 @@
   "doctor_quirk_cost_per_level": 50,
   "doctor_breaking_cost": 200,
 
+  "wagon_wear": [2, 5],
+  "mishap_chance": 18,
+  "mishaps": [
+    {"weight": 3, "text": "Rats got into the flour barrel overnight.", "effects": [{"type": "food", "amount": -4}],
+      "prevent": {"skill": "cook"}, "saved": "Rats sniffed around the food, but {hero} keeps it sealed tight."},
+    {"weight": 3, "text": "A wheel hits a hidden rock and cracks.", "effects": [{"type": "wagon", "amount": -14}],
+      "item": "wagon_parts", "used_item": "A wheel cracks on a rock. You swap in spare {item}.",
+      "prevent": {"skill": "wheelwright"}, "saved": "{hero} spots the loose wheel before it gives out."},
+    {"weight": 2, "text": "Bad water: {hero} comes down sick.", "effects": [{"type": "damage_pct", "value": 15, "target": "actor"}, {"type": "fatigue", "amount": 8, "target": "actor"}],
+      "item": "bandages", "used_item": "Bad water makes someone sick; {item} and rest get them through it.",
+      "prevent": {"skill": "medic"}, "saved": "{hero} boils the water before anyone drinks it."},
+    {"weight": 2, "text": "A rattlesnake in the supply crate bites {hero}!", "effects": [{"type": "damage_pct", "value": 20, "target": "actor"}],
+      "item": "antivenom", "used_item": "A rattlesnake bites someone in the supply crate. {item} saves the day.",
+      "prevent": {"skill": "trapper"}, "saved": "{hero} pins a rattlesnake in the supply crate and tosses it out."},
+    {"weight": 2, "text": "The trail vanishes in the dusk and the company wanders for hours.", "effects": [{"type": "fatigue", "amount": 5, "target": "party"}, {"type": "food", "amount": -2}],
+      "prevent": {"skill": "tracker"}, "saved": "The trail fades at dusk, but {hero} never loses it."},
+    {"weight": 2, "text": "An ox goes lame and the wagon crawls.", "effects": [{"type": "wagon", "amount": -8}, {"type": "fatigue", "amount": 3, "target": "party"}],
+      "prevent": {"class": "wrangler"}, "saved": "An ox starts limping; {hero} knows exactly how to treat the hoof."},
+    {"weight": 1, "text": "Spoilage: the salt pork has turned.", "effects": [{"type": "food", "amount": -3}],
+      "item": "salt", "used_item": "The meat starts to turn, but a sack of {item} cures it."},
+    {"weight": 1, "text": "A jar of lamp oil cracks in the heat.", "effects": [{"type": "item_loss", "item": "lamp_oil", "amount": 1}]},
+    {"weight": 1, "text": "Coyotes howl all night. Nobody sleeps.", "effects": [{"type": "fatigue", "amount": 4, "target": "party"}],
+      "item": "whiskey", "used_item": "Coyotes howl all night; a shared bottle of {item} helps everyone sleep."}
+  ],
   "wagon_max": 100,
   "wagon_capacity": 40
 }

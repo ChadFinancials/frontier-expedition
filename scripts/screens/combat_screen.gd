@@ -469,8 +469,49 @@ func _update_preview() -> void:
 
 # --- Event playback -------------------------------------------------------------------
 
+const PACE := 1.3
+
+
 func _wait(sec: float) -> void:
-	await get_tree().create_timer(sec / speed).timeout
+	await get_tree().create_timer(sec * PACE / speed).timeout
+
+
+## A curved arrow from the actor to a target that fades away.
+func _arrow(from: UnitView, to: UnitView, hostile: bool) -> void:
+	var arr := _Arrow.new()
+	arr.a = from.position + Vector2(0, from.top_local() * 0.6)
+	arr.b = to.position + Vector2(0, to.top_local() * 0.6)
+	arr.color = Color("#e05a4a") if hostile else Color("#7ee07a")
+	arr.z_index = 32
+	add_child(arr)
+	var tw := create_tween()
+	tw.tween_property(arr, "t", 1.0, 0.3 * PACE / speed)
+	tw.tween_interval(0.4 * PACE / speed)
+	tw.tween_property(arr, "modulate:a", 0.0, 0.3)
+	tw.tween_callback(arr.queue_free)
+
+
+## The target flinches away from the blow.
+func _flinch(c: Combatant, strong: bool) -> void:
+	if c == null or not views.has(c.id):
+		return
+	var f: Figure = views[c.id].figure
+	var away := -1.0 if c.is_hero() else 1.0
+	var tw := create_tween()
+	tw.tween_property(f, "position:x", away * (38.0 if strong else 20.0), 0.07)
+	tw.tween_property(f, "position:x", 0.0, 0.25 / speed).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+
+## A puff of dust or a shower of sparkles at a unit's feet.
+func _burst(c: Combatant, color: Color, rising: bool) -> void:
+	if c == null or not views.has(c.id):
+		return
+	var b := _Burst.new()
+	b.position = views[c.id].position + Vector2(0, -10 if not rising else -80)
+	b.color = color
+	b.rising = rising
+	b.z_index = 31
+	add_child(b)
 
 
 func _play(events: Array) -> void:
@@ -542,6 +583,8 @@ func _result(e: Dictionary) -> void:
 			if e.amount > 0:
 				_popup(t, ("CRIT! " if e.crit else "") + str(e.amount) + (" " + e.note if e.note != "" else ""), Color("#ffe08a") if e.crit else Color("#ffffff"), 40 if e.crit else 32)
 				_flash(t, Color(1, 0.3, 0.2))
+				_flinch(t, e.crit)
+				_burst(t, Color("#c9b48a"), false)
 				if views.has(t.id):
 					views[t.id].figure.set_pose("hurt")
 				Audio.play("hit", 0.8)
@@ -553,7 +596,8 @@ func _result(e: Dictionary) -> void:
 		"miss":
 			var t2 := engine.unit(e.target)
 			if t2 != null:
-				_popup(t2, "Miss", Color("#bbbbbb"), 28)
+				_popup(t2, "Miss" if t2.hero == null else "Dodged!", Color("#bbbbbb"), 28)
+				_flinch(t2, false)
 				Audio.play("whoosh", 0.7)
 				_log("%s misses %s." % [engine.unit(e.actor).display_name if engine.unit(e.actor) else "?", t2.display_name])
 		"heal":
@@ -561,6 +605,7 @@ func _result(e: Dictionary) -> void:
 			if t3 != null and e.amount > 0:
 				_popup(t3, "+%d" % e.amount, Color("#7ee07a"), 32)
 				_flash(t3, Color(0.4, 1, 0.4))
+				_burst(t3, Color("#b9f5a0"), true)
 				_log("%s heals %d." % [t3.display_name, e.amount])
 		"status":
 			var t4 := engine.unit(e.target)
@@ -650,6 +695,11 @@ func _result(e: Dictionary) -> void:
 			_log("The lamp flares brighter.")
 		"retreat":
 			_log("[b]The company retreats![/b]")
+		"crit_relief":
+			var ca := engine.unit(e.actor)
+			if ca != null:
+				_popup(ca, "Critical hit! Spirits lift", Color("#e8dcff"), 22, 110)
+				_log("[color=#c9a8ff]%s's critical hit lifts the company's spirits: Fatigue drops.[/color]" % ca.display_name)
 		"swap", "pass":
 			var c5 := engine.unit(e.actor)
 			if c5 != null and e.t == "pass":
@@ -677,6 +727,22 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 		if views.has(tid) and tid != a.id:
 			targets.append(views[tid])
 	_log("[color=#e0bd4f]%s[/color] uses [b]%s[/b]." % [a.display_name, sk.get("name", e.skill)])
+	# Telegraph: who is acting, on whom, before anything moves.
+	var tnames: Array = []
+	for v in targets:
+		tnames.append(v.unit.display_name)
+	var who := a.display_name
+	if not tnames.is_empty():
+		who += "  →  " + (", ".join(tnames) if tnames.size() <= 2 else "%d targets" % tnames.size())
+	_banner_skill(sk.get("name", ""), a.is_hero(), who)
+	av.set_glow("active")
+	for v in targets:
+		v.set_glow("enemy" if e.hostile else "ally")
+		_arrow(av, v, e.hostile)
+	await _wait(0.45)
+	for v in [av] + targets:
+		if is_instance_valid(v):
+			v.set_glow("")
 	# Dim and bring the actors forward.
 	var focus: Array = [av] + targets
 	for v in focus:
@@ -706,7 +772,6 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 	tw.tween_property(av, "position", a_to, 0.2 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	for v in focus:
 		tw.tween_property(v, "scale", big, 0.2 / speed)
-	_banner_skill(sk.get("name", ""), a.is_hero())
 	await tw.finished
 	# Pose and sound.
 	match anim:
@@ -729,7 +794,7 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 	await _wait(0.12)
 	for g in group:
 		_result(g)
-	await _wait(0.75)
+	await _wait(1.0)
 	# Step back.
 	av.figure.set_pose("idle")
 	for v in targets:
@@ -816,7 +881,20 @@ func _banner_async(text: String, bad: bool) -> void:
 	tw.tween_callback(l.queue_free)
 
 
-func _banner_skill(text: String, hero: bool) -> void:
+func _banner_skill(text: String, hero: bool, sub: String = "") -> void:
+	if sub != "":
+		var sl := UI.lbl(sub, 24, "Bold")
+		sl.position = Vector2(0, 148)
+		sl.size = Vector2(1920, 34)
+		sl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		sl.add_theme_constant_override("outline_size", 6)
+		sl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+		sl.z_index = 40
+		add_child(sl)
+		var tw0 := create_tween()
+		tw0.tween_interval(1.5 * PACE / speed)
+		tw0.tween_property(sl, "modulate:a", 0.0, 0.3)
+		tw0.tween_callback(sl.queue_free)
 	var l := UI.hdr(text, 40)
 	l.add_theme_color_override("font_color", Color("#f1d38a") if hero else Color("#f0a080"))
 	l.position = Vector2(0, 90)
@@ -825,7 +903,7 @@ func _banner_skill(text: String, hero: bool) -> void:
 	l.z_index = 40
 	add_child(l)
 	var tw := create_tween()
-	tw.tween_interval(0.9 / speed)
+	tw.tween_interval(1.5 * PACE / speed)
 	tw.tween_property(l, "modulate:a", 0.0, 0.3)
 	tw.tween_callback(l.queue_free)
 
@@ -850,7 +928,7 @@ func _finish() -> void:
 	var lines: Array = []
 	if state == "victory":
 		if int(res.money) > 0:
-			lines.append("+$%d" % res.money)
+			lines.append("+%d chips" % res.money)
 		if int(res.timber) > 0:
 			lines.append("+%d Timber" % res.timber)
 		if int(res.iron) > 0:
@@ -859,7 +937,7 @@ func _finish() -> void:
 			lines.append("+%d Land Charter%s!" % [res.charters, "s" if res.charters > 1 else ""])
 		for k in res.keepsakes:
 			if k != "":
-				lines.append("Keepsake: %s" % DB.keepsakes[k].name)
+				lines.append("Keepsake: %s  (click a hero's card on the trail to equip it)" % DB.keepsakes[k].name)
 	lines.append_array(res.msgs)
 	var ret: String = params.get("return", "trail")
 	if run.party_heroes().is_empty():
@@ -884,3 +962,54 @@ class _Spark extends Node2D:
 	func _draw() -> void:
 		draw_circle(Vector2.ZERO, 10, Color(1, 0.8, 0.3, 0.5))
 		draw_circle(Vector2.ZERO, 5, Color(1, 1, 0.8))
+
+
+class _Arrow extends Node2D:
+	var a := Vector2.ZERO
+	var b := Vector2.ZERO
+	var color := Color.RED
+	var t := 0.0:
+		set(v):
+			t = v
+			queue_redraw()
+
+	func _draw() -> void:
+		var mid := (a + b) / 2.0 + Vector2(0, -90 - absf(b.x - a.x) * 0.08)
+		var pts := PackedVector2Array()
+		var n := 24
+		for i in n + 1:
+			var f := t * i / float(n)
+			pts.append(a.lerp(mid, f).lerp(mid.lerp(b, f), f))
+		if pts.size() < 2:
+			return
+		draw_polyline(pts, Color(0, 0, 0, 0.5), 9.0, true)
+		draw_polyline(pts, color, 5.0, true)
+		var tip := pts[pts.size() - 1]
+		var dir := (tip - pts[pts.size() - 2]).normalized()
+		var n2 := dir.orthogonal()
+		draw_colored_polygon(PackedVector2Array([tip + dir * 16, tip - dir * 8 + n2 * 11, tip - dir * 8 - n2 * 11]), color)
+
+
+class _Burst extends Node2D:
+	var color := Color.WHITE
+	var rising := false
+	var life := 0.0
+	var parts: Array = []
+
+	func _ready() -> void:
+		for i in 10:
+			parts.append({"p": Vector2(randf_range(-30, 30), randf_range(-6, 6)), "v": Vector2(randf_range(-60, 60), randf_range(-140, -40) if rising else randf_range(-50, -10)), "r": randf_range(4, 10)})
+
+	func _process(delta: float) -> void:
+		life += delta
+		for q in parts:
+			q.p += q.v * delta
+			q.v *= 0.94
+		queue_redraw()
+		if life > 0.8:
+			queue_free()
+
+	func _draw() -> void:
+		var a := clampf(1.0 - life / 0.8, 0.0, 1.0)
+		for q in parts:
+			draw_circle(q.p, q.r * (0.6 + life), Color(color.r, color.g, color.b, a * 0.8))

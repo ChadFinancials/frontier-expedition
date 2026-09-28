@@ -96,7 +96,8 @@ func stat(s: String, ctx: Dictionary = {}) -> float:
 
 func dmg_range() -> Array:
 	var d: Array = cls().get("dmg", [4, 8])
-	return [int(d[0]), int(d[1])]
+	var m: float = DB.cfg("hero_dmg_mult", 1.0)
+	return [maxi(1, int(round(d[0] * m))), maxi(1, int(round(d[1] * m)))]
 
 
 func skill_level(sid: String) -> int:

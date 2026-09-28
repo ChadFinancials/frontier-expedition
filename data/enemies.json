@@ -34,7 +34,7 @@
   "buffalo_bull": {"name": "Buffalo Bull", "tags": ["beast"], "hp": 38, "dodge": 0, "prot": 20, "speed": 2, "acc": 0, "crit": 5, "dmg": [6, 10],
     "res": {"stun": 60, "bleed": 30, "poison": 40, "move": 80, "debuff": 35}, "skills": ["e_bull_charge", "e_bull_stomp"], "elite": true,
     "look": {"body": "bull", "scale": 1.35, "colors": {"fur": "#4a3527", "belly": "#6b4d38", "eye": "#1a1a1a"}}},
-  "silas_crane": {"name": "Silas Crane", "title": "Boss of the Tallgrass", "tags": ["outlaw", "human"], "hp": 165, "dodge": 15, "prot": 20, "speed": 7, "acc": 8, "crit": 10, "dmg": [8, 13],
+  "silas_crane": {"name": "Silas Crane", "title": "Boss of the Tallgrass", "tags": ["outlaw", "human"], "hp": 130, "dodge": 12, "prot": 15, "speed": 7, "acc": 6, "crit": 8, "dmg": [7, 11],
     "res": {"stun": 60, "bleed": 40, "poison": 40, "move": 70, "debuff": 45}, "skills": ["e_crane_fan", "e_crane_dead_aim", "e_crane_call", "e_crane_threat"], "boss": true,
     "look": {"body": "human", "build": "broad", "hat": "stetson_black", "coat": "long", "weapon": "pistols", "extra": "mustache", "scale": 1.15,
       "colors": {"coat": "#1f1a1d", "pants": "#26211f", "hat": "#0f0d0c", "accent": "#b8322a"}}},

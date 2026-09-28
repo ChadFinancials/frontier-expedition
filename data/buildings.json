@@ -9,8 +9,8 @@
       {"id": "bar", "name": "Belly Up to the Bar", "cost": [150, 150, 150], "relief": [45, 60, 80],
         "side_effects": [{"chance": 12, "type": "quirk", "quirk": "drinker", "text": "%s develops a taste for rotgut."}]},
       {"id": "cards", "name": "Card Table", "cost": [100, 100, 100], "relief": [35, 50, 65],
-        "side_effects": [{"chance": 20, "type": "money", "amount": -120, "text": "%s loses their shirt at faro. (-$120)"},
-                         {"chance": 12, "type": "money", "amount": 180, "text": "%s cleans out the table! (+$180)"}]}
+        "side_effects": [{"chance": 20, "type": "money", "amount": -120, "text": "%s loses their shirt at faro. (-120 chips)"},
+                         {"chance": 12, "type": "money", "amount": 180, "text": "%s cleans out the table! (+180 chips)"}]}
     ]},
   "chapel": {"name": "Chapel", "art": "chapel", "order": 2,
     "desc": "A whitewashed church with a crooked steeple. A quieter kind of rest.",

@@ -179,7 +179,7 @@ func pay(cost: Dictionary) -> bool:
 static func cost_text(cost: Dictionary) -> String:
 	var parts: Array = []
 	if int(cost.get("money", 0)) > 0:
-		parts.append("$%d" % int(cost.money))
+		parts.append("%d chips" % int(cost.money))
 	if int(cost.get("timber", 0)) > 0:
 		parts.append("%d Timber" % int(cost.timber))
 	if int(cost.get("iron", 0)) > 0:
@@ -607,7 +607,7 @@ func advance_week() -> Array:
 	week += 1
 	var floor_money: int = DB.cfg("grubstake_floor", 150)
 	if money < floor_money:
-		msgs.append("Fort Providence's merchants stake the company $%d." % (floor_money - money))
+		msgs.append("A Casino agent stakes the company %d chips. (\"The house always wants you back at the table.\")" % (floor_money - money))
 		money = floor_money
 	for h in heroes:
 		if h.busy_weeks > 0:

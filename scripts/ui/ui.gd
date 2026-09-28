@@ -255,7 +255,7 @@ static func stat_color(good: bool) -> String:
 
 
 static func money_text(v: int) -> String:
-	return "$%d" % v
+	return "%d chips" % v
 
 
 ## Text block describing a skill for tooltips.

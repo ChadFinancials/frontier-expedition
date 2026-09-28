@@ -20,13 +20,13 @@
       {"id": "wild_herbs", "name": "Wild Herb Poultice", "hours": 2, "target": "ally", "desc": "Heals one hero.", "effects": [{"type": "heal_pct", "base": 20, "per_rank": 8}]}
     ]},
   "scout": {"name": "Scout", "desc": "Rides ahead and comes back with news.",
-    "passive": {"type": "scout", "base": 1, "per_rank": 0, "text": "Reveals the next column of the trail"},
+    "passive": {"type": "scout", "base": 35, "per_rank": 15, "text": "Much better odds of seeing what lies ahead on the map"},
     "actions": [
       {"id": "scout_ahead", "name": "Scout Ahead", "hours": 2, "target": "self", "desc": "Reveals the next stretches of trail.", "effects": [{"type": "reveal", "base": 2, "per_rank": 1}]},
       {"id": "night_watch", "name": "Night Watch", "hours": 2, "target": "self", "desc": "No ambush tonight; better odds of surprising the next enemies.", "effects": [{"type": "no_ambush"}, {"type": "next_fight_buff", "stat": "surprise", "base": 15, "per_rank": 10}]}
     ]},
   "tracker": {"name": "Tracker", "desc": "Reads bent grass and broken twigs like a printed page.",
-    "passive": {"type": "surprise", "base": 8, "per_rank": 4, "text": "Party is harder to surprise and surprises enemies more often"},
+    "passive": {"type": "surprise", "base": 8, "per_rank": 4, "text": "Harder to surprise, surprises enemies more often, and reads who's waiting at spotted fights"},
     "actions": [
       {"id": "read_sign", "name": "Read the Sign", "hours": 2, "target": "party", "desc": "Party gains Damage for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "dmg_pct", "base": 8, "per_rank": 4}]},
       {"id": "cover_tracks", "name": "Cover Tracks", "hours": 3, "target": "party", "desc": "No ambush tonight, and the party rests easier.", "effects": [{"type": "no_ambush"}, {"type": "fatigue", "base": -5, "per_rank": -3}]}

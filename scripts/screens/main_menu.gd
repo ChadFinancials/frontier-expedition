@@ -28,7 +28,7 @@ func setup(_params: Dictionary) -> void:
 	title.add_theme_color_override("font_color", Color("#fbe9c4"))
 	title.add_theme_constant_override("shadow_offset_y", 5)
 	add_child(title)
-	var sub := UI.lbl("A caravan-crawler on the westward trail", 30, "Bold")
+	var sub := UI.lbl("All bets are west: a caravan-crawler on the road to the Great Casino", 30, "Bold")
 	sub.position = Vector2(0, 250)
 	sub.size = Vector2(1920, 40)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

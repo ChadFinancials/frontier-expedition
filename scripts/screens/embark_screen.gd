@@ -212,7 +212,7 @@ func _refresh_supplies() -> void:
 		nl.mouse_filter = Control.MOUSE_FILTER_STOP
 		row.add_child(nl)
 		var price := co.item_price(index, it)
-		row.add_child(UI.lbl("$%d" % price, 17, "Ink"))
+		row.add_child(UI.lbl("%d" % price, 17, "Ink"))
 		var n := int(supplies.get(it, 0))
 		var step := 4 if it == "food" else 1
 		var item: String = it
@@ -230,7 +230,7 @@ func _refresh_supplies() -> void:
 	var cost := co.supply_cost(index, supplies)
 	var food := int(supplies.get("food", 0))
 	supply_box.add_child(UI.lbl("Food lasts about %d stops for this party (a trail is 8 stops plus camp meals)." % int(food / maxf(1.0, ceil(2.0 * party.size() / 4.0))), 17, "Ink"))
-	total_label.text = "Supplies: $%d   (you have $%d)" % [cost, co.money]
+	total_label.text = "Supplies: %d chips   (you have %d)" % [cost, co.money]
 	var why := co.can_embark(index, party, supplies)
 	warn_label.text = why
 	if why == "" and party.size() < 4:

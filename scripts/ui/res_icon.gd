@@ -18,9 +18,14 @@ func _draw() -> void:
 	var c := Vector2(s / 2, s / 2)
 	match kind:
 		"money":
-			draw_circle(c, s * 0.42, Color("#8a6d1f"))
-			draw_circle(c, s * 0.34, Color("#e0bd4f"))
-			draw_string(UI.font_bold, c + Vector2(-s * 0.16, s * 0.2), "$", HORIZONTAL_ALIGNMENT_LEFT, -1, int(s * 0.55), Color("#6b4f10"))
+			# A poker chip: red rim with white notches, cream center.
+			draw_circle(c, s * 0.45, Color("#6b1a14"))
+			draw_circle(c, s * 0.42, Color("#b8322a"))
+			for i in 6:
+				var a := i * TAU / 6.0
+				draw_line(c + Vector2(cos(a), sin(a)) * s * 0.28, c + Vector2(cos(a), sin(a)) * s * 0.42, Color("#f3e9d2"), s * 0.1)
+			draw_circle(c, s * 0.24, Color("#f3e9d2"))
+			draw_circle(c, s * 0.16, Color("#b8322a"))
 		"timber":
 			for i in 3:
 				var y := s * (0.3 + i * 0.2)
@@ -47,6 +52,10 @@ func _draw() -> void:
 			draw_circle(Vector2(s * 0.72, s * 0.78), s * 0.12, Color("#3a2618"))
 		"xp":
 			draw_colored_polygon(PackedVector2Array(Figure.star_pts(c, s * 0.45, s * 0.2, 5)), Color("#e0bd4f"))
+		"eye":
+			draw_colored_polygon(PackedVector2Array(Figure.ellipse(c, s * 0.45, s * 0.26, 16)), Color("#efe3c8"))
+			draw_circle(c, s * 0.18, Color("#3f6f96"))
+			draw_circle(c, s * 0.08, Color("#1a1210"))
 		"skull":
 			draw_circle(Vector2(s * 0.5, s * 0.42), s * 0.3, Color("#e9e2cf"))
 			draw_rect(Rect2(s * 0.34, s * 0.6, s * 0.32, s * 0.2), Color("#e9e2cf"))

@@ -24,7 +24,7 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 		var col: Array = []
 		for l in count:
 			var n := {"id": nodes.size(), "col": c, "lane": l, "y": (l + 0.5) / float(count),
-				"type": "", "hidden": false, "next": [], "visited": false, "done": false, "data": {}}
+				"type": "", "intel": 0, "decoy": false, "next": [], "visited": false, "done": false, "data": {}}
 			nodes.append(n)
 			col.append(n)
 		columns.append(col)
@@ -67,12 +67,34 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 		for n in cur:
 			n.next.sort()
 
-	# Content.
+	# Content, and how much the company can see of it from the start. Landmarks (camps,
+	# the boss) are visible from afar; everything else must be scouted. Some fights look
+	# quiet from a distance until someone gets a proper look.
 	for n in nodes:
 		_fill(n, region, rng, used_events)
-		if n.type in ["fight", "event", "curio", "homestead"] and n.col >= 2 and rng.randf() < 0.3:
-			n.hidden = true
+		if n.type in ["start"]:
+			n.intel = 3
+		elif n.type in ["camp", "boss", "crossing"]:
+			n.intel = 2
+		if n.type == "fight" and rng.randf() < 0.15:
+			n.decoy = true
 	return nodes
+
+
+## 0 unknown, 1 rough idea (trouble / quiet / cave), 2 known type, 3 known details.
+static func intel(n: Dictionary) -> int:
+	if n.has("intel"):
+		return int(n.intel)
+	return 0 if n.get("hidden", false) else 2
+
+
+## What a rough look (intel 1) suggests: "danger", "quiet" or "cave".
+static func vague_kind(n: Dictionary) -> String:
+	if n.type == "cave":
+		return "cave"
+	if n.type in ["fight", "elite", "boss", "crossing"] and not n.get("decoy", false):
+		return "danger"
+	return "quiet"
 
 
 static func _closest(col: Array, y: float) -> Dictionary:
