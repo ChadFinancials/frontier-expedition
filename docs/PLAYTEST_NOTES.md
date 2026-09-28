@@ -153,3 +153,34 @@
   Trading posts mark up 2.2x; peddler prices up; new Trinket Peddler event.
 - Inventory: the wagon has 12 slots; items stack (Food 12, Bandages 6...). Embark is a store
   plus a wagon grid; the trail shows the wagon grid (click a slot to use it).
+
+## Round 3 (not started: waiting on the art-direction discussion)
+
+### Story & setup
+- [ ] Enemies may keep nicknames when they're uniques or bosses (heroes stay single-name).
+- [ ] Skipping the tutorial should start in town with exactly the post-tutorial setup.
+- [ ] Don't auto-add the Preacher and Sharpshooter after the tutorial. Put one on the hiring
+      board, and make the other a mysterious party member rescued in Dry Gulch Mine.
+- [ ] Starting company size cap is 5, not 24.
+
+### Store & supplies
+- [ ] Curio tools (rope, shovel, crowbar, etc.) can't be bought until the General Store is
+      built and upgraded.
+- [ ] Until then, the wagon starts pre-packed with food, bandages and a little wagon parts.
+      More must be found or bought.
+
+### Balance
+- [ ] Sermon on the Trail is too strong: halve its Fatigue relief and Accuracy buff.
+- [ ] Sharpshooter damage feels very strong early.
+- [ ] Question: does the Sermon's +5 Accuracy carry into the next fight? (Answer: no; see
+      the reply. Consider showing buff durations on units.)
+
+### Side adventures & camp
+- [ ] Maybe side adventures have no campsite (a one-day trip). This leaves room for camp
+      skills to grow and fits scarce early resources. Undecided.
+- [ ] Scout Ahead at the campsite right before the boss is useless: nothing left to scout.
+
+### Art direction (to explore first)
+- [ ] The drawn-polygon look lacks wow factor. Explore AI image generation (ComfyUI or
+      similar) with consistent style prompting for characters, backgrounds, buildings and
+      items. Keep the storybook / paper-cutout / papier-mâché feel.
