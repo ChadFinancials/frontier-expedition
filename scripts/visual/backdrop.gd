@@ -13,10 +13,13 @@ var ground_y: float = 770.0
 var light: float = 1.0          # cave lamplight 0..1
 var night: float = 0.0          # 0 day .. 1 night (camp)
 var seed_value: int = 1
+var paper: bool = false         # paper-theater look: layered paper sheets with the paper shader
 
 var _pal: Dictionary = {}
 var _layers: Array = []         # {factor, color, pts (for width 2W), props}
 var _t: float = 0.0
+var _paper_nodes: Array = []    # layer painters when paper is on
+var _grass_country := false
 
 
 func setup(region: String, m: String = "trail", s: int = 1) -> void:
@@ -31,6 +34,8 @@ func setup(region: String, m: String = "trail", s: int = 1) -> void:
 		_pal = {"sky_top": Color("#3d5a80"), "sky_bottom": Color("#f6bd60"), "sun": Color("#fff1c1"), "far": Color("#8d7b68"),
 			"mid": Color("#a98f5f"), "near": Color("#6b7d3c"), "ground": Color("#4f5d2f"), "accent": Color("#d4a24c")}
 	_build_layers(r.get("props", ["grass"]))
+	if paper and mode != "cave":
+		_build_paper()
 	queue_redraw()
 
 
@@ -43,6 +48,8 @@ func _process(delta: float) -> void:
 func set_scroll(v: float) -> void:
 	scroll = v
 	queue_redraw()
+	for n in _paper_nodes:
+		n.queue_redraw()
 
 
 func pal(k: String) -> Color:
@@ -114,30 +121,119 @@ func _draw() -> void:
 		"cave":
 			_draw_cave()
 			return
+	if paper:
+		return
 	_draw_sky()
-	for L in _layers:
-		var off := fposmod(scroll * L.factor, W * 2.0)
-		for rep in [-1, 0, 1]:
-			var shift: float = -off + rep * W * 2.0
-			if shift > W or shift < -W * 2.0 - 10:
+	for i in _layers.size():
+		_draw_layer(self, i, false)
+	_draw_ground(self, false)
+	if night > 0:
+		draw_rect(Rect2(0, 0, W, H), Color(0.05, 0.07, 0.15, night * 0.35))
+
+
+## One scenery layer onto canvas item ci. With edge, the ridge gets a cut-paper rim.
+func _draw_layer(ci: CanvasItem, i: int, edge: bool) -> void:
+	var L: Dictionary = _layers[i]
+	var off := fposmod(scroll * L.factor, W * 2.0)
+	for rep in [-1, 0, 1]:
+		var shift: float = -off + rep * W * 2.0
+		if shift > W or shift < -W * 2.0 - 10:
+			continue
+		var moved := PackedVector2Array()
+		for p in L.pts:
+			moved.append(p + Vector2(shift, 0))
+		var c: Color = L.color
+		if night > 0:
+			c = c.lerp(Color("#101522"), night * 0.6)
+		if edge:
+			var rim := moved.slice(1, moved.size() - 1)
+			ci.draw_polyline(rim, Figure.PAPER.darkened(0.04), 7.0, true)
+		ci.draw_colored_polygon(moved, c)
+		if edge:
+			_paper_detail(ci, i, moved, c, shift)
+		for pr in L.props:
+			var px: float = pr.x + shift
+			if px > -200 and px < W + 200:
+				_draw_prop(ci, pr.kind, Vector2(px, pr.y), pr.s, c.darkened(0.12))
+
+
+## Craft on a paper hill: a shaded band under the cut edge, pencil strokes across the
+## sheet, and little cut-paper grass tufts along the ridge.
+func _paper_detail(ci: CanvasItem, i: int, pts: PackedVector2Array, c: Color, shift: float) -> void:
+	var rim := pts.slice(1, pts.size() - 1)
+	var band := PackedVector2Array()
+	for p in rim:
+		band.append(p + Vector2(0, 16 + i * 4))
+	ci.draw_polyline(band, Color(c.darkened(0.18), 0.45), 20.0 + i * 6, true)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value * 31 + i
+	var depth := float(i + 1) / _layers.size()
+	for k in int(90 * depth + 30):
+		var x := rng.randf() * W * 2.0 + shift
+		var top := _ridge_y(rim, x)
+		if x < -60 or x > W + 60 or top >= ground_y:
+			rng.randf()
+			rng.randf()
+			continue
+		var y := top + 26 + rng.randf() * (ground_y - top) * 0.9
+		var ln := rng.randf_range(8, 26) * (0.6 + depth)
+		ci.draw_line(Vector2(x, y), Vector2(x + ln, y - ln * 0.18), Color(c.darkened(0.3), 0.28), 1.4, true)
+	# Tall grass country: whole meadows of cut-paper blades in two tones.
+	if _grass_country:
+		for k in int(900 * depth):
+			var gx := rng.randf() * W * 2.0 + shift
+			if gx < -40 or gx > W + 40:
+				rng.randf()
+				rng.randf()
 				continue
-			var moved := PackedVector2Array()
-			for p in L.pts:
-				moved.append(p + Vector2(shift, 0))
-			var c: Color = L.color
-			if night > 0:
-				c = c.lerp(Color("#101522"), night * 0.6)
-			draw_colored_polygon(moved, c)
-			for pr in L.props:
-				var px: float = pr.x + shift
-				if px > -200 and px < W + 200:
-					_draw_prop(pr.kind, Vector2(px, pr.y), pr.s, c.darkened(0.12))
-	# Ground band.
+			var gtop := _ridge_y(rim, gx)
+			var gy := gtop + 8 + pow(rng.randf(), 1.6) * (ground_y - gtop) * 0.85
+			var gh := rng.randf_range(16, 44) * (0.45 + depth)
+			var lean := rng.randf_range(-5, 8)
+			var gc := c.lightened(0.2) if k % 3 == 0 else c.darkened(0.2)
+			ci.draw_colored_polygon(PackedVector2Array([Vector2(gx - 3, gy), Vector2(gx + 3, gy), Vector2(gx + lean, gy - gh)]), Color(gc, 0.85))
+	for k in int(26 * depth + 6):
+		var x2 := rng.randf() * W * 2.0 + shift
+		if x2 < -60 or x2 > W + 60:
+			rng.randf()
+			continue
+		var y2 := _ridge_y(rim, x2) + 3
+		var hgt := rng.randf_range(8, 18) * (0.6 + depth)
+		var tuft := c.lightened(0.12)
+		for b in 3:
+			var bx := x2 + (b - 1) * 5 * (0.6 + depth)
+			ci.draw_colored_polygon(PackedVector2Array([Vector2(bx - 3, y2), Vector2(bx + 3, y2), Vector2(bx + (b - 1) * 3, y2 - hgt * (1.0 - absf(b - 1) * 0.3))]), tuft)
+
+
+static func _ridge_y(rim: PackedVector2Array, x: float) -> float:
+	for j in rim.size() - 1:
+		var a: Vector2 = rim[j]
+		var b: Vector2 = rim[j + 1]
+		if x >= a.x and x <= b.x and b.x > a.x:
+			return lerpf(a.y, b.y, (x - a.x) / (b.x - a.x))
+	return H
+
+
+func _draw_ground(ci: CanvasItem, edge: bool) -> void:
 	var g := pal("ground")
 	if night > 0:
 		g = g.lerp(Color("#0d1018"), night * 0.6)
-	draw_rect(Rect2(0, ground_y, W, H - ground_y), g)
-	draw_rect(Rect2(0, ground_y, W, 6), g.lightened(0.12))
+	if edge:
+		ci.draw_rect(Rect2(0, ground_y - 4, W, 8), Figure.PAPER.darkened(0.06))
+	ci.draw_rect(Rect2(0, ground_y, W, H - ground_y), g)
+	ci.draw_rect(Rect2(0, ground_y, W, 6), g.lightened(0.12))
+	if edge:
+		# Cut-paper grass along the front edge of the stage.
+		var r2 := RandomNumberGenerator.new()
+		r2.seed = seed_value + 11
+		var goff2 := fposmod(scroll, W)
+		for k in 60:
+			var x := fposmod(r2.randf() * W - goff2, W)
+			var hgt := r2.randf_range(10, 24)
+			var tc := g.lightened(r2.randf_range(0.05, 0.2))
+			for b in 3:
+				var bx := x + (b - 1) * 6
+				ci.draw_colored_polygon(PackedVector2Array([Vector2(bx - 4, ground_y + 2), Vector2(bx + 4, ground_y + 2), Vector2(bx + (b - 1) * 4, ground_y + 2 - hgt * (1.0 - absf(b - 1) * 0.3))]), tc)
 	# Texture strokes on the ground.
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value + 7
@@ -145,9 +241,118 @@ func _draw() -> void:
 	for i in 70:
 		var x := fposmod(rng.randf() * W - goff, W)
 		var y := ground_y + 20 + rng.randf() * (H - ground_y - 30)
-		draw_line(Vector2(x, y), Vector2(x + rng.randf_range(10, 40), y), g.darkened(0.15), 2.0)
+		ci.draw_line(Vector2(x, y), Vector2(x + rng.randf_range(10, 40), y), g.darkened(0.15), 2.0)
+
+
+# --- Paper theater --------------------------------------------------------------------
+
+## Builds the layered paper version: a watercolor sky sheet, the sun and clouds hung on
+## strings, and each ridge plus the ground as its own paper sheet. Far sheets are hazier
+## and slightly out of focus; near ones cast deeper shadows.
+func _build_paper() -> void:
+	for c in get_children():
+		c.queue_free()
+	_paper_nodes.clear()
+	_grass_country = "grass" in DB.regions.get(region_id, {}).get("props", [])
+	# Stronger light-to-dark steps between the sheets than the flat painting uses.
+	for i in _layers.size():
+		var L: Dictionary = _layers[i]
+		L.color = Color(L.color).darkened(0.05 * i)
+	var sky := ColorRect.new()
+	sky.size = Vector2(W, ground_y + 10)
+	sky.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var top := pal("sky_top")
+	var bot := pal("sky_bottom")
 	if night > 0:
-		draw_rect(Rect2(0, 0, W, H), Color(0.05, 0.07, 0.15, night * 0.35))
+		top = top.lerp(Color("#070a18"), night)
+		bot = bot.lerp(Color("#27304a"), night)
+	sky.material = PaperFX.sky_material(top, bot)
+	sky.material.set_shader_parameter("size", sky.size)
+	add_child(sky)
+	var hang := _SkyProps.new()
+	hang.bd = self
+	var hg := PaperFX.group({"bevel_strength": 0.7, "shadow_offset": Vector2(6, 8), "shadow_alpha": 0.22, "shadow_blur": 3.0})
+	hg.add_child(hang)
+	add_child(hg)
+	_paper_nodes.append(hang)
+	var n := _layers.size()
+	for i in n + 1:
+		var depth := 1.0 - float(i) / n    # 1 = farthest, 0 = ground
+		var params := {
+			"blur": 1.4 * depth * depth,
+			"haze": 0.38 * depth,
+			"haze_color": pal("sky_bottom").lerp(Color("#f3e9d2"), 0.4),
+			"bevel_strength": lerpf(1.0, 0.45, depth),
+			"bevel_radius": lerpf(3.5, 2.0, depth),
+			"shadow_offset": Vector2(-7, -12) * lerpf(1.6, 0.6, depth),
+			"shadow_alpha": lerpf(0.5, 0.25, depth),
+			"shadow_blur": 3.0,
+			"grain_strength": 0.16,
+		}
+		var grp := PaperFX.group(params, 32.0)
+		var painter := _LayerPainter.new()
+		painter.bd = self
+		painter.idx = i
+		grp.add_child(painter)
+		add_child(grp)
+		_paper_nodes.append(painter)
+
+
+class _LayerPainter extends Node2D:
+	var bd: Backdrop
+	var idx := 0
+
+	func _draw() -> void:
+		if idx < bd._layers.size():
+			bd._draw_layer(self, idx, true)
+		else:
+			bd._draw_ground(self, true)
+
+
+## The sun and a few clouds, cut from paper and hung on thread from the top of the stage.
+class _SkyProps extends Node2D:
+	var bd: Backdrop
+	var t := 0.0
+
+	func _process(delta: float) -> void:
+		t += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var W := Backdrop.W
+		var string_c := Color(0.2, 0.15, 0.1, 0.55)
+		if bd.night <= 0.5:
+			var sun := Vector2(1450 - bd.scroll * 0.02, 300 + sin(t * 0.6) * 4)
+			draw_line(Vector2(sun.x, 0), sun + Vector2(0, -78), string_c, 2.0, true)
+			for i in 10:
+				draw_circle(sun, 84 + i * 16, Color(bd.pal("sun").r, bd.pal("sun").g, bd.pal("sun").b, 0.03))
+			draw_circle(sun, 80, Figure.PAPER)
+			draw_circle(sun, 74, bd.pal("sun"))
+			# Hand-cut rays.
+			for k in 12:
+				var a := k * TAU / 12.0 + sin(t * 0.4) * 0.05
+				var d := Vector2(cos(a), sin(a))
+				var tip := sun + d * 108
+				var bl := sun + d * 78 + d.orthogonal() * 12
+				var br := sun + d * 78 - d.orthogonal() * 12
+				draw_colored_polygon(PackedVector2Array([tip, bl, br]), bd.pal("sun").darkened(0.06))
+		var rng := RandomNumberGenerator.new()
+		rng.seed = bd.seed_value + 3
+		for i in 5:
+			var cx := fposmod(rng.randf() * W * 1.5 - bd.scroll * 0.04, W * 1.5) - 200
+			var cy := rng.randf_range(90, 280)
+			var sway := sin(t * 0.8 + i * 1.3) * 5.0
+			var base := Vector2(cx + sway, cy)
+			draw_line(Vector2(cx + 90, 0), base + Vector2(90, -24), string_c, 2.0, true)
+			var col := Color("#f7f1e3") if bd.night <= 0.5 else Color("#8a93a8")
+			var puffs: Array = []
+			for k in 5:
+				puffs.append([base + Vector2(k * 46, (k % 2) * 8 - 6), 34 - absf(k - 2) * 6])
+			for pf in puffs:
+				draw_circle(pf[0], pf[1] + 5, Figure.PAPER.darkened(0.12))
+			for pf in puffs:
+				draw_circle(pf[0], pf[1], col)
+			draw_rect(Rect2(base + Vector2(-20, 4), Vector2(224, 22)), col)
 
 
 func _draw_sky() -> void:
@@ -184,46 +389,46 @@ func _draw_sky() -> void:
 			draw_colored_polygon(pts, cc)
 
 
-func _draw_prop(kind: String, p: Vector2, s: float, c: Color) -> void:
+func _draw_prop(ci: CanvasItem, kind: String, p: Vector2, s: float, c: Color) -> void:
 	match kind:
 		"grass":
 			for i in 5:
 				var x := p.x + (i - 2) * 7 * s
-				draw_line(Vector2(x, p.y), Vector2(x + (i - 2) * 3 * s, p.y - (22 + (i % 3) * 8) * s), c.lightened(0.15), 3.0 * s)
+				ci.draw_line(Vector2(x, p.y), Vector2(x + (i - 2) * 3 * s, p.y - (22 + (i % 3) * 8) * s), c.lightened(0.15), 3.0 * s)
 		"tree":
-			draw_line(p, p + Vector2(0, -60 * s), c.darkened(0.2), 8 * s)
+			ci.draw_line(p, p + Vector2(0, -60 * s), c.darkened(0.2), 8 * s)
 			for k in 3:
-				draw_circle(p + Vector2((k - 1) * 22 * s, -70 * s - (k % 2) * 16 * s), 30 * s, c)
+				ci.draw_circle(p + Vector2((k - 1) * 22 * s, -70 * s - (k % 2) * 16 * s), 30 * s, c)
 		"fence":
 			for i in 4:
-				draw_line(p + Vector2(i * 34 * s, 0), p + Vector2(i * 34 * s, -34 * s), c.darkened(0.25), 5 * s)
-			draw_line(p + Vector2(0, -26 * s), p + Vector2(102 * s, -26 * s), c.darkened(0.25), 4 * s)
-			draw_line(p + Vector2(0, -12 * s), p + Vector2(102 * s, -12 * s), c.darkened(0.25), 4 * s)
+				ci.draw_line(p + Vector2(i * 34 * s, 0), p + Vector2(i * 34 * s, -34 * s), c.darkened(0.25), 5 * s)
+			ci.draw_line(p + Vector2(0, -26 * s), p + Vector2(102 * s, -26 * s), c.darkened(0.25), 4 * s)
+			ci.draw_line(p + Vector2(0, -12 * s), p + Vector2(102 * s, -12 * s), c.darkened(0.25), 4 * s)
 		"rock", "snowrock":
-			draw_colored_polygon(PackedVector2Array([p + Vector2(-30, 0) * s, p + Vector2(-22, -24) * s, p + Vector2(4, -34) * s,
+			ci.draw_colored_polygon(PackedVector2Array([p + Vector2(-30, 0) * s, p + Vector2(-22, -24) * s, p + Vector2(4, -34) * s,
 				p + Vector2(28, -18) * s, p + Vector2(34, 0) * s]), c.darkened(0.1))
 			if kind == "snowrock":
-				draw_colored_polygon(PackedVector2Array([p + Vector2(-22, -24) * s, p + Vector2(4, -34) * s, p + Vector2(28, -18) * s, p + Vector2(2, -24) * s]), Color("#eef3f6"))
+				ci.draw_colored_polygon(PackedVector2Array([p + Vector2(-22, -24) * s, p + Vector2(4, -34) * s, p + Vector2(28, -18) * s, p + Vector2(2, -24) * s]), Color("#eef3f6"))
 		"cactus":
-			draw_line(p, p + Vector2(0, -70 * s), c.darkened(0.15), 12 * s)
-			draw_line(p + Vector2(0, -34 * s), p + Vector2(-18 * s, -34 * s), c.darkened(0.15), 9 * s)
-			draw_line(p + Vector2(-18 * s, -34 * s), p + Vector2(-18 * s, -54 * s), c.darkened(0.15), 9 * s)
-			draw_line(p + Vector2(0, -44 * s), p + Vector2(16 * s, -44 * s), c.darkened(0.15), 9 * s)
-			draw_line(p + Vector2(16 * s, -44 * s), p + Vector2(16 * s, -60 * s), c.darkened(0.15), 9 * s)
+			ci.draw_line(p, p + Vector2(0, -70 * s), c.darkened(0.15), 12 * s)
+			ci.draw_line(p + Vector2(0, -34 * s), p + Vector2(-18 * s, -34 * s), c.darkened(0.15), 9 * s)
+			ci.draw_line(p + Vector2(-18 * s, -34 * s), p + Vector2(-18 * s, -54 * s), c.darkened(0.15), 9 * s)
+			ci.draw_line(p + Vector2(0, -44 * s), p + Vector2(16 * s, -44 * s), c.darkened(0.15), 9 * s)
+			ci.draw_line(p + Vector2(16 * s, -44 * s), p + Vector2(16 * s, -60 * s), c.darkened(0.15), 9 * s)
 		"mesa":
-			draw_colored_polygon(PackedVector2Array([p + Vector2(-80, 0) * s, p + Vector2(-60, -60) * s, p + Vector2(60, -60) * s, p + Vector2(80, 0) * s]), c.darkened(0.08))
+			ci.draw_colored_polygon(PackedVector2Array([p + Vector2(-80, 0) * s, p + Vector2(-60, -60) * s, p + Vector2(60, -60) * s, p + Vector2(80, 0) * s]), c.darkened(0.08))
 		"skull":
-			draw_circle(p + Vector2(0, -10 * s), 10 * s, Color("#e9e2cf"))
-			draw_line(p + Vector2(-8, -16) * s, p + Vector2(-26, -26) * s, Color("#e9e2cf"), 4 * s)
-			draw_line(p + Vector2(8, -16) * s, p + Vector2(26, -26) * s, Color("#e9e2cf"), 4 * s)
+			ci.draw_circle(p + Vector2(0, -10 * s), 10 * s, Color("#e9e2cf"))
+			ci.draw_line(p + Vector2(-8, -16) * s, p + Vector2(-26, -26) * s, Color("#e9e2cf"), 4 * s)
+			ci.draw_line(p + Vector2(8, -16) * s, p + Vector2(26, -26) * s, Color("#e9e2cf"), 4 * s)
 		"pine":
-			draw_line(p, p + Vector2(0, -20 * s), c.darkened(0.3), 6 * s)
+			ci.draw_line(p, p + Vector2(0, -20 * s), c.darkened(0.3), 6 * s)
 			for k in 3:
 				var y := -20 - k * 26
-				draw_colored_polygon(PackedVector2Array([p + Vector2(-30 + k * 7, y) * s, p + Vector2(30 - k * 7, y) * s, p + Vector2(0, y - 44) * s]), c.darkened(0.2))
+				ci.draw_colored_polygon(PackedVector2Array([p + Vector2(-30 + k * 7, y) * s, p + Vector2(30 - k * 7, y) * s, p + Vector2(0, y - 44) * s]), c.darkened(0.2))
 		"cairn":
 			for k in 4:
-				draw_circle(p + Vector2(0, -8 - k * 14) * s, (14 - k * 2.5) * s, c.lightened(0.1))
+				ci.draw_circle(p + Vector2(0, -8 - k * 14) * s, (14 - k * 2.5) * s, c.lightened(0.1))
 
 
 func _draw_cave() -> void:

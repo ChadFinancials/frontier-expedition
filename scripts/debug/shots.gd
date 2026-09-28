@@ -28,6 +28,7 @@ static func run(main: Main, args: Dictionary) -> void:
 			root.set_anchors_preset(Control.PRESET_FULL_RECT)
 			main.add_child(root)
 			var bg := Backdrop.new()
+			bg.paper = args.has("paper")
 			bg.setup(args.get("region", "tallgrass"), "trail", 3)
 			root.add_child(bg)
 			var ids: Array = DB.classes.keys() if args.get("set", "heroes") == "heroes" else DB.enemies.keys()
@@ -39,8 +40,14 @@ static func run(main: Main, args: Dictionary) -> void:
 				f.setup(look, 50 + i, 1 if DB.classes.has(ids[i]) else -1)
 				var row := i / 5
 				f.position = Vector2(200 + (i % 5) * 360, 480 + row * 440)
-				f.scale *= 0.9
-				root.add_child(f)
+				f.scale *= float(args.get("zoom", "0.9"))
+				if args.has("paper"):
+					f.crafted = true
+					var pg := PaperFX.group({"shadow_offset": Vector2(10, 7), "shadow_alpha": 0.3, "bevel_strength": 1.1}, 30.0)
+					pg.add_child(f)
+					root.add_child(pg)
+				else:
+					root.add_child(f)
 				var l := UI.lbl(ids[i], 20, "Bold")
 				l.position = f.position + Vector2(-80, 20)
 				root.add_child(l)

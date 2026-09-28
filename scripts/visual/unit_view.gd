@@ -8,17 +8,25 @@ var figure: Figure
 var hud: Node2D
 var glow: String = ""        # "", "enemy", "ally", "hover", "active"
 var base_scale := 1.2
+var paper_group: CanvasGroup = null   # paper-theater material around the figure
 var _t := 0.0
 
 
-func setup(c: Combatant) -> void:
+func setup(c: Combatant, paper: bool = false) -> void:
 	unit = c
 	figure = Figure.new()
 	var look: Dictionary = c.data.get("look", {})
 	var seed_value: int = c.hero.look_seed if c.hero != null else c.id * 31
 	figure.setup(look, seed_value, 1 if c.is_hero() else -1)
 	figure.scale *= base_scale
-	add_child(figure)
+	if paper:
+		figure.crafted = true
+		paper_group = PaperFX.group({"shadow_offset": Vector2(10, 7), "shadow_alpha": 0.3, "shadow_blur": 2.5,
+			"bevel_strength": 1.1, "bevel_radius": 3.0}, 30.0)
+		paper_group.add_child(figure)
+		add_child(paper_group)
+	else:
+		add_child(figure)
 	hud = _Hud.new()
 	hud.view = self
 	add_child(hud)
@@ -31,6 +39,8 @@ func set_glow(g: String) -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
+	if paper_group != null:
+		paper_group.material.set_shader_parameter("grain_offset", get_global_transform_with_canvas().origin)
 	if glow != "":
 		queue_redraw()
 	hud.queue_redraw()

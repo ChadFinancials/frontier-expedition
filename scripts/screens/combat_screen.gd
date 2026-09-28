@@ -40,6 +40,7 @@ func setup(p: Dictionary) -> void:
 	speed = float(Game.settings.get("combat_speed", 1.0))
 	backdrop = Backdrop.new()
 	backdrop.ground_y = GROUND
+	backdrop.paper = PAPER_LOOK
 	if run != null and run.in_cave():
 		backdrop.mode = "cave"
 		backdrop.light = float(run.cave.light) / 100.0
@@ -47,6 +48,10 @@ func setup(p: Dictionary) -> void:
 	add_child(backdrop)
 	field = Node2D.new()
 	add_child(field)
+	if PAPER_LOOK:
+		var vig := PaperFX.vignette()
+		vig.z_index = 3
+		add_child(vig)
 	dim = ColorRect.new()
 	dim.color = Color(0, 0, 0, 0)
 	dim.size = Vector2(1920, 830)
@@ -125,7 +130,7 @@ func _build_hud() -> void:
 
 func _add_view(c: Combatant) -> void:
 	var v := UnitView.new()
-	v.setup(c)
+	v.setup(c, PAPER_LOOK)
 	field.add_child(v)
 	views[c.id] = v
 
@@ -516,6 +521,8 @@ func _update_preview() -> void:
 # --- Event playback -------------------------------------------------------------------
 
 const PACE := 1.3
+## Art pilot: the paper-theater look (layered paper backdrop, paper figures, lamp light).
+const PAPER_LOOK := true
 
 
 func _wait(sec: float) -> void:

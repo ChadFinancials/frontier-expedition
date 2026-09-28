@@ -22,6 +22,7 @@ var flash_color: Color = Color.WHITE
 var muzzle: float = 0.0            # muzzle flash strength
 var idle_anim: bool = true
 var height_px: float = 200.0       # nominal height of a normal human at scale 1
+var crafted: bool = false          # paper-theater detail: sculpted shading and pencil hatching
 
 var _shapes: Array = []
 var _t: float = 0.0
@@ -95,6 +96,8 @@ func _draw() -> void:
 	if _dirty:
 		_shapes.clear()
 		_build()
+		if crafted:
+			_add_hatching()
 		_dirty = false
 	var breathe := 1.0 + 0.012 * sin(_t * 2.2 + look_seed % 7) if idle_anim and pose != "dead" else 1.0
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, breathe))
@@ -110,7 +113,10 @@ func _draw() -> void:
 		_draw_shape(s, PAPER, Vector2.ZERO, 4.0)
 	# Fill pass.
 	for s in _shapes:
-		_draw_shape(s, s.c, Vector2.ZERO, 0.0)
+		if crafted and not s.get("glow", false):
+			_draw_sculpted(s)
+		else:
+			_draw_shape(s, s.c, Vector2.ZERO, 0.0)
 	if muzzle > 0.01:
 		_draw_star(_muzzle_pos, 10 + 22 * muzzle, 5 + 8 * muzzle, 7, Color(1, 0.85, 0.35, muzzle))
 		draw_circle(_muzzle_pos, 8 * muzzle, Color(1, 1, 0.9, muzzle))
@@ -154,6 +160,71 @@ func _draw_shape(s: Dictionary, c: Color, off: Vector2, edge: float) -> void:
 			if edge == 0.0 and pts2.size() > 0:
 				draw_circle(pts2[0], float(s.w) / 2.0, cc)
 				draw_circle(pts2[pts2.size() - 1], float(s.w) / 2.0, cc)
+
+
+## Papier-mache volume: each piece is lit from the top left of the screen and falls into
+## shadow toward the bottom right, with pencil hatching on the shadow side.
+func _draw_sculpted(s: Dictionary) -> void:
+	var c: Color = s.c
+	if s.has("a"):
+		c.a *= float(s.a)
+	match s.k:
+		"poly":
+			var pts: PackedVector2Array = s.pts
+			var bb := _bounds(pts)
+			var cols := PackedColorArray()
+			for p in pts:
+				var tx := (p.x - bb.position.x) / maxf(1.0, bb.size.x)
+				if facing < 0:
+					tx = 1.0 - tx
+				var ty := (p.y - bb.position.y) / maxf(1.0, bb.size.y)
+				var t := clampf(tx * 0.45 + ty * 0.55, 0.0, 1.0)
+				cols.append(c.lightened(0.1 * (1.0 - t)).darkened(0.16 * t))
+			draw_polygon(pts, cols)
+			for h in s.get("hatch", []):
+				draw_line(h[0], h[1], Color(c.darkened(0.45), 0.35 * c.a), 1.3, true)
+		"circle":
+			draw_circle(s.p, s.r, c.darkened(0.08), true, -1.0, true)
+			var hl := Vector2(-s.r * 0.22 * facing, -s.r * 0.22)
+			draw_circle(s.p + hl, s.r * 0.72, c.lightened(0.05), true, -1.0, true)
+		_:
+			_draw_shape(s, s.c, Vector2.ZERO, 0.0)
+
+
+static func _bounds(pts: PackedVector2Array) -> Rect2:
+	var r := Rect2(pts[0], Vector2.ZERO)
+	for p in pts:
+		r = r.expand(p)
+	return r
+
+
+## Pencil hatching clipped to the shadow side of the larger pieces.
+func _add_hatching() -> void:
+	for s in _shapes:
+		if s.k != "poly" or s.get("no_edge", false) or s.get("glow", false):
+			continue
+		var pts: PackedVector2Array = s.pts
+		var bb := _bounds(pts)
+		if bb.size.x * bb.size.y < 900.0 or bb.size.x < 14.0:
+			continue
+		var segs: Array = []
+		var step := 6.0
+		var x := bb.position.x - bb.size.y
+		while x < bb.end.x:
+			var a := Vector2(x, bb.end.y)
+			var b := Vector2(x + bb.size.y * 0.8, bb.position.y)
+			for piece in Geometry2D.intersect_polyline_with_polygon(PackedVector2Array([a, b]), pts):
+				if piece.size() < 2:
+					continue
+				var mid: Vector2 = (piece[0] + piece[piece.size() - 1]) / 2.0
+				var tx := (mid.x - bb.position.x) / bb.size.x
+				if facing < 0:
+					tx = 1.0 - tx
+				var ty := (mid.y - bb.position.y) / bb.size.y
+				if tx * 0.45 + ty * 0.55 > 0.62:
+					segs.append([piece[0], piece[piece.size() - 1]])
+			x += step
+		s["hatch"] = segs
 
 
 # --- Shape helpers --------------------------------------------------------------------
@@ -323,17 +394,34 @@ func _build_human() -> void:
 		_weapon("pistol", hand_b, 0.0 if pose == "aim" else 1.2, true)
 	# Legs.
 	var leg_c := pants
-	_poly([Vector2(-16, hip), Vector2(0, hip), Vector2(-3, -9), Vector2(-15, -9)], leg_c.darkened(0.15))
-	_poly([Vector2(-2, hip), Vector2(15, hip), Vector2(13, -9), Vector2(1, -9)], leg_c)
-	if coat_kind == "chaps":
-		_poly([Vector2(0, hip + 10), Vector2(16, hip + 8), Vector2(15, -14), Vector2(3, -14)], coat)
-	_poly([Vector2(-18, -11), Vector2(-1, -11), Vector2(2, 0), Vector2(-19, 0)], BOOT)
-	_poly([Vector2(-1, -11), Vector2(15, -11), Vector2(22, 0), Vector2(-1, 0)], BOOT)
+	if crafted:
+		# Storybook legs: tapered, a little bend at the knee, big boots with heels.
+		_poly([Vector2(-17, hip), Vector2(1, hip), Vector2(-1, -52), Vector2(-4, -12), Vector2(-15, -12), Vector2(-18, -52)], leg_c.darkened(0.15))
+		_poly([Vector2(-2, hip), Vector2(16, hip), Vector2(15, -52), Vector2(13, -12), Vector2(2, -12), Vector2(0, -52)], leg_c)
+		if coat_kind == "chaps":
+			_poly([Vector2(0, hip + 10), Vector2(17, hip + 8), Vector2(15, -16), Vector2(3, -16)], coat)
+		_poly([Vector2(-19, -15), Vector2(-3, -15), Vector2(-1, -7), Vector2(4, -5), Vector2(4, 0), Vector2(-21, 0), Vector2(-21, -5)], BOOT)
+		_poly([Vector2(0, -15), Vector2(15, -15), Vector2(17, -8), Vector2(25, -5), Vector2(26, 0), Vector2(-1, 0), Vector2(-1, -5)], BOOT)
+	else:
+		_poly([Vector2(-16, hip), Vector2(0, hip), Vector2(-3, -9), Vector2(-15, -9)], leg_c.darkened(0.15))
+		_poly([Vector2(-2, hip), Vector2(15, hip), Vector2(13, -9), Vector2(1, -9)], leg_c)
+		if coat_kind == "chaps":
+			_poly([Vector2(0, hip + 10), Vector2(16, hip + 8), Vector2(15, -14), Vector2(3, -14)], coat)
+		_poly([Vector2(-18, -11), Vector2(-1, -11), Vector2(2, 0), Vector2(-19, 0)], BOOT)
+		_poly([Vector2(-1, -11), Vector2(15, -11), Vector2(22, 0), Vector2(-1, 0)], BOOT)
 	# Torso.
 	var torso := [Vector2(-w / 2, hip + 4), Vector2(w / 2, hip + 4)]
-	if build == "heavy":
-		torso.append(Vector2(w / 2 + 7, hip - 26))
-	torso.append_array([Vector2(w / 2 + 2, sh + 8), Vector2(w / 2 - 6, sh), Vector2(-w / 2 + 6, sh), Vector2(-w / 2 - 2, sh + 8)])
+	if crafted:
+		# Broad rounded shoulders over a narrower waist.
+		torso = [Vector2(-w / 2 + 3, hip + 4), Vector2(w / 2 - 3, hip + 4)]
+		if build == "heavy":
+			torso.append(Vector2(w / 2 + 8, hip - 28))
+		torso.append_array([Vector2(w / 2 + 5, sh + 16), Vector2(w / 2 + 2, sh + 5), Vector2(w / 2 - 6, sh - 1),
+			Vector2(-w / 2 + 6, sh - 1), Vector2(-w / 2 - 2, sh + 5), Vector2(-w / 2 - 5, sh + 16)])
+	else:
+		if build == "heavy":
+			torso.append(Vector2(w / 2 + 7, hip - 26))
+		torso.append_array([Vector2(w / 2 + 2, sh + 8), Vector2(w / 2 - 6, sh), Vector2(-w / 2 + 6, sh), Vector2(-w / 2 - 2, sh + 8)])
 	match coat_kind:
 		"vest", "overalls":
 			_poly(torso, shirt)
@@ -371,8 +459,16 @@ func _build_human() -> void:
 		_poly([Vector2(8, -175), Vector2(20, -174), Vector2(22, -169), Vector2(8, -171)], _hair.darkened(0.1))
 	if extra == "bandana_mask":
 		_poly([Vector2(-8, -178), Vector2(19, -178), Vector2(18, -166), Vector2(4, -160), Vector2(-8, -166)], accent)
-	# Eye.
-	_circle(head + Vector2(8, -4), 2.2, Color("#1a1210"), {"no_edge": true})
+	# Face: nose, brow and eye.
+	_poly([head + Vector2(13, -3), head + Vector2(20, 4), head + Vector2(13, 6)], _skin.darkened(0.12), {"no_edge": true})
+	_line([head + Vector2(4, -10), head + Vector2(13, -9)], 2.0, _hair.darkened(0.2), {"no_edge": true})
+	if crafted:
+		# A storybook eye with a white, and a touch of color in the cheek.
+		_circle(head + Vector2(3, 5), 4.0, Color(0.85, 0.35, 0.3, 0.22), {"no_edge": true})
+		_circle(head + Vector2(8, -4), 3.6, Color("#f4efe4"), {"no_edge": true})
+		_circle(head + Vector2(9, -4), 2.2, Color("#1a1210"), {"no_edge": true})
+	else:
+		_circle(head + Vector2(8, -4), 2.2, Color("#1a1210"), {"no_edge": true})
 	if extra == "spectacles":
 		_circle(head + Vector2(9, -4), 5.0, Color(0.8, 0.85, 0.9, 0.5), {"no_edge": true})
 		_line([head + Vector2(4, -4), head + Vector2(14, -4)], 1.5, DARK_METAL, {"no_edge": true})

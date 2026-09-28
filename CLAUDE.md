@@ -41,3 +41,12 @@ In the cloud dev container: `GODOT=/home/user/tools/godot/Godot_v4.7.2-stable_li
 - On Windows, pass `encoding='utf-8'` explicitly for file I/O in Python tools.
 - Audio is generated: edit `tools/gen_audio.py` and rerun rather than hand-editing WAVs.
 - Heroes use they/them in all text; names are random and don't imply gender.
+
+## Art: paper-theater look (pilot)
+
+- `scripts/visual/paper_fx.gd` + `paper.gdshader`: wrap drawn nodes in a CanvasGroup with the
+  paper material (grain, fibers, papier-mache relief, cast shadow, depth haze/blur).
+- `Backdrop.paper = true` builds layered paper sheets, a watercolor sky and hanging sun/clouds.
+- `Figure.crafted = true` adds sculpted shading, hatching and storybook proportions.
+- Currently only the combat screen uses it (`CombatScreen.PAPER_LOOK`). Roll out to other
+  screens only after the owner approves the pilot.
