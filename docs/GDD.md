@@ -48,9 +48,9 @@ afterwards.
 ### Tiers
 | Tier | Building slots | Max building level | Upgrade cost |
 |---|---|---|---|
-| Outpost | 3 | 1 | Founding: 1 Charter, 600, chips 15 Timber, 8 Iron |
-| Town | 6 | 2 | 3 Charters, 2000, chips 40 Timber, 25 Iron |
-| City | 9 (all) | 3 | 6 Charters, 5000, chips 90 Timber, 60 Iron |
+| Outpost | 3 | 1 | Founding: 1 Charter, 600 chips, 15 Timber, 8 Iron |
+| Town | 6 | 2 | 3 Charters, 2000 chips, 40 Timber, 25 Iron |
+| City | 9 (all) | 3 | 6 Charters, 5000 chips, 90 Timber, 60 Iron |
 
 - **Founding** needs that region's boss to be beaten. The victorious party can found it
   on the spot if the company can pay, or later from any settlement.
@@ -249,9 +249,9 @@ Full skill lists are in `data/classes.json` and `data/skills.json`.
 
 ## 9. Economy (starting values, to be tuned)
 
-- Start with 750, chips 10 Timber, 5 Iron, and 6 heroes at Fort Providence.
-- Fights pay 8 chips–20 per enemy × region tier. Elites also drop Timber, Iron and a 35%
-  keepsake chance. Bosses drop a **Charter**, a keepsake and 400 chips × tier.
+- Currency is **chips**, the Great Casino's own coin. Start with 750 chips, 20 Timber, 8 Iron, and 6 heroes at Fort Providence.
+- Fights pay 5–12 chips per enemy × region tier. Elites also drop Timber, Iron and a 35%
+  keepsake chance. Bosses drop a **Charter**, a keepsake and 250 chips × tier.
 - Buildings cost roughly 400 chips / 1000 chips / 2200 chips plus Timber and Iron, rising by level.
 
 ---
