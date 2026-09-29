@@ -1,0 +1,49 @@
+{
+  "_comment": "SDXL text-to-image, portrait 768x1344, for standing character sheets. A landscape frame forces scene compositions and shrinks a standing figure, which is why the first marshal batch came back as landscapes. Required model: sd_xl_base_1.0.safetensors. Use with tools/art/generate.py --workflow tools/art/sdxl_character.json",
+  "3": {
+    "class_type": "KSampler",
+    "_meta": {"title": "KSampler"},
+    "inputs": {
+      "seed": 42,
+      "steps": 32,
+      "cfg": 6.5,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 1.0,
+      "model": ["4", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["5", 0]
+    }
+  },
+  "4": {
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {"title": "Load SDXL Base"},
+    "inputs": {"ckpt_name": "sd_xl_base_1.0.safetensors"}
+  },
+  "5": {
+    "class_type": "EmptyLatentImage",
+    "_meta": {"title": "Empty Latent"},
+    "inputs": {"width": 768, "height": 1344, "batch_size": 1}
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "_meta": {"title": "Positive Prompt"},
+    "inputs": {"text": "", "clip": ["4", 1]}
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "_meta": {"title": "Negative Prompt"},
+    "inputs": {"text": "", "clip": ["4", 1]}
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "_meta": {"title": "VAE Decode"},
+    "inputs": {"samples": ["3", 0], "vae": ["4", 2]}
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "_meta": {"title": "Save Image"},
+    "inputs": {"filename_prefix": "fx_char", "images": ["8", 0]}
+  }
+}

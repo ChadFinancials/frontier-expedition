@@ -171,7 +171,18 @@ func refresh() -> void:
 	wagon_bar.fill = Color("#d9a441") if run.wagon >= 40 else (Color("#c0392b") if run.wagon > 0 else Color("#555555"))
 
 
+## Painted scenery changes as the company pushes west: 0 at the first column, 1 at the last.
+func _sync_backdrop() -> void:
+	if backdrop == null or run == null:
+		return
+	var max_col: int = 1
+	for n: Dictionary in run.nodes:
+		max_col = maxi(max_col, int(n.get("col", 0)))
+	var col: int = int(run.current_node().get("col", 0))
+	backdrop.set_progress(float(col) / float(max_col))
+
 func _process(delta: float) -> void:
+	_sync_backdrop()
 	_walk_t += delta
 	for i in walkers.size():
 		var w: Figure = walkers[i]

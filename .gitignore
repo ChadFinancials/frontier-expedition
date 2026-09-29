@@ -9,3 +9,5 @@ build/
 Thumbs.db
 # tooling output
 screenshots/
+art-tests/
+__pycache__/

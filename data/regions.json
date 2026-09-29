@@ -2,6 +2,7 @@
   "_comment": "A region is one expedition map. tier scales enemies. fights/elites/cave_fights are weighted enemy groups (front rank first). boss.enemies is the boss formation; crossing is the fight at the map's end once the boss is beaten. palette/props drive the painted backdrop.",
 
   "old_mill_road": {
+		"backdrop": "tallgrass_trail",
     "difficulty": 1, "name": "The Old Mill Road", "tier": 1, "rec_level": "1", "tutorial": true, "xp_cap": 3, "no_ambush": true,
     "desc": "The last stretch of road east of Fort Providence, through orchards and wheat gone to seed. Crane's gang rode through here three days ago.",
     "palette": {"sky_top": "#4a6f8f", "sky_bottom": "#f2c57c", "sun": "#fff4d6", "far": "#8f8a6a", "mid": "#9aa05a", "near": "#6e8a3a", "ground": "#55692e", "accent": "#d9a441"},

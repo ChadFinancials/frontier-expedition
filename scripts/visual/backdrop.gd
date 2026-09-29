@@ -23,10 +23,86 @@ var _grass_country := false
 var _lamp: ColorRect = null     # paper cave lamplight pool
 
 
+var bg_key: String = ""         # optional painted-backdrop override, else "<region>_<mode>"
+var bg_progress: float = 0.0    # 0 at the start of the map, 1 at the end (drives variants)
+var bg: Sprite2D = null
+var _bg_paths: Array = []       # every "<key>.png" and "<key>_N.png" found, sorted
+var _bg_index: int = -1
+var _bg_margin := 0.0
+
+
+## If a painted backdrop exists for this region and mode, use it and skip the drawn layers.
+## Path: assets/art/backdrops/<region>_<mode>.png, or <bg_key>.png when bg_key is set.
+## Always falls back to the code-drawn scenery when the file is missing, so the game runs
+## correctly with any fraction of the art done.
+func _bg_candidates() -> Array:
+	## Keys to try, in order: an explicit bg_key, then the region's "backdrop" field, then
+	## "<region>_<mode>". The region field lets a region reuse another region's art.
+	var keys: Array = []
+	if bg_key != "":
+		keys.append(bg_key)
+	var r: Dictionary = DB.regions.get(region_id, {})
+	var alias: String = str(r.get("backdrop", ""))
+	if alias != "" and not keys.has(alias):
+		keys.append(alias)
+	var own: String = "%s_%s" % [region_id, mode]
+	if not keys.has(own):
+		keys.append(own)
+	return keys
+
+
+## Find a painted backdrop and show it, skipping the drawn layers. Variants are
+## "<key>_1.png", "<key>_2.png" and so on; set_progress picks among them as the company
+## travels. Falls back to the code-drawn scenery when nothing is found.
+func _load_backdrop_image() -> bool:
+	for key in _bg_candidates():
+		var found: Array = []
+		var single: String = "res://assets/art/backdrops/%s.png" % key
+		if ResourceLoader.exists(single):
+			found.append(single)
+		for i in range(1, 25):
+			var vp: String = "res://assets/art/backdrops/%s_%d.png" % [key, i]
+			if ResourceLoader.exists(vp):
+				found.append(vp)
+		if found.is_empty():
+			continue
+		_bg_paths = found
+		bg = Sprite2D.new()
+		bg.centered = true
+		add_child(bg)
+		_apply_bg(0)
+		return true
+	return false
+
+
+func _apply_bg(index: int) -> void:
+	if bg == null or _bg_paths.is_empty():
+		return
+	var i: int = clampi(index, 0, _bg_paths.size() - 1)
+	if i == _bg_index:
+		return
+	_bg_index = i
+	var tex: Texture2D = load(_bg_paths[i])
+	bg.texture = tex
+	# Cover the frame with a little overdraw, so the drift in set_scroll never shows an edge.
+	var cover: float = maxf(W / float(tex.get_width()), H / float(tex.get_height())) * 1.08
+	bg.scale = Vector2(cover, cover)
+	bg.position = Vector2(W * 0.5, H * 0.5)
+	_bg_margin = (float(tex.get_width()) * cover - W) * 0.5
+
+
+## Drive this from the screen so the scenery changes as the company pushes west.
+func set_progress(p: float) -> void:
+	bg_progress = clampf(p, 0.0, 1.0)
+	if _bg_paths.size() > 1:
+		_apply_bg(int(round(bg_progress * float(_bg_paths.size() - 1))))
+
 func setup(region: String, m: String = "trail", s: int = 1) -> void:
 	region_id = region
 	mode = m
 	seed_value = s
+	if _load_backdrop_image():
+		return
 	var r: Dictionary = DB.regions.get(region, {})
 	_pal = {}
 	for k in r.get("palette", {}):
@@ -63,6 +139,10 @@ func _update_lamp() -> void:
 
 func set_scroll(v: float) -> void:
 	scroll = v
+	if bg != null:
+		# A gentle bounded drift inside the overdraw margin: a flat image cannot scroll far
+		# without showing its edge, and it must not look pinned while the wagon rolls.
+		bg.position.x = W * 0.5 + sin(scroll * 0.004) * _bg_margin
 	queue_redraw()
 	for n in _paper_nodes:
 		n.queue_redraw()

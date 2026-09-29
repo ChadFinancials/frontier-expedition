@@ -8,6 +8,9 @@ var _scroll := 0.0
 
 func setup(_params: Dictionary) -> void:
 	backdrop = Backdrop.new()
+	# Painted title backdrop: assets/art/backdrops/title.png. Falls back to the drawn
+	# scenery when the file is missing, so the menu still works without the art.
+	backdrop.bg_key = "title"
 	backdrop.setup("tallgrass", "trail", 4)
 	add_child(backdrop)
 	wagon = WagonArt.new()

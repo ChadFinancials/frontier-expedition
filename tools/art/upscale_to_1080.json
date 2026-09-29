@@ -1,0 +1,34 @@
+{
+  "_comment": "Upscale a generated image to exactly 1920x1080 for the game. Model: RealESRGAN_x4plus.pth in models/upscale_models. Node ids: 1 LoadImage, 2 UpscaleModelLoader, 3 ImageUpscaleWithModel, 4 ImageScale, 5 SaveImage. The generator strips this _comment before submitting. Drive it with: python tools/art/generate.py --subject X --count 1 --upscale",
+  "1": {
+    "class_type": "LoadImage",
+    "_meta": {"title": "Load Image"},
+    "inputs": {"image": "PLACEHOLDER.png", "upload": "image"}
+  },
+  "2": {
+    "class_type": "UpscaleModelLoader",
+    "_meta": {"title": "Load Upscale Model"},
+    "inputs": {"model_name": "RealESRGAN_x4plus.pth"}
+  },
+  "3": {
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {"title": "Upscale Image (4x)"},
+    "inputs": {"upscale_model": ["2", 0], "image": ["1", 0]}
+  },
+  "4": {
+    "class_type": "ImageScale",
+    "_meta": {"title": "Fit to 1920x1080"},
+    "inputs": {
+      "upscale_method": "lanczos",
+      "width": 1920,
+      "height": 1080,
+      "crop": "disabled",
+      "image": ["3", 0]
+    }
+  },
+  "5": {
+    "class_type": "SaveImage",
+    "_meta": {"title": "Save Image"},
+    "inputs": {"filename_prefix": "fx_final", "images": ["4", 0]}
+  }
+}
