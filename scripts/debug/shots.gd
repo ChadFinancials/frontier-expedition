@@ -158,9 +158,14 @@ static func _act(main: Main, args: Dictionary) -> void:
 	var cs = main.screen
 	for turn in int(args.get("act", "1")):
 		for k in 900:
+			if not is_instance_valid(cs) or main.screen != cs:
+				break
 			if cs.get("engine") != null and cs.engine.awaiting_input():
 				break
 			await tree.process_frame
+		if not is_instance_valid(cs) or main.screen != cs:
+			print("ACT: fight over (left combat)")
+			break
 		if cs.get("engine") == null or not cs.engine.awaiting_input():
 			print("ACT: no hero turn (", main.screen.name, ")")
 			break
@@ -178,6 +183,9 @@ static func _act(main: Main, args: Dictionary) -> void:
 		else:
 			cs.chosen.emit("skill", sid, vt[0])
 		await tree.create_timer(float(args.get("gap", "4.0"))).timeout
+		if not is_instance_valid(cs) or main.screen != cs:
+			print("ACT: fight over (left combat)")
+			break
 		if cs.engine.is_over():
 			print("ACT: fight over (", cs.engine.state, ")")
 			break
