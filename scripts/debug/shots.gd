@@ -69,6 +69,15 @@ static func run(main: Main, args: Dictionary) -> void:
 				main.close_all_modals()
 				Game.company.run.travel_to(int(args.node))
 				await main.goto("trail", {}, true)
+			if args.has("act"):
+				# The tutorial's first fight, entered the way the trail does it.
+				main.close_all_modals()
+				var tr = main.screen
+				var n1: Dictionary = Game.company.run.current_node()
+				n1.data["story_seen"] = true
+				tr._resolve_node()
+				await tree.create_timer(2.0).timeout
+				await _act(main, args)
 		"embark":
 			Game.company.complete_tutorial()
 			Game.company.advance_week()
@@ -94,6 +103,8 @@ static func run(main: Main, args: Dictionary) -> void:
 				"combat":
 					var enemies: Array = args.get("enemies", "outlaw_brawler,outlaw_gunhand,prairie_wolf,outlaw_rifleman").split(",")
 					await main.goto("combat", {"enemies": enemies, "kind": args.get("kind", "fight"), "return": "trail"}, true)
+					if args.has("act"):
+						await _act(main, args)
 				"camp":
 					await main.goto("camp", {}, true)
 				"cave":
@@ -136,3 +147,27 @@ static func run(main: Main, args: Dictionary) -> void:
 	img.save_png(out)
 	print("saved ", out)
 	tree.quit()
+
+
+## Plays hero turns in the open combat with each hero's first move (or skill=...), printing
+## what happens, so runtime errors show up in the log.
+static func _act(main: Main, args: Dictionary) -> void:
+	var tree := main.get_tree()
+	var cs = main.screen
+	for turn in int(args.get("act", "1")):
+		for k in 900:
+			if cs.get("engine") != null and cs.engine.awaiting_input():
+				break
+			await tree.process_frame
+		if cs.get("engine") == null or not cs.engine.awaiting_input():
+			print("ACT: no hero turn (", main.screen.name, ")")
+			break
+		var hc: Combatant = cs.engine.current
+		var sid: String = args.get("skill", hc.skills[0])
+		var vt: Array = cs.engine.valid_targets(hc, sid)
+		print("ACT ", hc.display_name, " ", sid, " -> ", vt)
+		if vt.is_empty():
+			cs.chosen.emit("pass", null, null)
+		else:
+			cs.chosen.emit("skill", sid, vt[0])
+		await tree.create_timer(4.0).timeout
