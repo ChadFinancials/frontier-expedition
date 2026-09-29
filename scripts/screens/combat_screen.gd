@@ -707,9 +707,17 @@ func _result(e: Dictionary) -> void:
 				var st_name: String = {"stun": "Stun", "bleed": "Bleed", "poison": "Poison", "knockback": "Knockback", "pull": "Pull", "debuff": "Debuff"}.get(str(e.status), str(e.status).capitalize())
 				_popup(t5, "Resisted %s" % st_name, Color("#cccccc"), 22, 40)
 				_log("%s resists the %s (a status resistance; damage is unaffected)." % [t5.display_name, st_name.to_lower()])
+		"bounty":
+			var tb := engine.unit(e.actor)
+			_popup(tb, "+%d chips" % e.amount, Color("#e0bd4f"), 26, 70)
+			_log("[color=#e0bd4f]%s collects %d chips for that one.[/color]" % [tb.display_name if tb else "?", e.amount])
+			Audio.play("coin")
 		"buff", "debuff":
 			var t6 := engine.unit(e.target)
-			if t6 != null:
+			if t6 != null and str(e.get("card", "")) != "":
+				_card(t6, str(e.card), Stats.mod_text({"stat": e.stat, "value": e.value}))
+				_log("%s draws the %s: %s." % [t6.display_name, e.card, Stats.mod_text({"stat": e.stat, "value": e.value})])
+			elif t6 != null:
 				var txt := Stats.mod_text({"stat": e.stat, "value": e.value})
 				_popup(t6, txt, Color("#9fd07a") if Stats.mod_is_good({"stat": e.stat, "value": e.value}) else Color("#f0a080"), 20, 60)
 		"cure":
@@ -895,6 +903,9 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 		_result(g)
 	_move_has_sfx = false
 	await _wait(1.0)
+	# Give dealt cards (Stacked Deck) time to be read.
+	if group.any(func(g): return str(g.get("card", "")) != ""):
+		await _wait(1.2)
 	# Step back.
 	av.figure.set_pose("idle")
 	for v in targets:
@@ -920,6 +931,42 @@ func _projectile(from: Vector2, to: Vector2) -> void:
 	var tw := create_tween()
 	tw.tween_property(dot, "position", to, 0.18 / speed)
 	tw.tween_callback(dot.queue_free)
+
+
+## Stacked Deck: a playing card flips up over the hero and hangs there long enough to read.
+func _card(c: Combatant, card: String, boon: String) -> void:
+	if c == null or not views.has(c.id):
+		return
+	var v: UnitView = views[c.id]
+	var red := card.contains("Hearts") or card.contains("Diamonds")
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", UI.box(Color("#fbf6ea"), Color("#a8392e") if red else Color("#2b2320"), 3, 10, 10, 6))
+	var vb := UI.vb(2)
+	p.add_child(vb)
+	var parts := card.split(" of ")
+	var rank := UI.lbl(parts[0], 26, "Header")
+	rank.add_theme_color_override("font_color", Color("#a8392e") if red else Color("#2b2320"))
+	rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(rank)
+	var suit := UI.lbl("of " + (parts[1] if parts.size() > 1 else ""), 16, "Ink")
+	suit.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(suit)
+	var bl := UI.lbl(boon, 17, "InkBold")
+	bl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vb.add_child(bl)
+	p.custom_minimum_size = Vector2(150, 0)
+	p.z_index = 36
+	add_child(p)
+	var top := v.position + Vector2(-75, v.top_local() * v.scale.y - 150)
+	p.position = top + Vector2(0, 30)
+	p.scale = Vector2(0.2, 1.0)
+	p.pivot_offset = Vector2(75, 50)
+	var tw := create_tween()
+	tw.tween_property(p, "scale", Vector2.ONE, 0.18 / speed)
+	tw.parallel().tween_property(p, "position:y", top.y, 0.25 / speed)
+	tw.tween_interval(1.6 / speed)
+	tw.tween_property(p, "modulate:a", 0.0, 0.4 / speed)
+	tw.tween_callback(p.queue_free)
 
 
 func _popup(c: Combatant, text: String, color: Color, size: int = 28, yoff: float = 0.0) -> void:

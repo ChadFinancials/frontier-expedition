@@ -76,7 +76,7 @@ def main():
 					dmg += ", %+d%% vs %s" % (round(v * 100), tag)
 				if s.get("gamble"):
 					dmg += ", 50/50: double or quarter"
-			fx = [effect_text(x) for x in s.get("effects", [])] + ["self: " + effect_text(x) for x in s.get("self_effects", [])]
+			fx = [effect_text(x) for x in s.get("effects", [])] + ["self: " + effect_text(x) for x in s.get("self_effects", [])] + ["on kill: " + effect_text(x) for x in s.get("on_kill", [])]
 			acc = str(s.get("acc", "-")) if hostile else "-"
 			name = ("★ " if sid in eq else "") + "**%s**: %s" % (s.get("name", sid), s.get("desc", ""))
 			out.append("| %s | %s | %s | %s | %s | %s |" % (name, ranks(s.get("use_ranks")), hits_text(s), acc, dmg, "; ".join(fx) or "-"))

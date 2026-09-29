@@ -219,7 +219,7 @@ func look_ahead() -> Array:
 				spotted += 1
 			if MapGen.intel(n) == 2 and tracker and n.type in ["fight", "elite"]:
 				n.intel = 3
-		elif d == 2 and MapGen.intel(n) < 1 and company.rng.randf() * 100.0 < score / 2.0:
+		elif d == 2 and MapGen.intel(n) < 1 and not region().has("fixed_map") and company.rng.randf() * 100.0 < score / 2.0:
 			n.intel = 1
 	if spotted > 0 and score >= 30:
 		msgs.append("Your scouts get a good look at what lies ahead.")
@@ -441,7 +441,7 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 	var rng := company.rng
 	var mult := 1.0 + party_loot_pct() / 100.0
 	var em: Array = DB.cfg("enemy_money", [8, 20])
-	var money := 0
+	var money := engine.bounty
 	for eid in engine.killed:
 		money += rng.randi_range(int(em[0]), int(em[1])) * tier()
 	money = int(round(money * mult))

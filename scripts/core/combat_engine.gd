@@ -27,6 +27,7 @@ var fallen: Array = []          # hero uids who died
 var story_script: Dictionary = {}     # scripted ending (a boss's first meeting); see _check_script
 var _next_id: int = 1
 var _fresh_dd: Array = []       # heroes knocked onto Death's Door by the move being resolved
+var bounty: int = 0             # chips earned mid-fight (Money Shot kills), paid out with the loot
 
 
 func setup(party: Array, enemy_ids: Array, opts: Dictionary = {}) -> Array:
@@ -586,6 +587,13 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 	else:
 		ev.append({"t": "hit", "actor": a.id, "target": t.id, "amount": 0, "crit": false, "note": ""})
 	if t.dead:
+		# Some moves pay off on a kill (Money Shot).
+		for e in sk.get("on_kill", []):
+			if e.get("type", "") == "money":
+				bounty += int(e.get("amount", 0))
+				ev.append({"t": "bounty", "actor": a.id, "amount": int(e.get("amount", 0))})
+			else:
+				_apply_self_effect(a, sid, e, ev)
 		return crit
 	for e in sk.get("effects", []):
 		_apply_effect(a, sid, e, t, ev, crit)
@@ -639,8 +647,8 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 			var pool: Array = e.get("pool", [])
 			var b: Dictionary = Stats.pick(rng, pool)
 			if b != null:
-				t.buffs.append({"stat": b.stat, "value": b.value, "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", "")})
-				ev.append({"t": "buff", "target": t.id, "stat": b.stat, "value": b.value})
+				t.buffs.append({"stat": b.stat, "value": b.value, "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", ""), "fresh": t == a})
+				ev.append({"t": "buff", "target": t.id, "stat": b.stat, "value": b.value, "card": b.get("card", "")})
 		"heal":
 			var hmin := float(e.get("min", 3))
 			var hmax := float(e.get("max", 6))
@@ -653,7 +661,7 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 		"heal_pct":
 			_heal(a, t, int(ceil(t.max_hp * float(e.get("value", 10)) / 100.0)), false, ev)
 		"fatigue":
-			if t.hero != null:
+			if t.hero != null and (not e.has("chance") or rng.randi_range(1, 100) <= int(e.chance)):
 				var fa = e.get("amount", 5)
 				var amt: int = rng.randi_range(int(fa[0]), int(fa[1])) if fa is Array else int(fa)
 				if amt > 0 and not a.is_hero() and not a.boss:
@@ -954,4 +962,9 @@ func _pick_target(ids: Array, pref: String, chance: int = -1) -> int:
 			var dd := units_list.filter(func(x): return x.deaths_door())
 			if not dd.is_empty() and rng.randf() * 100.0 < (60 if chance < 0 else chance):
 				return Stats.pick(rng, dd).id
+		"random":
+			# A Marked hero draws the eye: enemies go for them half the time.
+			var mk := units_list.filter(func(x): return x.mark > 0)
+			if not mk.is_empty() and rng.randf() < float(DB.cfg("marked_draw", 0.5)):
+				return Stats.pick(rng, mk).id
 	return Stats.pick(rng, units_list).id

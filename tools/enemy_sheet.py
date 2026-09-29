@@ -70,8 +70,12 @@ def effect_text(fx):
 	if t == "fatigue":
 		a = fx.get("amount", 0)
 		if isinstance(a, list):
+			if a[1] <= 0:
+				return "%d to %d fatigue (relief)%s" % (a[1], a[0], chance)
 			return "+%d-%d fatigue" % tuple(a)
 		return "%+d fatigue%s" % (a, " (relief)" if a < 0 else "")
+	if t == "money":
+		return "+%d chips" % fx.get("amount", 0)
 	if t == "heal_self":
 		return "heals self %d HP" % fx.get("amount", 5)
 	if t == "heal_self_pct":

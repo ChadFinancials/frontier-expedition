@@ -296,6 +296,10 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 		var t2 := effect_text(e, level)
 		if t2 != "":
 			lines.append("• Self: " + t2)
+	for e in sk.get("on_kill", []):
+		var t3 := "+%d chips" % int(e.get("amount", 0)) if e.get("type", "") == "money" else effect_text(e, level)
+		if t3 != "":
+			lines.append("• On a kill: " + t3)
 	return "\n".join(lines)
 
 
@@ -331,7 +335,11 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "A random boon for %d rounds" % rounds
 		"fatigue":
 			if e.get("amount") is Array:
-				return "+%d-%d Fatigue" % [int(e.amount[0]), int(e.amount[1])]
+				var lo := int(e.amount[0])
+				var hi := int(e.amount[1])
+				if hi <= 0:
+					return "Relieves %d-%d Fatigue%s" % [-hi, -lo, chance]
+				return "+%d-%d Fatigue" % [lo, hi]
 			var fa := int(e.get("amount", 5))
 			if fa < 0:
 				fa = int(round(fa * (1.0 + 0.15 * (level - 1))))

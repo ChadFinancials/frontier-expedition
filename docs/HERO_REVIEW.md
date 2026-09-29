@@ -51,17 +51,19 @@ Notes:
 
 Drove steel for the railroad until the railroad forgot to pay. Swings a nine-pound hammer like it weighs nothing.
 
-`rail_driver` | HP **27** | dodge 0 | prot 15 | speed 1 | acc +0 | crit 3% | dmg 7-13 | prefers ranks 12
+`rail_driver` | HP **27** | dodge 2 | prot 10 | speed 1 | acc +0 | crit 2% | dmg 7-13 | prefers ranks 12
 Resists: stun 45, bleed 35, poison 35, move 60, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Hammer Blow**: A nine-pound sledge to the chest. Knocks the target back. | 12 | one of 1 | 85 | 8-14 | knockback 1 |
-| **Spike Drive**: Drives the hammer down like a railroad spike. Stuns. | 12 | one of 12 | 88 | 5-9 | stun |
-| **Steel-Driving Rhythm**: Finds the work song's beat. Gains Damage and Speed. | 123 | self | - | - | dmg_pct +25 for 3 rounds; speed +2 for 3 rounds |
-| **Line Breaker**: A sweeping swing that shoves the front two enemies back. | 1 | ALL of 12 | 85 | 4-8 each | knockback 1 (90%) |
-| **Brace**: Sets their feet like a railroad tie. Gains Protection and heals a little. | 1234 | self | - | - | prot +25 for 2 rounds; heals 2-4 HP |
-| **Sledge Toss**: Hurls a spare sledge from the second line, then steps forward. | 23 | one of 23 | 80 | 6-11 | self: user moves forward 1 |
+| **Hammerfell**: The whole nine pounds, straight down. Knocks the target back. | 12 | one of 1 | 92 | 7-13 | knockback 1 |
+| **Rain of Nails**: Swings a keg of railroad spikes into the second line. Slows. | 12 | ALL of 23 | 90 | 7-13 each | speed -3 for 2 rounds (90%) |
+| **Hammered Rhythm**: Finds the work song's beat. Gains Damage and Speed. | 123 | self | - | - | dmg_pct +20 for 3 rounds; speed +2 for 3 rounds |
+| **Line Breaker**: A sweeping swing that shoves the front two enemies back. | 1 | ALL of 12 | 85 | 7-13 each | knockback 1 (90%) |
+| **Brace Yourselves!**: Sets their feet and bellows for the enemy to come at them. Gains Protection, heals a little, and Marks themself as the target. | 12 | self | - | - | prot +20 for 2 rounds; heals 2-4 HP; mark 2 rounds |
+| **Sledge Toss**: Hurls a spare sledge blind into the enemy line, then steps forward. | 23 | 1 random in 234 | 85 | 7-13 x1 hits | self: user moves forward 1 |
+| **Hammer Frenzy**: Three wild swings at whatever's closest. Leaves them off balance, and the Rail Driver winded (stuns self). | 12 | 3 random in 1234 | 85 | 7-13 x3 hits | dodge -5 for 2 rounds; self: stun |
+| **Quarrel**: "You want some of this?" Marks the target and cracks its guard. | 123 | one of 12 | 90 | - | mark 3 rounds; prot -15 for 3 rounds |
 
 Notes: 
 
@@ -69,17 +71,19 @@ Notes:
 
 Fastest hands this side of the Missouri, and knows it. Fights anywhere in the line, empties cylinders faster than anyone can count.
 
-`gunslinger` | HP **19** | dodge 12 | prot 0 | speed 6 | acc +0 | crit 7% | dmg 4-9 | prefers ranks 123
+`gunslinger` | HP **19** | dodge 12 | prot 0 | speed 6 | acc +0 | crit 6% | dmg 4-9 | prefers ranks 123
 Resists: stun 30, bleed 30, poison 30, move 30, debuff 30, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Quick Draw**: Clears leather before anyone else can blink. Reaches any rank. | 123 | one of 1234 | 90 | 4-8, +5% crit | - |
-| **Fan the Hammer**: Three rapid shots at random enemies. | 12 | 3 random in 1234 | 80 | 2-4 x3 hits | - |
-| **Twin Shots**: Both pistols at once, two hits on one target. | 23 | one of 234 | 85 | 3-6 x2 hits | - |
-| **Point Blank**: Jams the barrel into the enemy's gut, fires, then steps back. | 1 | one of 1 | 95 | 7-14, +5% crit | self: user moves back 1 |
+| **Quick Draw**: Clears leather before anyone else can blink. Reaches any rank. | 234 | one of 1234 | 92 | 4-8, +5% crit | - |
+| **Fan the Hammer**: Three rapid shots at random enemies. | 23 | 3 random in 1234 | 82 | 4-9 x3 hits | - |
+| **Twin Shots**: Both pistols at once, two hits on one target. | 12 | one of 234 | 88 | 4-9 x2 hits | - |
+| **Point Blank**: Jams the barrel into the enemy's gut, fires, then steps back. | 1 | one of 1 | 98 | 4-9, +6% crit | self: user moves back 1 |
 | **Duck and Weave**: Rolls forward into cover. Gains Dodge. | 234 | self | - | - | dodge +20 for 2 rounds; self: user moves forward 1 |
 | **Called Shot**: Takes careful aim. Huge bonus damage against Marked targets. | 23 | one of 1234 | 90 | 4-7, +8% crit, +60% vs marked | - |
+| **Armor-Piercing Rounds**: Loads steel-cored rounds. Attacks ignore 15% of the target's Protection. | 23 | self | - | - | pierce +15 for 3 rounds |
+| **Smokescreen**: A shot into a powder pouch: a cloud of black smoke. The target is slowed and easier to hit. | 23 | one of 123 | 90 | 4-9 | speed -2 for 2 rounds; dodge -6 for 2 rounds |
 
 Notes: 
 
@@ -87,17 +91,19 @@ Notes:
 
 Cattle drover with a loyal dog named Biscuit and a rope that never misses. Drags enemies where they don't want to be.
 
-`wrangler` | HP **21** | dodge 8 | prot 0 | speed 5 | acc +0 | crit 5% | dmg 4-8 | prefers ranks 23
+`wrangler` | HP **21** | dodge 8 | prot 0 | speed 4 | acc +0 | crit 3% | dmg 4-8 | prefers ranks 23
 Resists: stun 35, bleed 35, poison 35, move 40, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Sic 'Em**: Biscuit the cattle dog goes for the ankles. Bleed; bonus against Marked targets. | 123 | one of 1234 | 90 | 4-8, +50% vs marked | bleed 2 x3 rounds |
-| **Lasso**: Ropes a back-line enemy and hauls them forward. Pull 2 and Mark. | 234 | one of 234 | 90 | 2-3 | pull 2; mark 2 rounds |
-| **Hogtie**: Ties the enemy up like a calf at branding. Stuns. | 123 | one of 12 | 90 | 1-2 | stun |
-| **Bullwhip**: A crack of the whip that throws the target off balance. Slows. | 123 | one of 123 | 88 | 4-6 | speed -3 for 2 rounds; dodge -8 for 2 rounds |
-| **Heel!**: Sends Biscuit to stand by an ally. The ally gains Dodge and Protection. | 1234 | one ally in 1234 | - | - | dodge +15 for 3 rounds; prot +10 for 3 rounds |
-| **Round 'Em Up**: A drover's whistle that gets everyone moving. Party sheds Fatigue and gains Accuracy. | 1234 | whole party | - | - | -4 fatigue (relief); acc +5 for 2 rounds |
+| **Sic 'Em**: Biscuit the cattle dog goes for the ankles. Bleed; bonus against Marked targets. | 23 | one of 1234 | 90 | 4-8, +50% vs marked | bleed 2 x3 rounds |
+| **Lasso**: Ropes a back-line enemy and hauls them forward. Pull 2 and Mark. | 234 | one of 34 | 92 | 2-3 | pull 2; mark 2 rounds |
+| **Hogtie**: Ties the enemy up like a calf at branding. Stuns. | 23 | one of 12 | 90 | 1-2 | stun |
+| **Crack the Whip**: A whip-crack over an ally's head (or their own): get moving! Gains Damage and Speed. | 234 | one ally in 1234 | - | - | dmg_flat +2 for 3 rounds; speed +2 for 3 rounds |
+| **Good Boy**: Biscuit trots over and leans on someone. Heals a little, and often takes the edge off. | 234 | one ally in 1234 | - | - | heals 2-5 HP; -2 to -5 fatigue (relief) (60%) |
+| **Round 'Em Up**: A drover's whistle that gets everyone moving. The party gains Accuracy. | 1234 | whole party | - | - | acc +5 for 3 rounds |
+| **Snarl**: Biscuit bares every tooth he has at the front line. They back off a step: less Protection and Damage. | 12 | ALL of 12 | 95 | - | prot -5 for 3 rounds; dmg_flat -2 for 3 rounds |
+| **Lightspeed Whip**: Twenty feet of braided leather that reaches the very back. Bonus against Marked targets. | 23 | one of 4 | 90 | 4-8, +50% vs marked | - |
 
 Notes: 
 
@@ -105,17 +111,19 @@ Notes:
 
 Riverboat card sharp who bet a fortune on the frontier. Every shot is a wager, and the house doesn't always win.
 
-`gambler` | HP **17** | dodge 12 | prot 0 | speed 5 | acc +0 | crit 10% | dmg 4-8 | prefers ranks 23
+`gambler` | HP **16** | dodge 15 | prot 0 | speed 6 | acc +5 | crit 5% | dmg 4-8 | prefers ranks 23
 Resists: stun 30, bleed 30, poison 30, move 30, debuff 40, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Derringer**: A pocket pistol from the sleeve. Reliable at short range. | 123 | one of 123 | 90 | 4-8 | - |
-| **Double or Nothing**: A wild shot: half the time it deals double damage, the other half it barely scratches. | 234 | one of 1234 | 85 | 4-9, 50/50: double or quarter | - |
-| **Razor Card**: A playing card with a honed steel edge. Bleed. | 234 | one of 234 | 90 | 2-5 | bleed 3 x3 rounds |
+| **Ace up the Sleeve**: A pocket pistol from the sleeve, and a steadier hand after. | 12 | one of 123 | 90 | 4-8 | self: acc +5 for 3 rounds |
+| **ALL IN**: Pushes every chip to the middle of the table. Big Damage, Accuracy and Speed, but everyone's watching (Marks self). | 234 | self | - | - | mark 3 rounds; dmg_pct +25 for 3 rounds; acc +10 for 3 rounds; speed +2 for 3 rounds |
+| **Deal 'Em**: Deals a hand of razor-edged cards to the whole table. Bleed. | 234 | ALL of 1234 | 85 | 4-8 each | bleed 2 x3 rounds |
 | **Stacked Deck**: Deals every ally a card: each gets a random boon. | 1234 | whole party | - | - | random boon for 3 rounds |
-| **Bluff**: A poker face that could curdle milk. Lowers the target's Accuracy and Damage. | 1234 | one of 1234 | 95 | - | acc -15 for 2 rounds; dmg_pct -15 for 2 rounds |
-| **Lucky Streak**: Kisses the lucky coin. Gains Crit and sheds Fatigue. | 1234 | self | - | - | crit +20 for 3 rounds; -6 fatigue (relief) |
+| **Poker Face**: Gives nothing away. Gains Dodge and Speed. | 234 | self | - | - | dodge +10 for 3 rounds; speed +2 for 3 rounds |
+| **Money Shot**: A shot with a bounty on it. If it kills, the Gambler pockets 50 chips and breathes easier. | 23 | one of 234 | 88 | 4-8 | on kill: +50 chips; on kill: -5 fatigue (relief) |
+| **Assign the Joker**: Flicks the Joker at a back-liner: Marked, and off their game. | 234 | one of 34 | 88 | - | mark 3 rounds; dodge -12 for 3 rounds; acc -10 for 3 rounds |
+| **Lotto Ticket**: A one-in-a-hundred shot from the very back. Nearly always misses; when it hits, it's a jackpot. Stack Accuracy to make it pay. | 4 | one of 1234 | 20 | 4-8 | - |
 
 Notes: 
 
