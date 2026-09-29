@@ -233,4 +233,10 @@
       (was 12 / 32 / 60 / 100). Roughly: a side quest ≈ 13 XP, a main trail ≈ 20.
 - [ ] Jagged edges on circles and cutouts (aliasing). Later.
 - [ ] Cave lamplight is too easy to ignore. Expand later.
-- [ ] Enemy deep dive: docs/ENEMY_REVIEW.md (tools/enemy_sheet.py) lists every enemy and move.
+- [x] Enemy deep dive: docs/ENEMY_REVIEW.md (tools/enemy_sheet.py) lists every enemy and move.
+      Tuned every Fort Providence enemy and boss (outlaws, wolves, snakes, crows, coyote, haint,
+      lieutenant, bull, Silas, Mulligan, claim jumper, bat, tommyknockers, Jeb, Ruby, crawler).
+      New engine support: per-move damage ranges, flat damage buffs, stacking pack buffs,
+      multi-summons, opener/once moves, low-HP move priority, out-of-position repositioning.
+- Focus: testing is locked to the first region (Tallgrass) and its side adventures and quests.
+  Red Canyon / Thunder Peaks enemies and the second settlement wait until the start is crisp.
