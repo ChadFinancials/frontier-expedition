@@ -17,11 +17,11 @@ Resists: stun 50, bleed 35, poison 30, move 50, debuff 35, deathblow 67
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | **Iron Justice**: A point-blank revolver shot, delivered with the full weight of the law. | 123 | one of 12 | 90 | 5-10, +2% crit | - |
-| **Pistol-Whip**: Cracks a revolver butt across a skull. Stuns. | 12 | one of 12 | 90 | 5-10 | stun |
+| **Pistol-Whip**: Cracks a revolver butt across a skull. Stuns. | 12 | one of 12 | 90 | 2-3 | stun |
 | **Deputize**: Steps in to shield an ally: attacks aimed at them hit the Marshal instead. The Marshal gains Protection. | 123 | one ally in 1234 | - | - | guards the ally for 3 rounds; self: prot +15 for 3 rounds |
 | **Serve a Warrant**: Names the target a wanted outlaw: Marked, and easier to hit. | 123 | one of 1234 | 100 | - | mark 3 rounds; dodge -10 for 3 rounds |
 | **Hold the Line**: Plants their boots. Taunts enemies into attacking the Marshal, gains Protection and sheds Fatigue. | 12 | self | - | - | taunt 2 rounds; prot +20 for 2 rounds; -4 fatigue (relief) |
-| **Weighted Shot**: A heavy-loaded round that hits like a mule's kick. Knocks the target back 2 ranks. | 12 | one of 12 | 90 | 5-10 | knockback 2 |
+| **Weighted Shot**: A heavy-loaded round that hits like a mule's kick. Knocks the target back 2 ranks. | 12 | one of 12 | 90 | 2-4 | knockback 2 |
 | **Flash the Badge**: "By the authority of the Territory!" Shakes an ally free: clears stuns and every debuff, and hurries them along. | 123 | one ally in 1234 | - | - | cures stun/debuff; speed +2 for 3 rounds |
 | **Armor-Piercing Rounds**: Thumbs steel-jacketed rounds into the cylinder. Attacks ignore 20% of the target's Protection. | 123 | self | - | - | pierce +20 for 3 rounds |
 
@@ -37,12 +37,12 @@ Resists: stun 35, bleed 40, poison 50, move 40, debuff 50, deathblow 67
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | **Axe Cleave**: A wide swing of a felling axe that catches both front ranks. | 12 | ALL of 12 | 85 | 4-6 each | - |
-| **Grizzly Chop**: An overhead chop. Much stronger when the Mystic is below half health. | 12 | one of 12 | 95 | 5-10, +4% crit, +50% when below half HP | - |
+| **Grizzly Chop**: An overhead chop. Much stronger when the Mystic is below half health. | 12 | one of 12 | 95 | 6-12, +4% crit, +50% when below half HP | - |
 | **Gnarl at the Flesh**: Bites into their own arm and melts back into the trees: moves back 2, bleeds, and is hard to hit for a round. | 12 | self | - | - | bleed 2 x3 rounds; dodge +30 for 1 rounds; self: user moves back 2 |
 | **Bear Trap**: Kicks a sprung trap into the brush; it snaps shut on whoever steps there. Bleed and Slow. | 34 | 1 random in 234 | 90 | 3-5 x1 hits | bleed 2 x3 rounds; speed -3 for 2 rounds |
 | **Take a Piece of Me**: Old mountain medicine paid in the Mystic's own blood: heals an ally and hardens them against bleeding and venom. | 34 | one ally in 1234 | - | - | heals 6-10 HP; bleed_res +10 for 3 rounds; poison_res +10 for 3 rounds; self: self_damage |
 | **Bellow**: A roar from deep in the trees. Lowers all enemies' Accuracy, but it takes something out of the Mystic. | 4 | ALL of 1234 | 95 | - | acc -10 for 2 rounds; self: +3 fatigue |
-| **From the Shadows**: Steps out of the tree line swinging: moves forward 2 and gains Crit and Damage. | 34 | one of 123 | 90 | 5-10 | self: user moves forward 2; self: crit +4 for 3 rounds; self: dmg_flat +2 for 3 rounds |
+| **From the Shadows**: Steps out of the tree line swinging: moves forward 2 and gains Crit and Damage. | 34 | one of 123 | 90 | 2-5 | self: user moves forward 2; self: crit +4 for 3 rounds; self: dmg_flat +2 for 3 rounds |
 | **Edible Meat**: Best not to ask what it is. Heals and cures Bleed and Poison. | 234 | self | - | - | heals 3-6 HP; cures bleed/poison |
 
 Notes: 
@@ -56,13 +56,13 @@ Resists: stun 45, bleed 35, poison 35, move 60, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Hammerfell**: The whole nine pounds, straight down. Knocks the target back. | 12 | one of 1 | 92 | 7-13 | knockback 1 |
-| **Rain of Nails**: Swings a keg of railroad spikes into the second line. Slows. | 12 | ALL of 23 | 90 | 7-13 each | speed -3 for 2 rounds (90%) |
+| **Hammerfell**: The whole nine pounds, straight down. Knocks the target back. | 12 | one of 1 | 92 | 7-12 | knockback 1 |
+| **Rain of Nails**: Swings a keg of railroad spikes into the second line. Slows. | 12 | ALL of 23 | 90 | 3-5 each | speed -3 for 2 rounds (90%) |
 | **Hammered Rhythm**: Finds the work song's beat. Gains Damage and Speed. | 123 | self | - | - | dmg_pct +20 for 3 rounds; speed +2 for 3 rounds |
-| **Line Breaker**: A sweeping swing that shoves the front two enemies back. | 1 | ALL of 12 | 85 | 7-13 each | knockback 1 (90%) |
+| **Line Breaker**: A sweeping swing that shoves the front two enemies back. | 1 | ALL of 12 | 85 | 3-5 each | knockback 1 (90%) |
 | **Brace Yourselves!**: Sets their feet and bellows for the enemy to come at them. Gains Protection, heals a little, and Marks themself as the target. | 12 | self | - | - | prot +20 for 2 rounds; heals 2-4 HP; mark 2 rounds |
-| **Sledge Toss**: Hurls a spare sledge blind into the enemy line, then steps forward. | 23 | 1 random in 234 | 85 | 7-13 x1 hits | self: user moves forward 1 |
-| **Hammer Frenzy**: Three wild swings at whatever's closest. Leaves them off balance, and the Rail Driver winded (stuns self). | 12 | 3 random in 1234 | 85 | 7-13 x3 hits | dodge -5 for 2 rounds; self: stun |
+| **Sledge Toss**: Hurls a spare sledge blind into the enemy line, then steps forward. | 23 | 1 random in 234 | 85 | 8-12 x1 hits | self: user moves forward 1 |
+| **Hammer Frenzy**: Three wild swings at whatever's closest. Leaves them off balance, and the Rail Driver winded (stuns self). | 12 | 3 random in 1234 | 85 | 6-8 x3 hits | dodge -5 for 2 rounds; self: stun |
 | **Quarrel**: "You want some of this?" Marks the target and cracks its guard. | 123 | one of 12 | 90 | - | mark 3 rounds; prot -15 for 3 rounds |
 
 Notes: 
@@ -77,13 +77,13 @@ Resists: stun 30, bleed 30, poison 30, move 30, debuff 30, deathblow 67
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | **Quick Draw**: Clears leather before anyone else can blink. Reaches any rank. | 234 | one of 1234 | 92 | 4-8, +5% crit | - |
-| **Fan the Hammer**: Three rapid shots at random enemies. | 23 | 3 random in 1234 | 82 | 4-9 x3 hits | - |
-| **Twin Shots**: Both pistols at once, two hits on one target. | 12 | one of 234 | 88 | 4-9 x2 hits | - |
-| **Point Blank**: Jams the barrel into the enemy's gut, fires, then steps back. | 1 | one of 1 | 98 | 4-9, +6% crit | self: user moves back 1 |
+| **Fan the Hammer**: Three rapid shots at random enemies. | 23 | 3 random in 1234 | 82 | 3-5 x3 hits | - |
+| **Twin Shots**: Both pistols at once, two hits on one target. | 12 | one of 234 | 88 | 3-6 x2 hits | - |
+| **Point Blank**: Jams the barrel into the enemy's gut, fires, then steps back. | 1 | one of 1 | 98 | 7-12, +6% crit | self: user moves back 1 |
 | **Duck and Weave**: Rolls forward into cover. Gains Dodge. | 234 | self | - | - | dodge +20 for 2 rounds; self: user moves forward 1 |
 | **Called Shot**: Takes careful aim. Huge bonus damage against Marked targets. | 23 | one of 1234 | 90 | 4-7, +8% crit, +60% vs marked | - |
 | **Armor-Piercing Rounds**: Loads steel-cored rounds. Attacks ignore 15% of the target's Protection. | 23 | self | - | - | pierce +15 for 3 rounds |
-| **Smokescreen**: A shot into a powder pouch: a cloud of black smoke. The target is slowed and easier to hit. | 23 | one of 123 | 90 | 4-9 | speed -2 for 2 rounds; dodge -6 for 2 rounds |
+| **Smokescreen**: A shot into a powder pouch: a cloud of black smoke. The target is slowed and easier to hit. | 23 | one of 123 | 90 | 1-3 | speed -2 for 2 rounds; dodge -6 for 2 rounds |
 
 Notes: 
 
@@ -103,7 +103,7 @@ Resists: stun 35, bleed 35, poison 35, move 40, debuff 35, deathblow 67
 | **Good Boy**: Biscuit trots over and leans on someone. Heals a little, and often takes the edge off. | 234 | one ally in 1234 | - | - | heals 2-5 HP; -2 to -5 fatigue (relief) (60%) |
 | **Round 'Em Up**: A drover's whistle that gets everyone moving. The party gains Accuracy. | 1234 | whole party | - | - | acc +5 for 3 rounds |
 | **Snarl**: Biscuit bares every tooth he has at the front line. They back off a step: less Protection and Damage. | 12 | ALL of 12 | 95 | - | prot -5 for 3 rounds; dmg_flat -2 for 3 rounds |
-| **Lightspeed Whip**: Twenty feet of braided leather that reaches the very back. Bonus against Marked targets. | 23 | one of 4 | 90 | 4-8, +50% vs marked | - |
+| **Lightspeed Whip**: Twenty feet of braided leather that reaches the very back. Bonus against Marked targets. | 23 | one of 4 | 90 | 5-10, +50% vs marked | - |
 
 Notes: 
 
@@ -116,14 +116,14 @@ Resists: stun 30, bleed 30, poison 30, move 30, debuff 40, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Ace up the Sleeve**: A pocket pistol from the sleeve, and a steadier hand after. | 12 | one of 123 | 90 | 4-8 | self: acc +5 for 3 rounds |
+| **Ace up the Sleeve**: A pocket pistol from the sleeve, and a steadier hand after. | 12 | one of 123 | 90 | 2-8 | self: acc +5 for 3 rounds |
 | **ALL IN**: Pushes every chip to the middle of the table. Big Damage, Accuracy and Speed, but everyone's watching (Marks self). | 234 | self | - | - | mark 3 rounds; dmg_pct +25 for 3 rounds; acc +10 for 3 rounds; speed +2 for 3 rounds |
-| **Deal 'Em**: Deals a hand of razor-edged cards to the whole table. Bleed. | 234 | ALL of 1234 | 85 | 4-8 each | bleed 2 x3 rounds |
+| **Deal 'Em**: Deals a hand of razor-edged cards to the whole table. Bleed. | 234 | ALL of 1234 | 85 | 2-4 each | bleed 2 x3 rounds |
 | **Stacked Deck**: Deals every ally a card: each gets a random boon. | 1234 | whole party | - | - | random boon for 3 rounds |
 | **Poker Face**: Gives nothing away. Gains Dodge and Speed. | 234 | self | - | - | dodge +10 for 3 rounds; speed +2 for 3 rounds |
-| **Money Shot**: A shot with a bounty on it. If it kills, the Gambler pockets 50 chips and breathes easier. | 23 | one of 234 | 88 | 4-8 | on kill: +50 chips; on kill: -5 fatigue (relief) |
+| **Money Shot**: A shot with a bounty on it. If it kills, the Gambler pockets 50 chips and breathes easier. | 23 | one of 234 | 88 | 2-12 | on kill: +50 chips; on kill: -5 fatigue (relief) |
 | **Assign the Joker**: Flicks the Joker at a back-liner: Marked, and off their game. | 234 | one of 34 | 88 | - | mark 3 rounds; dodge -12 for 3 rounds; acc -10 for 3 rounds |
-| **Lotto Ticket**: A one-in-a-hundred shot from the very back. Nearly always misses; when it hits, it's a jackpot. Stack Accuracy to make it pay. | 4 | one of 1234 | 20 | 4-8 | - |
+| **Lotto Ticket**: A one-in-a-hundred shot from the very back. Nearly always misses; when it hits, it's a jackpot. Stack Accuracy to make it pay. | 4 | one of 1234 | 20 | 24-48 | - |
 
 Notes: 
 
@@ -131,35 +131,36 @@ Notes:
 
 Forty-niner who never struck it rich but learned everything about blowing up rock. Carries more dynamite than is strictly legal.
 
-`prospector` | HP **20** | dodge 5 | prot 5 | speed 3 | acc +0 | crit 5% | dmg 5-10 | prefers ranks 234
+`prospector` | HP **22** | dodge 5 | prot 5 | speed 3 | acc +0 | crit 2% | dmg 5-10 | prefers ranks 234
 Resists: stun 35, bleed 35, poison 45, move 35, debuff 30, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Dynamite**: A lit stick lobbed into the enemy's back lines. | 34 | ALL of 234 | 85 | 3-5 each | - |
-| **Pickaxe**: Swings the old pick like they're chasing a vein of gold. | 12 | one of 12 | 85 | 6-10, +3% crit | - |
-| **Blasting Cap**: A short-fused cap at the front line. May Stun. | 234 | ALL of 12 | 85 | 3-5 each | stun (70%) |
-| **Flash Powder**: A blinding puff of magnesium. Lowers all enemies' Accuracy. | 234 | ALL of 1234 | 90 | - | acc -12 for 2 rounds |
-| **Hold the Lamp**: Raises the miner's lamp. Party gains Dodge; in caves, restores Lamplight. | 1234 | whole party | - | - | dodge +6 for 2 rounds; self: lamplight +20 |
-| **Rock Hammer**: Finds the weak seam in the enemy's armor. Lowers Protection. | 123 | one of 123 | 88 | 4-7 | prot -20 for 3 rounds |
+| **Dynamite Toss**: A lit stick lobbed into the enemy's back lines. | 34 | ALL of 234 | 85 | 2-4 each | stun (50%) |
+| **Pickaxe**: Swings the old pick like they're chasing a vein of gold. | 12 | one of 12 | 90 | 6-10, +3% crit | - |
+| **Blasting Charge**: A charge with a short fuse, planted on one enemy. May Stun. | 234 | one of 123 | 90 | 4-6 | stun (85%) |
+| **Flash Powder**: A blinding puff of magnesium over the front pair or the back pair. Lowers Accuracy. | 234 | ALL of 12 or 34 | 85 | - | acc -12 for 2 rounds |
+| **Raise the Lamp**: Holds the miner's lamp high. The party gains Dodge and Accuracy; in caves, restores Lamplight. | 23 | whole party | - | - | dodge +3 for 2 rounds; acc +3 for 2 rounds; self: lamplight +20 |
+| **Depth Charge**: A mining charge rolled into the front line. Huge blast: may Stun and knock back 2. *(once per fight)* | 34 | one of 12 | 90 | 8-12 | stun (75%); knockback 2 (90%) |
 
 Notes: 
 
-## Sharpshooter  (Marksman)
+## Bayou Poisoner  (Poisoner)
 
-Former army scout with a long rifle and a patient eye. Picks targets apart from the back of the line.
+Grew up on the edge of a Louisiana swamp and never lost the taste for it. Darts, gas and unspeakable frogs: poisons the enemy line, and grows deadlier when poisoned too.
 
-`sharpshooter` | HP **17** | dodge 5 | prot 0 | speed 3 | acc +0 | crit 8% | dmg 5-10 | prefers ranks 34
+`sharpshooter` | HP **17** | dodge 12 | prot 0 | speed 5 | acc +0 | crit 5% | dmg 5-10 | prefers ranks 34
 Resists: stun 30, bleed 30, poison 30, move 35, debuff 30, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Long Shot**: A steady rifle shot across the whole field. | 34 | one of 234 | 90 | 6-11, +4% crit | - |
-| **Sight In**: Finds the range. Marks the target and lowers its Protection. | 34 | one of 1234 | 100 | - | mark 3 rounds; prot -15 for 3 rounds |
-| **Kill Shot**: Weak against most targets, devastating against a Marked one. | 34 | one of 1234 | 88 | 4-8, +6% crit, +80% vs marked | - |
-| **Suppressing Fire**: Rakes the whole enemy line. Slows. | 34 | ALL of 1234 | 80 | 2-4 each | speed -2 for 2 rounds |
-| **Kneecap**: A low shot that hobbles. Lowers Dodge. | 234 | one of 123 | 90 | 4-6 | dodge -15 for 3 rounds |
-| **Field Bandage**: Army-issue bandage wrap. Heals and stops bleeding. | 234 | one ally in 1234 | - | - | heals 2-4 HP; cures bleed |
+| **Poison Darts**: Two blowgun darts into the enemy line. Weakens their resistances and Poisons (worse if the user is poisoned too). | 34 | 2 random in 234 | 90 | 2-4 x2 hits | debuff_res -10 for 2 rounds; poison_res -10 for 2 rounds; poison 2 x2 rounds (4 if user poisoned) |
+| **Gas Cloud**: A gourd of swamp gas bursts over the enemy. Lowers Debuff and Poison Resist, and whatever ails them lingers a round longer. | 34 | 2 random in 1234 | 95 | - | existing poison/bleed/debuffs +1 round; debuff_res -10 for 2 rounds; poison_res -10 for 2 rounds |
+| **Bola Shot**: Weighted cords whirl into the middle of the line and tangle both. Stuns. | 234 | ALL of 23 | 85 | 2-3 each | stun (80%) |
+| **Suppressing Fire**: A spray of darts across the front of the line. Slows. | 34 | ALL of 123 | 90 | 2-3 each | speed -2 for 2 rounds |
+| **Blighted Sacrament**: A thorn dipped in the worst of the bayou. Heavy Poison; hits much harder if the user is poisoned. | 23 | 1 random in 123 | 90 | 4-6 x1 hits, +80% while user is poisoned | poison 5 x3 rounds |
+| **Questionable Mushroom**: Eats something off a log. It's fine. Mostly. Poisons self a little and sheds Fatigue. | 234 | self | - | - | poison 1 x3 rounds; -6 fatigue (relief) |
+| **Sticky Frog**: Lobs a very unhappy tree frog. Whoever it lands on can't see straight or step lively. | 23 | 2 random in 123 | 90 | - | acc -10 for 2 rounds; dodge -5 for 2 rounds |
 
 Notes: 
 
@@ -167,17 +168,17 @@ Notes:
 
 Studied medicine back east, practices it out west, and has opinions about which tinctures go in patients and which go in outlaws.
 
-`frontier_doctor` | HP **16** | dodge 5 | prot 0 | speed 5 | acc +0 | crit 4% | dmg 4-7 | prefers ranks 34
+`frontier_doctor` | HP **16** | dodge 10 | prot 0 | speed 4 | acc +0 | crit 3% | dmg 3-6 | prefers ranks 34
 Resists: stun 30, bleed 40, poison 60, move 30, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| **Poison Dart**: A blowgun dart dipped in something nasty. Strong Poison on the back line. | 234 | one of 34 | 90 | 1-3 | poison 4 x3 rounds |
-| **Caustic Tonic**: A flask of acid-green tonic that splashes the front line. Poison. | 34 | ALL of 12 | 85 | 1-1 each | poison 3 x3 rounds |
-| **Battlefield Surgery**: Quick, bloody, effective. Heals and cures Bleed and Poison. | 234 | one ally in 1234 | - | - | heals 4-6 HP; cures bleed/poison |
-| **Smelling Salts**: Snaps an ally back to their senses. Cures Stun, Bleed and Poison; heals a little and gains Speed. | 234 | one ally in 1234 | - | - | heals 2-2 HP; cures bleed/poison/stun; speed +3 for 2 rounds |
-| **Chloroform**: A soaked rag over the mouth. Stuns. | 123 | one of 12 | 90 | - | stun |
-| **Laudanum**: A few drops take the edge off. Big Fatigue relief, but slows the patient. | 1234 | one ally in 1234 | - | - | -10 fatigue (relief); speed -2 for 2 rounds |
+| **Flask of Vileness**: A flask of something vile, uncorked in the back line. Strong Poison. | 34 | one of 234 | 90 | 1-3 | poison 4 x3 rounds |
+| **Experimental Tonic**: Untested, but promising. Heals a little, may ease or add Fatigue, and gives a Damage boost. | 34 | one ally in 1234 | - | - | heals 2-4 HP; -5 to +3 fatigue; dmg_pct +10 for 3 rounds |
+| **Battlefield Surgery**: Quick, bloody, effective, and the patient goes under for it. A big heal, cures Bleed and Poison, and they're braced but stunned. | 34 | one ally in 1234 | - | - | heals 8-12 HP; cures bleed/poison; stun; prot +25 for 1 rounds |
+| **Smelling Salts**: Snaps an ally back to their senses. Cures Stun, Bleed and Poison, and gains Speed. | 234 | one ally in 1234 | - | - | cures bleed/poison/stun; speed +3 for 2 rounds |
+| **Chloroform Rag**: A soaked rag over the mouth. Stuns. | 34 | one of 1 | 90 | 1-2 | stun |
+| **Laudanum**: A few drops take the edge off. Big Fatigue relief, but the patient is slow and sluggish. | 234 | one ally in 1234 | - | - | -12 fatigue (relief); speed -2 for 2 rounds; dodge -5 for 2 rounds |
 
 Notes: 
 
@@ -185,13 +186,13 @@ Notes:
 
 Carries a battered Bible, a brass lantern, and more faith than the rest of the company combined. Mends bodies and spirits alike.
 
-`preacher` | HP **19** | dodge 3 | prot 0 | speed 1 | acc +0 | crit 3% | dmg 4-7 | prefers ranks 34
+`preacher` | HP **20** | dodge 3 | prot 5 | speed 1 | acc +0 | crit 2% | dmg 4-7 | prefers ranks 34
 Resists: stun 40, bleed 30, poison 30, move 35, debuff 45, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | **Laying On of Hands**: A prayer and a firm hand. A strong single heal. | 234 | one ally in 1234 | - | - | heals 4-7 HP |
-| **Revival Meeting**: Leads the company in a hymn. Heals everyone a little. | 34 | whole party | - | - | heals 2-3 HP |
+| **Revival Meeting**: Leads the company in a hymn. Heals everyone a little. | 34 | whole party | - | - | heals 1-3 HP |
 | **Sermon on the Trail**: Words of comfort for weary souls. Party sheds Fatigue and gains Accuracy. | 234 | whole party | - | - | -3 fatigue (relief); acc +3 for 2 rounds |
 | **Fire and Brimstone**: Lifts the brass lantern and blazes holy light. May Stun. | 34 | one of 123 | 85 | 1-2 | stun |
 | **Righteous Smite**: Brings the good book down hard. Extra damage against mythic creatures. | 12 | one of 12 | 85 | 4-7, +50% vs mythic | - |

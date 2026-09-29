@@ -68,6 +68,10 @@ static func from_enemy(eid: String, uid: int, t: int, cave: bool) -> Combatant:
 	return c
 
 
+func is_poisoned() -> bool:
+	return dots.any(func(d): return d.kind == "poison")
+
+
 func is_hero() -> bool:
 	return side == "hero"
 

@@ -536,7 +536,11 @@ func _update_preview() -> void:
 					parts.append("%s %d%%" % [e.type.capitalize(), engine.effect_chance(a, selected_skill, e, t)])
 				elif e.type == "mark":
 					parts.append("Mark")
-			if sk.get("aoe", false):
+			if sk.get("aoe", false) and not sk.get("aoe_groups", []).is_empty():
+				for g in sk.aoe_groups:
+					if t.rank in g:
+						parts.append("(hits everyone in ranks %s)" % "-".join(g.map(func(x): return str(x))))
+			elif sk.get("aoe", false):
 				parts.append("(hits all highlighted)")
 			lines.append("  ".join(parts))
 		else:
@@ -697,7 +701,7 @@ func _result(e: Dictionary) -> void:
 				_log("%s heals %d." % [t3.display_name, e.amount])
 		"status":
 			var t4 := engine.unit(e.target)
-			var names := {"bleed": "Bleeding", "poison": "Poisoned", "stun": "Stunned", "mark": "Marked", "guard": "Guarded", "taunt": "Taunting"}
+			var names := {"bleed": "Bleeding", "poison": "Poisoned", "stun": "Stunned", "mark": "Marked", "guard": "Guarded", "taunt": "Taunting", "worse": "Lingering"}
 			if t4 != null:
 				_popup(t4, names.get(e.status, e.status), Color("#f0a080") if e.status in ["bleed", "poison", "stun", "mark"] else Color("#9fd07a"), 22, 40)
 				_log("%s is %s." % [t4.display_name, names.get(e.status, e.status).to_lower()])

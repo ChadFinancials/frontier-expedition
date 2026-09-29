@@ -362,6 +362,8 @@ func valid_targets(c: Combatant, sid: String) -> Array:
 	var sk := DB.skill(sid)
 	if sk.is_empty() or not can_use_from_rank(c, sid):
 		return []
+	if (sk.get("once_per_fight", false) or sk.get("ai", {}).get("once", false)) and sid in c.used_skills:
+		return []
 	var out: Array = []
 	match sk.get("target", "enemy"):
 		"enemy":
@@ -437,6 +439,8 @@ func dmg_mult(a: Combatant, sid: String, t: Combatant) -> float:
 		m += float(sk.get("vs_marked", 0.0))
 	if a.hp_ratio() < 0.5:
 		m += float(sk.get("low_hp_bonus", 0.0))
+	if a.is_poisoned():
+		m += float(sk.get("self_poisoned_bonus", 0.0))
 	if t != null:
 		var vt: Dictionary = sk.get("vs_tags", {})
 		for tag in vt:
@@ -510,8 +514,15 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 	if tkind == "party":
 		targets = side_of(a).filter(func(x): return not x.dead)
 	elif sk.get("aoe", false):
+		# "aoe_groups": [[1, 2], [3, 4]] hits only the clicked target's group.
+		var groups: Array = sk.get("aoe_groups", [])
+		var picked: Array = []
+		for g in groups:
+			if unit(target_id).rank in g:
+				picked = g
 		for id in valid:
-			targets.append(unit(id))
+			if picked.is_empty() or unit(id).rank in picked:
+				targets.append(unit(id))
 	elif sk.get("random_hits", 0) > 0:
 		for i in int(sk.random_hits):
 			targets.append(unit(Stats.pick(rng, valid)))
@@ -618,6 +629,8 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 		"bleed", "poison":
 			if _roll_effect(a, sid, e, t, ev):
 				var amt := float(e.get("amount", 2))
+				if a.is_poisoned() and t != a and e.has("amount_if_self_poisoned"):
+					amt = float(e.amount_if_self_poisoned)
 				if a.is_hero():
 					amt *= 1.0 + DB.cfg("skill_level_dot_pct", 15) / 100.0 * (lvl - 1)
 				elif not a.boss:
@@ -703,6 +716,19 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 				ev.append({"t": "cure", "target": t.id})
 		"clear_mark":
 			t.mark = 0
+		"extend":
+			# Existing poisons, bleeds and debuffs on the target last longer.
+			var n := int(e.get("rounds", 1))
+			var any := false
+			for d in t.dots:
+				d.rounds = int(d.rounds) + n
+				any = true
+			for b in t.buffs:
+				if float(b.value) < 0.0 and int(b.rounds) < 99:
+					b.rounds = int(b.rounds) + n
+					any = true
+			if any:
+				ev.append({"t": "status", "target": t.id, "status": "worse"})
 
 
 func _roll_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: Array) -> bool:

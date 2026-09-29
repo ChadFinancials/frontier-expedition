@@ -21,6 +21,8 @@ def hits_text(s):
 		return "whole party"
 	who = "ally" if t == "ally" else ""
 	r = ranks(s.get("target_ranks") or [1, 2, 3, 4])
+	if s.get("aoe_groups"):
+		return "ALL of " + " or ".join(ranks(g) for g in s["aoe_groups"])
 	if s.get("aoe"):
 		return "ALL of " + r + (" (allies)" if who else "")
 	if s.get("random_hits"):
@@ -59,7 +61,10 @@ def main():
 				dmg = "-"
 			else:
 				m = 1.0 + float(s.get("dmg", 0.0))
-				dmg = "%d-%d" % (max(1, round(c["dmg"][0] * mult * m)), max(1, round(c["dmg"][1] * mult * m)))
+				if s.get("dmg_range"):
+					dmg = "%d-%d" % tuple(s["dmg_range"])
+				else:
+					dmg = "%d-%d" % (max(1, round(c["dmg"][0] * mult * m)), max(1, round(c["dmg"][1] * mult * m)))
 				if s.get("aoe"):
 					dmg += " each"
 				if s.get("random_hits"):
@@ -70,6 +75,8 @@ def main():
 					dmg += ", %+d%% crit" % s["crit"]
 				if s.get("vs_marked"):
 					dmg += ", +%d%% vs marked" % round(s["vs_marked"] * 100)
+				if s.get("self_poisoned_bonus"):
+					dmg += ", +%d%% while user is poisoned" % round(s["self_poisoned_bonus"] * 100)
 				if s.get("low_hp_bonus"):
 					dmg += ", +%d%% when below half HP" % round(s["low_hp_bonus"] * 100)
 				for tag, v in s.get("vs_tags", {}).items():
@@ -78,7 +85,7 @@ def main():
 					dmg += ", 50/50: double or quarter"
 			fx = [effect_text(x) for x in s.get("effects", [])] + ["self: " + effect_text(x) for x in s.get("self_effects", [])] + ["on kill: " + effect_text(x) for x in s.get("on_kill", [])]
 			acc = str(s.get("acc", "-")) if hostile else "-"
-			name = ("★ " if sid in eq else "") + "**%s**: %s" % (s.get("name", sid), s.get("desc", ""))
+			name = ("★ " if sid in eq else "") + "**%s**: %s" % (s.get("name", sid), s.get("desc", "")) + (" *(once per fight)*" if s.get("once_per_fight") else "")
 			out.append("| %s | %s | %s | %s | %s | %s |" % (name, ranks(s.get("use_ranks")), hits_text(s), acc, dmg, "; ".join(fx) or "-"))
 		out.append("")
 		out.append("Notes: ")

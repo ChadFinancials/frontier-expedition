@@ -266,7 +266,10 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 	var line := "Use from: %s" % _ranks_text(ur)
 	match sk.get("target", "enemy"):
 		"enemy":
-			line += "   Target: %s%s" % ["ALL " if sk.get("aoe", false) else "", _ranks_text(sk.get("target_ranks", []))]
+			if not sk.get("aoe_groups", []).is_empty():
+				line += "   Target: ALL of %s" % " or ".join(sk.aoe_groups.map(func(g): return _ranks_text(g)))
+			else:
+				line += "   Target: %s%s" % ["ALL " if sk.get("aoe", false) else "", _ranks_text(sk.get("target_ranks", []))]
 		"ally":
 			line += "   Target: an ally"
 		"self":
@@ -287,6 +290,10 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 			parts.append("%d hits" % int(sk.hits))
 		if sk.get("random_hits", 0) > 0:
 			parts.append("%d random hits" % int(sk.random_hits))
+		if float(sk.get("self_poisoned_bonus", 0)) > 0:
+			parts.append("+%d%% damage while the user is poisoned" % int(round(float(sk.self_poisoned_bonus) * 100)))
+		if sk.get("once_per_fight", false):
+			parts.append("once per fight")
 		lines.append(", ".join(parts))
 	for e in sk.get("effects", []):
 		var t := effect_text(e, level)
@@ -321,7 +328,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "Heals itself %d%% of max HP" % int(e.get("value", 10))
 		"bleed", "poison":
 			var amt: float = float(e.get("amount", 2)) * (1.0 + DB.cfg("skill_level_dot_pct", 15) / 100.0 * (level - 1))
-			return "%s: %d damage a turn for %d turns%s" % [str(e.type).capitalize(), maxi(1, int(round(amt))), rounds, chance]
+			var extra := (" (%d if the user is poisoned)" % int(e.amount_if_self_poisoned)) if e.has("amount_if_self_poisoned") else ""
+			return "%s: %d damage a turn for %d turns%s%s" % [str(e.type).capitalize(), maxi(1, int(round(amt))), rounds, extra, chance]
 		"stun":
 			return "Stun: loses their next turn" + chance
 		"mark":
@@ -339,6 +347,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 				var hi := int(e.amount[1])
 				if hi <= 0:
 					return "Relieves %d-%d Fatigue%s" % [-hi, -lo, chance]
+				if lo < 0:
+					return "Fatigue %d to +%d (a gamble)%s" % [lo, hi, chance]
 				return "+%d-%d Fatigue" % [lo, hi]
 			var fa := int(e.get("amount", 5))
 			if fa < 0:
@@ -366,6 +376,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "Cures %s" % ", ".join(names)
 		"clear_shaken":
 			return "Cures Shaken"
+		"extend":
+			return "Poisons, bleeds and debuffs already on the target last %d more round%s" % [int(e.get("rounds", 1)), "" if int(e.get("rounds", 1)) == 1 else "s"]
 		"light":
 			return "Lamplight %+d" % int(e.get("amount", 10))
 		"summon":

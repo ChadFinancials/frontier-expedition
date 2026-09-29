@@ -64,7 +64,10 @@ def effect_text(fx):
 	ch = fx.get("chance")
 	chance = " (%d%%)" % ch if ch is not None and ch < 100 else ""
 	if t in ("bleed", "poison"):
-		return "%s %d x%d rounds%s" % (t, fx.get("amount", 0), fx.get("rounds", 3), chance)
+		extra = " (%d if user poisoned)" % fx["amount_if_self_poisoned"] if "amount_if_self_poisoned" in fx else ""
+		return "%s %d x%d rounds%s%s" % (t, fx.get("amount", 0), fx.get("rounds", 3), extra, chance)
+	if t == "extend":
+		return "existing poison/bleed/debuffs +%d round" % fx.get("rounds", 1)
 	if t == "debuff":
 		return "%s %+d for %d rounds%s" % (fx.get("stat"), fx.get("value", 0), fx.get("rounds", 2), chance)
 	if t == "fatigue":
@@ -72,6 +75,8 @@ def effect_text(fx):
 		if isinstance(a, list):
 			if a[1] <= 0:
 				return "%d to %d fatigue (relief)%s" % (a[1], a[0], chance)
+			if a[0] < 0:
+				return "%d to %+d fatigue%s" % (a[0], a[1], chance)
 			return "+%d-%d fatigue" % tuple(a)
 		return "%+d fatigue%s" % (a, " (relief)" if a < 0 else "")
 	if t == "money":

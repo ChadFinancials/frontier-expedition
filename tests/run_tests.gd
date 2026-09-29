@@ -72,7 +72,7 @@ func test_data_valid() -> void:
 	check(errs.is_empty(), "data validation (%d problems)" % errs.size())
 	check(DB.classes.size() == 10, "10 classes (got %d)" % DB.classes.size())
 	for cid in DB.classes:
-		check(DB.classes[cid].skills.size() in [6, 8], "%s has 6 or 8 moves" % cid)
+		check(DB.classes[cid].skills.size() >= 6 and DB.classes[cid].skills.size() <= 8, "%s has 6-8 moves" % cid)
 	for eid in DB.events:
 		for opt in DB.events[eid].options:
 			check(not opt.get("outcomes", []).is_empty(), "event %s option has outcomes" % eid)
@@ -268,6 +268,30 @@ func test_hero_moves() -> void:
 	mystic.set_hp(2)
 	e.use_skill(mystic, "mm_piece_of_me", hurt.id)
 	check(mystic.hp == 1, "blood price never drops below 1 HP")
+	# Poisoner and Prospector mechanics.
+	var p2 := [co.make_hero("sharpshooter"), co.make_hero("prospector"), co.make_hero("frontier_doctor"), co.make_hero("preacher")]
+	for h in p2:
+		h.known = h.cls().skills.duplicate()
+	var e2 := CombatEngine.new()
+	e2.setup(p2, ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman", "outlaw_knifeman"], {"rng": rng})
+	var poisoner: Combatant = e2.heroes[0]
+	var pros: Combatant = e2.heroes[1]
+	e2._shift(poisoner, -2, [])
+	var foe: Combatant = e2.enemies[0]
+	var plain := e2.dmg_mult(poisoner, "ss_sacrament", foe)
+	poisoner.dots.append({"kind": "poison", "amount": 1, "rounds": 3})
+	check(e2.dmg_mult(poisoner, "ss_sacrament", foe) > plain + 0.7, "Blighted Sacrament hits harder while the user is poisoned")
+	foe.dots.append({"kind": "poison", "amount": 2, "rounds": 1})
+	foe.buffs.append({"stat": "acc", "value": -5, "rounds": 1, "name": "x"})
+	e2._apply_effect(poisoner, "ss_sight", {"type": "extend", "rounds": 1}, foe, [], false)
+	check(foe.dots[0].rounds == 2 and foe.buffs[0].rounds == 2, "Gas Cloud makes poisons and debuffs linger")
+	var back: Combatant = e2.enemies[3]
+	e2._shift(pros, -2, [])
+	var ev2 := e2.use_skill(pros, "pr_flash", back.id)
+	var hit_ids: Array = ev2.filter(func(x): return x.t == "action")[0].targets
+	check(hit_ids.size() == 2 and hit_ids.all(func(id): return e2.unit(id).rank >= 3), "Flash Powder hits the back pair when a back-liner is picked")
+	e2.use_skill(pros, "pr_rock_hammer", e2.enemies[0].id)
+	check(e2.valid_targets(pros, "pr_rock_hammer").is_empty(), "Depth Charge is once per fight")
 
 
 func test_deaths_door() -> void:

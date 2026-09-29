@@ -348,7 +348,7 @@ func _build_human() -> void:
 	var weapon_ang := 1.1
 	var weapon: String = look.get("weapon", "none")
 	var long_melee: bool = weapon in ["axe", "hammer", "pickaxe", "big_pickaxe", "club"]
-	var long_gun: bool = weapon in ["rifle", "shotgun"]
+	var long_gun: bool = weapon in ["rifle", "shotgun", "blowgun"]
 	if long_melee:
 		hand_f = Vector2(w / 2 + 10, hip - 6)
 		weapon_ang = 1.05
@@ -564,6 +564,15 @@ func _weapon(kind: String, hand: Vector2, ang: float, back: bool) -> void:
 			_line([hand, hand + dir.rotated(1.9) * 12], 6.0, WOOD)
 			if not back:
 				_muzzle_pos = tip + dir * 6
+		"blowgun":
+			# A long cane tube, bound with twine, a dart pouch at the hip.
+			var tip := hand + dir * 70
+			_line([hand - dir * 40, tip], 5.0, WOOD.lightened(0.15))
+			for k in 3:
+				var at := hand + dir * (-24 + k * 34)
+				_line([at - dir.orthogonal() * 3.5, at + dir.orthogonal() * 3.5], 3.0, WOOD.darkened(0.35))
+			if not back:
+				_muzzle_pos = tip + dir * 4
 		"rifle", "shotgun":
 			var length := 92.0 if kind == "rifle" else 70.0
 			var tip := hand + dir * length * 0.62

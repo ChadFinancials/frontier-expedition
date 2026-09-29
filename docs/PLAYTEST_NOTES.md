@@ -290,4 +290,8 @@
       playing cards. Money Shot pays 50 chips per kill. Enemies go for Marked heroes half the time.
 - [ ] Future: Gunslinger bullet system (6 rounds in the cylinder shown overhead, moves spend
       bullets, a Reload move).
-- [ ] Remaining heroes: Prospector, Sharpshooter, Frontier Doctor, Preacher. Then ComfyUI tests.
+- [x] Sharpshooter is now the Bayou Poisoner (7 moves, poison synergy, blowgun). Prospector (6),
+      Frontier Doctor (6) and Preacher (6, stats only) retuned.
+- [ ] Workshop later: Prospector 7th/8th move (forced guard + strapped dynamite that goes off when
+      the guarded unit is attacked?), Doctor 7th/8th, Preacher's full kit, Poisoner's 8th.
+- [ ] Next: ComfyUI character tests.
