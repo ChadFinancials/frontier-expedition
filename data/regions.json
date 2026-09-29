@@ -2,7 +2,7 @@
   "_comment": "A region is one expedition map. tier scales enemies. fights/elites/cave_fights are weighted enemy groups (front rank first). boss.enemies is the boss formation; crossing is the fight at the map's end once the boss is beaten. palette/props drive the painted backdrop.",
 
   "old_mill_road": {
-    "name": "The Old Mill Road", "tier": 1, "rec_level": "1", "tutorial": true, "xp_cap": 3,
+    "difficulty": 1, "name": "The Old Mill Road", "tier": 1, "rec_level": "1", "tutorial": true, "xp_cap": 3, "no_ambush": true,
     "desc": "The last stretch of road east of Fort Providence, through orchards and wheat gone to seed. Crane's gang rode through here three days ago.",
     "palette": {"sky_top": "#4a6f8f", "sky_bottom": "#f2c57c", "sun": "#fff4d6", "far": "#8f8a6a", "mid": "#9aa05a", "near": "#6e8a3a", "ground": "#55692e", "accent": "#d9a441"},
     "props": ["fence", "tree", "grass", "rock"],
@@ -11,24 +11,24 @@
     "fixed_map": [
       [{"type": "start", "title": "The Old Mill Road",
         "story": "Your company has ridden a month from back east, chasing the same rumor as everyone else: past the last mountain stands [b]the Great Casino[/b], a paradise city where a fortune waits on every table. Its chips are the only coin anyone trusts out here.\n\nTwo of you are bringing the wagon; the other two rode ahead to Fort Providence, the last real town, two days west. But there's smoke on the western horizon, and nobody has passed you coming east.\n\n[i]Tip: This is the trail map. Your wagon is on the left. Click a stop you can reach (it glows) to travel there. Stops marked ? haven't been scouted yet. Each leg of travel eats Food and wears the wagon.[/i]"}],
-      [{"type": "fight", "enemies": ["outlaw_knifeman", "outlaw_gunhand"], "title": "Looters",
+      [{"type": "fight", "enemies": ["tut_looter", "tut_gunman"], "title": "Looters",
         "story": "A merchant's wagon lies in the ditch, sacks slit open and flour everywhere. Two men in red bandanas are picking it over. One of them looks up and grins.\n\n\"Silas said we'd get stragglers. Get 'em, Dutch!\"\n\n[i]Tip: In a fight, heroes and enemies stand in four ranks. Each move can only be used from certain ranks and can only reach certain ranks: the dots under each move show this. Hover an enemy to see your chance to hit, the damage, and the crit chance before you commit.[/i]"}],
       [{"type": "event", "event": "broken_axle", "lane_y": 0.3, "intel": 0, "title": "The Low Road",
         "story": "The low road follows the creek. The ruts are deep.\n\n[i]Tip: Trail events ask you to choose. Some choices need a supply (like Wagon Parts) or a hero with the right survival skill. Your supplies are listed at the bottom of the trail screen.[/i]"},
        {"type": "curio", "curios": ["abandoned_wagon"], "lane_y": 0.7, "intel": 0, "title": "The Orchard",
         "story": "The orchard road winds past a looted homestead. Something's left behind, if you care to look.\n\n[i]Tip: Curiosities can be searched by hand, which is a gamble, or with the right supply for a better result. Some quirks make heroes compelled to touch things they shouldn't.[/i]"}],
       [{"type": "camp", "title": "Creekside Camp",
-        "story": "At dusk you find a boy hiding in the reeds: Tobias, nephew of Ma Delaney, who keeps the saloon in Fort Providence.\n\n\"Crane's gang burned the fort,\" he says. \"The Marshal wouldn't pay the toll, so Silas set it alight. His man Mulligan took my aunt and the fort's stores up to the old mill. Please.\"\n\n[i]Tip: At camp, eat a meal and spend the evening's hours on your heroes' survival skills: healing, easing Fatigue, scouting, hunting. Fatigue is the frontier's slow killer. At 100 a hero hits a Breaking Point; at 200 they collapse.[/i]"}],
+        "story": "At dusk you find a boy hiding in the reeds: Tobias, nephew of Ma Delaney, who keeps the saloon in Fort Providence.\n\n\"Crane's gang burned the fort,\" he says. \"The Marshal wouldn't pay the toll, so Silas set it alight. His man Mulligan took my aunt and the fort's stores up to the old mill. Mulligan rode off again at noon, but his boys are still there. Please.\"\n\n[i]Tip: At camp, eat a meal and spend the evening's hours on your heroes' survival skills: healing, easing Fatigue, scouting, hunting. Fatigue is the frontier's slow killer. At 100 a hero hits a Breaking Point; at 200 they collapse.[/i]"}],
       [{"type": "boss", "title": "The Old Mill"}]
     ],
-    "fights": [{"enemies": ["outlaw_knifeman", "outlaw_gunhand"], "weight": 1}],
-    "elites": [{"enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_gunhand"], "weight": 1}],
+    "fights": [{"enemies": ["tut_looter", "tut_gunman"], "weight": 1}],
+    "elites": [{"enemies": ["tut_looter", "tut_gunman", "tut_gunman"], "weight": 1}],
     "cave_fights": [{"enemies": ["giant_bat", "giant_bat"], "weight": 1}],
-    "boss": {"name": "\"Mad Dog\" Mulligan", "landmark": "The Old Mill",
-      "intro": "The mill wheel creaks in the millrace. Barrels of flour and crates stamped FORT PROVIDENCE are stacked on the loading dock, and on top of them sits a woman in a green dress, tied at the wrists and swearing magnificently.\n\nA man the size of a woodstove steps out, cracking his knuckles, a black crow feather stuck in his cap: Mulligan, Silas Crane's enforcer.\n\n\"Boss says anybody heading west pays the toll. You look like you're heading west.\"",
-      "victory": "Mulligan goes down like a felled oak, and his boys scatter into the orchard. You cut Ma Delaney loose.\n\n\"Took you long enough,\" she says, rubbing her wrists. \"Help me get these stores back to Providence and I'll pour you the first round myself. My saloon's a cinder, but I've rebuilt it twice before.\"\n\nAs you load the wagon, a rider watches from the far ridge: a long black coat, a black feather in his hat, a crow riding his shoulder. He touches his hat brim, turns, and is gone. [b]Silas Crane[/b] knows your name now.",
-      "enemies": ["mad_dog_mulligan", "outlaw_gunhand"], "keepsake": "lucky_horseshoe"},
-    "crossing": {"name": "Mulligan's Boys", "enemies": ["outlaw_brawler", "outlaw_gunhand"]},
+    "boss": {"name": "Crowbar Pete", "landmark": "The Old Mill",
+      "intro": "The mill wheel creaks in the millrace. Barrels of flour and crates stamped FORT PROVIDENCE are stacked on the loading dock, and on top of them sits a woman in a green dress, tied at the wrists and swearing magnificently.\n\nA lanky man steps out of the mill door, a crowbar over his shoulder and a black crow feather stuck in his cap: Crowbar Pete, who minds things when Mulligan is away.\n\n\"Mulligan says anybody heading west pays the toll. You look like you're heading west.\"",
+      "victory": "Pete goes down in a cloud of flour, and his boys scatter into the orchard. You cut Ma Delaney loose.\n\n\"Took you long enough,\" she says, rubbing her wrists. \"Mulligan will be back for these stores, mark me. When he turns up, I'll hear about it.\" \"Help me get these stores back to Providence and I'll pour you the first round myself. My saloon's a cinder, but I've rebuilt it twice before.\"\n\nAs you load the wagon, a rider watches from the far ridge: a long black coat, a black feather in his hat, a crow riding his shoulder. He touches his hat brim, turns, and is gone. [b]Silas Crane[/b] knows your name now.",
+      "enemies": ["tut_pete", "tut_gunman"], "keepsake": "lucky_horseshoe"},
+    "crossing": {"name": "Mulligan's Boys", "enemies": ["tut_looter", "tut_gunman"]},
     "events": ["broken_axle"],
     "homestead_events": ["homestead_family"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "berry_bushes"],
@@ -36,12 +36,12 @@
   },
 
   "dry_gulch_mine": {
-    "name": "Dry Gulch Mine", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 8,
+    "difficulty": 2, "name": "Dry Gulch Mine", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 8,
     "desc": "A played-out silver mine in the hills north of the fort. One of your company rode up here and never came back. The miners left in a hurry, and they say the tapping in the walls never stopped. Lots of dark shafts: bring lamp oil.",
     "palette": {"sky_top": "#3b3350", "sky_bottom": "#d98c5f", "sun": "#ffd9a8", "far": "#7d5a4f", "mid": "#96694f", "near": "#6f4d3a", "ground": "#5a3f2f", "accent": "#e0a458"},
     "props": ["mesa", "rock", "skull", "cactus"],
     "cave_name": "Mine Shaft",
-    "node_weights": {"fight": 28, "event": 16, "curio": 14, "cave": 30, "elite": 8, "homestead": 0, "trading_post": 4},
+    "node_weights": {"fight": 34, "event": 18, "curio": 18, "cave": 18, "elite": 8, "homestead": 0, "trading_post": 4}, "max_caves": 2,
     "boss_rewards": {"money": 150, "charters": 0, "timber": 2, "iron": 6},
     "side_reward": {"rescue": true, "iron": 6, "text": "Tied up behind Old Jeb's throne of ore carts is {name}: alive, filthy and absolutely furious. The knockers had been keeping them as a pet."},
     "fights": [
@@ -70,7 +70,7 @@
   },
 
   "crows_nest": {
-    "name": "The Crow's Nest", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 8,
+    "difficulty": 3, "name": "The Crow's Nest", "tier": 1, "rec_level": "1-2", "side": true, "story": true, "columns": 8,
     "desc": "Silas Crane's supply camp in the cottonwoods south of the fort, run by his quartermaster Ruby Blackwing. The woods are full of lookouts and crows. Expect a lot of fighting.",
     "palette": {"sky_top": "#34465e", "sky_bottom": "#e8a86b", "sun": "#fff0c8", "far": "#6f7a5a", "mid": "#5d6d44", "near": "#465a30", "ground": "#3d4d28", "accent": "#c98e3e"},
     "props": ["tree", "grass", "fence", "rock"],
@@ -100,7 +100,7 @@
   },
 
   "tallgrass": {
-    "name": "The Tallgrass Sea", "tier": 1, "rec_level": "1-2",
+    "difficulty": 4, "name": "The Tallgrass Sea", "tier": 1, "rec_level": "1-2",
     "desc": "Grass as high as a horse's shoulder, rolling to the horizon like an ocean. Outlaws, wolves, and something that whispers when the wind stops.",
     "palette": {"sky_top": "#3d5a80", "sky_bottom": "#f6bd60", "sun": "#fff1c1", "far": "#8d7b68", "mid": "#a98f5f", "near": "#6b7d3c", "ground": "#4f5d2f", "accent": "#d4a24c"},
     "props": ["grass", "fence", "tree", "rock"],

@@ -95,10 +95,14 @@ func setup(_params: Dictionary) -> void:
 		call_deferred("_show_story", run.current_node(), Callable())
 		return
 	if run.day == 1 and run.current == 0:
-		Main.inst.toast("Click a glowing stop on the map to travel west. Hover a stop to see what's there.")
+		Main.inst.toast("Click a glowing stop on the map to travel on. Hover a stop to see what's there.")
 	# Arrived somewhere that hasn't been dealt with yet (e.g. after loading a save).
 	if not run.current_node().done:
 		call_deferred("_resolve_node")
+	elif run.current_node().type in ["fight", "elite"] and run.current_node().data.get("curios", []).any(func(c): return not c.done) \
+			and not run.party_heroes().is_empty():
+		# The dust settles: something on the battlefield is worth a look.
+		call_deferred("show_curios", run.current_node().data.curios, "After the Fight")
 	else:
 		call_deferred("_check_end")
 
@@ -386,12 +390,12 @@ func _event_choice(event_id: String, idx: int) -> void:
 
 # --- Curios ---------------------------------------------------------------------------
 
-func show_curios(curios: Array) -> void:
+func show_curios(curios: Array, title: String = "Curiosities") -> void:
 	var p := UI.panel()
 	p.custom_minimum_size = Vector2(1300, 0)
 	var v := UI.vb(12)
 	p.add_child(v)
-	v.add_child(UI.hdr("Curiosities", 36, true))
+	v.add_child(UI.hdr(title, 36, true))
 	v.add_child(UI.lbl("Investigate by hand for a random result, or use a supply for a sure one. Known uses are marked ✓.", 19, "Ink"))
 	var holder := {"wrap": null}
 	var row := UI.hb(14)

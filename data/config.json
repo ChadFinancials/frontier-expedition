@@ -7,8 +7,11 @@
   "start_heroes": ["marshal", "gunslinger"],
   "start_promised": ["preacher"],
   "start_missing": ["sharpshooter"],
-  "roster_per_tier": {"outpost": 2, "town": 5, "city": 8},
+  "roster_per_tier": {"outpost": 4, "town": 6, "city": 9},
   "roster_cap": 24,
+  "max_caves": 2,
+  "fight_curio_chance": 30,
+  "elite_curio_chance": 50,
   "grubstake_floor": 150,
 
   "level_hp_pct": 12,

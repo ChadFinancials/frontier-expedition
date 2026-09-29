@@ -21,23 +21,10 @@ CR = "oga/creatures/"
 
 # name: (max seconds, peak dB, [sources]). A source is a path, or (path, options) where
 # options can hold "start" (seconds to skip), "pitch" (playback rate) and "len".
+# Weapon and impact sounds (gunshots, punches, clangs, bells...) stay the generated ones from
+# tools/gen_audio.py: playtesting preferred them. "howl" is generated too; the recorded howl is "yip".
 SFX = {
-	"gunshot": (0.9, -1, ["oga/22_Pistol.wav", "oga/22_Magnum.wav", CC + "shot_01.ogg", CC + "shot_02.ogg"]),
-	"rifle": (1.3, -1, ["oga/sounds/sounds/mosin.wav", "oga/sounds/sounds/sks.wav", "oga/Unkown.wav"]),
-	"shotgun": (1.0, -1, ["oga/sounds/sounds/shotty.wav", "oga/Black_Powder.wav"]),
-	"explosion": (1.8, -1, [CC + "explosion.ogg", "oga/NenadSimic_-_Muffled_Distant_Explosion.wav"]),
-	"punch": (0.4, -3, [K_IMP + "impactPunch_medium_00%d.ogg" % i for i in range(5)]),
-	"blunt": (0.5, -2, [K_IMP + "impactPunch_heavy_00%d.ogg" % i for i in range(5)]),
-	"hit": (0.35, -4, [K_IMP + "impactGeneric_light_00%d.ogg" % i for i in range(5)]),
-	"slash": (0.45, -3, [K_RPG + "knifeSlice.ogg", K_RPG + "knifeSlice2.ogg", K_RPG + "chop.ogg"]),
-	"whoosh": (0.45, -4, [RPG + "battle/swing.wav", RPG + "battle/swing2.wav", RPG + "battle/swing3.wav"]),
-	"clang": (0.8, -3, [K_IMP + "impactMetal_medium_00%d.ogg" % i for i in range(5)]),
 	"glass": (0.7, -4, [K_IMP + "impactGlass_medium_00%d.ogg" % i for i in range(5)]),
-	"knock": (0.6, -3, [K_IMP + "impactWood_heavy_00%d.ogg" % i for i in range(3)]),
-	"breaking": (1.2, -2, [K_IMP + "impactWood_heavy_003.ogg", K_IMP + "impactWood_heavy_004.ogg", K_IMP + "impactPlank_medium_000.ogg"]),
-	"hammer": (0.8, -4, [K_IMP + "impactMining_00%d.ogg" % i for i in range(5)]),
-	"stomp": (0.9, -1, [(K_IMP + "impactSoft_heavy_00%d.ogg" % i, {"pitch": 0.75}) for i in range(5)]),
-	"bell": (1.6, -4, [K_IMP + "impactBell_heavy_000.ogg", K_IMP + "impactBell_heavy_001.ogg", K_IMP + "impactBell_heavy_002.ogg"]),
 	"cloth": (0.5, -5, [K_RPG + "cloth%d.ogg" % i for i in range(1, 5)]),
 	"coin": (0.7, -4, [K_CAS + "chips-handle-%d.ogg" % i for i in range(1, 4)] + [K_RPG + "handleCoins.ogg"]),
 	"card": (0.4, -5, [K_CAS + "card-place-%d.ogg" % i for i in range(1, 5)]),
@@ -52,7 +39,7 @@ SFX = {
 	"bite": (0.6, -2, [RPG + "NPC/beetle/bite-small.wav", RPG + "NPC/beetle/bite-small2.wav", RPG + "NPC/beetle/bite-small3.wav"]),
 	"growl": (1.2, -2, ["oga/dog2/dog/dog-growl.flac", "oga/dog2/dog/dog-snarl.flac", "oga/dog2/dog/dog-grumble.flac", "oga/wolf_monster_5.mp3"]),
 	"roar": (1.6, -1, [("oga/troll-roars_0.ogg", {"start": t, "len": l}) for t, l in ((0.0, 1.17), (1.86, 1.1), (3.6, 1.17), (7.07, 1.6))] + [CR + "roar_02.ogg"]),
-	"howl": (2.2, -3, [CR + "howl.ogg"]),
+	"yip": (2.2, -3, [CR + "howl.ogg"]),
 	"dog": (0.8, -3, ["oga/dog/Dog/Dog Bark 1.wav", "oga/dog/Dog/Dog Bark 2.wav", "oga/dog/Dog/Dog Bark 3.wav"]),
 	"screech": (0.7, -4, ["oga/bat/ogg/bat_0%d.ogg" % i for i in range(1, 4)]),
 	"eerie": (1.6, -4, [RPG + "NPC/shade/shade%d.wav" % i for i in (10, 11, 12, 13)]),
@@ -111,6 +98,17 @@ def footsteps(base):
 		run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error"] + inputs + ["-filter_complex", fc, "-ar", "44100", "-c:a", "libvorbis", "-q:a", "5", dst])
 
 
+def knock(base):
+	"""Knock, knock: two loud, slow, well-spaced raps on wood."""
+	for n, (a, b) in enumerate(((0, 1), (2, 0), (1, 2))):
+		srcs = [os.path.join(base, K_IMP + "impactWood_heavy_00%d.ogg" % i) for i in (a, b)]
+		fc = "[0]aformat=channel_layouts=mono[s0];[1]aformat=channel_layouts=mono,adelay=620[s1];"
+		fc += "[s0][s1]amix=inputs=2:normalize=0,volume=4dB,alimiter=limit=0.95"
+		dst = os.path.join(OUT, "knock_%d.ogg" % (n + 1))
+		run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", srcs[0], "-i", srcs[1], "-filter_complex", fc,
+			"-ac", "1", "-ar", "44100", "-c:a", "libvorbis", "-q:a", "5", dst])
+
+
 def clear(name):
 	for f in glob.glob(os.path.join(OUT, name + ".*")) + glob.glob(os.path.join(OUT, name + "_[0-9]*.*")):
 		os.remove(f)
@@ -118,15 +116,23 @@ def clear(name):
 
 def main():
 	base = sys.argv[1]
+	only = sys.argv[2:]  # optional: rebuild just these names
 	for name, (max_len, peak_db, sources) in SFX.items():
+		if only and name not in only:
+			continue
 		clear(name)
 		for i, s in enumerate(sources):
 			path, opt = (s if isinstance(s, tuple) else (s, {}))
 			convert(os.path.join(base, path), os.path.join(OUT, "%s_%d.ogg" % (name, i + 1)), max_len, peak_db, opt)
 		print("%-10s %d" % (name, len(sources)))
-	clear("footsteps")
-	footsteps(base)
-	print("footsteps  3")
+	if not only or "knock" in only:
+		clear("knock")
+		knock(base)
+		print("knock      3")
+	if not only or "footsteps" in only:
+		clear("footsteps")
+		footsteps(base)
+		print("footsteps  3")
 
 
 if __name__ == "__main__":

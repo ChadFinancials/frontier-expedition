@@ -309,6 +309,10 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "Heals %d-%d HP" % [int(round(float(e.get("min", 3)) * m)), int(round(float(e.get("max", 6)) * m))]
 		"heal_pct":
 			return "Heals %d%% of max HP" % int(e.get("value", 10))
+		"heal_self":
+			return "Heals itself %d HP" % int(e.get("amount", 5))
+		"heal_self_pct":
+			return "Heals itself %d%% of max HP" % int(e.get("value", 10))
 		"bleed", "poison":
 			var amt: float = float(e.get("amount", 2)) * (1.0 + DB.cfg("skill_level_dot_pct", 15) / 100.0 * (level - 1))
 			return "%s: %d damage a turn for %d turns%s" % [str(e.type).capitalize(), maxi(1, int(round(amt))), rounds, chance]

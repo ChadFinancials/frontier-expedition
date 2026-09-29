@@ -196,6 +196,20 @@ func test_enemy_moves() -> void:
 	kb.heroes[0].buffs.append({"stat": "dmg_flat", "value": -2, "rounds": 2, "name": "test"})
 	var after := kb.dmg_preview(kb.heroes[0], "marshal_iron_justice", tk)
 	check(after[1] < before[1], "flat damage debuff lowers hits (%s -> %s)" % [str(before), str(after)])
+	# A volley that knocks a hero onto Death's Door can't finish them with its later shots.
+	var dd := CombatEngine.new()
+	dd.setup(party, ["silas_crane"], {"rng": rng, "boss": true})
+	var victim: Combatant = dd.heroes[0]
+	victim.set_hp(1)
+	victim.hero.deaths_door = false
+	for i in 30:
+		dd._fresh_dd.clear()
+		var evs: Array = []
+		dd._apply_damage(victim, 5, dd.enemies[0], evs, false)
+		dd._apply_damage(victim, 5, dd.enemies[0], evs, false)
+		check(not victim.dead and victim.hero.deaths_door, "the knock-down hit and its follow-ups never kill")
+		victim.hero.deaths_door = false
+		victim.set_hp(1)
 
 
 func test_deaths_door() -> void:
@@ -212,6 +226,7 @@ func test_deaths_door() -> void:
 	check(hc.hero.deaths_door and hc.hp == 0 and not hc.dead, "big hit puts hero on Death's Door, not dead")
 	var died := false
 	for i in 60:
+		e._fresh_dd.clear()  # each blow is a separate move
 		e._apply_damage(hc, 1, e.enemies[0], ev, false)
 		if hc.dead:
 			died = true
@@ -280,6 +295,9 @@ func test_map_gen() -> void:
 			check(reach.size() == nodes.size(), "%s map fully reachable (seed %d)" % [rid, s])
 			var last: Dictionary = nodes[nodes.size() - 1]
 			check(last.type in ["boss", "crossing"], "%s map ends at boss/crossing" % rid)
+			if not DB.regions[rid].has("fixed_map"):
+				var caves := nodes.filter(func(x): return x.type == "cave").size()
+				check(caves <= int(DB.regions[rid].get("max_caves", DB.cfg("max_caves", 2))), "%s has at most two caves (got %d)" % [rid, caves])
 			for n in nodes:
 				if n.col < MapGen.column_count(nodes) - 1:
 					check(not n.next.is_empty(), "%s node %d has an exit" % [rid, n.id])
@@ -318,7 +336,7 @@ func test_region_fights() -> void:
 func test_settlement_services() -> void:
 	var co := Company.new()
 	co.new_game(5)
-	check(co.settlements.size() == 1 and co.heroes.size() == 2 and co.roster_cap() == 5, "new game setup: two heroes, room for five")
+	check(co.settlements.size() == 1 and co.heroes.size() == 2 and co.roster_cap() == 6, "new game setup: two heroes, room for six")
 	check(co.missing.size() == 1 and Hero.from_dict(co.missing[0]).class_id == "sharpshooter", "the sharpshooter is missing")
 	check(co.can_do_activity(0, "saloon", "bar", co.heroes[0]) != "", "saloon is a ruin until the tutorial")
 	co.complete_tutorial()
@@ -386,7 +404,7 @@ func test_tutorial_and_story() -> void:
 	check(MapGen.column_count(r.nodes) == 5 and r.nodes.size() == 6, "tutorial map: start, 3 stops, boss")
 	check(r.choices() == [1] and r.node(1).type == "fight", "tutorial opens with a fight")
 	check(r.nodes.filter(func(n): return n.col == 2).all(func(n): return MapGen.intel(n) == 0), "tutorial fork is unscouted")
-	check(r.node(r.nodes.size() - 1).type == "boss" and "mad_dog_mulligan" in r.node(r.nodes.size() - 1).data.enemies, "tutorial ends at Mulligan")
+	check(r.node(r.nodes.size() - 1).type == "boss" and "tut_pete" in r.node(r.nodes.size() - 1).data.enemies, "tutorial ends at Crowbar Pete")
 	r.boss_won = true
 	r.xp = 40
 	var sm := co.finish_run("victory")
@@ -428,6 +446,8 @@ func test_tutorial_and_story() -> void:
 		"Fort Providence offers the trail, two story adventures and this week's saloon rumor")
 	var qreg: Dictionary = DB.regions[opts2[3]]
 	check(qreg.final in ["boss", "crossing"] and not qreg.crossing.enemies.is_empty() and Company.quest_hints(qreg).begins_with("Rumored"), "a rumor is a playable quest")
+	var md := co._make_quest("mad_dog", "tallgrass", 0)
+	check(md.final == "boss" and "mad_dog_mulligan" in md.boss.enemies and md.done_flag == "mad_dog_beaten", "Mulligan waits at the end of his own rumor")
 	var missing_name := co.missing_name()
 	var hs: Array = co.heroes_at(0).slice(0, 2)
 	var r2 := co.start_run(0, hs.map(func(h): return h.uid), {"food": 12}, "dry_gulch_mine")

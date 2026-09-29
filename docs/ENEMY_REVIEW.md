@@ -8,7 +8,7 @@ Ranks: *from* is where the enemy must stand to use the move. *Hits* says how man
 
 `outlaw_brawler` | HP **16** | dodge 5 | prot 10 | speed 3 | acc +0 | crit 4% | dmg 3-6 | tags: outlaw, human
 Resists: stun 25, bleed 25, poison 25, move 30, debuff 25
-Found in: The Old Mill Road, The Crow's Nest, The Tallgrass Sea, Quests, summoned by "Mad Dog" Mulligan
+Found in: The Crow's Nest, The Tallgrass Sea, Quests, summoned by "Mad Dog" Mulligan
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
@@ -21,7 +21,7 @@ Notes:
 
 `outlaw_gunhand` | HP **12** | dodge 10 | prot 0 | speed 5 | acc +5 | crit 5% | dmg 3-6 | tags: outlaw, human
 Resists: stun 25, bleed 25, poison 25, move 25, debuff 25
-Found in: The Old Mill Road, Dry Gulch Mine, The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
+Found in: Dry Gulch Mine, The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
@@ -48,7 +48,7 @@ Notes:
 
 `outlaw_knifeman` | HP **14** | dodge 12 | prot 0 | speed 5 | acc +0 | crit 6% | dmg 3-5 | tags: outlaw, human
 Resists: stun 40, bleed 40, poison 25, move 25, debuff 25
-Found in: The Old Mill Road, The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
+Found in: The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
@@ -182,7 +182,7 @@ Notes:
 
 `mad_dog_mulligan` | HP **42** | dodge 5 | prot 10 | speed 4 | acc +2 | crit 5% | dmg 4-7 | tags: outlaw, human
 Resists: stun 50, bleed 30, poison 30, move 60, debuff 35
-Found in: The Old Mill Road
+Found in: Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
@@ -442,7 +442,7 @@ Found in: The Crow's Nest
 |---|---|---|---|---|---|---|
 | **Fan of Knives**: Three throwing knives from one sleeve. | 1234 | 3 random in 1234 | 90 | 2-4 x3 hits, +2% crit | bleed 1 x3 rounds (70%) | 3 |
 | **Murder of Crows**: Silas whistles, and the sky goes black with wings. | 1234 | self | - | - | summons Murder of Crows | 2 |
-| **Dark Commune**: Ruby presses the crow feather to her lips and whispers. Something whispers back. | 1234 | self | - | - | heal_self_pct; buff; buff; buff | 1 |
+| **Dark Commune**: Ruby presses the crow feather to her lips and whispers. Something whispers back. | 1234 | self | - | - | heals self 6 HP; self dmg_flat +1 (rest of fight, stacks); self crit +1 (rest of fight, stacks); self dodge +1 (rest of fight, stacks) | 1 |
 
 Notes: 
 
@@ -456,5 +456,42 @@ Found in: Dry Gulch Mine, The Tallgrass Sea, The Red Canyons, The Thunder Peaks
 |---|---|---|---|---|---|---|
 | **Pale Grasp**: Cold hands out of the dark. | 12 | one of 123 | 95 | 2-4 | stun (90%) | 2 |
 | **Horrors from Beyond**: It opens its mouth, and the dark behind it opens too. | 1234 | ALL of 1234 | 85 | 1-2 each | +8-12 fatigue | 2 |
+
+Notes: 
+
+## Looter  (Regular)
+
+`tut_looter` | HP **9** | dodge 5 | prot 0 | speed 4 | acc +0 | crit 2% | dmg 2-4 | tags: outlaw, human
+Resists: stun 15, bleed 15, poison 15, move 15, debuff 15
+Found in: The Old Mill Road
+
+| Move | From | Hits | Acc | Damage | Effects | AI |
+|---|---|---|---|---|---|---|
+| **Clumsy Stab**: A looter's knife, held like a fork. | 123 | one of 12 | 82 | 2-4 | - | 1 |
+
+Notes: 
+
+## Greenhorn Gunman  (Regular)
+
+`tut_gunman` | HP **8** | dodge 5 | prot 0 | speed 3 | acc +0 | crit 2% | dmg 2-4 | tags: outlaw, human
+Resists: stun 15, bleed 15, poison 15, move 15, debuff 15
+Found in: The Old Mill Road
+
+| Move | From | Hits | Acc | Damage | Effects | AI |
+|---|---|---|---|---|---|---|
+| **Wild Shot**: A greenhorn's pistol shot, eyes half shut. | 1234 | one of 1234 | 78 | 2-4 | - | 1 |
+
+Notes: 
+
+## Crowbar Pete - Mulligan's Second  (Boss)
+
+`tut_pete` | HP **24** | dodge 5 | prot 0 | speed 3 | acc +0 | crit 3% | dmg 3-5 | tags: outlaw, human
+Resists: stun 30, bleed 20, poison 20, move 40, debuff 20
+Found in: The Old Mill Road
+
+| Move | From | Hits | Acc | Damage | Effects | AI |
+|---|---|---|---|---|---|---|
+| **Crowbar**: The same bar he opened the fort's crates with. | 12 | one of 12 | 85 | 3-5 | stun (50%) | 2 |
+| **Sack of Flour**: A whole sack of the fort's flour, right in the face. | 123 | one of 123 | 90 | 1-2 | acc -10 for 2 rounds | 1 |
 
 Notes: 

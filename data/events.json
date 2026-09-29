@@ -345,9 +345,9 @@
     "text": "A widow works a claim alone with a shotgun across her knees. \"Wolves took my husband. I aim to see them pay.\"",
     "options": [
       {"text": "Help her clear the wolf den.", "outcomes": [
-        {"weight": 1, "text": "The den is nearby, and occupied.", "effects": [{"type": "fight", "enemies": ["prairie_wolf", "prairie_wolf", "prairie_wolf"], "reward": {"money": 80, "keepsake": true}}]}]},
+        {"weight": 1, "text": "The den is nearby, and occupied.", "effects": [{"type": "fight", "enemies": ["prairie_wolf", "prairie_wolf", "prairie_wolf"], "reward": {"money": 150, "keepsake": true}}]}]},
       {"text": "Rest and trade stories.", "outcomes": [
-        {"weight": 1, "good": true, "text": "She's good company. Everyone rests.", "effects": [{"type": "fatigue", "amount": -8, "target": "party"}, {"type": "heal_pct", "value": 10, "target": "party"}]}]},
+        {"weight": 1, "good": true, "text": "She's good company. Everyone rests.", "effects": [{"type": "fatigue", "amount": -5, "target": "party"}, {"type": "heal_pct", "value": 5, "target": "party"}]}]},
       {"text": "Offer her a place in the company.", "outcomes": [
         {"weight": 2, "good": true, "text": "\"Reckon there's nothing left for me here.\" She shoulders her shotgun.", "effects": [{"type": "recruit", "class": "random"}]},
         {"weight": 1, "text": "\"This is my land. I'm staying.\"", "effects": []}]}

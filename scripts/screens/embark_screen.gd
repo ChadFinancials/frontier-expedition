@@ -82,7 +82,7 @@ func setup(params: Dictionary) -> void:
 		b.custom_minimum_size = Vector2(bw, 76)
 		b.clip_text = true
 		b.add_theme_font_size_override("font_size", 17 if bw < 200 else 20)
-		var tip: String = rd.get("desc", "")
+		var tip: String = rd.get("desc", "") + "\n\n" + Company.difficulty_text(rd)
 		if rd.get("quest", false):
 			tip += "\n\n" + Company.quest_hints(rd) + "\nA short trip with no campsite. Taking the job takes it off the board."
 		elif rd.get("side", false):

@@ -355,6 +355,8 @@ func is_final_node() -> bool:
 # --- Combat ---------------------------------------------------------------------------
 
 func surprise_roll(extra_hero_surprise: int = 0) -> String:
+	if region().get("no_ambush", false):
+		return ""
 	var base := float(DB.cfg("surprise_base", 10))
 	var party_bonus := party_stat_sum("surprise") / maxf(1.0, party_heroes().size()) + party_passive("surprise")
 	for b in pending_buffs:
@@ -469,6 +471,12 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 			recruits.append(nh.to_dict())
 			res.msgs.append("%s the %s asks to ride with you, and will join when you return." % [nh.hero_name, nh.class_name_text()])
 		boss_won = true
+		if kind == "boss":
+			var flag: String = region().get("done_flag", "")
+			if flag != "":
+				company.story_flags[flag] = true
+			if str(region().get("boss_keepsake", "")) != "":
+				res.keepsakes.append(region().boss_keepsake)
 	elif kind == "boss":
 		xp += DB.cfg("xp_boss", 6)
 		var br: Dictionary = region().get("boss_rewards", {})
@@ -819,7 +827,7 @@ func camp_act(uid: int, action_id: String, target_uid: int = -1) -> Array:
 ## Ends the camp. Returns {"ambush": bool}. The ambush fight is queued in pending_fight.
 func camp_end() -> Dictionary:
 	var ambush := false
-	if not camp.get("no_ambush", false):
+	if not camp.get("no_ambush", false) and not region().get("no_ambush", false):
 		ambush = company.rng.randf() * 100.0 < DB.cfg("camp_ambush_chance", 20)
 	if ambush:
 		pending_fight = {"enemies": MapGen.roll_group(company.rng, region().fights), "surprise": "heroes", "kind": "fight"}

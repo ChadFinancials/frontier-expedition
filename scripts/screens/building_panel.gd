@@ -136,7 +136,17 @@ func _activities(body: VBoxContainer) -> void:
 		head.add_child(UI.lbl("Sheds up to %d Fatigue  |  %d chips" % [relief, cost], 18, "Ink"))
 		var side: Array = []
 		for se in a.get("side_effects", []):
-			side.append("%d%% chance: %s" % [int(se.chance), str(se.text).replace("%s ", "").replace("%s", "")])
+			var what := str(se.text).replace("%s ", "").replace("%s", "")
+			if se.get("type", "") == "quirk" and DB.quirks.has(se.quirk):
+				# Spell out what the quirk actually does, not just its flavor line.
+				var q: Dictionary = DB.quirks[se.quirk]
+				var fx: Array = []
+				for m in q.get("mods", []):
+					fx.append(Stats.mod_text(m))
+				if q.has("compulsion"):
+					fx.append("may compulsively grab %s on the trail" % str(q.compulsion.get("tag", "things")))
+				what = "the hero picks up the %s%s quirk (%s)" % ["" if q.get("positive", false) else "bad ", q.name, ", ".join(fx)]
+			side.append("%d%% chance each visit: %s." % [int(se.chance), what.trim_suffix(".")])
 		if not side.is_empty():
 			cv.add_child(UI.wrap(UI.lbl(" ".join(side), 16, "Ink"), 1100))
 		_slot_row(cv, key, co.slot_cap(index, bid), func():

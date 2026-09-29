@@ -54,6 +54,10 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 			Stats.pick(rng, columns[c]).type = "camp"
 		if c == 1 and not columns[c].any(func(x): return x.type == "fight"):
 			columns[c][0].type = "fight"
+	# Not too many caves on one trail: extras become fights or curiosities.
+	var caves := Stats.shuffled(rng, nodes.filter(func(x): return x.type == "cave"))
+	for k in range(int(region.get("max_caves", DB.cfg("max_caves", 2))), caves.size()):
+		caves[k].type = "fight" if rng.randf() < 0.5 else "curio"
 
 	# Edges: each node links to the nearest node(s) in the next column; every node gets
 	# at least one incoming link.
@@ -180,12 +184,21 @@ static func roll_group(rng: RandomNumberGenerator, groups: Array) -> Array:
 	return g.enemies.duplicate() if g != null else []
 
 
+## Sometimes a fight leaves something worth searching on the field (looked at afterwards).
+static func _battle_curio(n: Dictionary, region: Dictionary, rng: RandomNumberGenerator, chance: float) -> void:
+	if region.get("curios", []).is_empty() or rng.randf() * 100.0 >= chance:
+		return
+	n.data["curios"] = [{"id": Stats.pick(rng, region.curios), "done": false}]
+
+
 static func _fill(n: Dictionary, region: Dictionary, rng: RandomNumberGenerator, used_events: Array) -> void:
 	match n.type:
 		"fight":
 			n.data = {"enemies": roll_group(rng, region.fights)}
+			_battle_curio(n, region, rng, DB.cfg("fight_curio_chance", 30))
 		"elite":
 			n.data = {"enemies": roll_group(rng, region.elites)}
+			_battle_curio(n, region, rng, DB.cfg("elite_curio_chance", 50))
 		"boss":
 			n.data = {"enemies": region.boss.enemies.duplicate()}
 		"crossing":

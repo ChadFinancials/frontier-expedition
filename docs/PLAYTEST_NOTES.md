@@ -240,3 +240,31 @@
       multi-summons, opener/once moves, low-HP move priority, out-of-position repositioning.
 - Focus: testing is locked to the first region (Tallgrass) and its side adventures and quests.
   Red Canyon / Thunder Peaks enemies and the second settlement wait until the start is crisp.
+
+## Round 5
+- [x] Sounds: gunshots, rifles, shotguns, punches, blunt hits, slashes, clangs, stomps, bells,
+      explosions and the howl are back to the old generated ones. Kept the recorded bat bite,
+      crows, growls, roars, dogs, ghosts, glass, chips, cards and UI clicks. Coyote yipping keeps the
+      recorded howl ("yip"). Laying On of Hands rings the bell. Knock Knock is two slow, loud raps.
+      Moves with their own sound now play the generic impact quietly (it doubled up before).
+- [x] Tutorial: Looter and Greenhorn Gunman (weak, tutorial-only) replace the outlaws; the Old Mill
+      boss is now Crowbar Pete, Mulligan's second. No ambushes in the tutorial.
+- [x] Mad Dog Mulligan moved to a Saloon rumor ("Mad Dog's Hideout"): always ends at Mulligan,
+      jumps the rumor queue most weeks until he's beaten, pays Brass Knuckles.
+- [x] Trail map: compass rose removed, "WEST" arrow now reads "ONWARD". World map later.
+- [x] Expedition hover text shows difficulty (Gentle / Fair / Tough / Hard / Deadly).
+- [x] Hiring Board: More Notices costs chips only (500, then 1200). New Bunkhouse track (+2 / +4
+      company size). Company starts with room for 6. A recruit with no free bunk now waits on
+      the Hiring Board instead of vanishing.
+- [x] Saloon bar side effect spelled out: "12% chance each visit: the hero picks up the bad Drinker
+      quirk (-4 Accuracy, may compulsively grab whiskey on the trail)".
+- [x] At most 2 caves per trail (Dry Gulch cave weight lowered). Fights sometimes (30%, elites
+      50%) leave a curiosity to search afterwards, like DD.
+- [x] Saloon rumor money +25%. Widow's wolf den pays 150 chips (was 80); "trade stories" rest is
+      smaller (-5 Fatigue, 5% heal).
+- [x] Dark Commune heals a flat 6 HP (was 25%).
+- [x] Death's Door: the hit that knocks a hero onto it, and the rest of that same move (multi-shot
+      volleys like Fan of Knives or the Fusillade), can't kill. Heroes who start a fight still on
+      Death's Door (it carries over until healed) get a warning. A hero dying costs every ally
+      +15 Fatigue; an ally hitting Death's Door costs +6.
+- [ ] Next: hero-by-hero move review.

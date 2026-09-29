@@ -31,6 +31,7 @@ var selected_skill: String = ""
 var hover_id: int = -1
 var awaiting := false
 var speed := 1.0
+var _move_has_sfx := false   # the current move plays its own sound, so hits stay quiet
 
 
 func setup(p: Dictionary) -> void:
@@ -73,6 +74,11 @@ func setup(p: Dictionary) -> void:
 
 
 func _start(ev: Array) -> void:
+	# Death's Door carries over between fights until the hero is healed: say so up front.
+	for h in engine.heroes:
+		if h.hero != null and h.hero.deaths_door:
+			_popup(h, "Still on Death's Door!", Color("#e05a4a"), 22, 60)
+			_log("[color=#e05a4a]%s is still on Death's Door from before: any hit could be fatal. Heal them to bring them back.[/color]" % h.display_name)
 	await _play(ev)
 	if kind == "boss":
 		await _banner(DB.regions[run.region_id].boss.name, 1.4)
@@ -669,7 +675,7 @@ func _result(e: Dictionary) -> void:
 				_burst(t, Color("#c9b48a"), false)
 				if views.has(t.id):
 					views[t.id].figure.set_pose("hurt")
-				Audio.play("hit", 0.8)
+				Audio.play("hit", 0.3 if _move_has_sfx else 0.8)
 				if e.crit:
 					_shake(10)
 					Audio.play("crit")
@@ -884,8 +890,10 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 	if anim == "throw" and not targets.is_empty():
 		_projectile(av.position + Vector2(0, -160), targets[0].position + Vector2(0, -120))
 	await _wait(0.12)
+	_move_has_sfx = e.get("sfx", "") != ""
 	for g in group:
 		_result(g)
+	_move_has_sfx = false
 	await _wait(1.0)
 	# Step back.
 	av.figure.set_pose("idle")

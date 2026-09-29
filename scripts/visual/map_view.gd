@@ -17,7 +17,7 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
-## An old trail map: tea stains, a few hand-inked hills and a compass rose.
+## An old trail map: tea stains and a few hand-inked hills.
 func _draw_parchment() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7 + run.nodes.size()
@@ -33,14 +33,6 @@ func _draw_parchment() -> void:
 		for j in 3:
 			var o := Vector2(j * hw * 0.7, (j % 2) * 4)
 			draw_arc(hc + o, hw * 0.5, PI, TAU, 10, Color(ink, 0.16), 2.0, true)
-	var cp := Vector2(size.x - 170, size.y - 70)
-	for k in 8:
-		var a := k * TAU / 8.0 - PI / 2
-		var ln := 38.0 if k % 2 == 0 else 20.0
-		var d := Vector2(cos(a), sin(a))
-		draw_colored_polygon(PackedVector2Array([cp + d * ln, cp + d.orthogonal() * 6, cp - d.orthogonal() * 6]), Color(ink, 0.35 if k % 2 == 0 else 0.2))
-	draw_circle(cp, 7, Color(ink, 0.4))
-	draw_string(UI.font_bold, cp + Vector2(-52, 6), "W", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ink, 0.5))
 
 
 func node_pos(n: Dictionary) -> Vector2:
@@ -93,6 +85,8 @@ func _tip(id: int) -> String:
 				t += "\n" + ", ".join(n.data.enemies.map(func(e): return DB.enemy(e).get("name", e)))
 			else:
 				t += "\nYou can't tell who's waiting. (A Tracker reads the signs.)"
+			if n.data.has("curios"):
+				t += "\nSomething worth searching lies nearby, once the fight is done."
 		"boss":
 			t += ": " + run.region().boss.name + "\nRecommended level " + str(run.region().get("rec_level", "?")) + ". No retreat."
 		"crossing":
@@ -147,8 +141,8 @@ func _draw() -> void:
 		_icon(kind, p, r, n.visited and n.id != run.current)
 		if n.id == run.current:
 			draw_arc(p, r + 6, 0, TAU, 40, Color("#e0bd4f"), 4.0)
-	# Column legend: west arrow.
-	draw_string(UI.font_head, Vector2(size.x - 260, size.y - 10), "WEST  →", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(0.35, 0.25, 0.16, 0.7))
+	# Column legend: which way the trail runs.
+	draw_string(UI.font_head, Vector2(size.x - 260, size.y - 10), "ONWARD  →", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(0.35, 0.25, 0.16, 0.7))
 
 
 func _icon(kind: String, p: Vector2, r: float, faded: bool) -> void:

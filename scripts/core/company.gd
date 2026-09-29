@@ -57,12 +57,15 @@ func new_game(seed_value: int = -1) -> void:
 	_refresh_week()
 
 
-## How many heroes the company can keep: each settlement houses some, more as it grows.
+## How many heroes the company can keep: each settlement houses some, more as it grows,
+## plus the Hiring Board's Bunkhouse track.
 func roster_cap() -> int:
-	var per: Dictionary = DB.cfg("roster_per_tier", {"outpost": 2, "town": 5, "city": 8})
+	var per: Dictionary = DB.cfg("roster_per_tier", {"outpost": 4, "town": 6, "city": 9})
 	var n := 0
 	for s in settlements:
-		n += int(per.get(s.tier, 2))
+		n += int(per.get(s.tier, 4))
+		if building_level(int(s.index), "hiring_board") > 0:
+			n += int(track_value(int(s.index), "hiring_board", "bunks"))
 	return maxi(1, n)
 
 
@@ -861,8 +864,13 @@ func _roll_quests(st: Dictionary) -> void:
 		return
 	var count := int(track_value(i, "saloon", "chatter"))
 	var tier_l := int(track_value(i, "saloon", "tips"))
-	var templates: Array = DB.quests.get("templates", {}).keys()
+	var templates: Array = DB.quests.get("templates", {}).keys().filter(func(k): return not story_flags.has(DB.quests.templates[k].get("done_flag", "-")))
 	var picks := Stats.shuffled(rng, templates)
+	# Story rumors (like Mulligan's hideout) jump the queue most weeks until they're done.
+	for k in templates:
+		if rng.randf() * 100.0 < float(DB.quests.templates[k].get("priority", 0)):
+			picks.erase(k)
+			picks.push_front(k)
 	for n in mini(count, picks.size()):
 		var qid := "q_%d_%d_%d" % [i, week, n]
 		var reg := _make_quest(picks[n], west, tier_l)
@@ -890,11 +898,11 @@ func _make_quest(tid: String, west: String, tier_l: int) -> Dictionary:
 	var place: String = Stats.pick(rng, DB.quests.get("places", ["the hills"]))
 	var ch: Dictionary = DB.quests.get("chances", {})
 	var tl := clampi(tier_l, 0, 2)
-	var has_boss := rng.randf() * 100.0 < float(ch.get("boss", [25, 40, 55])[tl])
+	var has_boss: bool = t.get("always_boss", false) or rng.randf() * 100.0 < float(ch.get("boss", [25, 40, 55])[tl])
 	var tier := int(base.get("tier", 1))
 	var mult := (1.0 + tl * 0.5) * tier
 	var reward := {
-		"money": int(rng.randi_range(60, 120) * mult),
+		"money": int(rng.randi_range(80, 150) * mult),
 		"timber": rng.randi_range(1, 3) + tl,
 		"iron": rng.randi_range(0, 2) + tl,
 		"trinket": "",
@@ -921,8 +929,22 @@ func _make_quest(tid: String, west: String, tier_l: int) -> Dictionary:
 			"enemies": b.get("enemies", t.get("final", []))},
 		"crossing": {"name": str(t.name).replace("{place}", place), "enemies": t.get("final", [])},
 		"quest_reward": reward,
+		"done_flag": t.get("done_flag", ""), "boss_keepsake": t.get("boss_keepsake", ""),
+		"difficulty": int(t.get("difficulty", 2)) + (1 if has_boss and not t.get("always_boss", false) else 0) + tl,
 	}
 	return reg
+
+
+const DIFFICULTY := ["", "Gentle", "Fair", "Tough", "Hard", "Deadly"]
+const DIFFICULTY_TEXT := ["", "A good first outing.", "A fair test for a fresh company.",
+	"Expect hard fights: bring a healer and full bellies.", "A real ordeal: seasoned heroes and plenty of supplies.",
+	"Only the best-prepared come back."]
+
+
+## "Difficulty: Tough (3/5). Expect hard fights..." for a region's hover text.
+static func difficulty_text(reg: Dictionary) -> String:
+	var d := clampi(int(reg.get("difficulty", 2)), 1, 5)
+	return "Difficulty: %s (%d/5). %s" % [DIFFICULTY[d], d, DIFFICULTY_TEXT[d]]
 
 
 ## A short list of what a quest promises, for tooltips and the Saloon.
@@ -1077,11 +1099,19 @@ func finish_run(status: String) -> Dictionary:
 			if k != "":
 				stash.append(k)
 		for rd in r.recruits:
+			var nh := Hero.from_dict(rd)
+			nh.location = r.origin
 			if heroes.size() < roster_cap():
-				var nh := Hero.from_dict(rd)
-				nh.location = r.origin
 				heroes.append(nh)
 				summary.recruits.append("%s (%s)" % [nh.hero_name, nh.class_name_text()])
+			else:
+				# No bunk free: they wait on the Hiring Board (free to hire) instead of leaving.
+				var st := settlement(r.origin)
+				st["recruits"] = st.get("recruits", [])
+				st.recruits.push_front(nh.to_dict())
+				st["promised"] = st.get("promised", [])
+				st.promised.append(nh.to_dict())
+				summary.recruits.append("%s (%s): no room, waiting at the Hiring Board" % [nh.hero_name, nh.class_name_text()])
 	if won:
 		stats.victories += 1
 	var xp_gain := r.xp

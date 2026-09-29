@@ -26,6 +26,7 @@ var killed: Array = []          # enemy data ids slain
 var fallen: Array = []          # hero uids who died
 var story_script: Dictionary = {}     # scripted ending (a boss's first meeting); see _check_script
 var _next_id: int = 1
+var _fresh_dd: Array = []       # heroes knocked onto Death's Door by the move being resolved
 
 
 func setup(party: Array, enemy_ids: Array, opts: Dictionary = {}) -> Array:
@@ -490,6 +491,7 @@ func effect_chance(a: Combatant, sid: String, e: Dictionary, t: Combatant) -> in
 func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 	var sk := DB.skill(sid)
 	var ev: Array = []
+	_fresh_dd.clear()
 	var valid := valid_targets(a, sid)
 	if valid.is_empty():
 		ev.append({"t": "pass", "actor": a.id})
@@ -723,6 +725,8 @@ func _apply_self_effect(a: Combatant, sid: String, e: Dictionary, ev: Array) -> 
 				ev.append({"t": "summon", "actor": a.id, "unit": c.id})
 		"heal_self_pct":
 			_heal(a, a, int(ceil(a.max_hp * float(e.get("value", 10)) / 100.0)), false, ev)
+		"heal_self":
+			_heal(a, a, int(e.get("amount", 5)), false, ev)
 		"light":
 			if in_cave:
 				light = clampi(light + int(e.get("amount", 10)), 0, 100)
@@ -757,7 +761,10 @@ func _apply_damage(t: Combatant, amount: int, source: Combatant, ev: Array, is_d
 			killed.append(t.data.get("id", ""))
 			ev.append({"t": "death", "target": t.id})
 		return
-	# Heroes: Death's Door.
+	# Heroes: Death's Door. The hit that knocks a hero onto it never kills, and neither do
+	# the rest of that same move's hits (a multi-shot volley): the next move rolls Deathblow.
+	if t.hero.deaths_door and t.id in _fresh_dd and not is_dot:
+		return
 	if t.hero.deaths_door:
 		var resist := t.hero.stat("deathblow")
 		if rng.randf() * 100.0 < resist:
@@ -773,6 +780,7 @@ func _apply_damage(t: Combatant, amount: int, source: Combatant, ev: Array, is_d
 	t.set_hp(t.hp - amount)
 	if t.hp <= 0:
 		t.hero.deaths_door = true
+		_fresh_dd.append(t.id)
 		ev.append({"t": "deaths_door", "target": t.id})
 		for h in heroes:
 			if h != t and not h.dead:
