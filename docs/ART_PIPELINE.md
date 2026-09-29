@@ -375,6 +375,31 @@ checked, the in-game transition is not. Confirm it by travelling a full map.
 Note on repo size: those 7 PNGs are about 18 MB. Decide whether they belong in git, or are
 downscaled, or generated on demand, before committing.
 
+## Backdrop anchoring: why figures looked like they floated (Sept 29)
+
+Owner report: "the UI at the bottom blocks the bottom of the background, it looks like the
+characters are floating in air".
+
+Cause: an image scaled to cover the full 1080 puts its ground plane low in the frame. On the
+trail screen the map panel starts at **y=430**, so the ground (around y=555 downward) was
+entirely **behind the panel**. The visible strip showed only sky and distant hills, and the
+wagon at y=404 had no ground beneath it.
+
+A single bottom anchor cannot fix it: the measured horizon of the six trail variants runs from
+**21% to 61%** down the image. So the horizon is measured and stored.
+
+- `tools/art/prep_backdrops.py` measures each image's horizon, the row with the strongest
+  horizontal edge in the middle of the frame, and writes `assets/art/backdrops/horizons.json`.
+- `Backdrop.set_bg_horizon(y)` positions the image so its horizon lands at screen y, with sky
+  above and ground below, for whichever variant is showing. `cover` is chosen to also reach
+  the top edge, so the frame is never blank.
+- Values in use: **trail 300** (panel at 430, wagon at 404), **menu 430** (wagon at 772),
+  **combat 430** (heroes at GROUND 770, HUD at 835).
+- Rerun `prep_backdrops.py` after adding backdrop images, so the new ones get horizon data.
+
+If the horizon is unknown, `Backdrop` falls back to `bg_bottom` (image bottom edge), which may
+run behind an opaque panel.
+
 ## Open questions
 
 - How much of the parallax survives if a backdrop becomes a flat image. `Backdrop` scrolls

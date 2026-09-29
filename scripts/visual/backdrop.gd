@@ -25,6 +25,12 @@ var _lamp: ColorRect = null     # paper cave lamplight pool
 
 var bg_key: String = ""         # optional painted-backdrop override, else "<region>_<mode>"
 var bg_progress: float = 0.0    # 0 at the start of the map, 1 at the end (drives variants)
+var bg_bottom: float = -1.0     # screen y for the image BOTTOM edge; -1 means the frame bottom (H).
+var bg_horizon_y: float = -1.0  # screen y to place the image horizon at; -1 disables
+var _horizons: Dictionary = {}
+var _horizons_loaded := false
+                                # Let it run below an opaque panel so the ground fills the band that is.
+                                # actually visible, which is what stops figures looking like they float.
 var bg: Sprite2D = null
 var _bg_paths: Array = []       # every "<key>.png" and "<key>_N.png" found, sorted
 var _bg_index: int = -1
@@ -75,6 +81,18 @@ func _load_backdrop_image() -> bool:
 	return false
 
 
+## Fraction down the image where its horizon sits, from assets/art/backdrops/
+## horizons.json. Written by tools/art/prep_backdrops.py, which measures the images.
+func _horizon_frac(path: String) -> float:
+	if not _horizons_loaded:
+		_horizons_loaded = true
+		var f := FileAccess.open("res://assets/art/backdrops/horizons.json", FileAccess.READ)
+		if f != null:
+			var parsed: Variant = JSON.parse_string(f.get_as_text())
+			if parsed is Dictionary:
+				_horizons = parsed
+	return float(_horizons.get(path.get_file(), -1.0))
+
 func _apply_bg(index: int) -> void:
 	if bg == null or _bg_paths.is_empty():
 		return
@@ -84,12 +102,42 @@ func _apply_bg(index: int) -> void:
 	_bg_index = i
 	var tex: Texture2D = load(_bg_paths[i])
 	bg.texture = tex
-	# Cover the frame with a little overdraw, so the drift in set_scroll never shows an edge.
-	var cover: float = maxf(W / float(tex.get_width()), H / float(tex.get_height())) * 1.08
+	# Time of day the image is anchored to. The overdraw gives the drift in set_scroll room
+	# to move without ever showing an edge.
+	var h := float(tex.get_height())
+	var frac: float = _horizon_frac(_bg_paths[i])
+	var cover: float
+	var cy: float
+	if bg_horizon_y > 0.0 and frac > 0.0:
+		# Anchor on the horizon: sky above it, ground below, whatever the variant.
+		# cover must also reach the top edge, so the frame is never left blank.
+		cover = maxf(W * 1.08 / float(tex.get_width()), bg_horizon_y / (frac * h))
+		cy = bg_horizon_y - h * cover * (frac - 0.5)
+	else:
+		# No horizon data: anchor the image bottom, which may run behind an opaque panel.
+		var bottom: float = bg_bottom if bg_bottom > 0.0 else H
+		cover = maxf(W * 1.08 / float(tex.get_width()), bottom / h)
+		cy = bottom - h * cover * 0.5
 	bg.scale = Vector2(cover, cover)
-	bg.position = Vector2(W * 0.5, H * 0.5)
+	bg.position = Vector2(W * 0.5, cy)
 	_bg_margin = (float(tex.get_width()) * cover - W) * 0.5
 
+
+## Screen y where the image horizon should sit. Sky above, ground below. This is the
+## knob that stops figures looking like they float over an opaque panel.
+func set_bg_horizon(y: float) -> void:
+	bg_horizon_y = y
+	var keep: int = _bg_index
+	_bg_index = -1
+	_apply_bg(keep if keep >= 0 else 0)
+
+## Screen y for the image bottom edge. Lower it to pull more sky into view, raise it to
+## push the horizon up so more ground shows beneath the figures.
+func set_bg_bottom(y: float) -> void:
+	bg_bottom = y
+	var keep: int = _bg_index
+	_bg_index = -1
+	_apply_bg(keep if keep >= 0 else 0)
 
 ## Drive this from the screen so the scenery changes as the company pushes west.
 func set_progress(p: float) -> void:

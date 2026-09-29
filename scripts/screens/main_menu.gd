@@ -12,6 +12,8 @@ func setup(_params: Dictionary) -> void:
 	# scenery when the file is missing, so the menu still works without the art.
 	backdrop.bg_key = "title"
 	backdrop.setup("tallgrass", "trail", 4)
+	# Wagon at y=772, so put the horizon well above it. No opaque panel on this screen.
+	backdrop.set_bg_horizon(430.0)
 	add_child(backdrop)
 	wagon = WagonArt.new()
 	wagon.position = Vector2(700, 772)

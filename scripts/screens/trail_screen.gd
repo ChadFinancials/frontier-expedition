@@ -25,6 +25,8 @@ func setup(_params: Dictionary) -> void:
 	backdrop = Backdrop.new()
 	backdrop.ground_y = 400
 	backdrop.setup(run.region_id, "trail", 30 + run.day)
+	# Ground under the wagon: the map panel starts at y=430, so the horizon sits at 300.
+	backdrop.set_bg_horizon(300.0)
 	add_child(backdrop)
 	var clip := Control.new()
 	add_child(clip)
