@@ -33,6 +33,8 @@ func _ready() -> void:
 	test_combat_basics()
 	print("> test_enemy_moves()")
 	test_enemy_moves()
+	print("> test_hero_moves()")
+	test_hero_moves()
 	print("> test_deaths_door()")
 	test_deaths_door()
 	print("> test_fatigue()")
@@ -70,8 +72,7 @@ func test_data_valid() -> void:
 	check(errs.is_empty(), "data validation (%d problems)" % errs.size())
 	check(DB.classes.size() == 10, "10 classes (got %d)" % DB.classes.size())
 	for cid in DB.classes:
-		check(DB.classes[cid].skills.size() == 6, "%s has 6 skills" % cid)
-		check(DB.classes[cid].default_equipped.size() == 4, "%s equips 4" % cid)
+		check(DB.classes[cid].skills.size() in [6, 8], "%s has 6 or 8 moves" % cid)
 	for eid in DB.events:
 		for opt in DB.events[eid].options:
 			check(not opt.get("outcomes", []).is_empty(), "event %s option has outcomes" % eid)
@@ -116,7 +117,7 @@ func test_combat_basics() -> void:
 	check(e.valid_targets(marshal, "marshal_iron_justice").size() == 2, "iron justice hits ranks 1-2")
 	check(not rifle.id in e.valid_targets(marshal, "marshal_iron_justice"), "rank 3 out of melee reach")
 	var hc := e.hit_chance(marshal, "marshal_iron_justice", brawler)
-	check(hc == 80, "hit chance 85 acc - 5 dodge = 80 (got %d)" % hc)
+	check(hc == 87, "hit chance 90 acc + 2 Marshal acc - 5 dodge = 87 (got %d)" % hc)
 	var prev := e.dmg_preview(marshal, "marshal_iron_justice", brawler)
 	check(prev.size() == 2 and prev[0] >= 1 and prev[1] >= prev[0], "damage preview")
 	# Sharpshooter can't use Long Shot from rank 1.
@@ -210,6 +211,63 @@ func test_enemy_moves() -> void:
 		check(not victim.dead and victim.hero.deaths_door, "the knock-down hit and its follow-ups never kill")
 		victim.hero.deaths_door = false
 		victim.set_hp(1)
+
+
+func test_hero_moves() -> void:
+	var co := Company.new()
+	co.new_game(21)
+	# New heroes know 4 of their moves (at least two attacks) and equip them.
+	for i in 20:
+		var h := co.make_hero("mountain_man")
+		check(h.known.size() == 4 and h.equipped == h.known, "new hero knows and equips 4 moves")
+		var attacks := h.known.filter(func(s): return DB.skill(s).get("target", "enemy") == "enemy" and not DB.skill(s).get("no_damage", false))
+		check(attacks.size() >= 2, "at least two starting attacks")
+	# Learning the rest at a Drill Hall.
+	var hm := co.make_hero("marshal")
+	hm.location = 0
+	var unknown: Array = hm.cls().skills.filter(func(s): return not hm.knows(s))
+	check(co.can_learn_skill(0, hm, unknown[0]) == "No Drill Hall here", "learning needs a Drill Hall")
+	co.settlement(0).buildings["drill_hall"] = 1
+	co.money = 5000
+	check(co.can_upgrade_skill(0, hm, unknown[0]) == "Not learned yet", "can't train a move before learning it")
+	check(co.learn_skill(0, hm, unknown[0]) and hm.knows(unknown[0]) and co.money == 5000 - co.learn_cost(0), "learn a move for chips")
+	# Old saves: moves the class no longer has are dropped, and known moves are filled in.
+	var d := hm.to_dict()
+	d.erase("known")
+	d.equipped = ["mm_knife_toss", "marshal_iron_justice"]
+	var h2 := Hero.from_dict(d)
+	check(h2.equipped == ["marshal_iron_justice"] and h2.known == ["marshal_iron_justice"], "old save moves sanitized")
+	# New move effects.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4
+	var party := [co.make_hero("marshal"), co.make_hero("mountain_man"), co.make_hero("gunslinger"), co.make_hero("preacher")]
+	for h in party:
+		h.known = h.cls().skills.duplicate()
+	var e := CombatEngine.new()
+	e.setup(party, ["buffalo_bull", "outlaw_brawler"], {"rng": rng})
+	var marshal: Combatant = e.heroes[0]
+	var mystic: Combatant = e.heroes[1]
+	var bull: Combatant = e.enemies[0]
+	var before := e.dmg_preview(marshal, "marshal_iron_justice", bull)
+	e.use_skill(marshal, "marshal_ap_ammo", marshal.id)
+	var after := e.dmg_preview(marshal, "marshal_iron_justice", bull)
+	check(after[1] > before[1], "armor-piercing rounds get through the bull's hide (%s -> %s)" % [str(before), str(after)])
+	e._end_turn(marshal, [])
+	check(marshal.buff_total("pierce") == 20, "a self-buff isn't used up on the turn it's cast")
+	var gs: Combatant = e.heroes[2]
+	gs.stunned = true
+	gs.buffs.append({"stat": "acc", "value": -10, "rounds": 2, "name": "test"})
+	e.use_skill(marshal, "marshal_flash_badge", gs.id)
+	check(not gs.stunned and gs.buff_total("acc") == 0 and gs.buff_total("speed") == 2, "Flash the Badge clears stun and debuffs, adds speed")
+	var hp0 := mystic.hp
+	var hurt: Combatant = e.heroes[3]
+	hurt.set_hp(3)
+	e._shift(mystic, -2, [])
+	e.use_skill(mystic, "mm_piece_of_me", hurt.id)
+	check(mystic.hp == hp0 - 4 and hurt.hp > 3 and hurt.buff_total("bleed_res") == 10, "Take a Piece of Me: 4 of the Mystic's HP heals an ally")
+	mystic.set_hp(2)
+	e.use_skill(mystic, "mm_piece_of_me", hurt.id)
+	check(mystic.hp == 1, "blood price never drops below 1 HP")
 
 
 func test_deaths_door() -> void:

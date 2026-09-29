@@ -253,6 +253,11 @@ func _end_turn(c: Combatant, ev: Array) -> void:
 			if b.rounds >= 99:
 				kept.append(b)
 				continue
+			# A buff the unit gave itself this turn starts counting from its next turn.
+			if b.get("fresh", false):
+				b.erase("fresh")
+				kept.append(b)
+				continue
 			b.rounds -= 1
 			if b.rounds > 0:
 				kept.append(b)
@@ -449,17 +454,18 @@ func dmg_preview(a: Combatant, sid: String, t: Combatant) -> Array:
 	var r := skill_dmg_range(a, sid)
 	var m := dmg_mult(a, sid, t)
 	var flat := a.stat("dmg_flat", t)
-	var prot := t.stat("prot", a) / 100.0
+	var prot := maxf(0.0, t.stat("prot", a) - a.stat("pierce", t)) / 100.0
 	return [maxi(1, int(round(maxf(0.0, r[0] * m + flat) * (1.0 - prot)))), maxi(1, int(round(maxf(0.0, r[1] * m + flat) * (1.0 - prot))))]
 
 
-## Base damage for a move. An enemy move may set "dmg_range": [lo, hi], its tier-1 damage
-## as written (tier scaling still applies); otherwise it uses the attacker's own range.
+## Base damage for a move. A move may set "dmg_range": [lo, hi], its damage as written at
+## tier 1 / starting gear (enemy tiers scale it; hero weapons and skill levels add their
+## usual bonuses on top); otherwise it uses the attacker's own range.
 func skill_dmg_range(a: Combatant, sid: String) -> Array:
 	var d: Array = DB.skill(sid).get("dmg_range", [])
-	if d.size() < 2 or a.is_hero():
+	if d.size() < 2:
 		return a.dmg_range()
-	var mult: float = 1.0 if a.boss else 1.0 + DB.cfg("tier_dmg_pct", 30) / 100.0 * (a.tier - 1)
+	var mult: float = 1.0 if a.boss or a.is_hero() else 1.0 + DB.cfg("tier_dmg_pct", 30) / 100.0 * (a.tier - 1)
 	return [maxi(1, int(round(d[0] * mult))), maxi(1, int(round(d[1] * mult)))]
 
 
@@ -571,7 +577,7 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 				gamble_text = "Bust..."
 		if crit:
 			dmg *= DB.cfg("crit_mult", 1.5)
-		dmg *= 1.0 - t.stat("prot", a) / 100.0
+		dmg *= 1.0 - maxf(0.0, t.stat("prot", a) - a.stat("pierce", t)) / 100.0
 		var amount := maxi(1, int(round(dmg)))
 		ev.append({"t": "hit", "actor": a.id, "target": t.id, "amount": amount, "crit": crit, "note": gamble_text})
 		_apply_damage(t, amount, a, ev, false)
@@ -621,13 +627,13 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 			ev.append({"t": "status", "target": t.id, "status": "mark"})
 		"debuff":
 			if _roll_effect(a, sid, e, t, ev):
-				t.buffs.append({"stat": e.stat, "value": e.value, "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", "")})
+				t.buffs.append({"stat": e.stat, "value": e.value, "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", ""), "fresh": t == a})
 				ev.append({"t": "debuff", "target": t.id, "stat": e.stat, "value": e.value})
 		"buff":
 			var v: float = e.value
 			if a.is_hero() and lvl > 1:
 				v *= 1.0 + 0.1 * (lvl - 1)
-			t.buffs.append({"stat": e.stat, "value": int(round(v)), "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", "")})
+			t.buffs.append({"stat": e.stat, "value": int(round(v)), "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", ""), "fresh": t == a})
 			ev.append({"t": "buff", "target": t.id, "stat": e.stat, "value": int(round(v))})
 		"random_buff":
 			var pool: Array = e.get("pool", [])
@@ -680,6 +686,8 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 			t.dots = t.dots.filter(func(d): return not d.kind in kinds)
 			if "stun" in kinds:
 				t.stunned = false
+			if "debuff" in kinds:
+				t.buffs = t.buffs.filter(func(b): return float(b.value) >= 0.0)
 			ev.append({"t": "cure", "target": t.id})
 		"clear_shaken":
 			if t.hero != null and t.hero.shaken:
@@ -727,6 +735,12 @@ func _apply_self_effect(a: Combatant, sid: String, e: Dictionary, ev: Array) -> 
 			_heal(a, a, int(ceil(a.max_hp * float(e.get("value", 10)) / 100.0)), false, ev)
 		"heal_self":
 			_heal(a, a, int(e.get("amount", 5)), false, ev)
+		"self_damage":
+			# Blood price: hurts, but never below 1 HP.
+			var sd := mini(int(e.get("amount", 4)), a.hp - 1)
+			if sd > 0:
+				a.set_hp(a.hp - sd)
+				ev.append({"t": "hit", "actor": a.id, "target": a.id, "amount": sd, "crit": false, "note": ""})
 		"light":
 			if in_cave:
 				light = clampi(light + int(e.get("amount", 10)), 0, 100)

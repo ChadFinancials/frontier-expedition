@@ -3,23 +3,21 @@
     "name": "Marshal",
     "role": "Protector",
     "desc": "A lawman with a tin star and a long memory. Stands at the front, takes the hits meant for others, and makes outlaws think twice.",
-    "hp": 28, "dodge": 5, "prot": 10, "speed": 2, "acc": 0, "crit": 4, "dmg": [6, 11],
-    "res": {"stun": 40, "bleed": 35, "poison": 30, "move": 45, "debuff": 35, "deathblow": 67},
+    "hp": 24, "dodge": 5, "prot": 10, "speed": 2, "acc": 2, "crit": 4, "dmg": [6, 11],
+    "res": {"stun": 50, "bleed": 35, "poison": 30, "move": 50, "debuff": 35, "deathblow": 67},
     "ranks": [1, 2],
-    "skills": ["marshal_iron_justice", "marshal_pistol_whip", "marshal_deputize", "marshal_warrant", "marshal_hold_the_line", "marshal_warning_shot"],
-    "default_equipped": ["marshal_iron_justice", "marshal_pistol_whip", "marshal_deputize", "marshal_hold_the_line"],
+    "skills": ["marshal_iron_justice", "marshal_pistol_whip", "marshal_deputize", "marshal_warrant", "marshal_hold_the_line", "marshal_warning_shot", "marshal_flash_badge", "marshal_ap_ammo"],
     "look": {"body": "human", "build": "broad", "hat": "stetson", "coat": "duster", "weapon": "pistol", "extra": "badge",
       "colors": {"coat": "#5b4636", "pants": "#3b3530", "hat": "#2e2620", "accent": "#d9b44a"}}
   },
   "mountain_man": {
-    "name": "Mountain Man",
-    "role": "Bruiser",
-    "desc": "Spent twenty winters alone in the high country and came down meaner for it. Hits harder the more they bleed.",
-    "hp": 25, "dodge": 5, "prot": 5, "speed": 4, "acc": 0, "crit": 6, "dmg": [7, 13],
-    "res": {"stun": 35, "bleed": 40, "poison": 40, "move": 40, "debuff": 30, "deathblow": 67},
+    "name": "Mountain Mystic",
+    "role": "Mystic Bruiser",
+    "desc": "Spent twenty winters alone in the deep woods and came back strange. Pays in blood for power: hits hardest below half health, and can bleed to mend others.",
+    "hp": 25, "dodge": 5, "prot": 5, "speed": 3, "acc": 0, "crit": 6, "dmg": [6, 11],
+    "res": {"stun": 35, "bleed": 40, "poison": 50, "move": 40, "debuff": 50, "deathblow": 67},
     "ranks": [1, 2],
-    "skills": ["mm_axe_cleave", "mm_grizzly_chop", "mm_bear_trap", "mm_knife_toss", "mm_bellow", "mm_jerky"],
-    "default_equipped": ["mm_axe_cleave", "mm_grizzly_chop", "mm_bear_trap", "mm_bellow"],
+    "skills": ["mm_axe_cleave", "mm_grizzly_chop", "mm_gnarl", "mm_bear_trap", "mm_piece_of_me", "mm_bellow", "mm_shadows", "mm_jerky"],
     "look": {"body": "human", "build": "heavy", "hat": "coonskin", "coat": "buckskin", "weapon": "axe", "beard": true,
       "colors": {"coat": "#8a6a45", "pants": "#5a4632", "hat": "#6b5134", "accent": "#b5452c"}}
   },
@@ -31,7 +29,6 @@
     "res": {"stun": 45, "bleed": 35, "poison": 35, "move": 60, "debuff": 35, "deathblow": 67},
     "ranks": [1, 2],
     "skills": ["rd_hammer_blow", "rd_spike_drive", "rd_rhythm", "rd_line_breaker", "rd_brace", "rd_sledge_toss"],
-    "default_equipped": ["rd_hammer_blow", "rd_spike_drive", "rd_rhythm", "rd_line_breaker"],
     "look": {"body": "human", "build": "heavy", "hat": "flat_cap", "coat": "overalls", "weapon": "hammer",
       "colors": {"coat": "#3f5a78", "pants": "#34495e", "hat": "#3a3a3a", "accent": "#c0392b"}}
   },
@@ -43,7 +40,6 @@
     "res": {"stun": 30, "bleed": 30, "poison": 30, "move": 30, "debuff": 30, "deathblow": 67},
     "ranks": [1, 2, 3],
     "skills": ["gs_quick_draw", "gs_fan", "gs_twin", "gs_point_blank", "gs_duck", "gs_called_shot"],
-    "default_equipped": ["gs_quick_draw", "gs_fan", "gs_point_blank", "gs_called_shot"],
     "look": {"body": "human", "build": "slim", "hat": "cowboy", "coat": "vest", "weapon": "pistols", "extra": "bandana",
       "colors": {"coat": "#2f2f2f", "pants": "#4b3d33", "hat": "#1f1a17", "accent": "#a33a2e"}}
   },
@@ -55,7 +51,6 @@
     "res": {"stun": 35, "bleed": 35, "poison": 35, "move": 40, "debuff": 35, "deathblow": 67},
     "ranks": [2, 3],
     "skills": ["wr_sic_em", "wr_lasso", "wr_hogtie", "wr_bullwhip", "wr_heel", "wr_round_up"],
-    "default_equipped": ["wr_sic_em", "wr_lasso", "wr_hogtie", "wr_round_up"],
     "look": {"body": "human", "build": "normal", "hat": "cowboy_wide", "coat": "chaps", "weapon": "lasso", "extra": "dog",
       "colors": {"coat": "#9a6b3c", "pants": "#6e5238", "hat": "#8c6a43", "accent": "#2e86ab"}}
   },
@@ -67,7 +62,6 @@
     "res": {"stun": 30, "bleed": 30, "poison": 30, "move": 30, "debuff": 40, "deathblow": 67},
     "ranks": [2, 3],
     "skills": ["gb_derringer", "gb_double", "gb_card_toss", "gb_stacked", "gb_bluff", "gb_lucky"],
-    "default_equipped": ["gb_derringer", "gb_double", "gb_card_toss", "gb_stacked"],
     "look": {"body": "human", "build": "slim", "hat": "bowler", "coat": "frock", "weapon": "cards", "extra": "mustache",
       "colors": {"coat": "#4a2c3d", "pants": "#2b2b2b", "hat": "#222222", "accent": "#e2c044"}}
   },
@@ -79,7 +73,6 @@
     "res": {"stun": 35, "bleed": 35, "poison": 45, "move": 35, "debuff": 30, "deathblow": 67},
     "ranks": [2, 3, 4],
     "skills": ["pr_dynamite", "pr_pickaxe", "pr_blasting_cap", "pr_flash", "pr_lamp", "pr_rock_hammer"],
-    "default_equipped": ["pr_dynamite", "pr_pickaxe", "pr_blasting_cap", "pr_flash"],
     "look": {"body": "human", "build": "normal", "hat": "slouch", "coat": "shirt", "weapon": "pickaxe", "beard": true, "extra": "lantern",
       "colors": {"coat": "#a0522d", "pants": "#4f5d75", "hat": "#6f5a45", "accent": "#e07a1f"}}
   },
@@ -91,7 +84,6 @@
     "res": {"stun": 30, "bleed": 30, "poison": 30, "move": 35, "debuff": 30, "deathblow": 67},
     "ranks": [3, 4],
     "skills": ["ss_long_shot", "ss_sight", "ss_kill_shot", "ss_suppress", "ss_kneecap", "ss_bandage"],
-    "default_equipped": ["ss_long_shot", "ss_sight", "ss_kill_shot", "ss_suppress"],
     "look": {"body": "human", "build": "slim", "hat": "kepi", "coat": "long", "weapon": "rifle",
       "colors": {"coat": "#4d5b3c", "pants": "#3b4030", "hat": "#394a5c", "accent": "#c9a227"}}
   },
@@ -103,7 +95,6 @@
     "res": {"stun": 30, "bleed": 40, "poison": 60, "move": 30, "debuff": 35, "deathblow": 67},
     "ranks": [3, 4],
     "skills": ["dr_dart", "dr_caustic", "dr_surgery", "dr_salts", "dr_chloroform", "dr_laudanum"],
-    "default_equipped": ["dr_dart", "dr_caustic", "dr_surgery", "dr_salts"],
     "look": {"body": "human", "build": "slim", "hat": "top", "coat": "frock", "weapon": "bag", "extra": "spectacles",
       "colors": {"coat": "#2c3e50", "pants": "#2b2b2b", "hat": "#1b1b1b", "accent": "#7fb069"}}
   },
@@ -115,7 +106,6 @@
     "res": {"stun": 40, "bleed": 30, "poison": 30, "move": 35, "debuff": 45, "deathblow": 67},
     "ranks": [3, 4],
     "skills": ["pc_hands", "pc_revival", "pc_sermon", "pc_brimstone", "pc_smite", "pc_judgment"],
-    "default_equipped": ["pc_hands", "pc_revival", "pc_sermon", "pc_brimstone"],
     "look": {"body": "human", "build": "normal", "hat": "preacher", "coat": "long", "weapon": "bible", "extra": "collar",
       "colors": {"coat": "#1e1e1e", "pants": "#1e1e1e", "hat": "#161616", "accent": "#f2e8cf"}}
   }

@@ -81,7 +81,7 @@ func _build() -> void:
 	var mid := UI.vb(6)
 	mid.custom_minimum_size.x = 640
 	root.add_child(mid)
-	mid.add_child(UI.hdr("Combat Skills  (%d/4 equipped)" % h.equipped.size(), 24, true))
+	mid.add_child(UI.hdr("Combat Skills  (%d/4 equipped, %d/%d learned)" % [h.equipped.size(), h.known.size(), h.cls().get("skills", []).size()], 24, true))
 	mid.add_child(UI.lbl("Click a skill to equip or unequip it. Pips: gold = ranks it can be used from (4-3-2-1), red = enemy ranks it reaches (1-2-3-4).", 16, "Ink"))
 	for sid in h.cls().get("skills", []):
 		mid.add_child(_skill_row(sid))
@@ -179,22 +179,28 @@ func _skill_row(sid: String) -> Control:
 	var h := hero
 	var sk := DB.skill(sid)
 	var equipped := sid in h.equipped
+	var learned := h.knows(sid)
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", UI.box(Color("#f1d38a") if equipped else UI.PAPER_DARK, UI.GOLD if equipped else UI.WOOD, 2, 6, 8, 0))
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
-	p.tooltip_text = UI.skill_tooltip(sid, h.skill_level(sid))
+	p.tooltip_text = UI.skill_tooltip(sid, h.skill_level(sid)) + ("" if learned else "\n\nNot learned yet: teach it at a Drill Hall.")
+	if not learned:
+		p.modulate = Color(1, 1, 1, 0.5)
 	var row := UI.hb(10)
 	p.add_child(row)
-	var name_l := UI.lbl(("✔ " if equipped else "   ") + sk.get("name", sid), 19, "InkBold")
+	var name_l := UI.lbl(("✔ " if equipped else "   ") + sk.get("name", sid) + ("" if learned else " (unlearned)"), 19, "InkBold")
 	name_l.custom_minimum_size.x = 230
 	row.add_child(name_l)
 	row.add_child(RankDots.for_skill(sid))
-	var lv := UI.lbl("Lv %d" % h.skill_level(sid), 17, "Ink")
+	var lv := UI.lbl("Lv %d" % h.skill_level(sid) if learned else "", 17, "Ink")
 	lv.custom_minimum_size.x = 44
 	row.add_child(lv)
 	var can_edit := co.run == null or index >= 0
 	p.gui_input.connect(func(ev):
 		if can_edit and ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			if not learned:
+				Main.inst.toast("%s hasn't learned %s yet. Teach it at a Drill Hall." % [h.hero_name, sk.get("name", sid)])
+				return
 			if sid in h.equipped:
 				if h.equipped.size() > 1:
 					h.equipped.erase(sid)
@@ -205,7 +211,7 @@ func _skill_row(sid: String) -> Control:
 				return
 			Audio.play("click", 0.5)
 			_changed())
-	if index >= 0 and co.building_level(index, "drill_hall") > 0 and h.skill_level(sid) < DB.cfg("max_skill_level", 4):
+	if index >= 0 and learned and co.building_level(index, "drill_hall") > 0 and h.skill_level(sid) < DB.cfg("max_skill_level", 5):
 		var nl := h.skill_level(sid) + 1
 		var why := co.can_upgrade_skill(index, h, sid)
 		var b := UI.btn("Train (%d chips)" % co.skill_cost(index, nl), func():

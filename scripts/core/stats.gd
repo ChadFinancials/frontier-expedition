@@ -8,13 +8,13 @@ extends RefCounted
 
 const STAT_NAMES := {
 	"max_hp_pct": "Max HP", "acc": "Accuracy", "dodge": "Dodge", "prot": "Protection",
-	"speed": "Speed", "crit": "Crit", "dmg_pct": "Damage", "dmg_flat": "Damage per hit", "stun_res": "Stun Resist",
+	"speed": "Speed", "crit": "Crit", "dmg_pct": "Damage", "dmg_flat": "Damage per hit", "pierce": "Armor Piercing", "stun_res": "Stun Resist",
 	"bleed_res": "Bleed Resist", "poison_res": "Poison Resist", "move_res": "Move Resist",
 	"debuff_res": "Debuff Resist", "deathblow": "Deathblow Resist", "fatigue_pct": "Fatigue Taken",
 	"heal_pct": "Healing Received", "resolve": "Second Wind Chance", "scout": "Scouting",
 	"surprise": "Surprise Chance", "food_pct": "Food Eaten", "loot_pct": "Loot Found",
 }
-const PERCENT_STATS := ["max_hp_pct", "prot", "dmg_pct", "crit", "stun_res", "bleed_res",
+const PERCENT_STATS := ["max_hp_pct", "prot", "pierce", "dmg_pct", "crit", "stun_res", "bleed_res",
 	"poison_res", "move_res", "debuff_res", "deathblow", "fatigue_pct", "heal_pct", "resolve",
 	"scout", "surprise", "food_pct", "loot_pct"]
 ## For these stats a positive number is bad for the hero.

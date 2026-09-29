@@ -247,21 +247,33 @@ func _smithy(body: VBoxContainer) -> void:
 func _drill(body: VBoxContainer) -> void:
 	var co: Company = Game.company
 	var lvl := co.building_level(index, "drill_hall")
-	body.add_child(UI.lbl("Trains skills up to level %d. A skill can be at most one level above its hero's level." % int(DB.buildings.drill_hall.max_skill[lvl - 1]), 18, "InkBold"))
+	body.add_child(UI.lbl("Teaches heroes the moves they haven't learned yet (%d chips each), and trains known moves up to level %d. A move can be at most one level above its hero's level." % [co.learn_cost(index), int(DB.buildings.drill_hall.max_skill[lvl - 1])], 18, "InkBold"))
 	var h := _bench(body, "Who trains?")
 	if h == null:
 		return
 	for sid in h.cls().skills:
 		var row := UI.hb(10)
 		row.add_child(ResIcon.make(UI.skill_kind(sid), 24))
-		var nl := UI.lbl(DB.skill(sid).name + ("  (equipped)" if sid in h.equipped else ""), 19, "InkBold")
+		var nl := UI.lbl(DB.skill(sid).name + ("  (equipped)" if sid in h.equipped else ("" if h.knows(sid) else "  (not learned)")), 19, "InkBold")
 		nl.custom_minimum_size.x = 340
 		nl.tooltip_text = UI.skill_tooltip(sid, h.skill_level(sid))
 		nl.mouse_filter = Control.MOUSE_FILTER_STOP
 		row.add_child(nl)
 		row.add_child(RankDots.for_skill(sid))
+		if not h.knows(sid):
+			var s3: String = sid
+			var lb := UI.btn("Learn (%d chips)" % co.learn_cost(index), func():
+				if co.learn_skill(index, h, s3):
+					Audio.play("badge")
+					_changed(), "Small")
+			var why2 := co.can_learn_skill(index, h, sid)
+			lb.disabled = why2 != ""
+			lb.tooltip_text = why2
+			row.add_child(lb)
+			body.add_child(row)
+			continue
 		row.add_child(UI.lbl("Level %d" % h.skill_level(sid), 18, "Ink"))
-		if h.skill_level(sid) < DB.cfg("max_skill_level", 4):
+		if h.skill_level(sid) < DB.cfg("max_skill_level", 5):
 			var s2: String = sid
 			var b := UI.btn("Train to %d (%d chips)" % [h.skill_level(sid) + 1, co.skill_cost(index, h.skill_level(sid) + 1)], func():
 				if co.upgrade_skill(index, h, s2):

@@ -311,6 +311,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "Heals %d%% of max HP" % int(e.get("value", 10))
 		"heal_self":
 			return "Heals itself %d HP" % int(e.get("amount", 5))
+		"self_damage":
+			return "Costs %d of the user's own HP (never below 1)" % int(e.get("amount", 4))
 		"heal_self_pct":
 			return "Heals itself %d%% of max HP" % int(e.get("value", 10))
 		"bleed", "poison":
@@ -352,7 +354,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 		"taunt":
 			return "Draws enemy attacks for %d rounds" % int(e.get("rounds", 2))
 		"cure":
-			return "Cures %s" % " and ".join(e.get("kinds", ["bleed", "poison"]))
+			var names: Array = e.get("kinds", ["bleed", "poison"]).map(func(k): return {"debuff": "all debuffs"}.get(k, k))
+			return "Cures %s" % ", ".join(names)
 		"clear_shaken":
 			return "Cures Shaken"
 		"light":

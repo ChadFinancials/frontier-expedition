@@ -35,7 +35,8 @@ def main():
 		"Each skill level adds +%d accuracy, +%d%% damage, +%d%% effect chance, +%d%% healing (max level %d)." % (
 			cfg.get("skill_level_acc", 4), cfg.get("skill_level_dmg_pct", 8), cfg.get("skill_level_effect", 6), cfg.get("skill_level_heal_pct", 15), cfg.get("max_skill_level", 4)),
 		"*From* is where the hero must stand; *Hits* is who it reaches (\"one of 12\" = a single enemy in ranks 1-2, \"ALL of 12\" = every enemy there).",
-		"Effect chances are before the target's resistance (chance - resist = real odds). ★ = equipped on a new hero. Heroes equip 4 moves at a time.", ""]
+		"Effect chances are before the target's resistance (chance - resist = real odds). A new hero knows 4 random moves (at least two attacks);",
+		"the rest are learned at a Drill Hall. Heroes equip 4 moves at a time. Skills, weapons and armor go up to level 5.", ""]
 	for cid, c in classes.items():
 		if not isinstance(c, dict):
 			continue
@@ -50,7 +51,7 @@ def main():
 		out.append("")
 		out.append("| Move | From | Hits | Acc | Damage | Effects |")
 		out.append("|---|---|---|---|---|---|")
-		eq = c.get("default_equipped", [])
+		eq = []
 		for sid in c.get("skills", []):
 			s = skills.get(sid, {})
 			hostile = s.get("target", "enemy") == "enemy"

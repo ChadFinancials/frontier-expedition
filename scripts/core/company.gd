@@ -123,8 +123,8 @@ func make_hero(class_id: String, lvl: int = 1) -> Hero:
 	var table: Array = DB.cfg("xp_levels", [0, 10, 25, 45, 70])
 	if lvl > 1:
 		h.add_xp(int(table[mini(lvl - 1, table.size() - 1)]))
-	var c := DB.cls(class_id)
-	h.equipped = c.get("default_equipped", []).duplicate()
+	h.known = starting_moves(class_id)
+	h.equipped = h.known.duplicate()
 	var sk_pool: Array = Stats.shuffled(rng, DB.survival.keys())
 	for i in 2:
 		h.survival[sk_pool[i]] = {"rank": 1, "xp": 0}
@@ -588,6 +588,50 @@ func upgrade_gear(i: int, h: Hero, kind: String) -> bool:
 	return true
 
 
+## A new hero knows 4 of their class's moves at random, at least two of them attacks.
+func starting_moves(class_id: String) -> Array:
+	var all: Array = DB.cls(class_id).get("skills", [])
+	var n := int(DB.cfg("starting_moves", 4))
+	var attacks := Stats.shuffled(rng, all.filter(func(s): return DB.skill(s).get("target", "enemy") == "enemy" and not DB.skill(s).get("no_damage", false)))
+	var out: Array = attacks.slice(0, mini(2, attacks.size()))
+	for s in Stats.shuffled(rng, all):
+		if out.size() >= n:
+			break
+		if not s in out:
+			out.append(s)
+	# Keep the class's own listing order, so move lists read the same on every hero.
+	return all.filter(func(s): return s in out)
+
+
+func learn_cost(i: int) -> int:
+	var lvl := maxi(1, building_level(i, "drill_hall"))
+	var mult: float = DB.buildings.drill_hall.cost_mult[lvl - 1]
+	return int(round(int(DB.cfg("learn_cost", 300)) * mult))
+
+
+func can_learn_skill(i: int, h: Hero, sid: String) -> String:
+	if building_level(i, "drill_hall") <= 0:
+		return "No Drill Hall here"
+	if h == null or h.location != i or h.transit_to >= 0:
+		return "Hero not here"
+	if h.knows(sid):
+		return "Already known"
+	if money < learn_cost(i):
+		return "Not enough money"
+	return ""
+
+
+func learn_skill(i: int, h: Hero, sid: String) -> bool:
+	if can_learn_skill(i, h, sid) != "":
+		return false
+	money -= learn_cost(i)
+	h.known.append(sid)
+	h.known = h.cls().skills.filter(func(s): return s in h.known)
+	if h.equipped.size() < 4:
+		h.equipped.append(sid)
+	return true
+
+
 func skill_cost(i: int, next_level: int) -> int:
 	var lvl := maxi(1, building_level(i, "drill_hall"))
 	var mult: float = DB.buildings.drill_hall.cost_mult[lvl - 1]
@@ -600,8 +644,10 @@ func can_upgrade_skill(i: int, h: Hero, sid: String) -> String:
 		return "No Drill Hall here"
 	if h == null or h.location != i or h.transit_to >= 0:
 		return "Hero not here"
+	if not h.knows(sid):
+		return "Not learned yet"
 	var nl := h.skill_level(sid) + 1
-	if nl > DB.cfg("max_skill_level", 4):
+	if nl > DB.cfg("max_skill_level", 5):
 		return "Mastered"
 	if nl > int(DB.buildings.drill_hall.max_skill[lvl - 1]):
 		return "Needs a better Drill Hall"

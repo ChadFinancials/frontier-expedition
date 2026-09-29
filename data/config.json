@@ -23,8 +23,10 @@
   "weapon_dmg_pct": 12,
   "xp_levels": [0, 15, 45, 90, 150],
   "max_level": 5,
-  "max_tier": 4,
-  "max_skill_level": 4,
+  "max_tier": 5,
+  "max_skill_level": 5,
+  "starting_moves": 4,
+  "learn_cost": 300,
 
   "skill_level_acc": 4,
   "skill_level_dmg_pct": 8,
@@ -122,11 +124,11 @@
   "found_cost": {"charters": 1, "money": 600, "timber": 15, "iron": 8},
 
   "gear_costs": {
-    "weapon": [0, 250, 600, 1200],
-    "armor": [0, 200, 500, 1000],
-    "iron": [0, 2, 5, 9]
+    "weapon": [0, 250, 600, 1200, 2000],
+    "armor": [0, 200, 500, 1000, 1700],
+    "iron": [0, 2, 5, 9, 14]
   },
-  "skill_costs": [0, 150, 400, 800],
+  "skill_costs": [0, 150, 400, 800, 1400],
   "doctor_quirk_cost": 250,
   "doctor_quirk_cost_per_level": 50,
   "doctor_breaking_cost": 200,

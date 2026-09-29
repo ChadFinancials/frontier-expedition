@@ -16,6 +16,7 @@ var quirks: Array = []           # quirk ids
 var survival: Dictionary = {}    # skill id -> {"rank": int, "xp": int}
 var skill_levels: Dictionary = {} # combat skill id -> level 1..4
 var equipped: Array = []         # up to 4 combat skill ids
+var known: Array = []            # combat skills learned so far (4 at hire; the rest at a Drill Hall)
 var weapon_tier: int = 1
 var armor_tier: int = 1
 var keepsakes: Array = []        # up to 2 keepsake ids
@@ -100,6 +101,27 @@ func dmg_range() -> Array:
 	return [maxi(1, int(round(d[0] * m))), maxi(1, int(round(d[1] * m)))]
 
 
+func knows(sid: String) -> bool:
+	return sid in known
+
+
+## Drops moves the class no longer has (after a rework) and fills in older saves.
+func sanitize_skills() -> void:
+	var valid: Array = cls().get("skills", [])
+	known = known.filter(func(s): return s in valid)
+	equipped = equipped.filter(func(s): return s in valid)
+	if known.is_empty():
+		known = equipped.duplicate()
+	for s in equipped:
+		if not s in known:
+			known.append(s)
+	if known.is_empty():
+		known = valid.slice(0, 4)
+	equipped = equipped.filter(func(s): return s in known)
+	if equipped.is_empty():
+		equipped = known.slice(0, 4)
+
+
 func skill_level(sid: String) -> int:
 	return int(skill_levels.get(sid, 1))
 
@@ -159,7 +181,7 @@ func add_xp(amount: int) -> int:
 # --- Serialization -------------------------------------------------------------------
 
 const FIELDS := ["uid", "hero_name", "class_id", "level", "xp", "hp", "fatigue", "fatigue_state",
-	"deaths_door", "shaken", "quirks", "survival", "skill_levels", "equipped", "weapon_tier",
+	"deaths_door", "shaken", "quirks", "survival", "skill_levels", "equipped", "known", "weapon_tier",
 	"armor_tier", "keepsakes", "location", "busy_weeks", "busy_reason", "transit_to",
 	"transit_weeks", "alive", "expeditions", "kills", "death_note", "look_seed"]
 
@@ -181,4 +203,5 @@ static func from_dict(d: Dictionary) -> Hero:
 				h.set(f, v.duplicate(true))
 			else:
 				h.set(f, v)
+	h.sanitize_skills()
 	return h

@@ -268,3 +268,19 @@
       Death's Door (it carries over until healed) get a warning. A hero dying costs every ally
       +15 Fatigue; an ally hitting Death's Door costs +6.
 - [ ] Next: hero-by-hero move review.
+
+## Hero review, part 1 (Marshal, Mountain Mystic)
+- [x] Heroes start knowing 4 random moves of their class (always at least two attacks) and learn
+      the rest at the Drill Hall (300 chips, cheaper with a better hall), which also trains them.
+      Unlearned moves show greyed out on the hero sheet. Old saves keep what they had equipped.
+- [x] Skills, weapons and armor now go to level 5 (Drill Hall / Smithy: 2 / 4 / 5 by building
+      level; gear tier needs that hero level, a skill at most one level above the hero's).
+- [x] Marshal reworked: Weighted Shot (knockback 2), Flash the Badge, Armor-Piercing Rounds.
+- [x] Mountain Man is now the Mountain Mystic: Gnarl at the Flesh, Take a Piece of Me,
+      From the Shadows, Edible Meat; back-line Bear Trap and Bellow.
+- [x] Engine: hero moves can have fixed damage ranges; Armor Piercing stat; cure all debuffs;
+      blood-price self damage (never below 1 HP); a self-buff now lasts its full rounds (it no
+      longer ticks down on the turn it's cast).
+- [ ] Remaining heroes: Rail Driver, Gunslinger, Wrangler, Gambler, Prospector, Sharpshooter,
+      Frontier Doctor, Preacher (6 moves each until reworked; they start with 4 of the 6).
+- [ ] Decide how skill / weapon / armor levels 1-5 scale together.
