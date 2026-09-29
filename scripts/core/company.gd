@@ -588,12 +588,11 @@ func upgrade_gear(i: int, h: Hero, kind: String) -> bool:
 	return true
 
 
-## A new hero knows 4 of their class's moves at random, at least two of them attacks.
+## A new hero knows their class's first two (stock) moves plus two more at random.
 func starting_moves(class_id: String) -> Array:
 	var all: Array = DB.cls(class_id).get("skills", [])
 	var n := int(DB.cfg("starting_moves", 4))
-	var attacks := Stats.shuffled(rng, all.filter(func(s): return DB.skill(s).get("target", "enemy") == "enemy" and not DB.skill(s).get("no_damage", false)))
-	var out: Array = attacks.slice(0, mini(2, attacks.size()))
+	var out: Array = all.slice(0, mini(int(DB.cfg("stock_moves", 2)), all.size()))
 	for s in Stats.shuffled(rng, all):
 		if out.size() >= n:
 			break

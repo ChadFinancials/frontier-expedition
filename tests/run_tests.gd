@@ -216,12 +216,15 @@ func test_enemy_moves() -> void:
 func test_hero_moves() -> void:
 	var co := Company.new()
 	co.new_game(21)
-	# New heroes know 4 of their moves (at least two attacks) and equip them.
-	for i in 20:
+	# New heroes know their two stock moves plus two random others, all equipped.
+	var seen := {}
+	for i in 30:
 		var h := co.make_hero("mountain_man")
 		check(h.known.size() == 4 and h.equipped == h.known, "new hero knows and equips 4 moves")
-		var attacks := h.known.filter(func(s): return DB.skill(s).get("target", "enemy") == "enemy" and not DB.skill(s).get("no_damage", false))
-		check(attacks.size() >= 2, "at least two starting attacks")
+		check(h.known.slice(0, 2) == h.cls().skills.slice(0, 2), "the first two class moves are always known")
+		for s in h.known.slice(2):
+			seen[s] = true
+	check(seen.size() >= 4, "the other two starting moves vary (%d seen)" % seen.size())
 	# Learning the rest at a Drill Hall.
 	var hm := co.make_hero("marshal")
 	hm.location = 0

@@ -26,6 +26,7 @@
   "max_tier": 5,
   "max_skill_level": 5,
   "starting_moves": 4,
+  "stock_moves": 2,
   "learn_cost": 300,
 
   "skill_level_acc": 4,
