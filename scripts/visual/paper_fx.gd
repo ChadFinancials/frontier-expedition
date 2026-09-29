@@ -67,8 +67,9 @@ static func group(params: Dictionary = {}, margin: float = 28.0) -> CanvasGroup:
 	var g := CanvasGroup.new()
 	g.fit_margin = margin
 	g.clear_margin = margin
-	g.use_mipmaps = true
-	g.material = material(params)
+	# With the paper look switched off (Settings), groups draw their children plainly.
+	g.use_mipmaps = enabled
+	g.material = material(params) if enabled else null
 	# A CanvasGroup is not a Control, so the game's theme stops here: without this,
 	# Controls inside it fall back to Godot's default font and grey tooltips.
 	g.child_entered_tree.connect(_rethemed)

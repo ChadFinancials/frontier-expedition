@@ -117,7 +117,7 @@ func _draw() -> void:
 			_draw_sculpted(s)
 		else:
 			_draw_shape(s, s.c, Vector2.ZERO, 0.0)
-	if muzzle > 0.01:
+	if muzzle > 0.05 and _muzzle_pos.is_finite():
 		_draw_star(_muzzle_pos, 10 + 22 * muzzle, 5 + 8 * muzzle, 7, Color(1, 0.85, 0.35, muzzle))
 		draw_circle(_muzzle_pos, 8 * muzzle, Color(1, 1, 0.9, muzzle))
 	if flash > 0.01:
@@ -125,6 +125,18 @@ func _draw() -> void:
 			if not s.get("glow", false):
 				_draw_shape(s, Color(flash_color.r, flash_color.g, flash_color.b, flash * 0.75), Vector2.ZERO, 0.0)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## Drops broken and repeated points so antialiased outlines never get zero-length
+## segments (Godot can build runaway geometry from those, which stalls the GPU).
+static func clean_line(pts: PackedVector2Array) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for p in pts:
+		if not p.is_finite():
+			continue
+		if out.is_empty() or out[out.size() - 1].distance_squared_to(p) > 0.01:
+			out.append(p)
+	return out
 
 
 func _draw_shape(s: Dictionary, c: Color, off: Vector2, edge: float) -> void:
@@ -141,13 +153,19 @@ func _draw_shape(s: Dictionary, c: Color, off: Vector2, edge: float) -> void:
 				for p in pts:
 					moved.append(p + off)
 				pts = moved
+			pts = clean_line(pts)
+			if pts.size() < 3:
+				return
 			if edge > 0.0:
 				var closed := pts.duplicate()
-				closed.append(pts[0])
+				if closed[0].distance_squared_to(closed[closed.size() - 1]) > 0.01:
+					closed.append(pts[0])
 				draw_polyline(closed, cc, edge * 2.0, true)
 			else:
 				draw_colored_polygon(pts, cc)
 		"circle":
+			if not Vector2(s.p).is_finite() or float(s.r) + edge < 0.5:
+				return
 			draw_circle(s.p + off, s.r + edge, cc, true, -1.0, true)
 		"line":
 			var pts2: PackedVector2Array = s.pts
@@ -156,8 +174,11 @@ func _draw_shape(s: Dictionary, c: Color, off: Vector2, edge: float) -> void:
 				for p in pts2:
 					moved2.append(p + off)
 				pts2 = moved2
+			pts2 = clean_line(pts2)
+			if pts2.size() < 2:
+				return
 			draw_polyline(pts2, cc, float(s.w) + edge * 2.0, true)
-			if edge == 0.0 and pts2.size() > 0:
+			if edge == 0.0 and pts2.size() > 0 and float(s.w) >= 1.0:
 				draw_circle(pts2[0], float(s.w) / 2.0, cc)
 				draw_circle(pts2[pts2.size() - 1], float(s.w) / 2.0, cc)
 
@@ -170,7 +191,9 @@ func _draw_sculpted(s: Dictionary) -> void:
 		c.a *= float(s.a)
 	match s.k:
 		"poly":
-			var pts: PackedVector2Array = s.pts
+			var pts: PackedVector2Array = clean_line(s.pts)
+			if pts.size() < 3:
+				return
 			var bb := _bounds(pts)
 			var cols := PackedColorArray()
 			for p in pts:
@@ -182,8 +205,11 @@ func _draw_sculpted(s: Dictionary) -> void:
 				cols.append(c.lightened(0.1 * (1.0 - t)).darkened(0.16 * t))
 			draw_polygon(pts, cols)
 			for h in s.get("hatch", []):
-				draw_line(h[0], h[1], Color(c.darkened(0.45), 0.35 * c.a), 1.3, true)
+				if Vector2(h[0]).distance_squared_to(h[1]) > 0.25:
+					draw_line(h[0], h[1], Color(c.darkened(0.45), 0.35 * c.a), 1.3, true)
 		"circle":
+			if not Vector2(s.p).is_finite() or float(s.r) < 0.5:
+				return
 			draw_circle(s.p, s.r, c.darkened(0.08), true, -1.0, true)
 			var hl := Vector2(-s.r * 0.22 * facing, -s.r * 0.22)
 			draw_circle(s.p + hl, s.r * 0.72, c.lightened(0.05), true, -1.0, true)
@@ -205,6 +231,8 @@ func _add_hatching() -> void:
 			continue
 		var pts: PackedVector2Array = s.pts
 		var bb := _bounds(pts)
+		if not bb.is_finite() or bb.size.x > 4000.0 or bb.size.y > 4000.0:
+			continue
 		if bb.size.x * bb.size.y < 900.0 or bb.size.x < 14.0:
 			continue
 		var segs: Array = []

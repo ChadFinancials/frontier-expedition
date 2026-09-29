@@ -7,7 +7,7 @@ const SAVE_PATH := "user://save.json"
 const SETTINGS_PATH := "user://settings.json"
 
 var company: Company = null
-var settings := {"sfx": 0.8, "music": 0.45, "fullscreen": false, "combat_speed": 1.0}
+var settings := {"sfx": 0.8, "music": 0.45, "fullscreen": false, "combat_speed": 1.0, "paper": true}
 
 
 func _ready() -> void:
@@ -63,6 +63,7 @@ func load_settings() -> void:
 	if data is Dictionary:
 		for k in data:
 			settings[k] = data[k]
+	PaperFX.enabled = bool(settings.get("paper", true))
 
 
 func save_settings() -> void:

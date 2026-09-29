@@ -167,6 +167,8 @@ func _log(t: String) -> void:
 
 func _loop() -> void:
 	while not engine.is_over():
+		if OS.has_environment("FE_TRACE"):
+			print("STEP ", engine.current.display_name if engine.current else "-", " state=", engine.state)
 		var ev := engine.step()
 		await _play(ev)
 		if engine.awaiting_input():
@@ -610,6 +612,8 @@ func _play(events: Array) -> void:
 	var i := 0
 	while i < events.size():
 		var e: Dictionary = events[i]
+		if OS.has_environment("FE_TRACE"):
+			print("EV ", e)
 		if e.t == "action":
 			var group: Array = []
 			var j := i + 1
@@ -1211,3 +1215,4 @@ class _Burst extends Node2D:
 		var a := clampf(1.0 - life / 0.8, 0.0, 1.0)
 		for q in parts:
 			draw_circle(q.p, q.r * (0.6 + life), Color(color.r, color.g, color.b, a * 0.8))
+

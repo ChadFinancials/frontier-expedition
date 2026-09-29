@@ -23,6 +23,7 @@ var toast_layer: VBoxContainer
 var fade: ColorRect
 var _busy := false
 var shot_args: Dictionary = {}
+var grain_layer: Node = null
 
 
 func _ready() -> void:
@@ -46,6 +47,7 @@ func _ready() -> void:
 	if PaperFX.enabled:
 		var grain := PaperFX.grain_overlay()
 		grain.z_index = 100
+		grain_layer = grain
 		add_child.call_deferred(grain)
 	add_child(toast_layer)
 	fade = ColorRect.new()
@@ -263,6 +265,20 @@ func settings_panel() -> void:
 		Game.apply_settings()
 		Game.save_settings())
 	v.add_child(fs)
+	var pf := CheckBox.new()
+	pf.text = "Paper-theater look (paper texture, relief and shadows)"
+	pf.tooltip_text = "Turn this off if the game freezes or runs slowly. Takes full effect when you next change screens."
+	pf.button_pressed = PaperFX.enabled
+	for col in ["font_color", "font_hover_color", "font_pressed_color"]:
+		pf.add_theme_color_override(col, UI.INK)
+	pf.toggled.connect(func(on):
+		Game.settings.paper = on
+		PaperFX.enabled = on
+		Game.save_settings()
+		if grain_layer != null and is_instance_valid(grain_layer):
+			grain_layer.visible = on
+		toast("Paper look %s. It applies fully on the next screen." % ("on" if on else "off")))
+	v.add_child(pf)
 	var holder := {"wrap": null}
 	v.add_child(UI.btn("Done", func(): close_modal(holder.wrap)))
 	holder.wrap = modal(p)

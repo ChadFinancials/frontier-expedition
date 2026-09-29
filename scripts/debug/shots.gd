@@ -16,6 +16,8 @@ static func run(main: Main, args: Dictionary) -> void:
 		main.add_child(ap)
 		await main.goto("menu", {}, true)
 		return
+	if args.has("nopaper"):
+		PaperFX.enabled = false
 	Game.company = Company.new()
 	Game.company.new_game(int(args.get("seed", "12")))
 	match scenario:
@@ -164,10 +166,18 @@ static func _act(main: Main, args: Dictionary) -> void:
 			break
 		var hc: Combatant = cs.engine.current
 		var sid: String = args.get("skill", hc.skills[0])
+		if sid == "random":
+			var us: Array = cs.engine.usable_skills(hc)
+			sid = us[randi() % us.size()] if not us.is_empty() else hc.skills[0]
 		var vt: Array = cs.engine.valid_targets(hc, sid)
+		if args.get("skill", "") == "random" and not vt.is_empty():
+			vt.shuffle()
 		print("ACT ", hc.display_name, " ", sid, " -> ", vt)
 		if vt.is_empty():
 			cs.chosen.emit("pass", null, null)
 		else:
 			cs.chosen.emit("skill", sid, vt[0])
-		await tree.create_timer(4.0).timeout
+		await tree.create_timer(float(args.get("gap", "4.0"))).timeout
+		if cs.engine.is_over():
+			print("ACT: fight over (", cs.engine.state, ")")
+			break
