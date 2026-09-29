@@ -284,3 +284,10 @@
 - [ ] Remaining heroes: Rail Driver, Gunslinger, Wrangler, Gambler, Prospector, Sharpshooter,
       Frontier Doctor, Preacher (6 moves each until reworked; they start with 4 of the 6).
 - [ ] Decide how skill / weapon / armor levels 1-5 scale together.
+
+## Hero review, part 2 (Rail Driver, Gunslinger, Wrangler, Gambler)
+- [x] All four reworked to 8 moves (see docs/HERO_REVIEW.md). Stacked Deck now shows the dealt
+      playing cards. Money Shot pays 50 chips per kill. Enemies go for Marked heroes half the time.
+- [ ] Future: Gunslinger bullet system (6 rounds in the cylinder shown overhead, moves spend
+      bullets, a Reload move).
+- [ ] Remaining heroes: Prospector, Sharpshooter, Frontier Doctor, Preacher. Then ComfyUI tests.
