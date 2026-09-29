@@ -442,7 +442,7 @@ Found in: The Crow's Nest
 |---|---|---|---|---|---|---|
 | **Fan of Knives**: Three throwing knives from one sleeve. | 1234 | 3 random in 1234 | 90 | 2-4 x3 hits, +2% crit | bleed 1 x3 rounds (70%) | 3 |
 | **Murder of Crows**: Silas whistles, and the sky goes black with wings. | 1234 | self | - | - | summons Murder of Crows | 2 |
-| **Dark Commune**: Ruby presses the crow feather to her lips and whispers. Something whispers back. | 1234 | self | - | - | heals self 6 HP; self dmg_flat +1 (rest of fight, stacks); self crit +1 (rest of fight, stacks); self dodge +1 (rest of fight, stacks) | 1 |
+| **Dark Commune**: Ruby presses the crow feather to her lips and whispers. Something whispers back. | 1234 | self | - | - | heals self 6 HP; dmg_flat +1 (rest of fight, stacks); crit +1 (rest of fight, stacks); dodge +1 (rest of fight, stacks) | 1 |
 
 Notes: 
 

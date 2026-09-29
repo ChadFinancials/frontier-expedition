@@ -69,13 +69,15 @@ def effect_text(fx):
 		return "%s %+d for %d rounds%s" % (fx.get("stat"), fx.get("value", 0), fx.get("rounds", 2), chance)
 	if t == "fatigue":
 		a = fx.get("amount", 0)
-		return "+%d-%d fatigue" % tuple(a) if isinstance(a, list) else "+%d fatigue" % a
+		if isinstance(a, list):
+			return "+%d-%d fatigue" % tuple(a)
+		return "%+d fatigue%s" % (a, " (relief)" if a < 0 else "")
 	if t == "heal_self":
 		return "heals self %d HP" % fx.get("amount", 5)
 	if t == "heal_self_pct":
 		return "heals self %d%% max HP" % fx.get("value", 10)
 	if t == "buff":
-		return "self %s %+d%s" % (fx.get("stat"), fx.get("value", 0), " (rest of fight, stacks)" if fx.get("rounds", 3) >= 99 else " for %d rounds" % fx.get("rounds", 3))
+		return "%s %+d%s" % (fx.get("stat"), fx.get("value", 0), " (rest of fight, stacks)" if fx.get("rounds", 3) >= 99 else " for %d rounds" % fx.get("rounds", 3))
 	if t == "buff_kin":
 		return "other %s: %s for %d rounds" % (fx.get("kin", "kin"), ", ".join("%s %+d" % (m["stat"], m["value"]) for m in fx.get("mods", [])), fx.get("rounds", 2))
 	if t == "move":
@@ -84,6 +86,25 @@ def effect_text(fx):
 		return "stun%s" % chance
 	if t in ("knockback", "pull"):
 		return "%s %d%s" % (t, fx.get("amount", 1), chance)
+	if t == "heal":
+		m = float(cfg.get("heal_mult", 1.0))
+		return "heals %d-%d HP" % (round(fx.get("min", 3) * m), round(fx.get("max", 6) * m))
+	if t == "heal_pct":
+		return "heals %d%% max HP" % fx.get("value", 10)
+	if t == "guard":
+		return "guards the ally for %d rounds" % fx.get("rounds", 2)
+	if t == "taunt":
+		return "taunt %d rounds" % fx.get("rounds", 2)
+	if t == "cure":
+		return "cures " + "/".join(fx.get("kinds", ["bleed", "poison"]))
+	if t == "clear_mark":
+		return "clears mark"
+	if t == "clear_shaken":
+		return "cures Shaken"
+	if t == "random_buff":
+		return "random boon for %d rounds" % fx.get("rounds", 3)
+	if t == "light":
+		return "lamplight %+d" % fx.get("amount", 10)
 	if t == "mark":
 		return "mark %d rounds" % fx.get("rounds", 2)
 	if t == "summon":
