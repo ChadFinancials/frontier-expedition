@@ -53,6 +53,113 @@ static func run(main: Main, args: Dictionary) -> void:
 				var l := UI.lbl(ids[i], 20, "Bold")
 				l.position = f.position + Vector2(-80, 20)
 				root.add_child(l)
+		"face_shift":
+			# The approved face at four forward offsets, to pick how far off the head it sits.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var root := Control.new()
+			root.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(root)
+			var bgc := ColorRect.new()
+			bgc.color = Color("#8a7a5e")
+			bgc.set_anchors_preset(Control.PRESET_FULL_RECT)
+			root.add_child(bgc)
+			var shifts: Array = [9.0, 6.0, 4.0, 2.0]
+			for i in shifts.size():
+				var f := Figure.new()
+				f.crafted = true
+				f.face_shift = float(shifts[i])
+				f.setup(DB.classes["marshal"].look, 7, 1)
+				f.scale *= 1.9
+				f.position = Vector2(300 + i * 400, 700)
+				root.add_child(f)
+				var txt: String = "shift %.0f" % float(shifts[i])
+				var l := UI.lbl(txt, 22, "Bold")
+				l.position = Vector2(250 + i * 400, 716)
+				root.add_child(l)
+		"face_pose":
+			# The approved face across every pose, so the brows and mouth can be judged.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var root := Control.new()
+			root.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(root)
+			var bgc := ColorRect.new()
+			bgc.color = Color("#8a7a5e")
+			bgc.set_anchors_preset(Control.PRESET_FULL_RECT)
+			root.add_child(bgc)
+			var poses: Array = ["idle", "windup", "strike", "aim", "cast", "hurt", "dead"]
+			for i in poses.size():
+				var f := Figure.new()
+				f.crafted = true
+				f.setup(DB.classes["marshal"].look, 7, 1)
+				f.set_pose(str(poses[i]))
+				f.scale *= 1.5
+				var col: int = i % 4
+				var row: int = i / 4
+				f.position = Vector2(280 + col * 420, 520 + row * 520)
+				root.add_child(f)
+				var l := UI.lbl(str(poses[i]), 22, "Bold")
+				l.position = Vector2(220 + col * 420, 536 + row * 520)
+				root.add_child(l)
+		"face_ab":
+			# One Marshal face four ways, top row at lineup scale and bottom row at combat
+			# scale, to show whether the hovering cartoon face survives being small.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var root := Control.new()
+			root.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(root)
+			var bgc := ColorRect.new()
+			bgc.color = Color("#8a7a5e")
+			bgc.set_anchors_preset(Control.PRESET_FULL_RECT)
+			root.add_child(bgc)
+			var labels: Array = ["ORIGINAL", "FACE 1 hover", "FACE 2 buttons", "FACE 3 mask"]
+			for row in 2:
+				var sc: float = 1.9 if row == 0 else 1.15
+				var feet: float = 430.0 + row * 430.0
+				for i in 4:
+					var f := Figure.new()
+					f.crafted = true
+					f.face_style = i
+					f.setup(DB.classes["marshal"].look, 7, 1)
+					f.scale *= sc
+					f.position = Vector2(300 + i * 400, feet)
+					root.add_child(f)
+					if row == 0:
+						var txt: String = labels[i]
+						var l := UI.lbl(txt, 20, "Bold")
+						l.position = Vector2(190 + i * 400, feet + 16.0)
+						root.add_child(l)
+				var tag: String = "lineup scale 1.9" if row == 0 else "combat scale 1.15"
+				var t := UI.lbl(tag, 20, "Bold")
+				t.position = Vector2(20, feet + 16.0)
+				root.add_child(t)
+		"figure_ab":
+			# One Marshal drawn four ways, left to right: the current look, then the three
+			# art variants. Compare the cream border and the shading.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var root := Control.new()
+			root.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(root)
+			var bgc := ColorRect.new()
+			bgc.color = Color("#8a7a5e")
+			bgc.set_anchors_preset(Control.PRESET_FULL_RECT)
+			root.add_child(bgc)
+			var labels: Array = ["BEFORE  style 0", "V1  thin edge", "V2  finer + inset", "V3  cross-hatch"]
+			for i in 4:
+				var f := Figure.new()
+				f.crafted = true
+				f.style = i
+				f.setup(DB.classes["marshal"].look, 7, 1)
+				f.position = Vector2(300 + i * 400, 900)
+				f.scale *= 1.7
+				root.add_child(f)
+				var txt: String = labels[i]
+				var l := UI.lbl(txt, 22, "Bold")
+				l.position = Vector2(170 + i * 400, 930)
+				root.add_child(l)
 		"settlement":
 			await main.goto("settlement", {"index": 0}, true)
 		"silas":

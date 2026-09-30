@@ -24,6 +24,19 @@ var idle_anim: bool = true
 var height_px: float = 200.0       # nominal height of a normal human at scale 1
 var crafted: bool = PaperFX.enabled   # paper-theater detail: sculpted shading and pencil hatching
 
+## Art pass variant. 3 is the approved look: thin edge, fine hatching, inset contours and
+## cross-hatch. 0 is the original look, kept so a before/after can still be drawn.
+## 1 thin edge, 2 adds inset contours, 3 adds cross-hatch on top. See docs/ART_PIPELINE.md.
+var style: int = 3
+
+## Face variant. 0 is the original nose, brow and eye. 2 is the approved cartoon face:
+## two button eyes with a paper edge and a small mouth, expression changing with the pose.
+## See docs/ART_PIPELINE.md.
+var face_style: int = 2
+## How far forward of the head centre the face sits, in local pixels. Lower is closer to
+## the face. 9 read as poking off the front; the approved value is nearer 4.
+var face_shift: float = 4.0
+
 var _shapes: Array = []
 var _t: float = 0.0
 var _skin: Color
@@ -110,7 +123,7 @@ func _draw() -> void:
 	for s in _shapes:
 		if s.get("glow", false) or s.get("no_edge", false):
 			continue
-		_draw_shape(s, PAPER, Vector2.ZERO, 4.0)
+		_draw_shape(s, PAPER, Vector2.ZERO, _edge_w())
 	# Fill pass.
 	for s in _shapes:
 		if crafted and not s.get("glow", false):
@@ -137,6 +150,58 @@ static func clean_line(pts: PackedVector2Array) -> PackedVector2Array:
 		if out.is_empty() or out[out.size() - 1].distance_squared_to(p) > 0.01:
 			out.append(p)
 	return out
+
+
+## The cream paper border drawn under every piece. The original 4.0 doubles to an 8px
+## outline, which read as a white halo around the character.
+func _edge_w() -> float:
+	match style:
+		1: return 1.6
+		2: return 1.4
+		3: return 1.8
+		_: return 4.0
+
+
+## Spacing of the pencil hatch lines. Finer means denser texture.
+func _hatch_step() -> float:
+	match style:
+		1: return 5.0
+		2: return 4.0
+		3: return 3.4
+		_: return 6.0
+
+
+## Small pieces pick up hatching too once the density is worth it.
+func _hatch_min_area() -> float:
+	return 520.0 if style >= 2 else 900.0
+
+
+func _hatch_alpha() -> float:
+	return 0.30 if style == 1 else 0.35
+
+
+## How far the sculpt gradient falls into shadow at the bottom right.
+func _sculpt_dark() -> float:
+	match style:
+		1: return 0.13
+		2: return 0.16
+		3: return 0.21
+		_: return 0.16
+
+
+## An inset copy of the outline, read as a second layer of cut paper. Styles 2 and up.
+func _inset_contour(pts: PackedVector2Array, c: Color) -> void:
+	if style < 2 or pts.size() < 3:
+		return
+	var ctr := Vector2.ZERO
+	for p in pts:
+		ctr += p
+	ctr /= float(pts.size())
+	var inner := PackedVector2Array()
+	for p in pts:
+		inner.append(ctr + (p - ctr) * 0.86)
+	inner.append(inner[0])
+	draw_polyline(clean_line(inner), Color(c.darkened(0.34), 0.5 * c.a), 1.0, true)
 
 
 func _draw_shape(s: Dictionary, c: Color, off: Vector2, edge: float) -> void:
@@ -196,17 +261,19 @@ func _draw_sculpted(s: Dictionary) -> void:
 				return
 			var bb := _bounds(pts)
 			var cols := PackedColorArray()
+			var dk := _sculpt_dark()
 			for p in pts:
 				var tx := (p.x - bb.position.x) / maxf(1.0, bb.size.x)
 				if facing < 0:
 					tx = 1.0 - tx
 				var ty := (p.y - bb.position.y) / maxf(1.0, bb.size.y)
 				var t := clampf(tx * 0.45 + ty * 0.55, 0.0, 1.0)
-				cols.append(c.lightened(0.1 * (1.0 - t)).darkened(0.16 * t))
+				cols.append(c.lightened(dk * 0.62 * (1.0 - t)).darkened(dk * t))
 			draw_polygon(pts, cols)
+			_inset_contour(pts, c)
 			for h in s.get("hatch", []):
 				if Vector2(h[0]).distance_squared_to(h[1]) > 0.25:
-					draw_line(h[0], h[1], Color(c.darkened(0.45), 0.35 * c.a), 1.3, true)
+					draw_line(h[0], h[1], Color(c.darkened(0.45), _hatch_alpha() * c.a), 1.1 if style >= 2 else 1.3, true)
 		"circle":
 			if not Vector2(s.p).is_finite() or float(s.r) < 0.5:
 				return
@@ -233,10 +300,10 @@ func _add_hatching() -> void:
 		var bb := _bounds(pts)
 		if not bb.is_finite() or bb.size.x > 4000.0 or bb.size.y > 4000.0:
 			continue
-		if bb.size.x * bb.size.y < 900.0 or bb.size.x < 14.0:
+		if bb.size.x * bb.size.y < _hatch_min_area() or bb.size.x < 14.0:
 			continue
 		var segs: Array = []
-		var step := 6.0
+		var step := _hatch_step()
 		var x := bb.position.x - bb.size.y
 		while x < bb.end.x:
 			var a := Vector2(x, bb.end.y)
@@ -252,6 +319,23 @@ func _add_hatching() -> void:
 				if tx * 0.45 + ty * 0.55 > 0.62:
 					segs.append([piece[0], piece[piece.size() - 1]])
 			x += step
+		if style >= 3:
+			# Cross-hatch: the mirror sweep, so the deepest shadow gets a second direction.
+			var x2 := bb.position.x - bb.size.y
+			while x2 < bb.end.x:
+				var a2 := Vector2(x2, bb.position.y)
+				var b2 := Vector2(x2 + bb.size.y * 0.8, bb.end.y)
+				for piece2 in Geometry2D.intersect_polyline_with_polygon(PackedVector2Array([a2, b2]), pts):
+					if piece2.size() < 2:
+						continue
+					var mid2: Vector2 = (piece2[0] + piece2[piece2.size() - 1]) / 2.0
+					var tx2 := (mid2.x - bb.position.x) / bb.size.x
+					if facing < 0:
+						tx2 = 1.0 - tx2
+					var ty2 := (mid2.y - bb.position.y) / bb.size.y
+					if tx2 * 0.45 + ty2 * 0.55 > 0.78:
+						segs.append([piece2[0], piece2[piece2.size() - 1]])
+				x2 += step * 1.6
 		s["hatch"] = segs
 
 
@@ -487,16 +571,19 @@ func _build_human() -> void:
 		_poly([Vector2(8, -175), Vector2(20, -174), Vector2(22, -169), Vector2(8, -171)], _hair.darkened(0.1))
 	if extra == "bandana_mask":
 		_poly([Vector2(-8, -178), Vector2(19, -178), Vector2(18, -166), Vector2(4, -160), Vector2(-8, -166)], accent)
-	# Face: nose, brow and eye.
-	_poly([head + Vector2(13, -3), head + Vector2(20, 4), head + Vector2(13, 6)], _skin.darkened(0.12), {"no_edge": true})
-	_line([head + Vector2(4, -10), head + Vector2(13, -9)], 2.0, _hair.darkened(0.2), {"no_edge": true})
-	if crafted:
-		# A storybook eye with a white, and a touch of color in the cheek.
-		_circle(head + Vector2(3, 5), 4.0, Color(0.85, 0.35, 0.3, 0.22), {"no_edge": true})
-		_circle(head + Vector2(8, -4), 3.6, Color("#f4efe4"), {"no_edge": true})
-		_circle(head + Vector2(9, -4), 2.2, Color("#1a1210"), {"no_edge": true})
+	# Face: nose, brow and eye. Styles 1 to 3 replace this with a hovering cartoon face.
+	if face_style <= 0:
+		_poly([head + Vector2(13, -3), head + Vector2(20, 4), head + Vector2(13, 6)], _skin.darkened(0.12), {"no_edge": true})
+		_line([head + Vector2(4, -10), head + Vector2(13, -9)], 2.0, _hair.darkened(0.2), {"no_edge": true})
+		if crafted:
+			# A storybook eye with a white, and a touch of color in the cheek.
+			_circle(head + Vector2(3, 5), 4.0, Color(0.85, 0.35, 0.3, 0.22), {"no_edge": true})
+			_circle(head + Vector2(8, -4), 3.6, Color("#f4efe4"), {"no_edge": true})
+			_circle(head + Vector2(9, -4), 2.2, Color("#1a1210"), {"no_edge": true})
+		else:
+			_circle(head + Vector2(8, -4), 2.2, Color("#1a1210"), {"no_edge": true})
 	else:
-		_circle(head + Vector2(8, -4), 2.2, Color("#1a1210"), {"no_edge": true})
+		_face(head)
 	if extra == "spectacles":
 		_circle(head + Vector2(9, -4), 5.0, Color(0.8, 0.85, 0.9, 0.5), {"no_edge": true})
 		_line([head + Vector2(4, -4), head + Vector2(14, -4)], 1.5, DARK_METAL, {"no_edge": true})
@@ -542,6 +629,68 @@ func _arm(shoulder: Vector2, hand: Vector2, c: Color, front: bool) -> void:
 	_line([shoulder, mid, hand], 12.0 if front else 11.0, c)
 	_circle(hand, 6.5, _skin if front else _skin.darkened(0.2))
 
+
+## Cartoon faces. The whole group is pushed a few pixels forward along the facing
+## direction and carries a soft shadow, which is what makes it read as hovering off the
+## head instead of being painted on it.
+## Brow, eye and mouth settings per pose, so the same face reads differently in each.
+## brow: vertical brow offset. brow_ang: tilt, positive tips the inner end down.
+## eye: 1.0 open, lower is squinting, 0.0 draws a closed line. mouth: shape name.
+func _face_expr() -> Dictionary:
+	match pose:
+		"windup": return {"brow": -3.0, "brow_ang": -0.6, "eye": 1.15, "mouth": "open"}
+		"strike": return {"brow": 1.5, "brow_ang": 0.7, "eye": 0.85, "mouth": "shout"}
+		"aim": return {"brow": 0.0, "brow_ang": 0.3, "eye": 0.95, "mouth": "flat"}
+		"cast": return {"brow": -2.0, "brow_ang": -0.25, "eye": 0.3, "mouth": "open"}
+		"hurt": return {"brow": 2.5, "brow_ang": -0.8, "eye": 0.35, "mouth": "frown"}
+		"dead": return {"brow": 0.0, "brow_ang": 0.0, "eye": 0.0, "mouth": "flat"}
+		_: return {"brow": -1.0, "brow_ang": 0.0, "eye": 1.0, "mouth": "smile"}
+
+
+## The cartoon face: two button eyes, each with its own paper edge so it sits proud of the
+## skin, plus a mouth. No plate, no mask: that read as a white blob over the face.
+func _face(head: Vector2) -> void:
+	if face_style != 2:
+		return
+	var ink := Color("#1a1210")
+	var white := Color("#f4efe4")
+	var fwd := Vector2(face_shift * facing, 1.0)
+	var e := _face_expr()
+	var eye_scale: float = float(e["eye"])
+	var brow_dy: float = float(e["brow"])
+	var brow_ang: float = float(e["brow_ang"])
+	var mouth: String = str(e["mouth"])
+	# Eyes. Closed draws a line instead of a circle.
+	for side in 2:
+		var ex: float = 1.0 if side == 0 else 11.0
+		if eye_scale <= 0.06:
+			_line([head + fwd + Vector2(ex - 2, -3), head + fwd + Vector2(ex + 2, -3)], 1.8, ink, {"no_edge": true})
+		else:
+			# A white oval with a black pupil, not the reverse, and a touch smaller. A black
+			# disc with a white speck read as a hole rather than an eye.
+			var rx: float = (3.5 if side == 0 else 2.9) * eye_scale
+			var ry: float = (4.0 if side == 0 else 3.4) * eye_scale
+			_poly(ellipse(head + fwd + Vector2(ex, -3), rx, ry, 14), white, {"no_edge": true})
+			_circle(head + fwd + Vector2(ex + 0.5, -3), maxf(0.8, 1.3 * eye_scale), ink, {"no_edge": true})
+	# Brows, tilted by brow_ang so the expression reads even when the eyes are tiny.
+	var by: float = -11.0 + brow_dy
+	var tilt: float = brow_ang * 3.0
+	_line([head + fwd + Vector2(-1, by + tilt), head + fwd + Vector2(5, by - tilt)], 1.8, _hair.darkened(0.2), {"no_edge": true})
+	_line([head + fwd + Vector2(8, by - tilt), head + fwd + Vector2(14, by + tilt)], 1.8, _hair.darkened(0.2), {"no_edge": true})
+	# Mouth.
+	var my: float = 7.0
+	match mouth:
+		"flat":
+			_line([head + fwd + Vector2(-1, my), head + fwd + Vector2(11, my)], 2.0, ink, {"no_edge": true})
+		"open":
+			_poly(ellipse(head + fwd + Vector2(5, my + 1), 3.2, 4.0, 12), ink, {"no_edge": true})
+		"shout":
+			_poly(ellipse(head + fwd + Vector2(5, my + 2), 4.6, 5.6, 14), ink, {"no_edge": true})
+			_poly(ellipse(head + fwd + Vector2(5, my + 3), 2.6, 2.6, 12), Color("#7d3b3b"), {"no_edge": true})
+		"frown":
+			_line([head + fwd + Vector2(-1, my + 3), head + fwd + Vector2(5, my - 1), head + fwd + Vector2(11, my + 3)], 2.0, ink, {"no_edge": true})
+		_:
+			_line([head + fwd + Vector2(-1, my - 1), head + fwd + Vector2(5, my + 3), head + fwd + Vector2(11, my - 1)], 2.0, ink, {"no_edge": true})
 
 func _hat(head: Vector2) -> void:
 	var hat: String = look.get("hat", "none")

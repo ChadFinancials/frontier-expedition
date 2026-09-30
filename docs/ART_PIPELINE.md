@@ -400,6 +400,85 @@ A single bottom anchor cannot fix it: the measured horizon of the six trail vari
 If the horizon is unknown, `Backdrop` falls back to `bg_bottom` (image bottom edge), which may
 run behind an opaque panel.
 
+## Drawn characters: the art pass and the faces (Sept 29)
+
+Owner ask: improve the code-drawn characters, more detail, keep the flat patchwork polygons
+with light texture, hatching and shading. And: "there is a fairly large white border around the
+characters that makes it look a little odd".
+
+### The border
+
+`figure.gd` draws the paper edge as a polyline of **width 8px** centred on every shape outline,
+so about **4px of cream shows outside** each piece. On a small figure that reads as a halo.
+`Figure.style` now controls the pass. **Style 3 is approved and is the default.**
+
+| Style | Edge | Hatch step | Sculpt depth | Extra |
+|---|---|---|---|---|
+| 0 | 4.0 | 6.0 | 0.16 | the original look, kept for A/B |
+| 1 | 1.6 | 5.0 | 0.13 | none |
+| 2 | 1.4 | 4.0 | 0.16 | inset contour |
+| **3** | **1.8** | **3.4** | **0.21** | inset contour plus cross-hatch |
+
+This is a **render pass only**. No geometry, no `look` data, no new shapes in `_build()`. The
+inset contour is a copy of each shape's own outline pulled 14% toward its centre, so it adds
+detail on every class, enemy and animal automatically. Style 0 reproduces the old numbers, so a
+before/after is still possible with `shot=figure_ab`.
+
+### Faces
+
+`Figure.face_style = 2` is approved and is the default. `face_shift` (default 4.0) controls how
+far forward of the head the face sits; 9 read as poking off the front.
+
+Two failed attempts are worth recording:
+
+1. A 3px forward offset plus a hand-drawn shadow still read as paint on the skin. The fix was
+   to **stop hand-rolling it and use the engine's own three-pass pipeline**: any shape drawn
+   **without** the `no_edge` flag automatically gets the cast shadow and the cream paper edge.
+   Then the only remaining job is pushing the face far enough forward to break the head
+   silhouette.
+2. Mask plates over the face were rejected outright: "1 and 3 are awful and have like a white
+   blob taking up the space". Do not put a plate over the face.
+
+Eyes are a **white oval with a black pupil**, not the reverse. A black disc with a white speck
+reads as a hole rather than an eye. They are deliberately small, about 3.5 x 4.0 px at scale 1.
+
+`_face_expr()` changes brows, eye openness and mouth shape per pose, so one face carries every
+pose:
+
+| Pose | Brows | Eyes | Mouth |
+|---|---|---|---|
+| idle | slightly raised | open | small smile |
+| windup | raised, inner ends up | wider | small open |
+| strike | down, angled in | narrowed | shouting |
+| aim | flat, slight tilt | slightly squinted | flat |
+| cast | raised | nearly closed | small open |
+| hurt | down, inner ends up | squinted | frown |
+| dead | flat | closed lines | flat |
+
+Scenarios: `shot=figure_ab` (the style A/B), `shot=face_shift` (forward offset A/B),
+`shot=face_pose` (expressions across poses). All need `paper=1` for the crafted look on the
+lineup.
+
+**Verification note:** a vision check on a small render reported the eyes as black discs when
+they were in fact white ovals. Judge at 8x zoom, not at game scale, and prefer measuring pixels
+over trusting a small-image description.
+
+## Look variety: why characters look alike (open)
+
+The `look` data is fine. The **drawing collapses most keys into a shared shape with a number
+changed**, which is why Marshal, Gunslinger and Wrangler share a hat and recruits look like
+siblings:
+
+| Field | Keys | Reality |
+|---|---|---|
+| `hat` | cowboy, stetson, stetson_black, cowboy_wide | **one branch** at figure.gd line 700, differing only in brim width 32/34/40 and crown height 20/26 |
+| `coat` | duster, long, frock | one branch, only the tail constant differs (-34/-44/-54) |
+| `coat` | vest, overalls | one branch |
+| `build` | slim, normal, broad, heavy, tiny | width 38/44/52/56, and only `heavy` gets extra treatment |
+
+Plan, in order: split the hat branch into four real silhouettes, then the coat branch, then add
+per-hero variance from `look_seed` so two heroes of one class differ.
+
 ## Open questions
 
 - How much of the parallax survives if a backdrop becomes a flat image. `Backdrop` scrolls
