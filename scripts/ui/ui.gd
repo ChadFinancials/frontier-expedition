@@ -166,6 +166,37 @@ static func wrap(l: Label, width: float = 0.0) -> Label:
 	return l
 
 
+## The party's hero cards in marching order (rank 1 first), with a swap button between
+## each pair so the order can be changed on the trail or between cave rooms.
+## on_card(h) runs when a card is clicked; on_swap runs after a swap (save and rebuild).
+static func party_cards(row: HBoxContainer, run: RunState, card_w: float, on_card: Callable, on_swap: Callable) -> void:
+	clear(row)
+	var hs: Array = run.party_heroes()
+	for i in hs.size():
+		if i > 0:
+			var k := i
+			var sw := btn("⇄", func():
+				run.swap_party(k - 1, k)
+				Audio.play("cloth")
+				on_swap.call())
+			sw.custom_minimum_size = Vector2(28, 0)
+			sw.add_theme_constant_override("h_separation", 0)
+			for side in ["left", "right"]:
+				var sb: StyleBox = sw.get_theme_stylebox("normal").duplicate()
+				sb.set("content_margin_" + side, 4)
+				sw.add_theme_stylebox_override("normal", sb)
+			sw.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			sw.tooltip_text = "Swap ranks %d and %d" % [i, i + 1]
+			row.add_child(sw)
+		var h: Hero = hs[i]
+		var c := HeroCard.make(h, true)
+		c.custom_minimum_size.x = card_w
+		c.tooltip_text = "Rank %d" % (i + 1)
+		if on_card.is_valid():
+			c.clicked.connect(func(_c): on_card.call(h))
+		row.add_child(c)
+
+
 static func btn(text: String, cb: Callable = Callable(), variation: String = "", min_w: float = 0.0) -> Button:
 	var b := Button.new()
 	b.text = text

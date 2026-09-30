@@ -66,6 +66,18 @@ func current_node() -> Dictionary:
 	return node(current)
 
 
+## Swap two heroes' places in the marching order (party index = rank - 1), outside combat.
+func swap_party(i: int, j: int) -> void:
+	var alive: Array = party.filter(func(u): return company.hero(u) != null and company.hero(u).alive)
+	if i < 0 or j < 0 or i >= alive.size() or j >= alive.size() or i == j:
+		return
+	var a: int = party.find(alive[i])
+	var b: int = party.find(alive[j])
+	var t = party[a]
+	party[a] = party[b]
+	party[b] = t
+
+
 func party_heroes() -> Array:
 	var out: Array = []
 	for uid in party:

@@ -41,12 +41,12 @@ func _build() -> void:
 	row.add_child(col)
 	var name_l := UI.lbl(hero.hero_name, 19 if compact else 21, "InkBold")
 	name_l.clip_text = true
-	name_l.custom_minimum_size.x = 150 if compact else 190
+	name_l.custom_minimum_size.x = 140 if compact else 190
 	col.add_child(name_l)
 	col.add_child(UI.lbl("Lv %d %s" % [hero.level, hero.class_name_text()], 16, "Ink"))
-	var hp := UI.bar(hero.hp, hero.max_hp(), UI.HP, 170 if compact else 200, 14, true)
+	var hp := UI.bar(hero.hp, hero.max_hp(), UI.HP, 150 if compact else 200, 14, true)
 	col.add_child(hp)
-	var ft := UI.bar(hero.fatigue, 200, UI.FATIGUE, 170 if compact else 200, 12, true)
+	var ft := UI.bar(hero.fatigue, 200, UI.FATIGUE, 150 if compact else 200, 12, true)
 	ft.notch = 100
 	ft.text_override = "Fatigue %d" % hero.fatigue
 	col.add_child(ft)

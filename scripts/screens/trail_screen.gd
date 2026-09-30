@@ -80,16 +80,16 @@ func setup(_params: Dictionary) -> void:
 	party_row = UI.hb(6)
 	bh.add_child(party_row)
 	var mid := UI.vb(6)
-	mid.custom_minimum_size.x = 470
+	mid.custom_minimum_size.x = 450
 	bh.add_child(mid)
 	item_row = UI.vb(4)
-	item_row.custom_minimum_size.x = 470
+	item_row.custom_minimum_size.x = 450
 	mid.add_child(item_row)
 	var turn_back := UI.btn("Turn Back", _turn_back, "Danger")
 	turn_back.tooltip_text = "Abandon the expedition and head home with what you've found. Everyone gains Fatigue."
 	mid.add_child(turn_back)
-	log_label = UI.rich("", 16, false, 360)
-	log_label.custom_minimum_size = Vector2(360, 190)
+	log_label = UI.rich("", 16, false, 290)
+	log_label.custom_minimum_size = Vector2(290, 190)
 	log_label.scroll_active = true
 	log_label.fit_content = false
 	log_label.scroll_following = true
@@ -150,12 +150,10 @@ func refresh() -> void:
 		h.tooltip_text = it[2]
 		h.mouse_filter = Control.MOUSE_FILTER_STOP
 		hud_row.add_child(h)
-	UI.clear(party_row)
-	for h in run.party_heroes():
-		var c := HeroCard.make(h, true)
-		c.custom_minimum_size.x = 250
-		c.clicked.connect(func(_c): _open_hero(h))
-		party_row.add_child(c)
+	UI.party_cards(party_row, run, 0, _open_hero, func():
+		Game.save_game()
+		_make_walkers()
+		refresh())
 	UI.clear(item_row)
 	item_row.add_child(UI.lbl("Wagon: %d of %d slots  (click to use)" % [Inventory.slots_used(run.cargo()), Inventory.capacity()], 16, "Bold"))
 	var grid := InventoryGrid.make(run.cargo(), 50.0, 8, func(it: String):

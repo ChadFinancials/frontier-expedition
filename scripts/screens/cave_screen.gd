@@ -86,11 +86,14 @@ func _refresh() -> void:
 		var cur := i == int(run.cave.room)
 		var done: bool = rooms[i].get("done", false)
 		rooms_row.add_child(UI.chip("Room %d%s" % [i + 1, " ✓" if done else ""], "gold" if cur else ("good" if done else "neutral"), 17))
-	UI.clear(party_row)
-	for h in run.party_heroes():
-		var c := HeroCard.make(h, true)
-		c.custom_minimum_size.x = 225
-		party_row.add_child(c)
+	UI.party_cards(party_row, run, 0, Callable(), func():
+		Game.save_game()
+		# Redress the figures in the new marching order (rank 1 at the front).
+		var hs2 := run.party_heroes()
+		for i in mini(walkers.size(), hs2.size()):
+			walkers[i].setup(hs2[i].cls().look, hs2[i].look_seed, 1)
+			walkers[i].scale *= 1.05
+		_refresh())
 	UI.clear(btn_row)
 	if run.party_heroes().is_empty():
 		return

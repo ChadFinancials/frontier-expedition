@@ -424,6 +424,11 @@ static func run(main: Main, args: Dictionary) -> void:
 		"trail", "combat", "camp", "cave", "event", "curio":
 			var co: Company = Game.company
 			co.complete_tutorial()
+			# full: fill the party to four (the starting company only has two).
+			if args.has("full"):
+				for cid in ["mountain_man", "preacher"]:
+					if co.heroes.size() < 4:
+						co.heroes.append(co.make_hero(cid, 1))
 			var uids: Array = []
 			for h in co.heroes.slice(0, 4):
 				uids.append(h.uid)
