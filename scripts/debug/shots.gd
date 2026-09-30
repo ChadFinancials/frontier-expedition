@@ -218,6 +218,63 @@ static func run(main: Main, args: Dictionary) -> void:
 				var l := UI.lbl(txt, 22, "Bold")
 				l.position = Vector2(170 + i * 400, 930)
 				root.add_child(l)
+		"faces":
+			# Faces: Figure.face_look 0-5. Default: close-ups of the Marshal, 3 x 2.
+			# cast: combat-size columns (faces 0-5) for four classes in four poses.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var froot := Control.new()
+			froot.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(froot)
+			var fnames: Array = ["0  CURRENT", "1  PROFILE", "2  LIGNE CLAIRE", "3  RUGGED", "4  STORYBOOK", "5  BRIM SHADOW"]
+			if args.has("cast"):
+				var bgd2 := Backdrop.new()
+				bgd2.setup("tallgrass", "trail", 3)
+				froot.add_child(bgd2)
+				var rows: Array = [["marshal", "idle"], ["gunslinger", "aim"], ["mountain_man", "strike"], ["preacher", "hurt"]]
+				for r in rows.size():
+					for i in 6:
+						var fc := Figure.new()
+						fc.face_look = i
+						fc.setup(DB.classes[rows[r][0]].look, 11 + r, 1)
+						fc.set_pose(rows[r][1])
+						fc.position = Vector2(160 + i * 318, 290 + r * 258)
+						fc.scale *= 1.05
+						froot.add_child(fc)
+				for i in 6:
+					var lc := UI.lbl(fnames[i], 20, "Bold")
+					lc.add_theme_constant_override("outline_size", 6)
+					lc.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+					lc.position = Vector2(60 + i * 318, 6)
+					froot.add_child(lc)
+			else:
+				var bgc2 := ColorRect.new()
+				bgc2.color = Color("#b9a27c")
+				bgc2.set_anchors_preset(Control.PRESET_FULL_RECT)
+				froot.add_child(bgc2)
+				for i in 6:
+					var cell := Control.new()
+					cell.clip_contents = true
+					cell.position = Vector2((i % 3) * 640, (i / 3) * 540)
+					cell.size = Vector2(636, 536)
+					froot.add_child(cell)
+					var cbg := ColorRect.new()
+					cbg.color = Color("#cdb892") if (i % 2 == 0) else Color("#c4ad86")
+					cbg.set_anchors_preset(Control.PRESET_FULL_RECT)
+					cell.add_child(cbg)
+					var fz := Figure.new()
+					fz.face_look = i
+					fz.setup(DB.classes[args.get("cls", "marshal")].look, 7, 1)
+					if args.has("pose"):
+						fz.set_pose(args.pose)
+					fz.position = Vector2(318, 1030)
+					fz.scale *= float(args.get("zoom", "4.2"))
+					cell.add_child(fz)
+					var lz := UI.lbl(fnames[i], 24, "Bold")
+					lz.add_theme_constant_override("outline_size", 6)
+					lz.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+					lz.position = Vector2(14, 10)
+					cell.add_child(lz)
 		"body_ab":
 			# The Marshal in every body style (Figure.body_style 0-5), idle on top, aiming
 			# below, over the Tallgrass backdrop. cls=<class id> to try another class.

@@ -49,6 +49,10 @@ var eye_style: int = 3
 ## detail, 3 jointed paper puppet, 5 painted volume. See docs/ART_PIPELINE.md, shot=body_ab.
 static var default_body := 4
 var body_style: int = default_body
+## Face experiment (A/B). 0 is the current button-eyed face. 1 profile, 2 ligne claire,
+## 3 rugged western, 4 storybook, 5 brim shadow. See shot=faces.
+static var default_face := 0
+var face_look: int = default_face
 
 var _shapes: Array = []
 var _t: float = 0.0
@@ -588,9 +592,12 @@ func _build_human() -> void:
 		_poly([Vector2(-7, sh + 3), Vector2(10, sh + 3), Vector2(10, sh - 4), Vector2(-7, sh - 4)], Color("#f2efe6"))
 	if extra == "bandana":
 		_poly([Vector2(-9, sh + 2), Vector2(12, sh + 2), Vector2(3, sh + 18)], accent)
-	_circle(head, 16.0, _skin)
-	# Hair at the back of the head.
-	_poly(ellipse(head + Vector2(-6, -2), 11, 13, 10, PI * 0.5, PI * 1.5), _hair)
+	if face_look > 0:
+		_head_v(head)
+	else:
+		_circle(head, 16.0, _skin)
+		# Hair at the back of the head.
+		_poly(ellipse(head + Vector2(-6, -2), 11, 13, 10, PI * 0.5, PI * 1.5), _hair)
 	if look.get("beard", false):
 		_poly([Vector2(-6, -178), Vector2(18, -176), Vector2(14, -160), Vector2(2, -156), Vector2(-6, -166)], _hair)
 	if extra == "mustache" or look.get("beard", false):
@@ -598,7 +605,9 @@ func _build_human() -> void:
 	if extra == "bandana_mask":
 		_poly([Vector2(-8, -178), Vector2(19, -178), Vector2(18, -166), Vector2(4, -160), Vector2(-8, -166)], accent)
 	# Face: nose, brow and eye. Styles 1 to 3 replace this with a hovering cartoon face.
-	if face_style <= 0:
+	if face_look > 0:
+		_face_v(head)
+	elif face_style <= 0:
 		_poly([head + Vector2(13, -3), head + Vector2(20, 4), head + Vector2(13, 6)], _skin.darkened(0.12), {"no_edge": true})
 		_line([head + Vector2(4, -10), head + Vector2(13, -9)], 2.0, _hair.darkened(0.2), {"no_edge": true})
 		if crafted:
@@ -1565,3 +1574,151 @@ func _draw_flat_ink(s: Dictionary) -> void:
 	for band in s.get("ink_lit", []):
 		if band.size() >= 3:
 			draw_colored_polygon(band, Color(c.lightened(0.26).lerp(Color("#fff0c8"), 0.1), c.a))
+
+
+# --- Face experiments (face_look 1-5, see shot=faces) ------------------------------------
+
+## Head shape per face look: a true profile, an egg, a square jaw, or the plain round head.
+func _head_v(head: Vector2) -> void:
+	match face_look:
+		1:
+			# Profile: cranium, forehead, brow ridge, nose, lips, chin, jaw.
+			var ctrl := [Vector2(-15, 0), Vector2(-14, -8), Vector2(-7, -16), Vector2(4, -17), Vector2(12, -12), Vector2(15, -5),
+				Vector2(15.5, -2), Vector2(14.5, 0), Vector2(20, 5), Vector2(16, 7.5), Vector2(16.5, 10), Vector2(15.5, 12),
+				Vector2(15, 14.5), Vector2(10, 17.5), Vector2(1, 16), Vector2(-6, 11)]
+			_poly(spline(ctrl.map(func(p): return head + p), 3), _skin)
+			# Hair: a cap over the back and top of the skull.
+			_poly(spline([Vector2(-15, 2), Vector2(-15, -9), Vector2(-7, -17), Vector2(5, -18), Vector2(10, -14), Vector2(2, -11), Vector2(-5, -6), Vector2(-9, 3)].map(func(p): return head + p), 3), _hair)
+			_poly(ellipse(head + Vector2(-3, 1), 3.5, 5.0, 10), _skin.darkened(0.08))
+		2:
+			# Ligne claire: a clean egg, slightly longer at the chin, with an ear.
+			_poly(ellipse(head + Vector2(1, 1), 15.5, 17.0, 22), _skin)
+			_poly(ellipse(head + Vector2(-6, -3), 11, 13, 12, PI * 0.5, PI * 1.5), _hair)
+			_poly(ellipse(head + Vector2(-3, 1), 2.4, 3.3, 10), _skin.darkened(0.06))
+		3:
+			# Rugged: round skull over a square jaw.
+			_poly(spline([Vector2(-15, 2), Vector2(-14, -9), Vector2(-5, -16), Vector2(6, -16), Vector2(14, -9), Vector2(16, 0),
+				Vector2(17, 8), Vector2(14, 15), Vector2(4, 17), Vector2(-6, 15), Vector2(-12, 9)].map(func(p): return head + p), 3), _skin)
+			_poly(ellipse(head + Vector2(-6, -3), 11, 13, 10, PI * 0.5, PI * 1.5), _hair)
+			_poly(ellipse(head + Vector2(-4, 2), 3.2, 4.5, 10), _skin.darkened(0.08))
+		4:
+			# Storybook: a big round head.
+			_circle(head + Vector2(0, -1), 17.5, _skin)
+			_poly(ellipse(head + Vector2(-6, -4), 12, 14, 12, PI * 0.5, PI * 1.5), _hair)
+		_:
+			_circle(head, 16.0, _skin)
+			_poly(ellipse(head + Vector2(-6, -2), 11, 13, 10, PI * 0.5, PI * 1.5), _hair)
+
+
+func _face_v(head: Vector2) -> void:
+	var ink := Color("#1a1210")
+	var e := _face_expr()
+	var eo: float = float(e["eye"])
+	var bdy: float = float(e["brow"])
+	var bang: float = float(e["brow_ang"])
+	var mouth: String = str(e["mouth"])
+	var brow_c := _hair.darkened(0.25)
+	var nf := {"no_edge": true}
+	match face_look:
+		1:
+			# Profile: an almond eye near the front, brow on the ridge, lips at the front edge.
+			var ec := head + Vector2(10, -3)
+			if eo <= 0.06:
+				_line([ec + Vector2(-2.5, 0), ec + Vector2(2.5, 0.5)], 1.6, ink, nf)
+			else:
+				_poly([ec + Vector2(-3.2, 0), ec + Vector2(0, -2.4 * eo), ec + Vector2(3.2, 0.2), ec + Vector2(0, 1.8 * eo)], Color("#f4efe4"), nf)
+				_circle(ec + Vector2(1.2, -0.1), 1.5 * maxf(0.6, eo), ink, nf)
+				_line([ec + Vector2(-3.4, -0.4), ec + Vector2(0, -2.8 * eo), ec + Vector2(3.4, -0.2)], 1.2, ink, nf)
+			_line([head + Vector2(5, -7 + bdy + bang * 2), head + Vector2(15, -6 + bdy - bang * 2)], 2.4, brow_c, nf)
+			_circle(head + Vector2(16.5, 5.5), 0.9, _skin.darkened(0.4), nf)
+			match mouth:
+				"open", "shout":
+					_poly([head + Vector2(16, 9), head + Vector2(11, 10), head + Vector2(12, 14 if mouth == "shout" else 12.5), head + Vector2(15.5, 13)], ink, nf)
+				"frown":
+					_line([head + Vector2(16, 11), head + Vector2(12, 10), head + Vector2(10, 12)], 1.5, ink, nf)
+				_:
+					_line([head + Vector2(16, 10.5), head + Vector2(11.5, 10.5)], 1.4, ink, nf)
+		2:
+			# Ligne claire: dot eyes, a bean nose that breaks the outline, rosy cheek.
+			for ex in [4.0, 12.0]:
+				var ep := head + Vector2(ex, -3)
+				if eo <= 0.06:
+					_line([ep + Vector2(-1.8, 0), ep + Vector2(1.8, 0)], 1.4, ink, nf)
+				else:
+					_poly(ellipse(ep, 1.6, 2.2 * clampf(eo, 0.35, 1.2), 10), ink, nf)
+			_line([head + Vector2(1.5, -8.5 + bdy + bang * 2), head + Vector2(6, -9.5 + bdy - bang)], 1.3, brow_c, nf)
+			_line([head + Vector2(10, -9.5 + bdy - bang), head + Vector2(14.5, -8.5 + bdy + bang * 2)], 1.3, brow_c, nf)
+			_poly(ellipse(head + Vector2(15.2, 2.2), 2.9, 2.3, 12), _skin.darkened(0.03))
+			_circle(head + Vector2(5, 5), 3.4, Color(0.9, 0.4, 0.35, 0.3), nf)
+			_face_mouth(head + Vector2(9, 9), mouth, 1.3, ink)
+		3:
+			# Rugged: heavy brow, squint, crow's feet, a strong nose, stubble.
+			var stub := _hair.lerp(_skin, 0.25) if _skin.get_luminance() > 0.35 else _hair.lightened(0.25)
+			for k in 22:
+				var a := 0.15 + k * 0.12
+				var r := 12.5 + float(k % 3) * 1.3
+				var sp := head + Vector2(3, 3) + Vector2(cos(a), sin(a)) * r
+				if sp.y > head.y + 4:
+					_circle(sp, 0.8, Color(stub, 0.7), nf)
+			var sq := minf(eo, 0.7)
+			for ex in [5.0, 13.0]:
+				var ep2 := head + Vector2(ex, -3)
+				if sq <= 0.06:
+					_line([ep2 + Vector2(-2.2, 0), ep2 + Vector2(2.2, 0)], 1.6, ink, nf)
+				else:
+					_line([ep2 + Vector2(-2.6, -0.3), ep2 + Vector2(2.6, 0.3)], 1.6 + sq, ink, nf)
+					_line([ep2 + Vector2(-2.2, 1.8), ep2 + Vector2(2.2, 2.0)], 0.9, _skin.darkened(0.35), nf)
+			_line([head + Vector2(16.5, -4), head + Vector2(19, -6)], 0.9, _skin.darkened(0.4), nf)
+			_line([head + Vector2(16.5, -2), head + Vector2(19, -1)], 0.9, _skin.darkened(0.4), nf)
+			_line([head + Vector2(1, -7 + bdy + bang * 2.5), head + Vector2(8, -8 + bdy - bang)], 3.0, brow_c, nf)
+			_line([head + Vector2(10, -8 + bdy - bang), head + Vector2(16, -7 + bdy + bang * 2.5)], 3.0, brow_c, nf)
+			_poly([head + Vector2(13, -4), head + Vector2(20, 5), head + Vector2(17, 7), head + Vector2(13, 5)], _skin.darkened(0.04))
+			_face_mouth(head + Vector2(8, 10), mouth, 1.8, ink)
+		4:
+			# Storybook: big eyes with whites, irises and a catchlight, lashes, round cheeks.
+			for ex in [3.0, 13.0]:
+				var ep3 := head + Vector2(ex, -3)
+				if eo <= 0.06:
+					_line([ep3 + Vector2(-3, 0.5), ep3 + Vector2(0, 1.5), ep3 + Vector2(3, 0.5)], 1.5, ink, nf)
+					continue
+				var h := 4.6 * clampf(eo, 0.3, 1.2)
+				_poly(ellipse(ep3, 3.6, h, 14), Color("#fbf7ee"), nf)
+				_poly(ellipse(ep3 + Vector2(0.8, 0.4), 2.5, minf(h, 3.2), 12), Color("#5a3b22"), nf)
+				_circle(ep3 + Vector2(0.9, 0.5), 1.3, ink, nf)
+				_circle(ep3 + Vector2(-0.3, -1.0), 0.8, Color.WHITE, nf)
+				_line([ep3 + Vector2(-3.6, -h + 1), ep3 + Vector2(0, -h - 0.6), ep3 + Vector2(3.6, -h + 1), ep3 + Vector2(4.8, -h - 0.6)], 1.3, ink, nf)
+			_line([head + Vector2(0, -10.5 + bdy + bang * 2), head + Vector2(6, -11.5 + bdy - bang)], 1.4, brow_c, nf)
+			_line([head + Vector2(10, -11.5 + bdy - bang), head + Vector2(16, -10.5 + bdy + bang * 2)], 1.4, brow_c, nf)
+			_circle(head + Vector2(1, 6), 3.8, Color(0.95, 0.45, 0.45, 0.35), nf)
+			_circle(head + Vector2(16, 6), 3.0, Color(0.95, 0.45, 0.45, 0.3), nf)
+			_circle(head + Vector2(9, 4), 1.6, _skin.darkened(0.2), nf)
+			_face_mouth(head + Vector2(9, 10), mouth, 1.4, ink)
+		5:
+			# Brim shadow: the upper face lost under the hat, eyes glinting, a lit jaw.
+			var dark := Color(0.08, 0.05, 0.04, 0.78)
+			_poly(spline([Vector2(-15, -12), Vector2(3, -17), Vector2(16, -12), Vector2(18, -2), Vector2(15, 3), Vector2(4, 1), Vector2(-9, 3), Vector2(-15, -3)].map(func(p): return head + p), 3), dark, nf)
+			if eo > 0.06:
+				for ex in [5.0, 13.0]:
+					var ep4 := head + Vector2(ex, -3)
+					_poly(ellipse(ep4, 2.2, 1.1 * clampf(eo, 0.4, 1.2), 10), Color("#f3dca0"), nf)
+					_circle(ep4 + Vector2(0.4, 0), 0.7, Color("#fffbe8"), nf)
+			_poly([head + Vector2(14, 1), head + Vector2(19, 5), head + Vector2(15, 7)], _skin.darkened(0.12), nf)
+			_face_mouth(head + Vector2(8, 10), mouth, 1.7, ink)
+		_:
+			_face(head)
+
+
+func _face_mouth(at: Vector2, mouth: String, w: float, ink: Color) -> void:
+	var nf := {"no_edge": true}
+	match mouth:
+		"flat":
+			_line([at + Vector2(-4, 0), at + Vector2(4, 0)], w, ink, nf)
+		"open":
+			_poly(ellipse(at + Vector2(0, 1), 2.6, 3.2, 10), ink, nf)
+		"shout":
+			_poly(ellipse(at + Vector2(0, 1.5), 3.8, 4.6, 12), ink, nf)
+			_poly(ellipse(at + Vector2(0, 2.8), 2.2, 2.0, 10), Color("#7d3b3b"), nf)
+		"frown":
+			_line([at + Vector2(-4, 2), at + Vector2(0, -0.5), at + Vector2(4, 2)], w, ink, nf)
+		_:
+			_line([at + Vector2(-4, -1), at + Vector2(0, 1.8), at + Vector2(4, -1)], w, ink, nf)
