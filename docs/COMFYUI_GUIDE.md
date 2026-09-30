@@ -68,14 +68,21 @@ Tips that matter more than extra adjectives:
 
 ## 5. From image to game
 
-1. Cut out the background: `python tools/art/cutout.py <image>` (rembg), or any background
-   remover.
-2. Crop square with a little margin and resize to **256 x 256** PNG.
-3. Save as `assets/art/icons/<key>.png` (e.g. `food.png`, `bandage.png`).
-4. Run `play.bat`: the import step picks it up and the icon shows in the wagon and store.
-   Delete the file to get the drawn icon back.
-5. Commit and push it (GitHub Desktop is fine). Note the seed somewhere
-   (`assets/art/icons/icons.json`) so it can be regenerated.
+Generate at any size (1024 is fine; don't generate small, the model does worse). Keep the
+plain light background: the prep script removes it.
+
+1. Save the picture you like as **`art-src/icons/<key>.png`** (or .webp/.jpg), named by its
+   key: `food`, `bandage`, `vial` (antivenom), `bottle` (whiskey), `oil`, `rope`, `shovel`,
+   `crowbar`, `salt`, `wheel` (wagon parts), `timber`, `iron`, `money` (chips), `week`,
+   `wagon`, `xp`, `eye` (scouting), `charter`, `skull`.
+2. Either run `python tools/art/prep_icons.py --dir art-src/icons` (needs
+   `pip install pillow numpy`), which writes the game-ready `assets/art/icons/<key>.png`
+   (256 px, transparent, trimmed), or just commit and push the `art-src` file and ask Claude
+   to run it.
+3. Run `play.bat`: the icon replaces the drawn one. Delete the `assets/art/icons` file to
+   get the drawn icon back.
+4. Commit and push both files (GitHub Desktop is fine). The original stays in `art-src` so
+   it can be reprocessed later.
 
 ## 6. The scripted route (optional)
 

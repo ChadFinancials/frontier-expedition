@@ -75,7 +75,7 @@ func _draw_sheet() -> void:
 		draw_rect(Rect2(r.position + Vector2(inset, inset), r.size - Vector2(inset, inset) * 2), Color(0.55, 0.38, 0.18, 0.05), false, 8.0)
 	var rim := edge.duplicate()
 	rim.append(edge[0])
-	draw_polyline(rim, Color(0.36, 0.22, 0.11, 0.55), 3.0, true)
+	draw_polyline(Figure.clean_line(rim), Color(0.36, 0.22, 0.11, 0.55), 3.0, true)
 	# Tea stains.
 	for k in 4:
 		var c := Vector2(rng.randf_range(120, size.x - 120), rng.randf_range(60, size.y - 60))
@@ -140,21 +140,21 @@ func _sketch(kind: String, p: Vector2, s: float) -> void:
 			draw_arc(p + Vector2(0, -8) * s, 9 * s, 0, TAU, 14, c, 1.6, true)
 			draw_line(p + Vector2(-4, -8) * s, p + Vector2(2, -3) * s, Color(c, 0.3), 1.0, true)
 		"rock":
-			draw_polyline(PackedVector2Array([p + Vector2(-10, 6) * s, p + Vector2(-6, -3) * s, p + Vector2(2, -6) * s, p + Vector2(9, 0) * s, p + Vector2(10, 6) * s]), c, 1.6, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array([p + Vector2(-10, 6) * s, p + Vector2(-6, -3) * s, p + Vector2(2, -6) * s, p + Vector2(9, 0) * s, p + Vector2(10, 6) * s])), c, 1.6, true)
 		"mesa":
-			draw_polyline(PackedVector2Array([p + Vector2(-20, 8) * s, p + Vector2(-12, -8) * s, p + Vector2(10, -8) * s, p + Vector2(20, 8) * s]), c, 1.6, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array([p + Vector2(-20, 8) * s, p + Vector2(-12, -8) * s, p + Vector2(10, -8) * s, p + Vector2(20, 8) * s])), c, 1.6, true)
 			for k in 3:
 				draw_line(p + Vector2(-8 + k * 7, -6) * s, p + Vector2(-10 + k * 7, 6) * s, Color(c, 0.25), 1.0, true)
 		"cactus":
 			draw_line(p + Vector2(0, 10) * s, p + Vector2(0, -10) * s, c, 2.2, true)
-			draw_polyline(PackedVector2Array([p + Vector2(0, 0) * s, p + Vector2(-6, 0) * s, p + Vector2(-6, -6) * s]), c, 1.8, true)
-			draw_polyline(PackedVector2Array([p + Vector2(0, -3) * s, p + Vector2(5, -3) * s, p + Vector2(5, -9) * s]), c, 1.8, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array([p + Vector2(0, 0) * s, p + Vector2(-6, 0) * s, p + Vector2(-6, -6) * s])), c, 1.8, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array([p + Vector2(0, -3) * s, p + Vector2(5, -3) * s, p + Vector2(5, -9) * s])), c, 1.8, true)
 		"pine":
-			draw_polyline(PackedVector2Array([p + Vector2(-8, 6) * s, p + Vector2(0, -12) * s, p + Vector2(8, 6) * s, p + Vector2(-8, 6) * s]), c, 1.5, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array([p + Vector2(-8, 6) * s, p + Vector2(0, -12) * s, p + Vector2(8, 6) * s, p + Vector2(-8, 6) * s])), c, 1.5, true)
 			draw_line(p + Vector2(0, 6) * s, p + Vector2(0, 11) * s, c, 1.5, true)
 		"peak":
-			draw_polyline(PackedVector2Array([p + Vector2(-20, 10) * s, p + Vector2(0, -14) * s, p + Vector2(20, 10) * s]), c, 1.7, true)
-			draw_polyline(PackedVector2Array([p + Vector2(-6, -7) * s, p + Vector2(-2, -4) * s, p + Vector2(2, -7) * s, p + Vector2(6, -6) * s]), c, 1.2, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array([p + Vector2(-20, 10) * s, p + Vector2(0, -14) * s, p + Vector2(20, 10) * s])), c, 1.7, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array([p + Vector2(-6, -7) * s, p + Vector2(-2, -4) * s, p + Vector2(2, -7) * s, p + Vector2(6, -6) * s])), c, 1.2, true)
 
 
 ## A hand-inked trail between two stops: a gentle curve, dotted until travelled.
@@ -188,7 +188,7 @@ func _disc(p: Vector2, r: float, id: int, tone: Color, wax: bool) -> void:
 	draw_arc(p, r - 6, 0.3, 2.6, 12, Color(tone.darkened(0.25), 0.6), 1.2, true)
 	var ring := disc.duplicate()
 	ring.append(disc[0])
-	draw_polyline(ring, INK, 2.2, true)
+	draw_polyline(Figure.clean_line(ring), INK, 2.2, true)
 
 
 ## Unscouted country: a smudged wash over stops nobody has seen yet.
@@ -217,7 +217,7 @@ func _draw_token() -> void:
 	draw_colored_polygon(bonnet, Color("#f3ead6"))
 	var bl := bonnet.duplicate()
 	bl.append(bonnet[0])
-	draw_polyline(bl, INK, 1.5, true)
+	draw_polyline(Figure.clean_line(bl), INK, 1.5, true)
 	for hx in [-7.0, 0.0, 7.0]:
 		draw_line(p + Vector2(hx, 2), p + Vector2(hx * 0.9, -10 + absf(hx) * 0.3), Color(INK, 0.5), 1.0, true)
 	for wx in [-10.0, 10.0]:
@@ -262,7 +262,7 @@ func _draw_signpost() -> void:
 	draw_line(r.position + Vector2(4, r.size.y - 9), Vector2(r.end.x - 26, r.end.y - 9), Color("#6e4a2c"), 1.0, true)
 	var bl := board.duplicate()
 	bl.append(board[0])
-	draw_polyline(bl, INK, 2.0, true)
+	draw_polyline(Figure.clean_line(bl), INK, 2.0, true)
 	_nail(r.position + Vector2(30, r.size.y / 2))
 	draw_string(UI.font_head, r.position + Vector2(50, 29), "ONWARD", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color("#2a1a10"))
 
@@ -343,7 +343,7 @@ func _draw() -> void:
 			var pts := _trail_pts(node_pos(n), node_pos(m), int(n.id) * 97 + int(nx))
 			var travelled: bool = n.visited and m.visited
 			if travelled:
-				draw_polyline(pts, Color("#4a2f1c"), 4.0, true)
+				draw_polyline(Figure.clean_line(pts), Color("#4a2f1c"), 4.0, true)
 				continue
 			var ahead: bool = n.id == run.current and nx in choices and enabled
 			var col := Color(0.3, 0.2, 0.12, 0.85) if ahead else Color(0.35, 0.25, 0.16, 0.45)

@@ -1257,7 +1257,7 @@ class _Arrow extends Node2D:
 			shadow.append(q + Vector2(3, 4))
 		draw_colored_polygon(shadow, Color(0, 0, 0, 0.45))
 		draw_colored_polygon(head, color)
-		draw_polyline(PackedVector2Array([head[0], head[1], head[2], head[0]]), Color("#f3e9d2"), 2.5, true)
+		draw_polyline(Figure.clean_line(PackedVector2Array([head[0], head[1], head[2], head[0]])), Color("#f3e9d2"), 2.5, true)
 
 
 class _Burst extends Node2D:

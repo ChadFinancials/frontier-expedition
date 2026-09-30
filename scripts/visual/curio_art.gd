@@ -18,7 +18,7 @@ func _poly(pts: Array, c: Color) -> void:
 	draw_colored_polygon(sh, Color(0, 0, 0, 0.25))
 	var closed := p.duplicate()
 	closed.append(p[0])
-	draw_polyline(closed, PAPER, 6.0, true)
+	draw_polyline(Figure.clean_line(closed), PAPER, 6.0, true)
 	draw_colored_polygon(p, c)
 
 

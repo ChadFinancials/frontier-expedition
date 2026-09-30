@@ -291,7 +291,7 @@ func _draw_layer(ci: CanvasItem, i: int, edge: bool) -> void:
 			c = c.lerp(Color("#101522"), night * 0.6)
 		if edge:
 			var rim := moved.slice(1, moved.size() - 1)
-			ci.draw_polyline(rim, Figure.PAPER.darkened(0.04), 7.0, true)
+			ci.draw_polyline(Figure.clean_line(rim), Figure.PAPER.darkened(0.04), 7.0, true)
 		ci.draw_colored_polygon(moved, c)
 		if edge:
 			_paper_detail(ci, i, moved, c, shift)
@@ -308,7 +308,7 @@ func _paper_detail(ci: CanvasItem, i: int, pts: PackedVector2Array, c: Color, sh
 	var band := PackedVector2Array()
 	for p in rim:
 		band.append(p + Vector2(0, 16 + i * 4))
-	ci.draw_polyline(band, Color(c.darkened(0.18), 0.45), 20.0 + i * 6, true)
+	ci.draw_polyline(Figure.clean_line(band), Color(c.darkened(0.18), 0.45), 20.0 + i * 6, true)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value * 31 + i
 	var depth := float(i + 1) / _layers.size()
@@ -637,7 +637,7 @@ func _draw_cave_paper(ci: CanvasItem) -> void:
 			pts.append(Vector2(x, y + sin(k * 1.7 + i * 2.1 + seed_value) * 36 + rng.randf_range(-10, 10)))
 		pts.append(Vector2(W + 20, H))
 		var rim := pts.slice(1, pts.size() - 1)
-		ci.draw_polyline(rim, edge.darkened(0.1 * i), 6.0, true)
+		ci.draw_polyline(Figure.clean_line(rim), edge.darkened(0.1 * i), 6.0, true)
 		ci.draw_colored_polygon(pts, Color("#2f2822").lerp(Color("#4a3e33"), i / 4.0))
 		for k in 16:
 			var sx := rng.randf() * W
@@ -648,7 +648,7 @@ func _draw_cave_paper(ci: CanvasItem) -> void:
 		var l := rng.randf_range(70, 230)
 		var w2 := rng.randf_range(20, 48)
 		var st := PackedVector2Array([Vector2(x2 - w2, -10), Vector2(x2 + w2, -10), Vector2(x2 + w2 * 0.3, l * 0.6), Vector2(x2 + 3, l)])
-		ci.draw_polyline(PackedVector2Array([st[0], st[3], st[1]]), edge, 5.0, true)
+		ci.draw_polyline(Figure.clean_line(PackedVector2Array([st[0], st[3], st[1]])), edge, 5.0, true)
 		ci.draw_colored_polygon(st, Color("#3a3029"))
 	ci.draw_rect(Rect2(0, ground_y - 4, W, 8), edge)
 	ci.draw_rect(Rect2(0, ground_y, W, H - ground_y), Color("#3a3129"))

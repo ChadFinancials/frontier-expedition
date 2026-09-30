@@ -47,6 +47,8 @@ func _ready() -> void:
 	test_region_fights()
 	print("> test_settlement_services()")
 	test_settlement_services()
+	print("> test_quest_boss()")
+	test_quest_boss()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -663,6 +665,41 @@ func sim_tutorial(n: int) -> void:
 		if i == 0:
 			print("  sample xp: ", s.heroes.map(func(e): return e.xp))
 	print("TUTORIAL %d runs: %s  avg party hp at the end %.2f  levels %s" % [n, res, boss_hp_left / n, levels])
+
+
+## A saloon quest's boss (Mad Dog's hideout): win the fight and settle the expedition, as the
+## combat screen does, including the text it shows (owner saw a crash on the killing blow).
+func test_quest_boss() -> void:
+	var co := Company.new()
+	co.new_game(21)
+	co.complete_tutorial()
+	for cid in ["mountain_man", "preacher"]:
+		co.heroes.append(co.make_hero(cid, 1))
+	var west: String = co.site_by_index(0).get("region_west", "")
+	check(west != "", "first settlement has a region to the west")
+	var reg: Dictionary = co._make_quest("mad_dog", west, 1)
+	co.quest_regions["q_test"] = reg
+	DB.regions["q_test"] = reg
+	var uids: Array = []
+	for h in co.heroes.slice(0, 4):
+		uids.append(h.uid)
+	co.run = RunState.create(co, "q_test", 0, uids, {})
+	check(co.run.party_heroes().size() >= 2, "quest party assembled (got %d of %d)" % [co.run.party_heroes().size(), uids.size()])
+	var e := CombatEngine.new()
+	e.setup(co.run.party_heroes(), reg.boss.enemies, co.run.combat_options("boss"))
+	e.dev_win()
+	check(e.state == "victory", "quest boss fight won (got %s)" % e.state)
+	var res: Dictionary = co.run.after_combat(e, "boss")
+	check("brass_knuckles" in res.keepsakes, "Mulligan drops the brass knuckles")
+	check(co.story_flags.has("mad_dog_beaten"), "Mad Dog quest marked done")
+	for k in res.keepsakes:
+		check(k == "" or DB.keepsakes.has(k), "quest reward trinket %s exists" % k)
+	check(str(DB.regions[co.run.region_id].boss.victory) != "", "quest boss has victory text")
+	var summary := co.finish_run("victory")
+	check(summary.status == "victory", "quest expedition settles")
+	var d := JSON.parse_string(JSON.stringify(co.to_dict()))
+	check(Company.from_dict(DB.normalize(d)) != null, "company saves after the quest")
+	DB.regions.erase("q_test")
 
 
 func test_save_roundtrip() -> void:

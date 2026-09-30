@@ -447,6 +447,10 @@ static func run(main: Main, args: Dictionary) -> void:
 				"combat":
 					var enemies: Array = args.get("enemies", "outlaw_brawler,outlaw_gunhand,prairie_wolf,outlaw_rifleman").split(",")
 					await main.goto("combat", {"enemies": enemies, "kind": args.get("kind", "fight"), "return": "trail"}, true)
+					# ehp=N: every enemy starts at N HP, to reach a killing blow quickly.
+					if args.has("ehp"):
+						for ec in main.screen.engine.enemies:
+							ec.hp = int(args.ehp)
 					if args.has("act"):
 						await _act(main, args)
 				"camp":

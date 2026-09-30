@@ -26,7 +26,7 @@ func _poly(pts: Array, c: Color) -> void:
 	draw_colored_polygon(sh, Color(0, 0, 0, 0.22))
 	var closed := p.duplicate()
 	closed.append(p[0])
-	draw_polyline(closed, PAPER, 5.0, true)
+	draw_polyline(Figure.clean_line(closed), PAPER, 5.0, true)
 	draw_colored_polygon(p, c)
 
 
@@ -153,8 +153,8 @@ func _draw() -> void:
 			for k in 30:
 				var a := k * 0.5
 				pts.append(c + Vector2(cos(a) * (60 - k), -20 + sin(a) * (22 - k * 0.6)))
-			draw_polyline(PackedVector2Array(pts), PAPER, 20, true)
-			draw_polyline(PackedVector2Array(pts), Color("#8a7a3a"), 14, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array(pts)), PAPER, 20, true)
+			draw_polyline(Figure.clean_line(PackedVector2Array(pts)), Color("#8a7a3a"), 14, true)
 			_disc(c + Vector2(62, -24), 12, Color("#7a6a32"))
 		"snow":
 			for k in 40:
@@ -182,7 +182,7 @@ func _draw() -> void:
 				var pts2: Array = []
 				for j in 12:
 					pts2.append(Vector2(w * 0.2 + j * w * 0.05, yy + sin(j + _t * 3 + k) * 4))
-				draw_polyline(PackedVector2Array(pts2), Color(1, 0.9, 0.7, 0.4), 2, true)
+				draw_polyline(Figure.clean_line(PackedVector2Array(pts2)), Color(1, 0.9, 0.7, 0.4), 2, true)
 		"tracks":
 			for k in 8:
 				var tp := Vector2(w * 0.1 + k * w * 0.11, ground + 22 + (k % 2) * 14)

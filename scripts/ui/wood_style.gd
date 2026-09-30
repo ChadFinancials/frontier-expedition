@@ -87,7 +87,7 @@ func _draw_planks(ci: RID, r: Rect2, rng: RandomNumberGenerator) -> void:
 				x += 24.0
 			pts.append(Vector2(pr.end.x, y0 + sin(pr.end.x * freq + ph0) * amp))
 			var gc := tone.darkened(0.3) if g % 2 == 0 else tone.lightened(0.1)
-			rs.canvas_item_add_polyline(ci, pts, PackedColorArray([Color(gc, 0.45)]), 1.0, true)
+			rs.canvas_item_add_polyline(ci, Figure.clean_line(pts), PackedColorArray([Color(gc, 0.45)]), 1.0, true)
 		# Now and then a knot.
 		if pr.size.x > 300 and rng.randf() < 0.6:
 			var kc := Vector2(rng.randf_range(pr.position.x + 80, pr.end.x - 80), pr.position.y + ph * rng.randf_range(0.35, 0.65))
@@ -133,7 +133,7 @@ func _bracket(ci: RID, r: Rect2, corner: int) -> void:
 	RenderingServer.canvas_item_add_polygon(ci, pts, PackedColorArray([IRON]))
 	var edge_pts := pts.duplicate()
 	edge_pts.append(pts[0])
-	RenderingServer.canvas_item_add_polyline(ci, edge_pts, PackedColorArray([Color(0, 0, 0, 0.6)]), 1.0, true)
+	RenderingServer.canvas_item_add_polyline(ci, Figure.clean_line(edge_pts), PackedColorArray([Color(0, 0, 0, 0.6)]), 1.0, true)
 	for k in [Vector2(t * 0.5, t * 0.5), Vector2(arm - 5, t * 0.5), Vector2(t * 0.5, arm - 5)]:
 		var p: Vector2 = o + Vector2(k.x * sx, k.y * sy)
 		RenderingServer.canvas_item_add_circle(ci, p, 1.8, RIVET)
@@ -165,7 +165,7 @@ func _draw_sign(ci: RID, r: Rect2, rng: RandomNumberGenerator) -> void:
 		while x <= r.end.x - 4:
 			pts.append(Vector2(x, y0 + sin(x * 0.03 + ph0) * 1.2))
 			x += 14.0
-		rs.canvas_item_add_polyline(ci, pts, PackedColorArray([Color(tone.darkened(0.3), 0.4)]), 1.0, true)
+		rs.canvas_item_add_polyline(ci, Figure.clean_line(pts), PackedColorArray([Color(tone.darkened(0.3), 0.4)]), 1.0, true)
 	# Worn paint: bare wood showing through at the corners.
 	if paint.a > 0.0:
 		for k in 3:
@@ -174,7 +174,7 @@ func _draw_sign(ci: RID, r: Rect2, rng: RandomNumberGenerator) -> void:
 	# Ink outline.
 	var ring := body.duplicate()
 	ring.append(body[0])
-	rs.canvas_item_add_polyline(ci, ring, PackedColorArray([edge if edge.a > 0.0 else INK]), 2.0 if edge.a > 0.0 else 1.5, true)
+	rs.canvas_item_add_polyline(ci, Figure.clean_line(ring), PackedColorArray([edge if edge.a > 0.0 else INK]), 2.0 if edge.a > 0.0 else 1.5, true)
 	if nails and r.size.x >= 70:
 		_nail(ci, Vector2(r.position.x + 8, r.position.y + r.size.y / 2))
 		_nail(ci, Vector2(r.end.x - 8, r.position.y + r.size.y / 2))
