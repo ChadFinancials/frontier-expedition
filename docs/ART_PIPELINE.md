@@ -513,3 +513,18 @@ picked **ink illustration (`Figure.body_style = 4`)**, now the default for every
   from `_add_ink_bands`: a shadow tone on the far side, a darker core line at the far edge, a
   warm highlight along the lit (top-left) edge, and sparse ink hatching in bigger shadows.
 - Styles 0-3 and 5 stay in the code for A/B. `body=N` on any shot scenario renders it in style N.
+
+## Faces: profile with storybook reactions (Sept 30, owner's pick)
+
+Five faces were tried against the old one (`shot=faces`, `cast` for combat size): profile,
+ligne claire, rugged, storybook, brim shadow. The owner loved the **profile** look but missed
+the cartoon reactions, so the default is **face 6 (`Figure.face_look`)**: the side-view profile
+head at rest (idle, dead), switching to storybook reactions in action poses (`_toon_expr`,
+`_face_toon`): a big eye with white, iris and catchlight, and a jaw that drops open.
+
+- windup: eyes wide, brows up, mouth open. strike: scowl (the lid cuts the eye), a shout
+  with teeth and tongue. aim: squint, gritted mouth. cast: eyes rolled up, a small "o".
+  hurt: wide eye with a pinprick pupil, clenched teeth, a sweat drop.
+- The windup and cast arms were moved so they no longer cross the face.
+- `shot=faces poses` shows every pose, face 1 above face 6 (`zoom=`, `cls=`); `poses small`
+  shows four classes at combat size. Faces 1-5 stay in the code for A/B.

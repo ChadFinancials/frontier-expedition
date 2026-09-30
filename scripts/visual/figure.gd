@@ -51,7 +51,7 @@ static var default_body := 4
 var body_style: int = default_body
 ## Face experiment (A/B). 0 is the current button-eyed face. 1 profile, 2 ligne claire,
 ## 3 rugged western, 4 storybook, 5 brim shadow. See shot=faces.
-static var default_face := 0
+static var default_face := 6
 var face_look: int = default_face
 
 var _shapes: Array = []
@@ -505,13 +505,14 @@ func _build_human() -> void:
 			if weapon == "pistols":
 				hand_b = shoulder_b + Vector2(44, 14)
 		"windup":
-			hand_f = shoulder_f + Vector2(-6, -34)
+			# Cocked back behind the head, so the arm doesn't hide the face.
+			hand_f = shoulder_f + Vector2(-26, -40)
 			weapon_ang = -2.4 if long_melee else -1.2
 		"strike":
 			hand_f = shoulder_f + Vector2(38, 18)
 			weapon_ang = 0.5 if long_melee else 0.2
 		"cast":
-			hand_f = shoulder_f + Vector2(16, -46)
+			hand_f = shoulder_f + Vector2(38, -32)
 			weapon_ang = -1.4
 		"hurt":
 			hand_f = shoulder_f + Vector2(10, 30)
@@ -1581,11 +1582,16 @@ func _draw_flat_ink(s: Dictionary) -> void:
 ## Head shape per face look: a true profile, an egg, a square jaw, or the plain round head.
 func _head_v(head: Vector2) -> void:
 	match face_look:
-		1:
-			# Profile: cranium, forehead, brow ridge, nose, lips, chin, jaw.
+		1, 6:
+			# Profile: cranium, forehead, brow ridge, nose, lips, chin, jaw. Face 6 drops the
+			# jaw open for its cartoon reactions (see _toon_expr).
 			var ctrl := [Vector2(-15, 0), Vector2(-14, -8), Vector2(-7, -16), Vector2(4, -17), Vector2(12, -12), Vector2(15, -5),
 				Vector2(15.5, -2), Vector2(14.5, 0), Vector2(20, 5), Vector2(16, 7.5), Vector2(16.5, 10), Vector2(15.5, 12),
 				Vector2(15, 14.5), Vector2(10, 17.5), Vector2(1, 16), Vector2(-6, 11)]
+			var jaw: float = float(_toon_expr().get("jaw", 0.0)) if face_look == 6 else 0.0
+			if jaw > 0.0:
+				ctrl = ctrl.slice(0, 10) + [Vector2(16.4, 9), Vector2(16.2, 10 + jaw), Vector2(15.5, 12 + jaw),
+					Vector2(15, 14.5 + jaw), Vector2(10, 17.5 + jaw * 0.9), Vector2(1, 16 + jaw * 0.5), Vector2(-6, 11)]
 			_poly(spline(ctrl.map(func(p): return head + p), 3), _skin)
 			# Hair: a cap over the back and top of the skull.
 			_poly(spline([Vector2(-15, 2), Vector2(-15, -9), Vector2(-7, -17), Vector2(5, -18), Vector2(10, -14), Vector2(2, -11), Vector2(-5, -6), Vector2(-9, 3)].map(func(p): return head + p), 3), _hair)
@@ -1620,7 +1626,10 @@ func _face_v(head: Vector2) -> void:
 	var brow_c := _hair.darkened(0.25)
 	var nf := {"no_edge": true}
 	match face_look:
-		1:
+		1, 6:
+			if face_look == 6 and not _toon_expr().is_empty():
+				_face_toon(head)
+				return
 			# Profile: an almond eye near the front, brow on the ridge, lips at the front edge.
 			var ec := head + Vector2(10, -3)
 			if eo <= 0.06:
@@ -1706,6 +1715,105 @@ func _face_v(head: Vector2) -> void:
 			_face_mouth(head + Vector2(8, 10), mouth, 1.7, ink)
 		_:
 			_face(head)
+
+
+## Face 6: the profile face at rest, storybook reactions in action. Per pose: the eye
+## size (rx, ry), an upper lid cutting into it (lid: how far down, slope: tilt, positive
+## drops the front for a scowl), pupil offset and size, whether it has an iris, the brow
+## height and tilt (positive tips the front end down), the mouth, and how far the jaw
+## drops open. An empty dict means the pose keeps the plain profile face.
+func _toon_expr() -> Dictionary:
+	match pose:
+		"windup": return {"rx": 3.7, "ry": 5.4, "lid": 0.0, "slope": 0.0, "pupil": Vector2(1.3, -0.3), "pr": 1.5, "iris": true,
+			"brow": -11.5, "bang": -0.3, "mouth": "open", "jaw": 3.0}
+		"strike": return {"rx": 4.0, "ry": 5.2, "lid": 2.4, "slope": 0.75, "pupil": Vector2(1.6, 1.0), "pr": 1.6, "iris": true,
+			"brow": -6.0, "bang": 1.0, "mouth": "shout", "jaw": 5.5}
+		"aim": return {"rx": 3.8, "ry": 4.8, "lid": 3.3, "slope": 0.15, "pupil": Vector2(1.8, 0.9), "pr": 1.5, "iris": true,
+			"brow": -6.5, "bang": 0.35, "mouth": "grit", "jaw": 0.0}
+		"cast": return {"rx": 3.6, "ry": 5.3, "lid": 0.0, "slope": 0.0, "pupil": Vector2(0.9, -2.2), "pr": 1.4, "iris": true,
+			"brow": -11.5, "bang": -0.25, "mouth": "o", "jaw": 2.0}
+		"hurt": return {"rx": 4.3, "ry": 6.0, "lid": 0.0, "slope": 0.0, "pupil": Vector2(0.5, 0.3), "pr": 0.9, "iris": false,
+			"brow": -12.0, "bang": -0.8, "mouth": "grimace", "jaw": 3.2, "sweat": true}
+	return {}
+
+
+func _face_toon(head: Vector2) -> void:
+	var t := _toon_expr()
+	var ink := Color("#1a1210")
+	var nf := {"no_edge": true}
+	var rx: float = t.rx
+	var ry: float = t.ry
+	var lid: float = t.lid
+	var slope: float = t.slope
+	var ec := head + Vector2(9.5, -3.5)
+	# The eye: a tall storybook oval, its top cut flat by the lid when squinting or scowling.
+	var eye: Array = []
+	for p in ellipse(ec, rx, ry, 20):
+		eye.append(Vector2(p.x, maxf(p.y, ec.y - ry + lid + slope * (p.x - ec.x))))
+	_poly(eye, Color("#fbf7ee"), nf)
+	var pc: Vector2 = ec + t.pupil
+	var pr: float = t.pr
+	if t.iris:
+		for part in Geometry2D.intersect_polygons(PackedVector2Array(ellipse(pc, pr * 1.7, pr * 2.0, 14)), PackedVector2Array(eye)):
+			_poly(Array(part), Color("#5a3b22"), nf)
+	for part in Geometry2D.intersect_polygons(PackedVector2Array(ellipse(pc, pr, pr * 1.1, 12)), PackedVector2Array(eye)):
+		_poly(Array(part), ink, nf)
+	if t.iris:
+		_circle(pc + Vector2(-0.6, -0.9), 0.75, Color.WHITE, nf)
+	var ring: Array = eye.duplicate()
+	ring.append(eye[0])
+	_line(ring, 1.1, ink, nf)
+	# A heavier upper lid line, with a lash flicking forward off the front corner.
+	var top: Array = []
+	for p in eye:
+		if p.y < ec.y - ry * 0.35:
+			top.append(p)
+	top.sort_custom(func(a, b): return a.x < b.x)
+	if top.size() >= 2:
+		_line(top, 1.9, ink, nf)
+		if lid < 1.0:
+			var tip: Vector2 = top[top.size() - 1]
+			_line([tip, tip + Vector2(2.2, -1.2)], 1.1, ink, nf)
+	# Brow: an arch on the ridge, the front end tipping down to scowl or up to fret.
+	var by: float = t.brow
+	var bang: float = t.bang
+	var brow_c := _hair.darkened(0.25)
+	_line([head + Vector2(5, by - bang * 2), head + Vector2(10, by - 1.2), head + Vector2(14.5, by + bang * 2.5 + 0.5)], 2.6, brow_c, nf)
+	_circle(head + Vector2(16.5, 5.5), 0.9, _skin.darkened(0.4), nf)
+	_circle(head + Vector2(8, 5.5), 3.2, Color(0.95, 0.45, 0.45, 0.3), nf)
+	# Mouth, seen from the side: the jaw has dropped (see _head_v), open to the front.
+	var jaw: float = t.jaw
+	var cav := Color("#3a1414")
+	var teeth := Color("#f1ead8")
+	match str(t.mouth):
+		"open", "shout":
+			var depth := 11.0 if t.mouth == "open" else 9.0
+			var m := [head + Vector2(17.6, 9), head + Vector2(13, 9.2), head + Vector2(depth, 9.6 + jaw * 0.5),
+				head + Vector2(13, 9.8 + jaw), head + Vector2(17.6, 9.8 + jaw)]
+			_poly(m, cav, nf)
+			_poly(ellipse(head + Vector2(14.2, 9.1 + jaw), 2.8, 1.3, 10), Color("#b04a4e"), nf)
+			_poly([head + Vector2(17.2, 9.0), head + Vector2(13.4, 9.2), head + Vector2(13.6, 10.4), head + Vector2(17.2, 10.3)], teeth, nf)
+			_line([head + Vector2(16.4, 9), head + Vector2(13, 9.2), head + Vector2(depth, 9.6 + jaw * 0.5), head + Vector2(13, 9.8 + jaw), head + Vector2(16.4, 9.8 + jaw)], 1.2, ink, nf)
+		"o":
+			_poly(ellipse(head + Vector2(16.2, 9.6 + jaw * 0.5), 1.7, 0.9 + jaw * 0.5, 10), cav, nf)
+			var om: Array = ellipse(head + Vector2(16.2, 9.6 + jaw * 0.5), 1.7, 0.9 + jaw * 0.5, 10)
+			_line(om + [om[0]], 1.0, ink, nf)
+		"grimace":
+			# Clenched teeth bared at the front, the lip corner pulled back and down.
+			var gm := [head + Vector2(17.4, 9), head + Vector2(11.5, 9.6), head + Vector2(10.5, 10.4 + jaw * 0.5), head + Vector2(11.5, 10 + jaw), head + Vector2(17.4, 9.8 + jaw)]
+			_poly(gm, teeth, nf)
+			_line([head + Vector2(17, 9.4 + jaw * 0.5), head + Vector2(11, 9.9 + jaw * 0.5)], 0.9, ink, nf)
+			_line([gm[0], gm[1], gm[2], gm[3], gm[4]], 1.3, ink, nf)
+		"grit":
+			_line([head + Vector2(16.4, 10.4), head + Vector2(12, 10.6), head + Vector2(10.8, 11.8)], 1.4, ink, nf)
+			_line([head + Vector2(15.2, 9.9), head + Vector2(15.2, 11.0)], 0.7, ink, nf)
+	if t.get("sweat", false):
+		var sd := head + Vector2(-19, -1)
+		var drop := [sd + Vector2(0, -4.5), sd + Vector2(2.2, 0.2), sd + Vector2(1.6, 2.2), sd + Vector2(0, 2.8), sd + Vector2(-1.6, 2.2), sd + Vector2(-2.2, 0.2)]
+		var dp: Array = spline(drop, 3)
+		_poly(dp, Color("#cfe9f4"), nf)
+		_line(dp + [dp[0]], 1.0, ink, nf)
+		_circle(sd + Vector2(-0.7, 0.6), 0.6, Color.WHITE, nf)
 
 
 func _face_mouth(at: Vector2, mouth: String, w: float, ink: Color) -> void:

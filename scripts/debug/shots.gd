@@ -226,8 +226,47 @@ static func run(main: Main, args: Dictionary) -> void:
 			var froot := Control.new()
 			froot.set_anchors_preset(Control.PRESET_FULL_RECT)
 			main.add_child(froot)
-			var fnames: Array = ["0  CURRENT", "1  PROFILE", "2  LIGNE CLAIRE", "3  RUGGED", "4  STORYBOOK", "5  BRIM SHADOW"]
-			if args.has("cast"):
+			var fnames: Array = ["0  CURRENT", "1  PROFILE", "2  LIGNE CLAIRE", "3  RUGGED", "4  STORYBOOK", "5  BRIM SHADOW", "6  PROFILE + TOON"]
+			if args.has("poses"):
+				# Every pose, face 1 (profile) on top and face 6 (profile + storybook reactions)
+				# below. small: combat size instead, face 6 for four classes.
+				var pl: Array = ["idle", "aim", "windup", "strike", "cast", "hurt", "dead"]
+				var small := args.has("small")
+				if small:
+					var bgd3 := Backdrop.new()
+					bgd3.setup("tallgrass", "trail", 3)
+					froot.add_child(bgd3)
+				var classes: Array = ["marshal", "gunslinger", "mountain_man", "preacher"] if small else [args.get("cls", "marshal"), args.get("cls", "marshal")]
+				for r in classes.size():
+					for i in pl.size():
+						var cellp := Control.new()
+						cellp.clip_contents = true
+						cellp.position = Vector2(i * 274, r * (270 if small else 540))
+						cellp.size = Vector2(272, 268 if small else 536)
+						froot.add_child(cellp)
+						if not small:
+							var cb := ColorRect.new()
+							cb.color = Color("#cdb892") if ((i + r) % 2 == 0) else Color("#c4ad86")
+							cb.set_anchors_preset(Control.PRESET_FULL_RECT)
+							cellp.add_child(cb)
+						var fp := Figure.new()
+						fp.face_look = 6 if (small or r == 1) else 1
+						fp.setup(DB.classes[classes[r]].look, 7 + r if small else 7, 1)
+						fp.set_pose(pl[i])
+						var pz := float(args.get("zoom", "2.6"))
+						# Centre the head: the body leans about (0, -10) per pose (see Figure._build_human).
+						var lean: float = {"aim": 0.04, "windup": -0.08, "strike": 0.14, "hurt": -0.16, "cast": -0.05}.get(pl[i], 0.0)
+						var hd: Vector2 = Vector2(0, -10) + Vector2(8, -170).rotated(lean)
+						fp.position = Vector2(120, 250) if small else Vector2(136, 250) - hd * pz
+						fp.scale *= (1.05 if small else pz)
+						cellp.add_child(fp)
+						if r == 0 or not small:
+							var lp := UI.lbl(pl[i].to_upper() + ("" if small else ("  (6)" if r == 1 else "  (1)")), 18, "Bold")
+							lp.add_theme_constant_override("outline_size", 6)
+							lp.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+							lp.position = Vector2(10, 6)
+							cellp.add_child(lp)
+			elif args.has("cast"):
 				var bgd2 := Backdrop.new()
 				bgd2.setup("tallgrass", "trail", 3)
 				froot.add_child(bgd2)
