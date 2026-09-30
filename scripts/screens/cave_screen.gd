@@ -8,6 +8,7 @@ var info: RichTextLabel
 var rooms_row: HBoxContainer
 var btn_row: HBoxContainer
 var light_bar: StatBar
+var light_fx: Label
 var party_row: HBoxContainer
 
 
@@ -37,8 +38,20 @@ func setup(_params: Dictionary) -> void:
 	hp.add_child(hh)
 	hh.add_child(UI.hdr(run.current_node().data.get("name", "Cave"), 32))
 	hh.add_child(UI.lbl("Lamplight", 20, "Bold"))
+	var lcol := UI.vb(2)
+	hh.add_child(lcol)
 	light_bar = UI.bar(0, 100, Color("#f2c14e"), 320, 24, true)
-	hh.add_child(light_bar)
+	lcol.add_child(light_bar)
+	# What the light is doing right now: the dark is dangerous but pays better.
+	light_fx = UI.lbl("", 15)
+	light_fx.add_theme_color_override("font_color", Color("#e8d9b0"))
+	lcol.add_child(light_fx)
+	var tip: Array = ["Lamplight drops %d each room. Lamp Oil restores it." % int(DB.cfg("light_per_room", 30))]
+	for r in DB.cfg("light_levels", []):
+		tip.append("%s (%d+): enemies +%d%% dmg, ambush %+d%%, crit +%d%%, loot +%d%%, %d Fatigue/room" % [r.name, int(r.min), int(r.enemy_dmg), int(r.surprise_heroes), int(r.hero_crit), int(r.loot_pct), int(r.fatigue)])
+	light_bar.tooltip_text = "\n".join(tip)
+	light_fx.tooltip_text = light_bar.tooltip_text
+	light_fx.mouse_filter = Control.MOUSE_FILTER_PASS
 	rooms_row = UI.hb(8)
 	hh.add_child(rooms_row)
 	var bp := UI.panel("Dark")
@@ -64,6 +77,7 @@ func _refresh() -> void:
 		return
 	light_bar.value = int(run.cave.light)
 	light_bar.text_override = "%d (%s)" % [int(run.cave.light), run.light_name()]
+	light_fx.text = run.light_effects()
 	backdrop.light = float(run.cave.light) / 100.0
 	backdrop.queue_redraw()
 	UI.clear(rooms_row)

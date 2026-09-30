@@ -135,7 +135,19 @@ func test_combat_basics() -> void:
 	check(e.valid_targets(marshal, "marshal_iron_justice").size() == 2, "iron justice hits ranks 1-2")
 	check(not rifle.id in e.valid_targets(marshal, "marshal_iron_justice"), "rank 3 out of melee reach")
 	var hc := e.hit_chance(marshal, "marshal_iron_justice", brawler)
-	check(hc == 87, "hit chance 90 acc + 2 Marshal acc - 5 dodge = 87 (got %d)" % hc)
+	check(hc == 89, "hit chance 92 acc + 2 Marshal acc - 5 dodge = 89 (got %d)" % hc)
+	# Class edge: the Mountain Mystic hits beasts harder and more surely (classes.json vs_tags).
+	var mm_party: Array = _party(co, ["mountain_man"])
+	for mh in mm_party:
+		mh.quirks.clear()
+	var emm := CombatEngine.new()
+	emm.setup(mm_party, ["prairie_wolf", "outlaw_brawler"], {"rng": rng})
+	var mmc: Combatant = emm.heroes[0]
+	var wolf: Combatant = emm.enemies[0]
+	var man: Combatant = emm.enemies[1]
+	check(is_equal_approx(emm.dmg_mult(mmc, "mm_grizzly_chop", wolf) - emm.dmg_mult(mmc, "mm_grizzly_chop", man), 0.2), "Mountain Mystic +20% damage vs beasts")
+	check(emm.hit_chance(mmc, "mm_grizzly_chop", wolf) - emm.hit_chance(mmc, "mm_grizzly_chop", man) == 2 + int(man.stat("dodge", mmc) - wolf.stat("dodge", mmc)), "Mountain Mystic +2 accuracy vs beasts")
+	check(wolf.max_hp == 8, "prairie wolf has 8 HP (got %d)" % wolf.max_hp)
 	var prev := e.dmg_preview(marshal, "marshal_iron_justice", brawler)
 	check(prev.size() == 2 and prev[0] >= 1 and prev[1] >= prev[0], "damage preview")
 	# Sharpshooter can't use Long Shot from rank 1.

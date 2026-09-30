@@ -18,7 +18,8 @@
   "mountain_man": {
     "name": "Mountain Mystic",
     "role": "Mystic Bruiser",
-    "desc": "Spent twenty winters alone in the deep woods and came back strange. Pays in blood for power: hits hardest below half health, and can bleed to mend others.",
+    "desc": "Spent twenty winters alone in the deep woods and came back strange. Pays in blood for power: hits hardest below half health, and can bleed to mend others. Knows the wild: +20% damage and +2 Accuracy against beasts.",
+    "vs_tags": {"beast": {"dmg": 0.2, "acc": 2}},
     "hp": 25, "dodge": 5, "prot": 5, "speed": 3, "acc": 0, "crit": 6, "dmg": [6, 11],
     "res": {"stun": 35, "bleed": 40, "poison": 50, "move": 40, "debuff": 50, "deathblow": 67},
     "ranks": [1, 2],

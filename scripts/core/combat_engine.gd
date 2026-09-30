@@ -403,7 +403,7 @@ func valid_targets(c: Combatant, sid: String) -> Array:
 		"enemy":
 			var ranks: Array = sk.get("target_ranks", [1, 2, 3, 4])
 			var pool := foes_of(c).filter(func(x): return not x.dead and x.rank in ranks)
-			if not sk.get("aoe", false) and sk.get("random_hits", 0) == 0:
+			if not sk.get("aoe", false) and sk.get("random_hits", 0) == 0 and sk.get("random_targets", 0) == 0:
 				var taunters := pool.filter(func(x): return x.taunt > 0)
 				if not taunters.is_empty():
 					pool = taunters
@@ -442,8 +442,22 @@ func hit_chance(a: Combatant, sid: String, t: Combatant) -> int:
 		return 100
 	var acc := float(sk.get("acc", 85)) + a.stat("acc", t)
 	acc += DB.cfg("skill_level_acc", 4) * (a.skill_level(sid) - 1)
+	acc += _class_vs(a, t, "acc")
 	var dodge := t.stat("dodge", a)
 	return clampi(int(round(acc - dodge)), 5, 95)
+
+
+## A class's edge against a kind of foe (classes.json "vs_tags", e.g. the Mountain Man
+## against beasts): {"beast": {"dmg": 0.2, "acc": 2}}. Returns the summed field.
+func _class_vs(a: Combatant, t: Combatant, field: String) -> float:
+	if a == null or t == null or a.hero == null:
+		return 0.0
+	var total := 0.0
+	var vt: Dictionary = a.hero.cls().get("vs_tags", {})
+	for tag in vt:
+		if tag in t.tags:
+			total += float(vt[tag].get(field, 0.0))
+	return total
 
 
 func crit_chance(a: Combatant, sid: String, t: Combatant) -> int:
@@ -480,6 +494,7 @@ func dmg_mult(a: Combatant, sid: String, t: Combatant) -> float:
 		for tag in vt:
 			if tag in t.tags:
 				m += float(vt[tag])
+		m += _class_vs(a, t, "dmg")
 	if in_cave and not a.is_hero():
 		m += _light_row().get("enemy_dmg", 0) / 100.0
 	return maxf(0.0, m)
@@ -557,6 +572,13 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 		for id in valid:
 			if picked.is_empty() or unit(id).rank in picked:
 				targets.append(unit(id))
+	elif sk.get("random_targets", 0) > 0:
+		# Hits that many different targets, picked at random from the valid ranks.
+		var pool := valid.duplicate()
+		for i in mini(int(sk.random_targets), pool.size()):
+			var pick: int = Stats.pick(rng, pool)
+			pool.erase(pick)
+			targets.append(unit(pick))
 	elif sk.get("random_hits", 0) > 0:
 		for i in int(sk.random_hits):
 			targets.append(unit(Stats.pick(rng, valid)))

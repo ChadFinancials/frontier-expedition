@@ -55,9 +55,10 @@
     ],
     "elites": [{"enemies": ["pale_crawler", "tommyknocker", "giant_bat"], "weight": 2}, {"enemies": ["claim_jumper", "claim_jumper", "dynamiter"], "weight": 1}],
     "cave_fights": [
-      {"enemies": ["tommyknocker", "tommyknocker"], "weight": 3},
-      {"enemies": ["pale_crawler", "giant_bat"], "weight": 2},
-      {"enemies": ["giant_bat", "giant_bat"], "weight": 2}
+      {"enemies": ["tommyknocker", "tommyknocker", "giant_bat"], "weight": 3},
+      {"enemies": ["pale_crawler", "giant_bat", "giant_bat"], "weight": 2},
+      {"enemies": ["giant_bat", "giant_bat", "giant_bat", "giant_bat"], "weight": 1},
+      {"enemies": ["tommyknocker", "tommyknocker", "giant_bat", "giant_bat"], "weight": 2}
     ],
     "boss": {"name": "Old Jeb, King Under the Hill", "landmark": "The Deep Drift",
       "intro": "At the bottom of the deepest drift the tapping stops. A little old man in a miner's hat sits on a throne of ore carts, a tin crown on his head and a pick across his knees.\n\n\"You're standing in my mine,\" says Old Jeb. Every wall around you starts to knock.",
@@ -88,7 +89,7 @@
       {"enemies": ["outlaw_knifeman", "outlaw_brawler", "outlaw_gunhand", "carrion_crows"], "weight": 2}
     ],
     "elites": [{"enemies": ["crane_lieutenant", "outlaw_gunhand", "murder_of_crows"], "weight": 2}, {"enemies": ["outlaw_brawler", "outlaw_brawler", "outlaw_rifleman", "carrion_crows"], "weight": 1}],
-    "cave_fights": [{"enemies": ["giant_bat", "giant_bat"], "weight": 1}],
+    "cave_fights": [{"enemies": ["giant_bat", "giant_bat", "giant_bat"], "weight": 2}, {"enemies": ["giant_bat", "giant_bat", "giant_bat", "giant_bat"], "weight": 1}],
     "boss": {"name": "Ruby Blackwing", "landmark": "The Stockade",
       "intro": "The stockade gate stands open. Inside, crates stamped with a black crow and a woman in a black duster sitting on them, cleaning her nails with a throwing knife. Crows line the palisade.\n\n\"Silas said you'd come sniffing,\" says Ruby Blackwing. \"He also said I could keep whatever's left of you.\"",
       "victory": "Ruby Blackwing goes over the palisade and is gone into the cottonwoods, leaving her feather charm in the mud. The stockade's stores are yours, and Crane's gang will be a little hungrier this winter.",
@@ -126,8 +127,9 @@
     "cave_fights": [
       {"enemies": ["giant_bat", "giant_bat", "giant_bat"], "weight": 2},
       {"enemies": ["tommyknocker", "giant_bat", "tommyknocker"], "weight": 2},
-      {"enemies": ["pale_crawler", "giant_bat"], "weight": 2},
-      {"enemies": ["rattlesnake", "rattlesnake", "giant_bat"], "weight": 1}
+      {"enemies": ["pale_crawler", "giant_bat", "giant_bat"], "weight": 2},
+      {"enemies": ["rattlesnake", "rattlesnake", "giant_bat", "giant_bat"], "weight": 1},
+      {"enemies": ["tommyknocker", "tommyknocker", "giant_bat", "giant_bat"], "weight": 1}
     ],
     "boss": {"name": "Silas Crane and the Crows", "landmark": "Crane's Crossing",
       "intro": "The trail ends at a rope-and-plank toll bridge over the Redwater. Crows line every rail and rope of it, hundreds of them, silent. Silas Crane leans on the toll post in a long black coat, a big crow on his shoulder and a silver revolver turning in his hand. \"Toll's everything you got, pilgrims.\"",

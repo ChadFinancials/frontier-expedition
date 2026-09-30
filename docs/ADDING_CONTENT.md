@@ -70,6 +70,7 @@ In `data/skills.json`:
 | `target_ranks` | Enemy (or ally) ranks it can reach |
 | `aoe` | `true` hits every valid target |
 | `hits` / `random_hits` | Several hits on one target / on random targets |
+| `random_targets` | Hits that many *different* random targets in `target_ranks` (Jeb's Cave-In: 2) |
 | `acc` | Base accuracy; hit chance = acc + attacker acc − target dodge (5–95%) |
 | `dmg` | Damage modifier: `-0.5` means half weapon damage, `0.2` means +20% |
 | `no_damage` | Pure utility (marks, debuffs...) |

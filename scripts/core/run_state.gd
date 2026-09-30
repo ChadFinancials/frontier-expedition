@@ -131,6 +131,24 @@ func light_name() -> String:
 	return _light_row().get("name", "")
 
 
+## What the current lamplight does, in one line for the cave HUD.
+func light_effects() -> String:
+	var r := _light_row()
+	var parts: Array = []
+	if int(r.get("enemy_dmg", 0)) != 0:
+		parts.append("Enemies +%d%% damage" % int(r.enemy_dmg))
+	if int(r.get("surprise_heroes", 0)) > 0:
+		parts.append("Ambush +%d%%" % int(r.surprise_heroes))
+	elif int(r.get("surprise_heroes", 0)) < 0:
+		parts.append("Ambush %d%%" % int(r.surprise_heroes))
+	if int(r.get("hero_crit", 0)) != 0:
+		parts.append("Heroes +%d%% crit" % int(r.hero_crit))
+	if int(r.get("loot_pct", 0)) != 0:
+		parts.append("Loot +%d%%" % int(r.loot_pct))
+	parts.append("%d Fatigue per room" % int(r.get("fatigue", 2)))
+	return ", ".join(parts)
+
+
 func describe_events(evs: Array) -> Array:
 	var out: Array = []
 	for e in evs:
