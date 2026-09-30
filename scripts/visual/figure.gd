@@ -53,6 +53,8 @@ var body_style: int = default_body
 ## 3 rugged western, 4 storybook, 5 brim shadow. See shot=faces.
 static var default_face := 6
 var face_look: int = default_face
+## Outfit index into look.outfits; -1 picks one from the seed in setup().
+var outfit: int = -1
 
 var _shapes: Array = []
 var _t: float = 0.0
@@ -69,7 +71,20 @@ func setup(look_in: Dictionary, seed_value: int = 0, face: int = 1) -> void:
 	facing = face
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
-	var cols: Dictionary = look.get("colors", {})
+	var cols: Dictionary = look.get("colors", {}).duplicate()
+	# Outfits: alternate colorings of the same class (data/classes.json "outfits"). The first
+	# is the class's own colors. Picked from the seed with its own generator, so skin and
+	# hair rolls stay as they were.
+	var outfits: Array = look.get("outfits", [])
+	if not outfits.is_empty():
+		var oi := outfit
+		if oi < 0:
+			var orng := RandomNumberGenerator.new()
+			orng.seed = seed_value ^ 0x5eed0f17
+			oi = orng.randi() % outfits.size() if seed_value != 0 else 0
+		for k in outfits[oi % outfits.size()]:
+			if k != "name":
+				cols[k] = outfits[oi % outfits.size()][k]
 	_skin = Color(cols.get("skin", SKINS[rng.randi() % SKINS.size()]))
 	_hair = Color(HAIRS[rng.randi() % HAIRS.size()])
 	_colors = {}
@@ -92,6 +107,12 @@ func set_pose(p: String) -> void:
 
 func col(key: String, fallback: String = "#777777") -> Color:
 	return _colors.get(key, Color(fallback))
+
+
+## Hat band: its own "band" color when the outfit sets one, else the accent. Lets an outfit
+## change the band without touching the accent (the Marshal's badge, for one).
+func band_col(fallback: String) -> Color:
+	return _colors.get("band", col("accent", fallback))
 
 
 ## Approximate top of the head in local coordinates (for bars and labels).
@@ -464,7 +485,7 @@ func _build_human() -> void:
 	var pants := col("pants")
 	var accent := col("accent", "#aa3333")
 	var coat_kind: String = look.get("coat", "shirt")
-	var shirt := Color("#d8cbb0")
+	var shirt := col("shirt", "#d8cbb0")
 	var lean := 0.0
 	match pose:
 		"aim":
@@ -763,7 +784,7 @@ func _hat(head: Vector2) -> void:
 			var ch := 26.0 if hat in ["stetson", "stetson_black"] else 20.0
 			_poly([Vector2(-bw, y - 2), Vector2(-bw + 6, y - 6), Vector2(bw - 6, y - 6), Vector2(bw + 4, y - 4), Vector2(bw, y + 1), Vector2(0, y - 2)], hc)
 			_poly([Vector2(-14, y - 5), Vector2(16, y - 5), Vector2(14, y - 5 - ch), Vector2(1, y - ch), Vector2(-12, y - 5 - ch)], hc.lightened(0.05))
-			_poly([Vector2(-14, y - 5), Vector2(16, y - 5), Vector2(15.5, y - 10), Vector2(-13.5, y - 10)], col("accent", "#8b2e2e").darkened(0.2))
+			_poly([Vector2(-14, y - 5), Vector2(16, y - 5), Vector2(15.5, y - 10), Vector2(-13.5, y - 10)], band_col("#8b2e2e").darkened(0.2))
 		"coonskin":
 			_poly(ellipse(Vector2(head.x, y - 4), 18, 14, 12, PI, TAU), hc)
 			_line([Vector2(head.x - 16, y - 2), Vector2(head.x - 26, y + 16), Vector2(head.x - 30, y + 36)], 7.0, hc.darkened(0.1))
@@ -774,7 +795,7 @@ func _hat(head: Vector2) -> void:
 		"top":
 			_poly([Vector2(-24, y - 2), Vector2(26, y - 2), Vector2(26, y - 7), Vector2(-24, y - 7)], hc)
 			_poly([Vector2(-13, y - 6), Vector2(15, y - 6), Vector2(16, y - 46), Vector2(-12, y - 46)], hc)
-			_poly([Vector2(-13, y - 8), Vector2(15, y - 8), Vector2(15, y - 14), Vector2(-13, y - 14)], col("accent", "#555555"))
+			_poly([Vector2(-13, y - 8), Vector2(15, y - 8), Vector2(15, y - 14), Vector2(-13, y - 14)], band_col("#555555"))
 		"preacher":
 			_poly([Vector2(-36, y - 1), Vector2(38, y - 1), Vector2(38, y - 6), Vector2(-36, y - 6)], hc)
 			_poly(ellipse(Vector2(head.x, y - 5), 15, 13, 12, PI, TAU), hc)
@@ -795,7 +816,7 @@ func _hat(head: Vector2) -> void:
 ## Distinct hat silhouettes. Each key gets its own brim curve and crown, instead of the
 ## old single shape with two numbers changed.
 func _hat_new(hat: String, y: float, hc: Color) -> void:
-	var band: Color = col("accent", "#8b2e2e").darkened(0.2)
+	var band: Color = band_col("#8b2e2e").darkened(0.2)
 	match hat:
 		"cowboy":
 			# Medium brim curling up at the sides, pinched crown with a crease.

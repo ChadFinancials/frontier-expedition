@@ -75,6 +75,22 @@ func test_data_valid() -> void:
 	check(DB.classes.size() == 10, "10 classes (got %d)" % DB.classes.size())
 	for cid in DB.classes:
 		check(DB.classes[cid].skills.size() >= 6 and DB.classes[cid].skills.size() <= 8, "%s has 6-8 moves" % cid)
+		# Outfits: three colorings per class, colors only, all valid colors.
+		var outfits: Array = DB.classes[cid].look.get("outfits", [])
+		check(outfits.size() == 3, "%s has 3 outfits" % cid)
+		for o in outfits:
+			for k in o:
+				check(k in ["name", "coat", "pants", "hat", "shirt", "accent", "band"], "%s outfit key %s is a color" % [cid, k])
+				if k != "name":
+					check(Color.html_is_valid(str(o[k])), "%s outfit %s color %s" % [cid, k, o[k]])
+	# Every outfit gets rolled across seeds.
+	var seen := {}
+	for sd in range(1, 200):
+		var f := Figure.new()
+		f.setup(DB.classes["preacher"].look, sd, 1)
+		seen[f.col("hat").to_html(false)] = true
+		f.free()
+	check(seen.size() == 3, "all 3 preacher outfits roll (got %d)" % seen.size())
 	for eid in DB.events:
 		for opt in DB.events[eid].options:
 			check(not opt.get("outcomes", []).is_empty(), "event %s option has outcomes" % eid)

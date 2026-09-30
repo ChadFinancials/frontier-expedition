@@ -314,6 +314,32 @@ static func run(main: Main, args: Dictionary) -> void:
 					lz.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
 					lz.position = Vector2(14, 10)
 					cell.add_child(lz)
+		"outfits":
+			# Every class (columns) in each of its outfits (rows), same seed so only colors change.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var oroot := Control.new()
+			oroot.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(oroot)
+			var obg := Backdrop.new()
+			obg.setup("tallgrass", "trail", 3)
+			oroot.add_child(obg)
+			var ocls: Array = ["marshal", "mountain_man", "rail_driver", "gunslinger", "wrangler", "gambler", "prospector", "sharpshooter", "frontier_doctor", "preacher"]
+			for ci in ocls.size():
+				var olook: Dictionary = DB.classes[ocls[ci]].look
+				var ol: Array = olook.get("outfits", [{}])
+				for oi in ol.size():
+					var fo := Figure.new()
+					fo.outfit = oi
+					fo.setup(olook, 5 + ci, 1)
+					fo.position = Vector2(88 + ci * 190, 318 + oi * 352)
+					fo.scale *= 1.0
+					oroot.add_child(fo)
+					var lo := UI.lbl(str(ol[oi].get("name", "")), 16, "Bold")
+					lo.add_theme_constant_override("outline_size", 6)
+					lo.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+					lo.position = Vector2(10 + ci * 190, 326 + oi * 352)
+					oroot.add_child(lo)
 		"body_ab":
 			# The Marshal in every body style (Figure.body_style 0-5), idle on top, aiming
 			# below, over the Tallgrass backdrop. cls=<class id> to try another class.

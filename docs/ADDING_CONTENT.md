@@ -41,6 +41,12 @@ percent resistances; `deathblow` is the Death's Door survival chance (default 67
   bible, lasso, bag, dynamite, fists.
 - `extra`: badge, bandana, bandana_mask, mustache, spectacles, collar, lantern, dog.
 - `beard`: true/false. `colors`: coat, pants, hat, accent, and optionally skin.
+  Optional: `shirt` (shows under vests, overalls and open coats) and `band` (hat band; falls
+  back to accent, so an outfit can change the band without the Marshal's badge).
+- `outfits` (classes): alternate colorings, colors only, no shape changes. A list of dicts, each
+  with a `name` plus any of coat, pants, hat, shirt, accent, band laid over `colors`. The first
+  is the class's own colors (`{"name": "..."}`). Each hero rolls one from its look seed, apart
+  from skin and hair, which roll on their own. `shot=outfits` shows every class in each one.
 
 ## Add or change a combat skill
 

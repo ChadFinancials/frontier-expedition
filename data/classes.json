@@ -8,7 +8,12 @@
     "ranks": [1, 2],
     "skills": ["marshal_iron_justice", "marshal_pistol_whip", "marshal_deputize", "marshal_warrant", "marshal_hold_the_line", "marshal_warning_shot", "marshal_flash_badge", "marshal_ap_ammo"],
     "look": {"body": "human", "build": "broad", "hat": "stetson", "coat": "duster", "weapon": "pistol", "extra": "badge",
-      "colors": {"coat": "#5b4636", "pants": "#3b3530", "hat": "#2e2620", "accent": "#d9b44a"}}
+      "colors": {"coat": "#5b4636", "pants": "#3b3530", "hat": "#2e2620", "accent": "#d9b44a"},
+      "outfits": [
+        {"name": "Trail Brown"},
+        {"name": "Dust Gray", "coat": "#6b6660", "pants": "#3a3836", "hat": "#3b3733", "band": "#5a2a22"},
+        {"name": "Black Duster", "coat": "#2b2826", "pants": "#4a3f35", "hat": "#1c1917", "band": "#8a7a5c"}
+      ]}
   },
   "mountain_man": {
     "name": "Mountain Mystic",
@@ -19,7 +24,12 @@
     "ranks": [1, 2],
     "skills": ["mm_axe_cleave", "mm_grizzly_chop", "mm_gnarl", "mm_bear_trap", "mm_piece_of_me", "mm_bellow", "mm_shadows", "mm_jerky"],
     "look": {"body": "human", "build": "heavy", "hat": "coonskin", "coat": "buckskin", "weapon": "axe", "beard": true,
-      "colors": {"coat": "#8a6a45", "pants": "#5a4632", "hat": "#6b5134", "accent": "#b5452c"}}
+      "colors": {"coat": "#8a6a45", "pants": "#5a4632", "hat": "#6b5134", "accent": "#b5452c"},
+      "outfits": [
+        {"name": "Buckskin"},
+        {"name": "Dark Hide", "coat": "#5e4630", "pants": "#3e3024", "hat": "#4a3a2c"},
+        {"name": "Pale Buckskin", "coat": "#a58f72", "pants": "#6a5236", "hat": "#6e6a62"}
+      ]}
   },
   "rail_driver": {
     "name": "Rail Driver",
@@ -30,7 +40,12 @@
     "ranks": [1, 2],
     "skills": ["rd_hammer_blow", "rd_spike_drive", "rd_rhythm", "rd_line_breaker", "rd_brace", "rd_sledge_toss", "rd_frenzy", "rd_quarrel"],
     "look": {"body": "human", "build": "heavy", "hat": "flat_cap", "coat": "overalls", "weapon": "hammer",
-      "colors": {"coat": "#3f5a78", "pants": "#34495e", "hat": "#3a3a3a", "accent": "#c0392b"}}
+      "colors": {"coat": "#3f5a78", "pants": "#34495e", "hat": "#3a3a3a", "accent": "#c0392b"},
+      "outfits": [
+        {"name": "Blue Denim"},
+        {"name": "Red Flannel", "coat": "#5a6470", "pants": "#4a525c", "hat": "#5a4a3a", "shirt": "#a8433a"},
+        {"name": "Brown Duck", "coat": "#7a5a36", "pants": "#5e4a32", "hat": "#2e2e2e", "shirt": "#7d93a8"}
+      ]}
   },
   "gunslinger": {
     "name": "Gunslinger",
@@ -41,7 +56,12 @@
     "ranks": [1, 2, 3],
     "skills": ["gs_quick_draw", "gs_fan", "gs_twin", "gs_point_blank", "gs_duck", "gs_called_shot", "gs_ap_ammo", "gs_smoke"],
     "look": {"body": "human", "build": "slim", "hat": "cowboy", "coat": "vest", "weapon": "pistols", "extra": "bandana",
-      "colors": {"coat": "#2f2f2f", "pants": "#4b3d33", "hat": "#1f1a17", "accent": "#a33a2e"}}
+      "colors": {"coat": "#2f2f2f", "pants": "#4b3d33", "hat": "#1f1a17", "accent": "#a33a2e"},
+      "outfits": [
+        {"name": "Black Vest"},
+        {"name": "Drifter", "coat": "#6a4a32", "pants": "#3a3a40", "hat": "#8a7050", "accent": "#2e4a6b", "shirt": "#a8987a"},
+        {"name": "Midnight", "coat": "#1f2a3a", "pants": "#2a2a2a", "hat": "#141414", "accent": "#c9b27c", "shirt": "#6e2a2a"}
+      ]}
   },
   "wrangler": {
     "name": "Wrangler",
@@ -52,7 +72,12 @@
     "ranks": [2, 3],
     "skills": ["wr_sic_em", "wr_lasso", "wr_hogtie", "wr_bullwhip", "wr_heel", "wr_round_up", "wr_snarl", "wr_light_whip"],
     "look": {"body": "human", "build": "normal", "hat": "cowboy_wide", "coat": "chaps", "weapon": "lasso", "extra": "dog",
-      "colors": {"coat": "#9a6b3c", "pants": "#6e5238", "hat": "#8c6a43", "accent": "#2e86ab"}}
+      "colors": {"coat": "#9a6b3c", "pants": "#6e5238", "hat": "#8c6a43", "accent": "#2e86ab"},
+      "outfits": [
+        {"name": "Saddle Tan"},
+        {"name": "Sorrel", "coat": "#6e4030", "pants": "#4f4238", "hat": "#c2a57a", "accent": "#3d5c3a"},
+        {"name": "Smoke", "coat": "#5d5a55", "pants": "#3e4a5a", "hat": "#3a2e24", "accent": "#a33a2e"}
+      ]}
   },
   "gambler": {
     "name": "Gambler",
@@ -63,7 +88,12 @@
     "ranks": [2, 3],
     "skills": ["gb_derringer", "gb_all_in", "gb_card_toss", "gb_stacked", "gb_bluff", "gb_money_shot", "gb_joker", "gb_lotto"],
     "look": {"body": "human", "build": "slim", "hat": "bowler", "coat": "frock", "weapon": "cards", "extra": "mustache",
-      "colors": {"coat": "#4a2c3d", "pants": "#2b2b2b", "hat": "#222222", "accent": "#e2c044"}}
+      "colors": {"coat": "#4a2c3d", "pants": "#2b2b2b", "hat": "#222222", "accent": "#e2c044"},
+      "outfits": [
+        {"name": "Plum"},
+        {"name": "Bottle Green", "coat": "#24453a", "pants": "#2e2a26", "hat": "#2a2420"},
+        {"name": "Claret", "coat": "#6b1f2a", "pants": "#3a3a3a", "hat": "#4a3a30", "shirt": "#e6dcc4"}
+      ]}
   },
   "prospector": {
     "name": "Prospector",
@@ -74,7 +104,12 @@
     "ranks": [2, 3, 4],
     "skills": ["pr_dynamite", "pr_pickaxe", "pr_blasting_cap", "pr_flash", "pr_lamp", "pr_rock_hammer"],
     "look": {"body": "human", "build": "normal", "hat": "slouch", "coat": "shirt", "weapon": "pickaxe", "beard": true, "extra": "lantern",
-      "colors": {"coat": "#a0522d", "pants": "#4f5d75", "hat": "#6f5a45", "accent": "#e07a1f"}}
+      "colors": {"coat": "#a0522d", "pants": "#4f5d75", "hat": "#6f5a45", "accent": "#e07a1f"},
+      "outfits": [
+        {"name": "Rust Shirt"},
+        {"name": "Red Flannel", "coat": "#8e2f2a", "pants": "#5a4a38", "hat": "#4a3c30"},
+        {"name": "Faded Blue", "coat": "#6a7f96", "pants": "#5a4632", "hat": "#8a7658"}
+      ]}
   },
   "sharpshooter": {
     "name": "Bayou Poisoner",
@@ -85,7 +120,12 @@
     "ranks": [3, 4],
     "skills": ["ss_long_shot", "ss_sight", "ss_kill_shot", "ss_suppress", "ss_sacrament", "ss_mushroom", "ss_frog"],
     "look": {"body": "human", "build": "slim", "hat": "kepi", "coat": "long", "weapon": "blowgun",
-      "colors": {"coat": "#4d5b3c", "pants": "#3b4030", "hat": "#394a5c", "accent": "#c9a227"}}
+      "colors": {"coat": "#4d5b3c", "pants": "#3b4030", "hat": "#394a5c", "accent": "#c9a227"},
+      "outfits": [
+        {"name": "Moss"},
+        {"name": "Swamp Brown", "coat": "#5a4630", "pants": "#3b3228", "hat": "#4d5b3c"},
+        {"name": "Gray Moss", "coat": "#5f6660", "pants": "#34383a", "hat": "#2e3a2e"}
+      ]}
   },
   "frontier_doctor": {
     "name": "Frontier Doctor",
@@ -96,7 +136,12 @@
     "ranks": [3, 4],
     "skills": ["dr_dart", "dr_caustic", "dr_surgery", "dr_salts", "dr_chloroform", "dr_laudanum"],
     "look": {"body": "human", "build": "slim", "hat": "top", "coat": "frock", "weapon": "bag", "extra": "spectacles",
-      "colors": {"coat": "#2c3e50", "pants": "#2b2b2b", "hat": "#1b1b1b", "accent": "#7fb069"}}
+      "colors": {"coat": "#2c3e50", "pants": "#2b2b2b", "hat": "#1b1b1b", "accent": "#7fb069"},
+      "outfits": [
+        {"name": "Navy Frock"},
+        {"name": "Charcoal", "coat": "#3d3d3d", "pants": "#26262a", "hat": "#2a2a2a", "accent": "#8b2e2e"},
+        {"name": "Tweed", "coat": "#5c4a3a", "pants": "#3a332c", "hat": "#3b2e24", "accent": "#c9b27c"}
+      ]}
   },
   "preacher": {
     "name": "Preacher",
@@ -107,6 +152,11 @@
     "ranks": [3, 4],
     "skills": ["pc_hands", "pc_revival", "pc_sermon", "pc_brimstone", "pc_smite", "pc_judgment"],
     "look": {"body": "human", "build": "normal", "hat": "preacher", "coat": "long", "weapon": "bible", "extra": "collar",
-      "colors": {"coat": "#1e1e1e", "pants": "#1e1e1e", "hat": "#161616", "accent": "#f2e8cf"}}
+      "colors": {"coat": "#1e1e1e", "pants": "#1e1e1e", "hat": "#161616", "accent": "#f2e8cf"},
+      "outfits": [
+        {"name": "Black Cloth"},
+        {"name": "Oxblood", "coat": "#4a1a1c", "pants": "#1e1e1e", "hat": "#1a1212"},
+        {"name": "Ash Gray", "coat": "#4a4a4c", "pants": "#2a2a2c", "hat": "#2a2a2a"}
+      ]}
   }
 }
