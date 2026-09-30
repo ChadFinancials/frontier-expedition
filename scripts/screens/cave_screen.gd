@@ -48,7 +48,8 @@ func setup(_params: Dictionary) -> void:
 	lcol.add_child(light_fx)
 	var tip: Array = ["Lamplight drops %d each room. Lamp Oil restores it." % int(DB.cfg("light_per_room", 30))]
 	for r in DB.cfg("light_levels", []):
-		tip.append("%s (%d+): enemies +%d%% dmg, ambush %+d%%, crit +%d%%, loot +%d%%, %d Fatigue/room" % [r.name, int(r.min), int(r.enemy_dmg), int(r.surprise_heroes), int(r.hero_crit), int(r.loot_pct), int(r.fatigue)])
+		var amb := (", ambush %+d%%" % int(r.surprise_heroes)) if DB.cfg("hero_ambush", true) else ""
+		tip.append("%s (%d+): enemies +%d%% dmg%s, crit +%d%%, loot +%d%%, %d Fatigue/room" % [r.name, int(r.min), int(r.enemy_dmg), amb, int(r.hero_crit), int(r.loot_pct), int(r.fatigue)])
 	light_bar.tooltip_text = "\n".join(tip)
 	light_fx.tooltip_text = light_bar.tooltip_text
 	light_fx.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -65,7 +66,7 @@ func setup(_params: Dictionary) -> void:
 	var col := UI.vb(8)
 	bh.add_child(col)
 	info = UI.rich("", 20, false, 700)
-	col.add_child(info)
+	col.add_child(UI.inset(info))
 	btn_row = UI.hb(10)
 	col.add_child(btn_row)
 	Audio.play_music("music_cave")

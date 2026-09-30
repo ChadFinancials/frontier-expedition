@@ -87,6 +87,7 @@
   "surprise_base": 10,
   "light_start": 100,
   "light_per_room": 30,
+  "hero_ambush": false,
   "light_levels": [
     {"min": 75, "name": "Bright", "hero_crit": 0, "enemy_dmg": 0, "fatigue": 1, "surprise_heroes": -5, "loot_pct": 0},
     {"min": 50, "name": "Dim", "hero_crit": 2, "enemy_dmg": 5, "fatigue": 2, "surprise_heroes": 0, "loot_pct": 10},

@@ -147,7 +147,7 @@ func _refresh() -> void:
 	panel_box.add_child(UI.spacer(0, 10))
 	var brk := UI.btn("Break Camp at Dawn", _end, "Big")
 	panel_box.add_child(brk)
-	if not run.camp.get("no_ambush", false):
+	if DB.cfg("hero_ambush", true) and not run.camp.get("no_ambush", false):
 		panel_box.add_child(UI.lbl("Without a watch, there's a %d%% chance of a night ambush." % DB.cfg("camp_ambush_chance", 20), 17, "Ink"))
 	else:
 		panel_box.add_child(UI.lbl("The camp is guarded tonight.", 17, "Ink"))

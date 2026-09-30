@@ -122,24 +122,24 @@ func _build_hud() -> void:
 	var h := UI.hb(16)
 	hud_panel.add_child(h)
 	hero_info = UI.vb(4)
-	hero_info.custom_minimum_size = Vector2(430, 220)
-	h.add_child(hero_info)
+	hero_info.custom_minimum_size = Vector2(410, 204)
+	h.add_child(UI.inset(hero_info))
 	var mid := UI.vb(8)
 	mid.custom_minimum_size.x = 960
 	h.add_child(mid)
-	hint_label = UI.rich("", 17, false, 950)
-	hint_label.custom_minimum_size = Vector2(950, 24)
-	mid.add_child(hint_label)
+	hint_label = UI.rich("", 17, false, 940)
+	hint_label.custom_minimum_size = Vector2(940, 24)
+	mid.add_child(UI.inset(hint_label))
 	skill_row = UI.hb(8)
 	mid.add_child(skill_row)
 	action_row = UI.hb(8)
 	mid.add_child(action_row)
-	log_label = UI.rich("", 16, false, 470)
-	log_label.custom_minimum_size = Vector2(470, 220)
+	log_label = UI.rich("", 16, false, 440)
+	log_label.custom_minimum_size = Vector2(440, 204)
 	log_label.fit_content = false
 	log_label.scroll_active = true
 	log_label.scroll_following = true
-	h.add_child(log_label)
+	h.add_child(UI.inset(log_label))
 
 
 func _add_view(c: Combatant) -> void:
@@ -948,23 +948,27 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 		_projectile(av.position + Vector2(0, -160), targets[0].position + Vector2(0, -120))
 	await _wait(0.12)
 	_move_has_sfx = e.get("sfx", "") != ""
-	# Results land one at a time, so stacked numbers and statuses can be read. A second
-	# hit on the same target (a multi-shot move) fires the sound and muzzle flash again.
+	# Results land one at a time, so stacked numbers and statuses can be read: hits on a
+	# steady beat, a status or fatigue note just after its hit. Multi-hit moves (Fan the
+	# Hammer) fire the sound and muzzle flash again with every hit after the first.
+	# Moves that hit a whole group (AoE, whole-party heals) show everything at once.
 	_popup_stack = {}
-	var struck := {}
+	var multi: bool = int(sk.get("hits", 1)) > 1 or int(sk.get("random_hits", 0)) > 0
+	var at_once: bool = not multi and (sk.get("aoe", false) or sk.get("target", "") == "party")
+	var hits_seen := 0
 	var shown_any := false
 	for g in group:
 		var pops: bool = g.t in POPPING
-		if pops and shown_any:
-			await _wait(0.3)
-		if g.t in ["hit", "miss"]:
-			var tid: int = int(g.get("target", -1))
-			if struck.has(tid):
+		var is_hit: bool = g.t in ["hit", "miss"]
+		if pops and shown_any and not at_once:
+			await _wait(0.3 if is_hit else 0.16)
+		if is_hit:
+			if multi and hits_seen > 0:
 				if anim == "shoot":
 					av.figure.muzzle = 1.0
 					create_tween().tween_property(av.figure, "muzzle", 0.0, 0.2 / speed)
 				Audio.play(e.get("sfx", ""))
-			struck[tid] = true
+			hits_seen += 1
 		_result(g)
 		shown_any = shown_any or pops
 	_move_has_sfx = false
@@ -1039,10 +1043,12 @@ func _popup(c: Combatant, text: String, color: Color, size: int = 28, yoff: floa
 	if c == null or not views.has(c.id):
 		return
 	var v: UnitView = views[c.id]
-	# Several popups on one unit in the same action stack upwards instead of overlapping.
+	# Several popups on one unit in the same action stack upwards, one line apart, instead of
+	# overlapping. Each rises less than a line, so the stack never catches up with itself.
 	var n: int = int(_popup_stack.get(c.id, 0))
 	_popup_stack[c.id] = n + 1
-	yoff += n * 30.0
+	if n > 0:
+		yoff = n * 46.0
 	var l := UI.lbl(text, size, "Header")
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_constant_override("outline_size", 8)
@@ -1054,7 +1060,7 @@ func _popup(c: Combatant, text: String, color: Color, size: int = 28, yoff: floa
 	l.z_index = 35
 	add_child(l)
 	var tw := create_tween().set_parallel(true)
-	tw.tween_property(l, "position:y", top.y - 70, 1.1 / speed)
+	tw.tween_property(l, "position:y", top.y - 40, 1.1 / speed)
 	tw.tween_property(l, "modulate:a", 0.0, 1.1 / speed).set_delay(0.5 / speed)
 	tw.chain().tween_callback(l.queue_free)
 

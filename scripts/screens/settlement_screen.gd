@@ -77,8 +77,8 @@ func setup(params: Dictionary) -> void:
 	var bh := UI.hb(24)
 	bp.add_child(bh)
 	info_label = UI.rich("", 20, false, 900)
-	info_label.custom_minimum_size = Vector2(900, 150)
-	bh.add_child(info_label)
+	info_label.custom_minimum_size = Vector2(900, 140)
+	bh.add_child(UI.inset(info_label))
 	action_row = UI.hb(14)
 	action_row.alignment = BoxContainer.ALIGNMENT_END
 	action_row.size_flags_vertical = Control.SIZE_SHRINK_CENTER

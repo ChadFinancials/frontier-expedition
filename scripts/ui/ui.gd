@@ -108,6 +108,10 @@ static func theme() -> Theme:
 	rb.rope_bottom = true
 	rb.content_margin_bottom = 16
 	t.set_stylebox("panel", "DarkRopeBottom", rb)
+	# Inset: a smooth dark backing for text that sits on the wood, so plank seams and grain
+	# never run through the words.
+	t.set_type_variation("Inset", "PanelContainer")
+	t.set_stylebox("panel", "Inset", box(Color(0.09, 0.06, 0.04, 0.88), Color(0.45, 0.3, 0.19, 0.8), 1, 5, 8, 0))
 	t.set_type_variation("Card", "PanelContainer")
 	t.set_stylebox("panel", "Card", box(PAPER_DARK, WOOD, 2, 6, 10, 3))
 	t.set_type_variation("Clear", "PanelContainer")
@@ -228,8 +232,14 @@ static func btn(text: String, cb: Callable = Callable(), variation: String = "",
 	if cb.is_valid():
 		b.pressed.connect(cb)
 	b.pressed.connect(func(): Audio.play("click", 0.6))
-	b.mouse_entered.connect(func(): if not b.disabled: Audio.play("hover", 0.25, 0.02))
 	return b
+
+
+## Wraps a text control in the Inset backing (for text on the wooden bars).
+static func inset(c: Control) -> PanelContainer:
+	var p := panel("Inset")
+	p.add_child(c)
+	return p
 
 
 static func panel(variation: String = "") -> PanelContainer:

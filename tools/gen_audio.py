@@ -459,6 +459,15 @@ def s_whistle():
     return mul(mix(x, gain(highpass(noise(0.8), 3000), 0.05)), env(len(x), 0.03, 0.2, 0.0, 0.45))
 
 
+def s_click():
+    """UI click: a soft, low wooden tock with no noise in it (the recorded tick was hissy)."""
+    n = int(0.12 * SR)
+    body = mul(osc(360, 0.12), env(n, 0.001, 0.045))
+    over = gain(mul(osc(720, 0.12), env(n, 0.001, 0.025)), 0.3)
+    knock = gain(mul(lowpass(noise(0.12), 900), env(n, 0.0005, 0.006)), 0.25)
+    return mix(body, over, knock)
+
+
 def s_thunder():
     x = mul(lowpass(noise(2.0), 180), env(int(2.0 * SR), 0.02, 0.9, curve=3))
     crack = mul(highpass(noise(0.2), 2000), env(int(0.2 * SR), 0.001, 0.05))
@@ -487,13 +496,6 @@ def s_screech():
     return mul(x, env(len(x), 0.01, 0.2))
 
 
-def s_click():
-    return mul(bandpass(noise(0.04), 1500, 5000), env(int(0.04 * SR), 0.0005, 0.008))
-
-
-def s_hover():
-    x = osc(1600, 0.05, "sine")
-    return mul(x, env(len(x), 0.002, 0.015))
 
 
 def s_hit():

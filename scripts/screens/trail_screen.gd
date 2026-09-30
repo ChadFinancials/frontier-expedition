@@ -85,12 +85,12 @@ func setup(_params: Dictionary) -> void:
 	var turn_back := UI.btn("Turn Back", _turn_back, "Danger")
 	turn_back.tooltip_text = "Abandon the expedition and head home with what you've found. Everyone gains Fatigue."
 	mid.add_child(turn_back)
-	log_label = UI.rich("", 16, false, 290)
-	log_label.custom_minimum_size = Vector2(290, 190)
+	log_label = UI.rich("", 16, false, 272)
+	log_label.custom_minimum_size = Vector2(272, 176)
 	log_label.scroll_active = true
 	log_label.fit_content = false
 	log_label.scroll_following = true
-	bh.add_child(log_label)
+	bh.add_child(UI.inset(log_label))
 	refresh()
 	Audio.play_music("music_trail")
 	for m in pending_notes:

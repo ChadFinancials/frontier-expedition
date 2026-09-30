@@ -127,7 +127,15 @@ func party_stat_sum(stat: String) -> float:
 func party_loot_pct() -> float:
 	var v := party_stat_sum("loot_pct") + party_passive("loot_pct")
 	if in_cave():
-		v += _light_row().get("loot_pct", 0)
+		v += _light_row().get("loot_pct", 0) + cave_class_loot()
+	return v
+
+
+## Class edges in caves (classes.json "cave_loot_pct", the Prospector's nose for ore).
+func cave_class_loot() -> float:
+	var v := 0.0
+	for h in party_heroes():
+		v += float(h.cls().get("cave_loot_pct", 0))
 	return v
 
 
@@ -149,14 +157,13 @@ func light_effects() -> String:
 	var parts: Array = []
 	if int(r.get("enemy_dmg", 0)) != 0:
 		parts.append("Enemies +%d%% damage" % int(r.enemy_dmg))
-	if int(r.get("surprise_heroes", 0)) > 0:
-		parts.append("Ambush +%d%%" % int(r.surprise_heroes))
-	elif int(r.get("surprise_heroes", 0)) < 0:
-		parts.append("Ambush %d%%" % int(r.surprise_heroes))
+	if DB.cfg("hero_ambush", true) and int(r.get("surprise_heroes", 0)) != 0:
+		parts.append("Ambush %+d%%" % int(r.surprise_heroes))
 	if int(r.get("hero_crit", 0)) != 0:
 		parts.append("Heroes +%d%% crit" % int(r.hero_crit))
-	if int(r.get("loot_pct", 0)) != 0:
-		parts.append("Loot +%d%%" % int(r.loot_pct))
+	var loot := int(r.get("loot_pct", 0)) + int(cave_class_loot())
+	if loot != 0:
+		parts.append("Loot +%d%%" % loot)
 	parts.append("%d Fatigue per room" % int(r.get("fatigue", 2)))
 	return ", ".join(parts)
 
@@ -395,6 +402,10 @@ func surprise_roll(extra_hero_surprise: int = 0) -> String:
 	var heroes_surprised := base - party_bonus + extra_hero_surprise
 	if in_cave():
 		heroes_surprised += _light_row().get("surprise_heroes", 0)
+	# Enemies catching the party off guard is switched off for now (owner, round 6); it may
+	# come back tied to the wagon. The party can still catch enemies napping.
+	if not DB.cfg("hero_ambush", true):
+		heroes_surprised = 0.0
 	var enemies_surprised := base + party_bonus
 	var r := company.rng.randf() * 100.0
 	if r < heroes_surprised:
@@ -414,6 +425,8 @@ func combat_options(kind: String, forced_surprise: String = "") -> Dictionary:
 			buffs[uid] = []
 		buffs[uid].append({"stat": b.stat, "value": b.value, "name": "Prepared"})
 	var surprise := forced_surprise
+	if surprise == "heroes" and not DB.cfg("hero_ambush", true):
+		surprise = ""
 	if surprise == "" and kind != "boss" and kind != "crossing":
 		surprise = surprise_roll()
 	var opts := {"rng": company.rng, "in_cave": in_cave(), "light": int(cave.get("light", 100)), "tier": tier(),
@@ -857,7 +870,7 @@ func camp_act(uid: int, action_id: String, target_uid: int = -1) -> Array:
 ## Ends the camp. Returns {"ambush": bool}. The ambush fight is queued in pending_fight.
 func camp_end() -> Dictionary:
 	var ambush := false
-	if not camp.get("no_ambush", false) and not region().get("no_ambush", false):
+	if DB.cfg("hero_ambush", true) and not camp.get("no_ambush", false) and not region().get("no_ambush", false):
 		ambush = company.rng.randf() * 100.0 < DB.cfg("camp_ambush_chance", 20)
 	if ambush:
 		pending_fight = {"enemies": MapGen.roll_group(company.rng, region().fights), "surprise": "heroes", "kind": "fight"}

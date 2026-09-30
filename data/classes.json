@@ -99,7 +99,8 @@
   "prospector": {
     "name": "Prospector",
     "role": "Demolitions",
-    "desc": "Forty-niner who never struck it rich but learned everything about blowing up rock. Carries more dynamite than is strictly legal.",
+    "desc": "Forty-niner who never struck it rich but learned everything about blowing up rock. Carries more dynamite than is strictly legal. Nose for ore: +25% loot in caves and mines.",
+    "cave_loot_pct": 25,
     "hp": 22, "dodge": 5, "prot": 5, "speed": 3, "acc": 0, "crit": 2, "dmg": [6, 11],
     "res": {"stun": 35, "bleed": 35, "poison": 45, "move": 35, "debuff": 30, "deathblow": 67},
     "ranks": [2, 3, 4],

@@ -23,6 +23,7 @@ CR = "oga/creatures/"
 # options can hold "start" (seconds to skip), "pitch" (playback rate) and "len".
 # Weapon and impact sounds (gunshots, punches, clangs, bells...) stay the generated ones from
 # tools/gen_audio.py: playtesting preferred them. "howl" is generated too; the recorded howl is "yip".
+# The UI click is generated (a soft wooden tock); there is no hover sound (owner, round 6).
 SFX = {
 	"glass": (0.7, -4, [K_IMP + "impactGlass_medium_00%d.ogg" % i for i in range(5)]),
 	"cloth": (0.5, -5, [K_RPG + "cloth%d.ogg" % i for i in range(1, 5)]),
@@ -30,8 +31,6 @@ SFX = {
 	"card": (0.4, -5, [K_CAS + "card-place-%d.ogg" % i for i in range(1, 5)]),
 	"page": (0.5, -6, [K_RPG + "bookFlip%d.ogg" % i for i in range(1, 4)]),
 	"paper": (0.5, -6, [CC + "paper_0%d.ogg" % i for i in range(1, 5)]),
-	"click": (0.15, -8, [K_UI + "click_00%d.ogg" % i for i in range(1, 4)]),
-	"hover": (0.1, -12, [K_UI + "tick_001.ogg", K_UI + "tick_002.ogg"]),
 	"lantern": (0.5, -6, [K_RPG + "metalLatch.ogg", K_RPG + "metalClick.ogg"]),
 	"eat": (0.9, -5, [CR + "eat_0%d.ogg" % i for i in range(1, 5)]),
 	# Animals and monsters.

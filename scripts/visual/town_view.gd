@@ -73,8 +73,6 @@ func _gui_input(event: InputEvent) -> void:
 		var h := _plot_at(event.position)
 		if h != hover:
 			hover = h
-			if h >= 0:
-				Audio.play("hover", 0.25, 0.02)
 			var tip := ""
 			if h >= 0:
 				var bid: String = plots[h].id
