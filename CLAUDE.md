@@ -24,6 +24,17 @@ Read `docs/DESIGN_BRIEF.md` (creative direction agreed with the owner) before ch
 - Lambdas capture locals **by value**. To reference something assigned later (for example a
   modal wrapper, or a recursive lambda), capture a dictionary holder: `var holder := {"wrap": null}`.
 
+## Workflow (owner's rules)
+
+- The owner plays from source with `play.bat` (Godot 4.7.2 installed on their PC), after
+  pulling `main`. Commit and push source changes to `main`; that is how they reach the game.
+- Do **not** rebuild or commit `download/FrontierExpedition-windows.zip` for routine
+  changes. Only refresh it for a major version, when the owner asks.
+- More than one agent pushes to `main`: pull (`git pull --ff-only origin main`) before
+  starting work and again before pushing. Never force-push.
+- Keep checks quick: `tools/check.sh` plus the unit tests. Skip long autoplay runs unless
+  asked; the owner playtests and reports back.
+
 ## Checks to run before committing
 
 ```bash
