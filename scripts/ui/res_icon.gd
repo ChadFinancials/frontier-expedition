@@ -5,6 +5,30 @@ extends Control
 
 var kind: String = "money"
 
+## Painted icons (docs/COMFYUI_BRIEF.md): assets/art/icons/<kind>.png replaces the drawn
+## icon when the file exists. They are 256 px and shown at 20-50 px, so each is shrunk once
+## per size with a Lanczos filter (crisper than the GPU's linear filter) and cached.
+const ART_DIR := "res://assets/art/icons/"
+static var _art_cache: Dictionary = {}   # "kind@size" -> Texture2D, or null when there is no file
+
+
+static func art(k: String, px: int) -> Texture2D:
+	var key := "%s@%d" % [k, px]
+	if _art_cache.has(key):
+		return _art_cache[key]
+	var tex: Texture2D = null
+	var path := ART_DIR + k + ".png"
+	if ResourceLoader.exists(path):
+		var src: Texture2D = load(path)
+		var img: Image = src.get_image() if src != null else null
+		if img != null:
+			if img.is_compressed():
+				img.decompress()
+			img.resize(px, px, Image.INTERPOLATE_LANCZOS)
+			tex = ImageTexture.create_from_image(img)
+	_art_cache[key] = tex
+	return tex
+
 
 static func make(k: String, s: float = 26) -> ResIcon:
 	var r := ResIcon.new()
@@ -17,6 +41,10 @@ static func make(k: String, s: float = 26) -> ResIcon:
 func _draw() -> void:
 	var s := size.x
 	var c := Vector2(s / 2, s / 2)
+	var painted := ResIcon.art(kind, maxi(8, int(round(s))))
+	if painted != null:
+		draw_texture_rect(painted, Rect2(Vector2.ZERO, Vector2(s, s)), false)
+		return
 	match kind:
 		"money":
 			# A poker chip: red rim with white notches, cream center.
