@@ -9,7 +9,7 @@
       {"weight": 2, "text": "A rattlesnake was nesting in the flour barrel!", "effects": [{"type": "damage_pct", "value": 10, "target": "actor"}, {"type": "fatigue", "amount": 8, "target": "actor"}]},
       {"weight": 1, "text": "Nothing but a child's rag doll. {hero} can't stop wondering what happened.", "effects": [{"type": "fatigue", "amount": 10, "target": "actor"}]}
     ],
-    "keys": {"crowbar": {"text": "{hero} pries open the locked sea chest under the seat. Silver coins, and a trinket wrapped in a handkerchief.", "effects": [{"type": "money", "min": 60, "max": 110}, {"type": "keepsake"}]}}},
+    "keys": {"shovel": {"text": "{hero} pries open the locked sea chest under the seat. Silver coins, and a trinket wrapped in a handkerchief.", "effects": [{"type": "money", "min": 60, "max": 110}, {"type": "keepsake"}]}}},
 
   "whiskey_barrel": {"name": "Whiskey Barrel", "art": "barrel", "tags": ["whiskey"],
     "desc": "A barrel of Taos Lightning, half-full and sloshing.",
@@ -19,7 +19,7 @@
       {"weight": 2, "text": "{hero} fills a few bottles for later.", "effects": [{"type": "item", "item": "whiskey", "amount": 2}]},
       {"weight": 1, "text": "{hero} drinks... and keeps drinking.", "effects": [{"type": "quirk", "quirk": "drinker", "target": "actor"}, {"type": "fatigue", "amount": -20, "target": "actor"}]}
     ],
-    "keys": {"crowbar": {"text": "Under the false bottom: a smuggler's stash of coins and good bourbon.", "effects": [{"type": "money", "min": 40, "max": 80}, {"type": "item", "item": "whiskey", "amount": 3}]}}},
+    "keys": {"shovel": {"text": "Under the false bottom: a smuggler's stash of coins and good bourbon.", "effects": [{"type": "money", "min": 40, "max": 80}, {"type": "item", "item": "whiskey", "amount": 3}]}}},
 
   "old_grave": {"name": "Lonely Grave", "art": "grave", "tags": ["treasure", "strange"],
     "desc": "A wooden cross, the name worn away. Somebody piled stones on it to keep the wolves off.",
@@ -38,7 +38,7 @@
       {"weight": 3, "text": "The lock won't budge. {hero} bloodies their knuckles trying.", "effects": [{"type": "damage_pct", "value": 6, "target": "actor"}, {"type": "fatigue", "amount": 5, "target": "actor"}]},
       {"weight": 1, "text": "A spring-loaded blade! Somebody booby-trapped it.", "effects": [{"type": "damage_pct", "value": 15, "target": "actor"}]}
     ],
-    "keys": {"crowbar": {"text": "The lid pops open. Gold eagles and a mail pouch.", "effects": [{"type": "money", "min": 100, "max": 180}, {"type": "keepsake", "chance": 35}]}}},
+    "keys": {"shovel": {"text": "The lid pops open. Gold eagles and a mail pouch.", "effects": [{"type": "money", "min": 100, "max": 180}, {"type": "keepsake", "chance": 35}]}}},
 
   "prairie_well": {"name": "Prairie Well", "art": "well", "tags": [],
     "desc": "A stone well with a broken windlass. Something glints far below.",
@@ -101,7 +101,7 @@
       {"weight": 3, "text": "Iron tools and ore samples.", "effects": [{"type": "iron", "amount": 2}]},
       {"weight": 1, "text": "Old blasting powder goes off in {hero}'s face!", "effects": [{"type": "damage_pct", "value": 18, "target": "actor"}]}
     ],
-    "keys": {"crowbar": {"text": "The nailed crate holds a poke of gold dust and good tools.", "effects": [{"type": "money", "min": 80, "max": 140}, {"type": "iron", "amount": 2}]}}},
+    "keys": {"shovel": {"text": "The nailed crate holds a poke of gold dust and good tools.", "effects": [{"type": "money", "min": 80, "max": 140}, {"type": "iron", "amount": 2}]}}},
 
   "bone_pile": {"name": "Pile of Bones", "art": "bones", "tags": ["strange", "treasure"],
     "desc": "Animal bones, and some that aren't animal. Something drags its meals back here.",
@@ -146,7 +146,7 @@
       {"weight": 2, "text": "The railroad sets alarms. Company men come running.", "effects": [{"type": "fight", "enemies": ["railroad_enforcer", "outlaw_gunhand"]}]},
       {"weight": 2, "text": "{hero} finds the payroll ledger. The company is swindling everyone.", "effects": [{"type": "fatigue", "amount": 6, "target": "actor"}, {"type": "money", "min": 20, "max": 40}]}
     ],
-    "keys": {"crowbar": {"text": "{hero} opens it quietly. Dynamite-proof lockbox inside: the payroll!", "effects": [{"type": "money", "min": 120, "max": 200}, {"type": "iron", "amount": 2}]}}},
+    "keys": {"shovel": {"text": "{hero} opens it quietly. Dynamite-proof lockbox inside: the payroll!", "effects": [{"type": "money", "min": 120, "max": 200}, {"type": "iron", "amount": 2}]}}},
 
   "ore_vein": {"name": "Ore Vein", "art": "vein", "tags": ["treasure"],
     "desc": "A streak of rust-red ore running through the rock. A little gold glitters in it.",

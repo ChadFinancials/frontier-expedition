@@ -94,7 +94,7 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 	var uids: Array = []
 	for h in party:
 		uids.append(h.uid)
-	var supplies := {"food": 20, "bandages": 2, "lamp_oil": 3, "wagon_parts": 1, "shovel": 1, "crowbar": 1, "salt": 1}
+	var supplies := {"food": 20, "bandages": 2, "lamp_oil": 3, "wagon_parts": 1, "shovel": 1, "salt": 1}
 	if not co.has_store(i):
 		supplies = co.free_kit()
 	else:
@@ -103,7 +103,7 @@ func play_expedition(co: Company, i: int) -> Dictionary:
 				supplies.erase(k)
 	while co.supply_cost(i, supplies) > co.money and supplies.food > 0:
 		supplies.food = maxi(0, supplies.food - 2)
-		for k in ["salt", "crowbar", "shovel", "wagon_parts", "lamp_oil", "bandages"]:
+		for k in ["salt", "shovel", "wagon_parts", "lamp_oil", "bandages"]:
 			if co.supply_cost(i, supplies) > co.money:
 				supplies.erase(k)
 	var r := co.start_run(i, uids, supplies)

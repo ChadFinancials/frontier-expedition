@@ -31,6 +31,13 @@ see what each change does.
 
 ## 3. A prompt that works for icons
 
+**The owner's vetted style (use this):** the object, then
+`single objects, centred, three-quarter view, light from the top left, bold thick dark brown
+outline, flat colour shapes, one shadow tone, chunky simple silhouette, plain flat cream
+background`. The approved originals are kept in `art-src/icons/` as the reference set.
+
+### Earlier suggestion
+
 Positive (swap the middle part per item):
 
 > storybook game inventory icon, **a small burlap sack tied with twine and a tin can of beans**,

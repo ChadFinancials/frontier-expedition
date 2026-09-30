@@ -1,8 +1,8 @@
 extends Control
 ## Plan an expedition: pick up to four heroes, arrange the formation, buy supplies.
 
-const ITEM_ORDER := ["food", "bandages", "antivenom", "whiskey", "lamp_oil", "wagon_parts", "rope", "shovel", "crowbar", "salt"]
-const RECOMMENDED := {"food": 24, "bandages": 2, "antivenom": 1, "whiskey": 1, "lamp_oil": 2, "wagon_parts": 1, "rope": 1, "shovel": 1, "crowbar": 1, "salt": 1}
+const ITEM_ORDER := ["food", "bandages", "antivenom", "whiskey", "lamp_oil", "wagon_parts", "rope", "shovel", "salt"]
+const RECOMMENDED := {"food": 24, "bandages": 2, "antivenom": 1, "whiskey": 1, "lamp_oil": 2, "wagon_parts": 1, "rope": 1, "shovel": 1, "salt": 1}
 
 var index: int = 0
 var dest: String = ""          # region id of the chosen destination
@@ -319,7 +319,7 @@ func _default_load() -> Dictionary:
 func _affordable(want: Dictionary) -> Dictionary:
 	var co: Company = Game.company
 	var out := want.duplicate()
-	for k in ["crowbar", "shovel", "rope", "salt", "whiskey", "antivenom", "lamp_oil", "wagon_parts", "bandages"]:
+	for k in ["shovel", "rope", "salt", "whiskey", "antivenom", "lamp_oil", "wagon_parts", "bandages"]:
 		if co.supply_cost(index, out) <= co.money:
 			break
 		out.erase(k)

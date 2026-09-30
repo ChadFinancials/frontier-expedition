@@ -357,7 +357,7 @@ const HELP_TEXT := """[b]The Company.[/b] Somewhere past the last mountain stand
 
 [b]Survival Skills.[/b] Every hero has two survival skills (Cook, Hunter, Scout, Wheelwright...). At camp, spend 12 hours on their actions: cook, hunt, fell timber, stand night watch, tell tall tales. Skills also help on the trail and unlock special choices in events. They improve with use.
 
-[b]Curios.[/b] Investigate odd finds by hand for a random result, or use the right supply (a crowbar on a strongbox, salt on something strange) for a sure reward. Some quirks make heroes grab things on their own.
+[b]Curios.[/b] Investigate odd finds by hand for a random result, or use the right supply (a shovel to pry a strongbox, salt on something strange) for a sure reward. Some quirks make heroes grab things on their own.
 
 [b]Settlements.[/b] Heroes return at full health, but Fatigue and quirks come home with them. Build and upgrade buildings with chips, Timber and Iron. Beat a region's boss to found an Outpost on its ground; grow it into a Town and City with Land Charters. Use the Stage Line to move heroes between settlements: the oldest towns have the best facilities, but the trip takes weeks.
 

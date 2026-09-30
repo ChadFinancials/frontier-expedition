@@ -9,8 +9,8 @@ in docs/COMFYUI_BRIEF.md). Needs Pillow and numpy: pip install pillow numpy
 
 How the background goes: its colour is read from the image border; everything of that colour
 connected to the border is removed (a loose match, so soft ground shadows go too, stopped by
-the dark outline), then enclosed pockets of the exact background colour (the gaps between a
-wheel's spokes) are removed as well. Edge pixels fade out so there is no light halo.
+the dark outline). For keys in POCKET_KEYS (see-through shapes like the wheel) enclosed
+pockets of the background colour are removed too. Edge pixels fade out so there is no halo.
 """
 import os
 import sys
@@ -27,6 +27,10 @@ LOOSE = 62          # colour distance still counted as background when touching 
 TIGHT = 18          # colour distance for enclosed background pockets
 POCKET = 120        # smallest enclosed pocket (pixels at WORK size) removed
 MARGIN = 0.07       # clear margin around the trimmed icon
+# Icons with see-through gaps inside (a wheel's spokes): enclosed pockets of background colour
+# are cut out too. Off for everything else, because a paper, canvas or label inside the
+# outline is often the same cream as the background.
+POCKET_KEYS = {"wheel"}
 
 
 def _flood(ok: np.ndarray, seeds) -> np.ndarray:
@@ -46,7 +50,9 @@ def _flood(ok: np.ndarray, seeds) -> np.ndarray:
     return seen
 
 
-def prep(src: str, key: str) -> str:
+def prep(src: str, key: str, pockets: bool | None = None) -> str:
+    if pockets is None:
+        pockets = key in POCKET_KEYS
     img = Image.open(src).convert("RGBA")
     img.thumbnail((WORK, WORK), Image.LANCZOS)
     a = np.asarray(img).astype(np.float32)
@@ -62,7 +68,7 @@ def prep(src: str, key: str) -> str:
     shadow = (lum > 150) & (sat < 45)
     is_bg = _flood((dist < LOOSE) | shadow, seeds)
     # Enclosed pockets of plain background.
-    near = (dist < TIGHT) & ~is_bg
+    near = ((dist < TIGHT) & ~is_bg) if pockets else np.zeros_like(is_bg)
     done = np.zeros_like(near)
     for y in range(h):
         for x in range(w):
