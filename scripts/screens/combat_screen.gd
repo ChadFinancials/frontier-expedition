@@ -114,7 +114,7 @@ func _build_hud() -> void:
 	add_child(preview)
 	preview_label = UI.rich("", 19, false, 590)
 	preview.add_child(preview_label)
-	hud_panel = UI.panel("Dark")
+	hud_panel = UI.panel("DarkRopeTop")
 	hud_panel.position = Vector2(0, 835)
 	hud_panel.custom_minimum_size = Vector2(1920, 245)
 	hud_panel.z_index = 20

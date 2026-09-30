@@ -528,3 +528,18 @@ head at rest (idle, dead), switching to storybook reactions in action poses (`_t
 - The windup and cast arms were moved so they no longer cross the face.
 - `shot=faces poses` shows every pose, face 1 above face 6 (`zoom=`, `cls=`); `poses small`
   shows four classes at combat size. Faces 1-5 stay in the code for A/B.
+
+## UI: wood and rope, drawn in code (Sept 30, owner's pick: light pass first)
+
+- `StyleBoxWood` (`scripts/ui/wood_style.gd`) is a drawn StyleBox. `plank`: dark stained
+  planks with low-contrast grain, knots, butt joints, nail heads, a frame and iron corner
+  brackets; the `Dark` panel style. `DarkRopeTop` / `DarkRopeBottom` add a rope along that
+  edge (bottom HUDs / top bars). `sign_board`: every button is a small signboard with
+  chamfered corners and two nails; Danger and Good are painted boards with worn edges.
+- Text sits on the dark planks or on parchment, never on busy grain.
+- The expedition map (`MapView`) is a scorched parchment sheet nailed to a board: sketched
+  terrain per region (`TERRAIN`), hand-inked curved trails (dotted until travelled, marching
+  dots on the ways onward), wooden stop discs with the kind burned in (elites and the boss in
+  red wax), a wash of fog over unscouted stops, a wagon piece that rolls between stops, a
+  nailed legend card and an ONWARD signpost. The camp stop is a campfire (no tent).
+- If this reads flat, the plan is a ComfyUI pass for the wood texture (see COMFYUI_BRIEF.md).

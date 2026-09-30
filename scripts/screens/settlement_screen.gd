@@ -70,7 +70,7 @@ func setup(params: Dictionary) -> void:
 	transit_box = UI.vb(2)
 	sc2.add_child(transit_box)
 	# Bottom bar.
-	var bp := UI.panel("Dark")
+	var bp := UI.panel("DarkRopeTop")
 	bp.position = Vector2(0, 890)
 	bp.custom_minimum_size = Vector2(1920, 190)
 	add_child(bp)

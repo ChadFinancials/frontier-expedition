@@ -31,7 +31,7 @@ func setup(_params: Dictionary) -> void:
 		f.scale *= 1.05
 		stage_node.add_child(f)
 		walkers.append(f)
-	var hp := UI.panel("Dark")
+	var hp := UI.panel("DarkRopeBottom")
 	hp.custom_minimum_size = Vector2(1920, 90)
 	add_child(hp)
 	var hh := UI.hb(20)
@@ -54,7 +54,7 @@ func setup(_params: Dictionary) -> void:
 	light_fx.mouse_filter = Control.MOUSE_FILTER_PASS
 	rooms_row = UI.hb(8)
 	hh.add_child(rooms_row)
-	var bp := UI.panel("Dark")
+	var bp := UI.panel("DarkRopeTop")
 	bp.position = Vector2(0, 850)
 	bp.custom_minimum_size = Vector2(1920, 230)
 	add_child(bp)

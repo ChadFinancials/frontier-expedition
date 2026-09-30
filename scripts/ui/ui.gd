@@ -94,8 +94,20 @@ static func theme() -> Theme:
 	t.set_color("default_color", "InkRich", INK)
 	# Panels.
 	t.set_stylebox("panel", "PanelContainer", box(PAPER, WOOD, 3, 8, 16, 6))
+	# Dark panels are stained planks (StyleBoxWood); the RopeTop/RopeBottom variations add a
+	# rope along that edge, for the bars at the top and bottom of the screen.
 	t.set_type_variation("Dark", "PanelContainer")
-	t.set_stylebox("panel", "Dark", box(Color(0.12, 0.08, 0.05, 0.92), WOOD_LIGHT, 2, 8, 14, 6))
+	t.set_stylebox("panel", "Dark", StyleBoxWood.plank(14))
+	t.set_type_variation("DarkRopeTop", "PanelContainer")
+	var rt := StyleBoxWood.plank(14)
+	rt.rope_top = true
+	rt.content_margin_top = 18
+	t.set_stylebox("panel", "DarkRopeTop", rt)
+	t.set_type_variation("DarkRopeBottom", "PanelContainer")
+	var rb := StyleBoxWood.plank(14)
+	rb.rope_bottom = true
+	rb.content_margin_bottom = 16
+	t.set_stylebox("panel", "DarkRopeBottom", rb)
 	t.set_type_variation("Card", "PanelContainer")
 	t.set_stylebox("panel", "Card", box(PAPER_DARK, WOOD, 2, 6, 10, 3))
 	t.set_type_variation("Clear", "PanelContainer")
@@ -113,10 +125,23 @@ static func theme() -> Theme:
 		elif v == "Tab":
 			base = Color("#4a3322")
 		var pad := 18 if v == "Big" else (8 if v == "Small" else 12)
-		t.set_stylebox("normal", v, box(base, WOOD_DARK, 2, 6, pad, 2))
-		t.set_stylebox("hover", v, box(base.lightened(0.18), GOLD, 2, 6, pad, 3))
-		t.set_stylebox("pressed", v, box(base.darkened(0.2), GOLD, 2, 6, pad, 0))
-		t.set_stylebox("disabled", v, box(Color(0.35, 0.3, 0.26, 0.65), Color(0.25, 0.2, 0.16, 0.6), 2, 6, pad, 0))
+		# Wooden signboards; Danger and Good are painted boards.
+		var board := Color("#6e4a2e") if v != "Tab" else Color("#4a3322")
+		var paint := Color(0, 0, 0, 0)
+		if v in ["Danger", "Good"]:
+			paint = base
+		var sn := StyleBoxWood.sign_board(board, pad, paint)
+		var sh := StyleBoxWood.sign_board(board.lightened(0.14), pad, paint.lightened(0.14) if paint.a > 0 else paint, GOLD)
+		var sp := StyleBoxWood.sign_board(board.darkened(0.2), pad, paint.darkened(0.2) if paint.a > 0 else paint, GOLD)
+		var sd := StyleBoxWood.sign_board(Color("#4f4640"), pad)
+		sd.nails = false
+		if v == "Small":
+			for sb in [sn, sh, sp, sd]:
+				sb.nails = false
+		t.set_stylebox("normal", v, sn)
+		t.set_stylebox("hover", v, sh)
+		t.set_stylebox("pressed", v, sp)
+		t.set_stylebox("disabled", v, sd)
 		t.set_stylebox("focus", v, StyleBoxEmpty.new())
 		t.set_color("font_color", v, CREAM)
 		t.set_color("font_hover_color", v, Color.WHITE)
@@ -124,7 +149,7 @@ static func theme() -> Theme:
 		t.set_color("font_disabled_color", v, Color(0.75, 0.7, 0.62, 0.7))
 		t.set_font("font", v, font_head if v == "Big" else font_bold)
 		t.set_font_size("font_size", v, 30 if v == "Big" else (18 if v == "Small" else 21))
-	t.set_stylebox("normal", "Tab", box(Color("#4a3322"), WOOD_DARK, 2, 6, 12, 0))
+
 	# Tooltips.
 	t.set_stylebox("panel", "TooltipPanel", box(Color(0.1, 0.07, 0.05, 0.96), GOLD, 2, 6, 12, 4))
 	t.set_color("font_color", "TooltipLabel", CREAM)
@@ -179,12 +204,8 @@ static func party_cards(row: HBoxContainer, run: RunState, card_w: float, on_car
 				run.swap_party(k - 1, k)
 				Audio.play("cloth")
 				on_swap.call())
-			sw.custom_minimum_size = Vector2(28, 0)
-			sw.add_theme_constant_override("h_separation", 0)
-			for side in ["left", "right"]:
-				var sb: StyleBox = sw.get_theme_stylebox("normal").duplicate()
-				sb.set("content_margin_" + side, 4)
-				sw.add_theme_stylebox_override("normal", sb)
+			sw.theme_type_variation = "Small"
+			sw.custom_minimum_size = Vector2(30, 0)
 			sw.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			sw.tooltip_text = "Swap ranks %d and %d" % [i, i + 1]
 			row.add_child(sw)

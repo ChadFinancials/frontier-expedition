@@ -45,13 +45,14 @@ func setup(_params: Dictionary) -> void:
 	wagon_bar.tooltip_text = "Wagon condition. The trail wears it down a little every stop; events and some enemies damage it. Wagon Parts or a Wheelwright repair it. At 0 every stop adds Fatigue."
 	add_child(wagon_bar)
 	# HUD strip.
-	var hp := UI.panel("Dark")
+	var hp := UI.panel("DarkRopeBottom")
 	hp.custom_minimum_size = Vector2(1920, 64)
 	add_child(hp)
 	hud_row = UI.hb(22)
 	hp.add_child(hud_row)
 	# Map.
-	var mp := UI.panel()
+	# The map sheet is nailed to a board (MapView draws the parchment, legend and signpost).
+	var mp := UI.panel("Dark")
 	mp.position = Vector2(10, 430)
 	mp.custom_minimum_size = Vector2(1900, 420)
 	mp.size = Vector2(1900, 420)
@@ -66,12 +67,8 @@ func setup(_params: Dictionary) -> void:
 		map.position = Vector2(sb.get_margin(SIDE_LEFT), sb.get_margin(SIDE_TOP))
 		map.size = Vector2(1860, 390)
 	mg.add_child(map)
-	var legend := UI.rich("[color=#5e3f27]?[/color] unknown   [color=#a8392e]?[/color] signs of trouble   [color=#4f7a33]?[/color] looks quiet   Hover a stop for details.", 16, true, 700)
-	legend.position = Vector2(30, 818)
-	legend.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(legend)
 	# Bottom bar.
-	var bp := UI.panel("Dark")
+	var bp := UI.panel("DarkRopeTop")
 	bp.position = Vector2(0, 860)
 	bp.custom_minimum_size = Vector2(1920, 220)
 	add_child(bp)
@@ -237,12 +234,17 @@ func _travel(id: int, confirmed: bool = false) -> void:
 	map.enabled = false
 	Audio.play("footsteps", 0.8)
 	var start := scroll
+	map.token_to = id
+	map.token_t = 0.0
 	var tw := create_tween()
 	tw.tween_method(func(v):
 		scroll = v
 		backdrop.set_scroll(v)
+		map.token_t = (v - start) / 700.0
 		wagon.roll(v), start, start + 700.0, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await tw.finished
+	map.token_to = -1
+	map.token_t = 0.0
 	var msgs := run.travel_to(id)
 	travelling = false
 	map.enabled = true

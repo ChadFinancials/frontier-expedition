@@ -8,7 +8,7 @@ var res_row: HBoxContainer
 
 
 func _init() -> void:
-	theme_type_variation = "Dark"
+	theme_type_variation = "DarkRopeBottom"
 	custom_minimum_size = Vector2(1920, 70)
 	var row := UI.hb(18)
 	add_child(row)
