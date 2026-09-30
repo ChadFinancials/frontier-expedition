@@ -495,3 +495,21 @@ per-hero variance from `look_seed` so two heroes of one class differ.
 - Do we train a LoRA on the approved set, or hold at IPAdapter references.
 - Reference captures: we need screenshots of the current approved look as IPAdapter input.
   Take them from the shipped build, or install Godot 4.7.2 and use `tools/shot.sh`.
+
+## Ink illustration look (Sept 30, owner's pick)
+
+Owner ask: the drawn characters looked like "8 boxes clobbered together". Five body styles
+were tried against the old look on the Marshal (`shot=body_ab`, `grid` for close-ups):
+tailored curves, costume detail, paper puppet, ink illustration, painted volume. The owner
+picked **ink illustration (`Figure.body_style = 4`)**, now the default for every figure, with
+"a touch more highlights and shadowing", applied to every part.
+
+- **Geometry** (`_body_v`, humans): spline torso with sloped shoulders, chest and waist; tapered
+  limbs with elbows and knees; heeled boots; a flaring coat with an open front. Every piece,
+  hats and animals included, gets its corners rounded (`_round_corners`, Chaikin: once on
+  people, twice on animals and creatures). Face features (`no_edge`) stay crisp.
+- **Render** (`_draw_layered`, piece by piece): a small cast shadow onto the pieces behind, a
+  bold ink outline (so the lines between overlapping parts show), a flat fill, then cel bands
+  from `_add_ink_bands`: a shadow tone on the far side, a darker core line at the far edge, a
+  warm highlight along the lit (top-left) edge, and sparse ink hatching in bigger shadows.
+- Styles 0-3 and 5 stay in the code for A/B. `body=N` on any shot scenario renders it in style N.

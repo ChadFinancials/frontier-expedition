@@ -43,10 +43,11 @@ var hat_style: int = 0
 ## Eye variant. 3 is the approved look: a wide black oval, no white. 0 is the older white
 ## oval with a black pupil. 1 dot, 2 tall oval, 4 dot with a lid, 5 L bracket. See docs/ART_PIPELINE.md.
 var eye_style: int = 3
-## Body construction experiment (A/B). 0 is the current body. 1 tailored curves, 2 curves plus
-## costume detail, 3 jointed paper puppet, 4 ink illustration, 5 painted volume.
-## Head, face, hat and weapon are shared. See docs/ART_PIPELINE.md and shot=body_ab.
-static var default_body := 0
+## Body construction and render style. 4, the ink illustration look, is the owner's pick and
+## the default: curved bodies, a bold ink outline on every piece, flat color with cel
+## highlights and shadows. 0 is the older look; 1 tailored curves, 2 curves plus costume
+## detail, 3 jointed paper puppet, 5 painted volume. See docs/ART_PIPELINE.md, shot=body_ab.
+static var default_body := 4
 var body_style: int = default_body
 
 var _shapes: Array = []
@@ -127,6 +128,9 @@ func _draw() -> void:
 			_add_deckle()
 		if body_style == 5:
 			_add_light_bands()
+		if body_style == 4:
+			_round_corners()
+			_add_ink_bands()
 		_dirty = false
 	if body_style >= 3:
 		_draw_layered()
@@ -1446,6 +1450,8 @@ func _draw_layered() -> void:
 					_draw_shape(s, s.c, Vector2.ZERO, 0.0)
 			4:
 				if edged:
+					# Each piece casts a little shadow onto the pieces behind it, then its ink line.
+					_draw_shape(s, Color(0, 0, 0, 0.22), Vector2(3.0 * facing, 4.0), 0.0)
 					_draw_shape(s, INK, Vector2.ZERO, 1.5)
 				_draw_flat_ink(s)
 			_:
@@ -1469,24 +1475,93 @@ func _draw_layered() -> void:
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
-## Style 4 fill: flat color with one hard-edged shadow tone, like a printed comic.
+## Style 4: precomputes each piece's cel bands (light from the top left of the screen):
+## a highlight along the lit edge, a shadow tone on the far side, a darker core line right at
+## the far edge, and a few ink hatch strokes inside the shadow of the bigger pieces.
+func _add_ink_bands() -> void:
+	for s in _shapes:
+		if s.get("glow", false) or s.get("no_edge", false):
+			continue
+		var pts := PackedVector2Array()
+		if s.k == "poly":
+			pts = clean_line(s.pts)
+		elif s.k == "circle" and float(s.r) >= 4.0:
+			pts = PackedVector2Array(ellipse(s.p, s.r, s.r, 24))
+		if pts.size() < 3:
+			continue
+		var bb := _bounds(pts)
+		var area := bb.size.x * bb.size.y
+		if area < 90.0:
+			continue
+		var sh := minf(6.0, 2.0 + sqrt(area) * 0.09)
+		s["ink_dark"] = Geometry2D.clip_polygons(pts, _shifted(pts, Vector2(-sh * facing, -sh * 0.85)))
+		s["ink_core"] = Geometry2D.clip_polygons(pts, _shifted(pts, Vector2(-1.8 * facing, -1.6)))
+		s["ink_lit"] = Geometry2D.clip_polygons(pts, _shifted(pts, Vector2(2.4 * facing, 2.4)))
+		var hatch: Array = []
+		if area > 700.0:
+			for band in s.ink_dark:
+				if band.size() < 3:
+					continue
+				var bb2 := _bounds(band)
+				var x := bb2.position.x - bb2.size.y
+				while x < bb2.end.x:
+					var a := Vector2(x, bb2.end.y)
+					var b := Vector2(x + bb2.size.y * 0.9, bb2.position.y)
+					for piece in Geometry2D.intersect_polyline_with_polygon(PackedVector2Array([a, b]), band):
+						if piece.size() >= 2 and piece[0].distance_squared_to(piece[piece.size() - 1]) > 9.0:
+							hatch.append([piece[0], piece[piece.size() - 1]])
+					x += 4.5
+		s["ink_hatch"] = hatch
+
+
+## Style 4: rounds every piece's corners (Chaikin), lightly on people, whose bodies are
+## already curved, and more on animals and creatures, so nothing reads as a box. Face
+## features (no_edge) and pieces marked "sharp" keep their corners.
+func _round_corners() -> void:
+	var iters := 1 if look.get("body", "human") == "human" else 2
+	for s in _shapes:
+		if s.k != "poly" or s.get("no_edge", false) or s.get("glow", false) or s.get("sharp", false):
+			continue
+		var pts: PackedVector2Array = clean_line(s.pts)
+		if pts.size() < 3 or pts.size() > 90:
+			continue
+		for i in iters:
+			pts = chaikin(pts, 0.22)
+		s.pts = pts
+
+
+static func chaikin(pts: PackedVector2Array, cut: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	var n := pts.size()
+	for i in n:
+		var a: Vector2 = pts[i]
+		var b: Vector2 = pts[(i + 1) % n]
+		out.append(a.lerp(b, cut))
+		out.append(a.lerp(b, 1.0 - cut))
+	return out
+
+
+static func _shifted(pts: PackedVector2Array, by: Vector2) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	for p in pts:
+		out.append(p + by)
+	return out
+
+
+## Style 4 fill: flat color with cel shading (see _add_ink_bands), like a printed comic.
 func _draw_flat_ink(s: Dictionary) -> void:
 	var c: Color = s.c
 	if s.has("a"):
 		c.a *= float(s.a)
-	if s.k != "poly":
-		_draw_shape(s, c, Vector2.ZERO, 0.0)
-		return
-	var pts: PackedVector2Array = clean_line(s.pts)
-	if pts.size() < 3:
-		return
-	draw_colored_polygon(pts, c)
-	var bb := _bounds(pts)
-	if bb.size.x * bb.size.y < 200.0:
-		return
-	var moved := PackedVector2Array()
-	for p in pts:
-		moved.append(p + Vector2(-5.0 * facing, -4.0))
-	for band in Geometry2D.clip_polygons(pts, moved):
+	_draw_shape(s, c, Vector2.ZERO, 0.0)
+	for band in s.get("ink_dark", []):
 		if band.size() >= 3:
-			draw_colored_polygon(band, Color(c.darkened(0.3), c.a))
+			draw_colored_polygon(band, Color(c.darkened(0.28), c.a))
+	for h in s.get("ink_hatch", []):
+		draw_line(h[0], h[1], Color(INK, 0.28 * c.a), 1.0, true)
+	for band in s.get("ink_core", []):
+		if band.size() >= 3:
+			draw_colored_polygon(band, Color(c.darkened(0.45), c.a))
+	for band in s.get("ink_lit", []):
+		if band.size() >= 3:
+			draw_colored_polygon(band, Color(c.lightened(0.26).lerp(Color("#fff0c8"), 0.1), c.a))
