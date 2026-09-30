@@ -34,6 +34,12 @@ var speed := 1.0
 var _move_has_sfx := false   # the current move plays its own sound, so hits stay quiet
 
 
+## Result events that show a popup; within one action they are shown one after another.
+const POPPING := ["hit", "miss", "heal", "status", "resist", "buff", "debuff", "cure", "fatigue",
+	"deaths_door", "deathblow_resist", "bounty", "crit_relief"]
+var _popup_stack: Dictionary = {}   # unit id -> popups shown on it this action
+
+
 func setup(p: Dictionary) -> void:
 	params = p
 	run = Game.company.run
@@ -171,6 +177,7 @@ func _loop() -> void:
 	while not engine.is_over():
 		if OS.has_environment("FE_TRACE"):
 			print("STEP ", engine.current.display_name if engine.current else "-", " state=", engine.state)
+		_freeze(true)
 		var ev := engine.step()
 		await _play(ev)
 		if engine.awaiting_input():
@@ -178,6 +185,7 @@ func _loop() -> void:
 			var choice: Array = await chosen
 			_hide_controls()
 			var ev2: Array = []
+			_freeze(true)
 			match choice[0]:
 				"skill":
 					ev2 = engine.hero_skill(choice[1], choice[2])
@@ -628,15 +636,40 @@ func _play(events: Array) -> void:
 		await _play_one(e)
 		i += 1
 	_layout()
+	_freeze(false)
+
+
+## Hold every HUD at what it shows now, so the engine's instant results only appear as the
+## animation reaches them (see UnitView.shown).
+func _freeze(on: bool) -> void:
+	for id in views:
+		var v: UnitView = views[id]
+		v.sync()
+		v.frozen = on
+
+
+func _shift_hp(c: Combatant, delta: int) -> void:
+	if c != null and views.has(c.id):
+		views[c.id].shift_hp(delta)
+
+
+func _sync_status(c: Combatant) -> void:
+	if c != null and views.has(c.id):
+		views[c.id].sync_status()
 
 
 func _play_one(e: Dictionary) -> void:
 	match e.t:
 		"round":
 			_update_order()
+			for id in views:
+				views[id].shown["actions"] = views[id].unit.actions_left
 			_log("[b]— Round %d —[/b]" % e.round)
 		"turn":
 			_update_order()
+			_popup_stack = {}
+			for id in views:
+				views[id].shown["actions"] = views[id].unit.actions_left
 			var c := engine.unit(e.actor)
 			if c != null and views.has(e.actor):
 				for id in views:
@@ -655,6 +688,7 @@ func _play_one(e: Dictionary) -> void:
 			await _wait(0.6)
 		"dot":
 			var c3 := engine.unit(e.target)
+			_shift_hp(c3, -int(e.amount))
 			_popup(c3, str(e.amount), Color("#e05a4a") if e.kind == "bleed" else Color("#8fce5a"), 30)
 			_flash(c3, Color("#e05a4a") if e.kind == "bleed" else Color("#8fce5a"))
 			_log("%s takes %d %s damage." % [c3.display_name, e.amount, e.kind])
@@ -678,6 +712,8 @@ func _result(e: Dictionary) -> void:
 			var t := engine.unit(e.target)
 			if t == null:
 				return
+			_shift_hp(t, -int(e.amount))
+			_sync_status(t)
 			if e.amount > 0:
 				_popup(t, ("CRIT! " if e.crit else "") + str(e.amount) + (" " + e.note if e.note != "" else ""), Color("#ffe08a") if e.crit else Color("#ffffff"), 40 if e.crit else 32)
 				_flash(t, Color(1, 0.3, 0.2))
@@ -700,6 +736,7 @@ func _result(e: Dictionary) -> void:
 				_log("%s misses %s." % [engine.unit(e.actor).display_name if engine.unit(e.actor) else "?", t2.display_name])
 		"heal":
 			var t3 := engine.unit(e.target)
+			_shift_hp(t3, int(e.amount))
 			if t3 != null and e.amount > 0:
 				_popup(t3, "+%d" % e.amount, Color("#7ee07a"), 32)
 				_flash(t3, Color(0.4, 1, 0.4))
@@ -708,6 +745,7 @@ func _result(e: Dictionary) -> void:
 		"status":
 			var t4 := engine.unit(e.target)
 			var names := {"bleed": "Bleeding", "poison": "Poisoned", "stun": "Stunned", "mark": "Marked", "guard": "Guarded", "taunt": "Taunting", "worse": "Lingering"}
+			_sync_status(t4)
 			if t4 != null:
 				_popup(t4, names.get(e.status, e.status), Color("#f0a080") if e.status in ["bleed", "poison", "stun", "mark"] else Color("#9fd07a"), 22, 40)
 				_log("%s is %s." % [t4.display_name, names.get(e.status, e.status).to_lower()])
@@ -724,6 +762,7 @@ func _result(e: Dictionary) -> void:
 			Audio.play("coin")
 		"buff", "debuff":
 			var t6 := engine.unit(e.target)
+			_sync_status(t6)
 			if t6 != null and str(e.get("card", "")) != "":
 				_card(t6, str(e.card), Stats.mod_text({"stat": e.stat, "value": e.value}))
 				_log("%s draws the %s: %s." % [t6.display_name, e.card, Stats.mod_text({"stat": e.stat, "value": e.value})])
@@ -732,11 +771,14 @@ func _result(e: Dictionary) -> void:
 				_popup(t6, txt, Color("#9fd07a") if Stats.mod_is_good({"stat": e.stat, "value": e.value}) else Color("#f0a080"), 20, 60)
 		"cure":
 			var t7 := engine.unit(e.target)
+			_sync_status(t7)
 			if t7 != null:
 				_popup(t7, "Cured", Color("#7ee07a"), 22, 40)
 		"fatigue":
 			var h := Game.company.hero(e.hero)
 			var c := _combatant_for_hero(e.hero)
+			if c != null and views.has(c.id):
+				views[c.id].shift_fatigue(float(e.amount))
 			if c != null and e.amount != 0:
 				_popup(c, "%s%d Fatigue" % ["+" if e.amount > 0 else "", e.amount], Color("#c9a8ff") if e.amount > 0 else Color("#e8dcff"), 20, 80)
 			if h != null:
@@ -744,12 +786,14 @@ func _result(e: Dictionary) -> void:
 		"breaking", "second_wind":
 			var h2 := Game.company.hero(e.hero)
 			var st: Dictionary = DB.fatigue_states.get(e.state, {})
+			_sync_status(_combatant_for_hero(e.hero))
 			if h2 != null:
 				_banner_async("%s: %s!" % [h2.hero_name, st.get("name", "")], e.t == "breaking")
 				Audio.play("breaking" if e.t == "breaking" else "fanfare")
 				_log("[b]%s[/b]" % Fatigue.describe(e, h2.hero_name))
 		"recovered":
 			var h3 := Game.company.hero(e.hero)
+			_sync_status(_combatant_for_hero(e.hero))
 			if h3 != null:
 				_log(Fatigue.describe(e, h3.hero_name))
 		"collapse":
@@ -770,6 +814,8 @@ func _result(e: Dictionary) -> void:
 				_log("%s clings to life!" % t9.display_name)
 		"revived":
 			var t10 := engine.unit(e.target)
+			if t10 != null and views.has(t10.id):
+				views[t10.id].sync()
 			if t10 != null:
 				_log("%s is pulled back from Death's Door." % t10.display_name)
 		"death":
@@ -898,19 +944,29 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 		_:
 			av.figure.set_pose("cast")
 	Audio.play(e.get("sfx", ""))
-	# Multi-shot moves fire their sound (and muzzle flash) once per shot.
-	for k in int(sk.get("random_hits", sk.get("hits", 1))) - 1:
-		await _wait(0.16)
-		if anim == "shoot":
-			av.figure.muzzle = 1.0
-			create_tween().tween_property(av.figure, "muzzle", 0.0, 0.2 / speed)
-		Audio.play(e.get("sfx", ""))
 	if anim == "throw" and not targets.is_empty():
 		_projectile(av.position + Vector2(0, -160), targets[0].position + Vector2(0, -120))
 	await _wait(0.12)
 	_move_has_sfx = e.get("sfx", "") != ""
+	# Results land one at a time, so stacked numbers and statuses can be read. A second
+	# hit on the same target (a multi-shot move) fires the sound and muzzle flash again.
+	_popup_stack = {}
+	var struck := {}
+	var shown_any := false
 	for g in group:
+		var pops: bool = g.t in POPPING
+		if pops and shown_any:
+			await _wait(0.3)
+		if g.t in ["hit", "miss"]:
+			var tid: int = int(g.get("target", -1))
+			if struck.has(tid):
+				if anim == "shoot":
+					av.figure.muzzle = 1.0
+					create_tween().tween_property(av.figure, "muzzle", 0.0, 0.2 / speed)
+				Audio.play(e.get("sfx", ""))
+			struck[tid] = true
 		_result(g)
+		shown_any = shown_any or pops
 	_move_has_sfx = false
 	await _wait(1.0)
 	# Give dealt cards (Stacked Deck) time to be read.
@@ -983,6 +1039,10 @@ func _popup(c: Combatant, text: String, color: Color, size: int = 28, yoff: floa
 	if c == null or not views.has(c.id):
 		return
 	var v: UnitView = views[c.id]
+	# Several popups on one unit in the same action stack upwards instead of overlapping.
+	var n: int = int(_popup_stack.get(c.id, 0))
+	_popup_stack[c.id] = n + 1
+	yoff += n * 30.0
 	var l := UI.lbl(text, size, "Header")
 	l.add_theme_color_override("font_color", color)
 	l.add_theme_constant_override("outline_size", 8)

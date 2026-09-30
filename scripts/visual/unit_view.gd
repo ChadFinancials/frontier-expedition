@@ -10,6 +10,11 @@ var glow: String = ""        # "", "enemy", "ally", "hover", "active"
 var base_scale := 1.2
 var paper_group: CanvasGroup = null   # paper-theater material around the figure
 var _t := 0.0
+## What the HUD shows. The engine resolves a whole action at once, so while the combat
+## screen plays it back the HUD is frozen and only moves as each hit lands (shift_hp,
+## sync); otherwise it follows the unit every frame.
+var shown: Dictionary = {}
+var frozen := false
 
 
 func setup(c: Combatant, paper: bool = false) -> void:
@@ -37,8 +42,43 @@ func set_glow(g: String) -> void:
 	queue_redraw()
 
 
+func sync() -> void:
+	var u := unit
+	if u == null:
+		return
+	shown = {"hp": u.hp, "max_hp": u.max_hp, "dd": u.deaths_door(), "fatigue": u.hero.fatigue if u.hero != null else 0.0,
+		"fstate": u.hero.fatigue_state if u.hero != null else "", "chips": u.status_chips(), "actions": u.actions_left}
+
+
+## A hit or heal landing on screen: move the shown HP now, before the full sync.
+func shift_hp(delta: int) -> void:
+	if shown.is_empty():
+		sync()
+	shown.hp = clampi(int(shown.hp) + delta, 0, int(shown.max_hp))
+	if unit.hero != null:
+		shown.dd = int(shown.hp) <= 0 and (bool(shown.dd) or delta < 0)
+
+
+func shift_fatigue(delta: float) -> void:
+	if shown.is_empty():
+		sync()
+	shown.fatigue = clampf(float(shown.fatigue) + delta, 0.0, 200.0)
+
+
+## Take the unit's statuses (and fatigue state) as they are now, leaving HP as shown.
+func sync_status() -> void:
+	if shown.is_empty():
+		sync()
+		return
+	shown.chips = unit.status_chips()
+	if unit.hero != null:
+		shown.fstate = unit.hero.fatigue_state
+
+
 func _process(delta: float) -> void:
 	_t += delta
+	if not frozen or shown.is_empty():
+		sync()
 	if paper_group != null:
 		paper_group.material.set_shader_parameter("grain_offset", get_global_transform_with_canvas().origin)
 	if glow != "":
@@ -76,37 +116,38 @@ class _Hud extends Node2D:
 
 	func _draw() -> void:
 		var u := view.unit
-		if u == null or u.dead:
+		if u == null or u.dead or view.shown.is_empty():
 			return
+		var sh: Dictionary = view.shown
 		var font: Font = UI.font_bold
 		var w := 124.0
 		var y := 16.0
 		# HP bar.
 		draw_rect(Rect2(-w / 2, y, w, 12), Color(0, 0, 0, 0.7))
-		var f := clampf(float(u.hp) / maxf(1.0, u.max_hp), 0.0, 1.0)
-		draw_rect(Rect2(-w / 2 + 1, y + 1, (w - 2) * f, 10), Color("#c0392b") if not u.deaths_door() else Color("#6b0f0f"))
-		var hp_txt := "%d/%d" % [u.hp, u.max_hp]
-		if u.deaths_door():
+		var f := clampf(float(sh.hp) / maxf(1.0, sh.max_hp), 0.0, 1.0)
+		draw_rect(Rect2(-w / 2 + 1, y + 1, (w - 2) * f, 10), Color("#c0392b") if not sh.dd else Color("#6b0f0f"))
+		var hp_txt := "%d/%d" % [sh.hp, sh.max_hp]
+		if sh.dd:
 			hp_txt = "DEATH'S DOOR"
 		_text(font, Vector2(0, y + 10), hp_txt, 12, Color.WHITE)
 		y += 14
 		if u.hero != null:
 			draw_rect(Rect2(-w / 2, y, w, 8), Color(0, 0, 0, 0.7))
-			var ff := clampf(u.hero.fatigue / 200.0, 0.0, 1.0)
+			var ff := clampf(float(sh.fatigue) / 200.0, 0.0, 1.0)
 			draw_rect(Rect2(-w / 2 + 1, y + 1, (w - 2) * ff, 6), UI.FATIGUE)
 			draw_line(Vector2(0, y), Vector2(0, y + 8), Color(1, 1, 1, 0.7), 1.5)
 			y += 10
-			if u.hero.fatigue_state != "":
-				var st: Dictionary = DB.fatigue_states[u.hero.fatigue_state]
+			if str(sh.fstate) != "" and DB.fatigue_states.has(str(sh.fstate)):
+				var st: Dictionary = DB.fatigue_states[str(sh.fstate)]
 				_text(font, Vector2(0, y + 14), st.name, 15, Color(st.get("color", "#ffffff")))
 				y += 18
 		# Turn markers: one gold pip per action this unit still has this round (like DD).
-		for k in u.actions_left:
+		for k in int(sh.actions):
 			var c := Vector2(w / 2 + 14, 22 + k * 20)
 			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -10), c + Vector2(8, 0), c + Vector2(0, 10), c + Vector2(-8, 0)]), Color(0, 0, 0, 0.8))
 			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -7), c + Vector2(5.5, 0), c + Vector2(0, 7), c + Vector2(-5.5, 0)]), Color("#e0bd4f"))
 		# Status chips.
-		var chips := u.status_chips()
+		var chips: Array = sh.chips
 		var x := -w / 2
 		for ch in chips:
 			var t: String = ch.text
