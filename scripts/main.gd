@@ -28,6 +28,8 @@ var grain_layer: Node = null
 
 func _ready() -> void:
 	inst = self
+	# play.bat runs the debug build of Godot, which adds " (DEBUG)" to the window title.
+	get_window().title = str(ProjectSettings.get_setting("application/config/name", "Frontier Expedition"))
 	theme = UI.theme()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	var bg := ColorRect.new()

@@ -1279,7 +1279,8 @@ func _hand_v(at: Vector2, dir: Vector2, c: Color) -> void:
 
 ## Sleeve from shoulder to wrist with an elbow, a cuff, and a hand.
 func _arm_v(shoulder: Vector2, hand: Vector2, c: Color, front: bool) -> void:
-	var elbow := bend(shoulder, hand, 7.0 if front else -6.0)
+	# Both elbows point backwards (a "<" facing right), like a working arm.
+	var elbow := bend(shoulder, hand, -7.0 if front else -6.0)
 	var wrist := hand + (elbow - hand).normalized() * 6.0
 	if body_style == 3:
 		# Puppet: two separate card pieces pinned at the elbow.

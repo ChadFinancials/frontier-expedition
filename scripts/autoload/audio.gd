@@ -6,6 +6,7 @@ const DIR := "res://assets/audio/"
 const POOL := 12
 
 var clips: Dictionary = {}       # name -> Array[AudioStream]
+var gains: Dictionary = {}       # AudioStream -> dB offset from levels.json (tools/level_audio.py)
 var players: Array = []
 var music_player: AudioStreamPlayer
 var _next := 0
@@ -26,6 +27,11 @@ func _load_clips() -> void:
 	var d := DirAccess.open(DIR)
 	if d == null:
 		return
+	var levels: Dictionary = {}
+	if FileAccess.file_exists(DIR + "levels.json"):
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(DIR + "levels.json"))
+		if parsed is Dictionary:
+			levels = parsed
 	for f in d.get_files():
 		# Exported builds list "x.wav.import" instead of "x.wav".
 		var fname := f.trim_suffix(".import").trim_suffix(".remap")
@@ -43,6 +49,7 @@ func _load_clips() -> void:
 			clips[key] = []
 		if not stream in clips[key]:
 			clips[key].append(stream)
+			gains[stream] = float(levels.get(base, 0.0))
 
 
 func has(name: String) -> bool:
@@ -58,7 +65,7 @@ func play(name: String, volume: float = 1.0, pitch_var: float = 0.08) -> void:
 	var p: AudioStreamPlayer = players[_next]
 	_next = (_next + 1) % players.size()
 	p.stream = clips[name][randi() % clips[name].size()]
-	p.volume_db = linear_to_db(vol)
+	p.volume_db = linear_to_db(vol) + float(gains.get(p.stream, 0.0))
 	p.pitch_scale = 1.0 + randf_range(-pitch_var, pitch_var)
 	p.play()
 

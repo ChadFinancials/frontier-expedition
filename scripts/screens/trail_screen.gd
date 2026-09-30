@@ -15,6 +15,9 @@ var scroll := 0.0
 var travelling := false
 var wagon_bar: StatBar
 var _walk_t := 0.0
+## Road news (scouting, food, wagon wear) from arriving at a stop that opens another screen
+## (a fight, camp, a cave). Held until the map is back, so there is time to read it.
+static var pending_notes: Array = []
 
 
 func setup(_params: Dictionary) -> void:
@@ -93,6 +96,9 @@ func setup(_params: Dictionary) -> void:
 	bh.add_child(log_label)
 	refresh()
 	Audio.play_music("music_trail")
+	for m in pending_notes:
+		Main.inst.toast(m, _note_kind(m))
+	pending_notes = []
 	if _has_story(run.current_node()):
 		call_deferred("_show_story", run.current_node(), Callable())
 		return
@@ -231,7 +237,7 @@ func _travel(id: int, confirmed: bool = false) -> void:
 		return
 	travelling = true
 	map.enabled = false
-	Audio.play("wagon")
+	Audio.play("footsteps", 0.8)
 	var start := scroll
 	var tw := create_tween()
 	tw.tween_method(func(v):
@@ -242,14 +248,22 @@ func _travel(id: int, confirmed: bool = false) -> void:
 	var msgs := run.travel_to(id)
 	travelling = false
 	map.enabled = true
+	var leaving: bool = not run.current_node().done and run.current_node().type in ["fight", "elite", "boss", "crossing", "camp", "cave"]
 	for m in msgs:
-		Main.inst.toast(m, "bad" if "hungry" in m or "BROKEN" in m or "Breaking" in m or "BREAKING" in m else "neutral")
+		if leaving:
+			pending_notes.append(m)
+		else:
+			Main.inst.toast(m, _note_kind(m))
 	Game.save_game()
 	refresh()
 	if run.party_heroes().is_empty():
 		_check_end()
 		return
 	_resolve_node()
+
+
+func _note_kind(m: String) -> String:
+	return "bad" if "hungry" in m or "BROKEN" in m or "Breaking" in m or "BREAKING" in m else "neutral"
 
 
 func _has_story(n: Dictionary) -> bool:
