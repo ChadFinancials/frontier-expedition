@@ -80,7 +80,7 @@ plain light background: the prep script removes it.
 
 1. Save the picture you like as **`art-src/icons/<key>.png`** (or .webp/.jpg), named by its
    key: `food`, `bandage`, `vial` (antivenom), `bottle` (whiskey), `oil`, `rope`, `shovel`,
-   `crowbar`, `salt`, `wheel` (wagon parts), `timber`, `iron`, `money` (chips), `week`,
+   `salt`, `wheel` (wagon parts), `timber`, `iron`, `money` (chips), `week`,
    `wagon`, `xp`, `eye` (scouting), `charter`, `skull`.
 2. Either run `python tools/art/prep_icons.py --dir art-src/icons` (needs
    `pip install pillow numpy`), which writes the game-ready `assets/art/icons/<key>.png`

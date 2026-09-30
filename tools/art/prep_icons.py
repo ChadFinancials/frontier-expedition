@@ -9,7 +9,7 @@ in docs/COMFYUI_BRIEF.md). Needs Pillow and numpy: pip install pillow numpy
 
 How the background goes: its colour is read from the image border; everything of that colour
 connected to the border is removed (a loose match, so soft ground shadows go too, stopped by
-the dark outline). For keys in POCKET_KEYS (see-through shapes like the wheel) enclosed
+the dark outline; coloured shadows listed in SHADOW_COLS go the same way). For keys in POCKET_KEYS (see-through shapes like the wheel) enclosed
 pockets of the background colour are removed too. Edge pixels fade out so there is no halo.
 """
 import os
@@ -31,6 +31,10 @@ MARGIN = 0.07       # clear margin around the trimmed icon
 # are cut out too. Off for everything else, because a paper, canvas or label inside the
 # outline is often the same cream as the background.
 POCKET_KEYS = {"wheel"}
+# Coloured ground shadows the grey-shadow rule misses, per key: the shadow's colour. Pixels near
+# it that join the background go too (the dark outline stops the flood at the object).
+SHADOW_COLS = {"bottle": [(197, 106, 50)]}
+SHADOW_TOL = 40
 
 
 def _flood(ok: np.ndarray, seeds) -> np.ndarray:
@@ -66,6 +70,11 @@ def prep(src: str, key: str, pockets: bool | None = None) -> str:
     lum = rgb.mean(axis=2)
     sat = rgb.max(axis=2) - rgb.min(axis=2)
     shadow = (lum > 150) & (sat < 45)
+    for c in SHADOW_COLS.get(key, []):
+        # Distance to the blend from background to shadow colour, so the soft rim goes too.
+        seg = np.array(c, np.float32) - bg
+        t = np.clip(((rgb - bg) * seg).sum(axis=2) / max(float((seg * seg).sum()), 1.0), 0.0, 1.0)
+        shadow |= np.sqrt(((rgb - (bg + t[:, :, None] * seg)) ** 2).sum(axis=2)) < SHADOW_TOL
     is_bg = _flood((dist < LOOSE) | shadow, seeds)
     # Enclosed pockets of plain background.
     near = ((dist < TIGHT) & ~is_bg) if pockets else np.zeros_like(is_bg)
