@@ -7,6 +7,22 @@ rem "C:\...\frontier-expedition\" and that final \" escapes the closing quote, s
 rem path arrives malformed. The trailing backslash is stripped below.
 cd /d "%~dp0"
 
+rem Pull the latest version from GitHub first, so the game is always current.
+rem Skipped quietly when Git isn't installed or this folder isn't a Git clone; if the pull
+rem fails (offline, or local edits in the way) the game still starts with what's here.
+if exist ".git" (
+  where git >nul 2>nul
+  if not errorlevel 1 (
+    echo Checking GitHub for updates...
+    git pull --ff-only origin main
+    if errorlevel 1 (
+      echo.
+      echo Could not update ^(offline, or local changes in the way^). Starting the current version.
+      echo.
+    )
+  )
+)
+
 set "REPO=%~dp0"
 if "%REPO:~-1%"=="\" set "REPO=%REPO:~0,-1%"
 

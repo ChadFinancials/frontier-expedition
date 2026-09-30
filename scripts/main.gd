@@ -50,6 +50,7 @@ func _ready() -> void:
 		grain_layer = grain
 		add_child.call_deferred(grain)
 	add_child(toast_layer)
+	_add_version_label()
 	fade = ColorRect.new()
 	fade.color = Color(0, 0, 0, 1)
 	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -192,6 +193,48 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif screen_name != "menu":
 			pause_menu()
 		get_viewport().set_input_as_handled()
+
+
+## "v0.6 · 14b4f60" in the bottom-right corner, so playtest feedback names the exact build.
+func _add_version_label() -> void:
+	var l := UI.lbl(version_text(), 14, "Bold")
+	l.modulate = Color(1, 1, 1, 0.55)
+	l.add_theme_constant_override("outline_size", 4)
+	l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	l.position = Vector2(1920 - 330, 1080 - 24)
+	l.size = Vector2(320, 20)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.z_index = 90
+	add_child(l)
+
+
+## The version from project.godot plus, when run from a Git clone, the current commit.
+static func version_text() -> String:
+	var v := "v" + str(ProjectSettings.get_setting("application/config/version", "?"))
+	var sha := _git_commit()
+	return v + ("  ·  " + sha if sha != "" else "")
+
+
+static func _git_commit() -> String:
+	var root := ProjectSettings.globalize_path("res://")
+	var head_path := root.path_join(".git/HEAD")
+	if not FileAccess.file_exists(head_path):
+		return ""
+	var head := FileAccess.get_file_as_string(head_path).strip_edges()
+	if not head.begins_with("ref: "):
+		return head.substr(0, 7)
+	var ref := head.substr(5)
+	var ref_path := root.path_join(".git").path_join(ref)
+	if FileAccess.file_exists(ref_path):
+		return FileAccess.get_file_as_string(ref_path).strip_edges().substr(0, 7)
+	# Refs can also live in packed-refs ("<sha> <ref>" per line).
+	var packed := root.path_join(".git/packed-refs")
+	if FileAccess.file_exists(packed):
+		for line in FileAccess.get_file_as_string(packed).split("\n"):
+			if line.ends_with(" " + ref):
+				return line.substr(0, 7)
+	return ""
 
 
 func pause_menu() -> void:
