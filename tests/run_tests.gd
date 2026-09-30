@@ -308,12 +308,13 @@ func test_turn_order() -> void:
 	var e := CombatEngine.new()
 	e.setup(party, ["outlaw_brawler", "prairie_wolf"], {"rng": rng})
 	e._start_round()
-	# Strictly by Speed: every unit once, fastest first.
-	var speeds: Array = e.queue.map(func(c): return int(c.stat("speed")))
+	# By Speed plus this round's small roll: every unit once, highest first.
+	var speeds: Array = e.queue.map(func(c): return int(c.stat("speed")) + c.speed_roll)
 	var sorted_speeds := speeds.duplicate()
 	sorted_speeds.sort()
 	sorted_speeds.reverse()
-	check(speeds == sorted_speeds and e.queue.size() == 4, "turn order follows Speed, highest first (%s)" % str(speeds))
+	check(speeds == sorted_speeds and e.queue.size() == 4, "turn order follows Speed + roll, highest first (%s)" % str(speeds))
+	check(e.queue.all(func(c): return c.speed_roll >= 1 and c.speed_roll <= int(DB.cfg("initiative_roll", 3))), "initiative roll is 1 to 3")
 	check(e.queue.all(func(c): return c.actions_left == 1), "everyone starts the round with one action")
 	# A mid-round Speed buff counts at once.
 	var slow: Combatant = e.queue[e.queue.size() - 1]

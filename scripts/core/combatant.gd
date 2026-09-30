@@ -27,6 +27,7 @@ var initiative: int = 0          # round-1 surprise bonus (+100 for the side tha
 var actions_left: int = 0        # turns still to take this round (heroes 1; some bosses more)
 var actions_used: int = 0        # turns taken this round
 var tiebreak: float = 0.0        # random each round: settles equal speeds 50/50
+var speed_roll: int = 0          # this round's small initiative roll, added to Speed
 
 
 ## Turns per round: 1, or the enemy's "actions" field (bosses can act more than once).

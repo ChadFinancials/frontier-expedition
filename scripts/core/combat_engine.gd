@@ -144,8 +144,9 @@ func step() -> Array:
 
 
 ## Everyone gets their turns for the round (heroes 1, some bosses more). Order is decided
-## turn by turn by current Speed (so a mid-round Speed buff or debuff counts at once):
-## fastest first, equal Speed settled by a coin flip each round. A unit's second action
+## turn by turn by current Speed plus a small roll made at the start of the round
+## (config "initiative_roll": 1..N, 0 = strict Speed), so a mid-round Speed buff or debuff
+## counts at once: highest first, exact ties settled by a coin flip. A unit's second action
 ## comes after everyone's first.
 func _start_round() -> Array:
 	round_num += 1
@@ -153,6 +154,8 @@ func _start_round() -> Array:
 		c.actions_left = 0 if c.dead else c.actions_per_round()
 		c.actions_used = 0
 		c.tiebreak = rng.randf()
+		var roll := int(DB.cfg("initiative_roll", 3))
+		c.speed_roll = rng.randi_range(1, roll) if roll > 0 else 0
 		c.initiative = 0
 		if round_num == 1:
 			if surprise == "heroes" and not c.is_hero():
@@ -179,8 +182,8 @@ func _turn_order() -> Array:
 			return x.n < y.n
 		if x.c.initiative != y.c.initiative:
 			return x.c.initiative > y.c.initiative
-		var sx: float = x.c.stat("speed")
-		var sy: float = y.c.stat("speed")
+		var sx: float = x.c.stat("speed") + x.c.speed_roll
+		var sy: float = y.c.stat("speed") + y.c.speed_roll
 		if sx != sy:
 			return sx > sy
 		return x.c.tiebreak > y.c.tiebreak)

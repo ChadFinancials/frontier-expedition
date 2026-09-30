@@ -139,8 +139,9 @@ Full skill lists are in `data/classes.json` and `data/skills.json`.
 ### Rules
 - Four ranks per side. Every skill lists the ranks it can be **used from** and the ranks
   it can **target**. A skill that hits every listed rank is marked AoE.
-- **Turn order**: strictly by current Speed, highest first (buffs and debuffs count the moment
-  they land); equal Speed is a coin flip each round. Each unit has one action per round (an
+- **Turn order**: current Speed plus a small roll (1-3, `initiative_roll` in config; 0 = strict),
+  rolled at the start of each round; highest first. Buffs and debuffs count the moment they land;
+  exact ties are a coin flip. A unit 3+ Speed faster always goes first; within 1-2 it's likely. Each unit has one action per round (an
   enemy can have more via its `actions` field; extra actions come after everyone's first). A
   gold diamond beside a unit's bars shows each action it still has this round. Round 1 after an
   ambush: the side that got the jump acts first.
