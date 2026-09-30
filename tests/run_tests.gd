@@ -35,6 +35,8 @@ func _ready() -> void:
 	test_enemy_moves()
 	print("> test_hero_moves()")
 	test_hero_moves()
+	print("> test_turn_order()")
+	test_turn_order()
 	print("> test_deaths_door()")
 	test_deaths_door()
 	print("> test_fatigue()")
@@ -295,6 +297,53 @@ func test_hero_moves() -> void:
 	check(hit_ids.size() == 2 and hit_ids.all(func(id): return e2.unit(id).rank >= 3), "Flash Powder hits the back pair when a back-liner is picked")
 	e2.use_skill(pros, "pr_rock_hammer", e2.enemies[0].id)
 	check(e2.valid_targets(pros, "pr_rock_hammer").is_empty(), "Depth Charge is once per fight")
+
+
+func test_turn_order() -> void:
+	var co := Company.new()
+	co.new_game(31)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 9
+	var party := [co.make_hero("gunslinger"), co.make_hero("marshal")]
+	var e := CombatEngine.new()
+	e.setup(party, ["outlaw_brawler", "prairie_wolf"], {"rng": rng})
+	e._start_round()
+	# Strictly by Speed: every unit once, fastest first.
+	var speeds: Array = e.queue.map(func(c): return int(c.stat("speed")))
+	var sorted_speeds := speeds.duplicate()
+	sorted_speeds.sort()
+	sorted_speeds.reverse()
+	check(speeds == sorted_speeds and e.queue.size() == 4, "turn order follows Speed, highest first (%s)" % str(speeds))
+	check(e.queue.all(func(c): return c.actions_left == 1), "everyone starts the round with one action")
+	# A mid-round Speed buff counts at once.
+	var slow: Combatant = e.queue[e.queue.size() - 1]
+	slow.buffs.append({"stat": "speed", "value": 50, "rounds": 2, "name": "test"})
+	check(e._next_actor() == slow, "a Speed buff moves a unit up immediately")
+	slow.buffs.clear()
+	# Ties are a coin flip.
+	var a: Combatant = e.heroes[0]
+	var b: Combatant = e.heroes[1]
+	var tie := int(a.stat("speed")) - int(b.stat("speed"))
+	b.buffs.append({"stat": "speed", "value": tie, "rounds": 99, "name": "tie"})
+	var a_first := 0
+	for i in 400:
+		e._start_round()
+		var order := e._turn_order()
+		if order.find(a) < order.find(b):
+			a_first += 1
+	check(a_first > 150 and a_first < 250, "equal Speed goes either way about half the time (%d/400)" % a_first)
+	# A boss with two actions takes its second after everyone's first.
+	var boss: Combatant = e.enemies[0]
+	boss.data = boss.data.duplicate()
+	boss.data["actions"] = 2
+	e._start_round()
+	var order2 := e._turn_order()
+	check(order2.count(boss) == 2 and order2[order2.size() - 1] == boss, "second boss action comes after everyone's first")
+	# Taking a turn spends the marker.
+	var ev := e.step()
+	var turn_ev: Array = ev.filter(func(x): return x.t == "turn")
+	var who: Combatant = e.unit(turn_ev[0].actor)
+	check(who.actions_left == who.actions_per_round() - 1, "taking a turn spends that unit's action marker")
 
 
 func test_deaths_door() -> void:

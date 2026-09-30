@@ -139,7 +139,11 @@ Full skill lists are in `data/classes.json` and `data/skills.json`.
 ### Rules
 - Four ranks per side. Every skill lists the ranks it can be **used from** and the ranks
   it can **target**. A skill that hits every listed rank is marked AoE.
-- **Turn order**: each round every unit rolls `speed + 1d8`; highest goes first.
+- **Turn order**: strictly by current Speed, highest first (buffs and debuffs count the moment
+  they land); equal Speed is a coin flip each round. Each unit has one action per round (an
+  enemy can have more via its `actions` field; extra actions come after everyone's first). A
+  gold diamond beside a unit's bars shows each action it still has this round. Round 1 after an
+  ambush: the side that got the jump acts first.
 - **Hit chance** = `skill accuracy + attacker accuracy − target dodge`, clamped to
   **5–95%** and always shown. Ally-targeted skills always hit.
 - **Crit chance** = `attacker crit + skill crit modifier`. Crits deal ×1.5 damage and

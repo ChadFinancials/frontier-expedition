@@ -106,13 +106,15 @@ func step() -> Array:
 	var ev: Array = []
 	if is_over() or state == "await":
 		return ev
-	while true:
-		if queue.is_empty():
-			ev.append_array(_start_round())
-		current = queue.pop_front()
-		if current == null or current.dead:
-			continue
-		break
+	current = _next_actor()
+	if current == null:
+		ev.append_array(_start_round())
+		current = _next_actor()
+	if current == null:
+		return ev
+	current.actions_left -= 1
+	current.actions_used += 1
+	queue = _turn_order()
 	_check_script(ev)
 	if is_over():
 		return ev
@@ -141,24 +143,53 @@ func step() -> Array:
 	return ev
 
 
+## Everyone gets their turns for the round (heroes 1, some bosses more). Order is decided
+## turn by turn by current Speed (so a mid-round Speed buff or debuff counts at once):
+## fastest first, equal Speed settled by a coin flip each round. A unit's second action
+## comes after everyone's first.
 func _start_round() -> Array:
 	round_num += 1
-	queue.clear()
 	for c in heroes + enemies:
-		if c.dead:
-			continue
-		c.initiative = int(c.stat("speed")) + rng.randi_range(1, 8)
+		c.actions_left = 0 if c.dead else c.actions_per_round()
+		c.actions_used = 0
+		c.tiebreak = rng.randf()
+		c.initiative = 0
 		if round_num == 1:
 			if surprise == "heroes" and not c.is_hero():
-				c.initiative += 100
+				c.initiative = 100
 			elif surprise == "enemies" and c.is_hero():
-				c.initiative += 100
-		queue.append(c)
-	queue.sort_custom(func(a, b): return a.initiative > b.initiative)
+				c.initiative = 100
+	queue = _turn_order()
 	var order: Array = []
 	for c in queue:
 		order.append(c.id)
 	return [{"t": "round", "round": round_num, "order": order}]
+
+
+## Units still to act this round, next first (a unit with 2 actions left appears twice).
+func _turn_order() -> Array:
+	var slots: Array = []
+	for c in heroes + enemies:
+		if c.dead:
+			continue
+		for k in c.actions_left:
+			slots.append({"c": c, "n": c.actions_used + k})
+	slots.sort_custom(func(x, y):
+		if x.n != y.n:
+			return x.n < y.n
+		if x.c.initiative != y.c.initiative:
+			return x.c.initiative > y.c.initiative
+		var sx: float = x.c.stat("speed")
+		var sy: float = y.c.stat("speed")
+		if sx != sy:
+			return sx > sy
+		return x.c.tiebreak > y.c.tiebreak)
+	return slots.map(func(s): return s.c)
+
+
+func _next_actor() -> Combatant:
+	var order := _turn_order()
+	return order[0] if not order.is_empty() else null
 
 
 func _start_turn(c: Combatant) -> Array:

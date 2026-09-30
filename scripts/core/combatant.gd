@@ -23,7 +23,15 @@ var guarding: int = -1           # id of the ally this unit shields
 var guarded_by: int = -1
 var taunt: int = 0
 var dead: bool = false
-var initiative: int = 0
+var initiative: int = 0          # round-1 surprise bonus (+100 for the side that got the jump)
+var actions_left: int = 0        # turns still to take this round (heroes 1; some bosses more)
+var actions_used: int = 0        # turns taken this round
+var tiebreak: float = 0.0        # random each round: settles equal speeds 50/50
+
+
+## Turns per round: 1, or the enemy's "actions" field (bosses can act more than once).
+func actions_per_round() -> int:
+	return 1 if hero != null else maxi(1, int(data.get("actions", 1)))
 var tier: int = 1
 var boss: bool = false
 var rank: int = 1

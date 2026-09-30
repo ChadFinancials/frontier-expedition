@@ -100,6 +100,11 @@ class _Hud extends Node2D:
 				var st: Dictionary = DB.fatigue_states[u.hero.fatigue_state]
 				_text(font, Vector2(0, y + 14), st.name, 15, Color(st.get("color", "#ffffff")))
 				y += 18
+		# Turn markers: one gold pip per action this unit still has this round (like DD).
+		for k in u.actions_left:
+			var c := Vector2(w / 2 + 14, 22 + k * 20)
+			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -10), c + Vector2(8, 0), c + Vector2(0, 10), c + Vector2(-8, 0)]), Color(0, 0, 0, 0.8))
+			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -7), c + Vector2(5.5, 0), c + Vector2(0, 7), c + Vector2(-5.5, 0)]), Color("#e0bd4f"))
 		# Status chips.
 		var chips := u.status_chips()
 		var x := -w / 2
