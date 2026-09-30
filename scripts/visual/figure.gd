@@ -36,6 +36,13 @@ var face_style: int = 2
 ## How far forward of the head centre the face sits, in local pixels. Lower is closer to
 ## the face. 9 read as poking off the front; the approved value is nearer 4.
 var face_shift: float = 4.0
+## Hat variant. 0 is the old shared shape where cowboy, stetson, stetson_black and
+## cowboy_wide all drew the same two polygons at different sizes. 1 gives each its own
+## silhouette. See docs/ART_PIPELINE.md.
+var hat_style: int = 0
+## Eye variant. 3 is the approved look: a wide black oval, no white. 0 is the older white
+## oval with a black pupil. 1 dot, 2 tall oval, 4 dot with a lid, 5 L bracket. See docs/ART_PIPELINE.md.
+var eye_style: int = 3
 
 var _shapes: Array = []
 var _t: float = 0.0
@@ -666,12 +673,32 @@ func _face(head: Vector2) -> void:
 		if eye_scale <= 0.06:
 			_line([head + fwd + Vector2(ex - 2, -3), head + fwd + Vector2(ex + 2, -3)], 1.8, ink, {"no_edge": true})
 		else:
-			# A white oval with a black pupil, not the reverse, and a touch smaller. A black
-			# disc with a white speck read as a hole rather than an eye.
-			var rx: float = (3.5 if side == 0 else 2.9) * eye_scale
-			var ry: float = (4.0 if side == 0 else 3.4) * eye_scale
-			_poly(ellipse(head + fwd + Vector2(ex, -3), rx, ry, 14), white, {"no_edge": true})
-			_circle(head + fwd + Vector2(ex + 0.5, -3), maxf(0.8, 1.3 * eye_scale), ink, {"no_edge": true})
+			var base: float = 3.4 * eye_scale
+			var ctr: Vector2 = head + fwd + Vector2(ex, -3)
+			match eye_style:
+				1:
+					# A plain black dot. The simplest thing that can read as an eye.
+					_circle(ctr, base * 0.92, ink, {"no_edge": true})
+				2:
+					# A tall black oval.
+					_poly(ellipse(ctr, base * 0.72, base * 1.3, 12), ink, {"no_edge": true})
+				3:
+					# A wide black oval, flatter and more watchful.
+					_poly(ellipse(ctr, base * 1.3, base * 0.78, 12), ink, {"no_edge": true})
+				4:
+					# Dot under a lid line: hooded, half closed.
+					_circle(ctr + Vector2(0, 1), base * 0.85, ink, {"no_edge": true})
+					_line([ctr + Vector2(-3.6, -6), ctr + Vector2(3.6, -6)], 1.7, ink, {"no_edge": true})
+				5:
+					# An L bracket: a corner mark, like a cartoon closed or squinting eye.
+					_line([ctr + Vector2(-3.2, -6), ctr + Vector2(-3.2, 1.6)], 1.8, ink, {"no_edge": true})
+					_line([ctr + Vector2(-3.2, 1.6), ctr + Vector2(3.2, 1.6)], 1.8, ink, {"no_edge": true})
+				_:
+					# Approved: white oval with a black pupil, not the reverse.
+					var rx: float = (3.5 if side == 0 else 2.9) * eye_scale
+					var ry: float = (4.0 if side == 0 else 3.4) * eye_scale
+					_poly(ellipse(ctr, rx, ry, 14), white, {"no_edge": true})
+					_circle(ctr + Vector2(0.5, 0), maxf(0.8, 1.3 * eye_scale), ink, {"no_edge": true})
 	# Brows, tilted by brow_ang so the expression reads even when the eyes are tiny.
 	var by: float = -11.0 + brow_dy
 	var tilt: float = brow_ang * 3.0
@@ -698,6 +725,9 @@ func _hat(head: Vector2) -> void:
 	var y := head.y - 8
 	match hat:
 		"cowboy", "stetson", "stetson_black", "cowboy_wide":
+			if hat_style == 1:
+				_hat_new(hat, y, hc)
+				return
 			var bw := 40.0 if hat == "cowboy_wide" else (32.0 if hat != "stetson" and hat != "stetson_black" else 34.0)
 			var ch := 26.0 if hat in ["stetson", "stetson_black"] else 20.0
 			_poly([Vector2(-bw, y - 2), Vector2(-bw + 6, y - 6), Vector2(bw - 6, y - 6), Vector2(bw + 4, y - 4), Vector2(bw, y + 1), Vector2(0, y - 2)], hc)
@@ -729,6 +759,34 @@ func _hat(head: Vector2) -> void:
 			_poly(ellipse(Vector2(head.x, y - 2), 18, 16, 12, PI, TAU), hc)
 			_circle(Vector2(head.x + 14, y - 6), 26.0, Color(1, 0.9, 0.5, 0.18), {"glow": true})
 			_circle(Vector2(head.x + 14, y - 6), 5.0, Color("#fff3b0"))
+
+
+## Distinct hat silhouettes. Each key gets its own brim curve and crown, instead of the
+## old single shape with two numbers changed.
+func _hat_new(hat: String, y: float, hc: Color) -> void:
+	var band: Color = col("accent", "#8b2e2e").darkened(0.2)
+	match hat:
+		"cowboy":
+			# Medium brim curling up at the sides, pinched crown with a crease.
+			_poly([Vector2(-31, y + 2), Vector2(-25, y - 4), Vector2(-14, y - 7), Vector2(15, y - 7), Vector2(27, y - 3), Vector2(32, y + 3), Vector2(20, y + 4), Vector2(-20, y + 4)], hc)
+			_poly([Vector2(-13, y - 6), Vector2(15, y - 6), Vector2(13, y - 23), Vector2(1, y - 27), Vector2(-11, y - 23)], hc.lightened(0.06))
+			_poly([Vector2(-8, y - 25), Vector2(10, y - 25), Vector2(9, y - 20), Vector2(-7, y - 20)], hc.darkened(0.24))
+			_poly([Vector2(-13, y - 6), Vector2(15, y - 6), Vector2(14.5, y - 12), Vector2(-12.5, y - 12)], band)
+		"stetson", "stetson_black":
+			# Wider rolled brim sitting higher at the front, tall dented crown.
+			_poly([Vector2(-37, y + 3), Vector2(-29, y - 5), Vector2(-16, y - 9), Vector2(17, y - 9), Vector2(31, y - 5), Vector2(38, y + 2), Vector2(24, y + 5), Vector2(-24, y + 5)], hc)
+			_poly([Vector2(-14, y - 8), Vector2(16, y - 8), Vector2(15, y - 31), Vector2(1, y - 35), Vector2(-13, y - 31)], hc.lightened(0.06))
+			_poly([Vector2(-8, y - 34), Vector2(10, y - 34), Vector2(9, y - 27), Vector2(-7, y - 27)], hc.darkened(0.26))
+			_poly([Vector2(-14, y - 8), Vector2(16, y - 8), Vector2(15.5, y - 14), Vector2(-13.5, y - 14)], hc.darkened(0.38))
+		"cowboy_wide":
+			# A flat, very wide brim with no curl, and a low flat crown.
+			_poly([Vector2(-45, y - 5), Vector2(47, y - 5), Vector2(45, y + 2), Vector2(-43, y + 2)], hc)
+			_poly([Vector2(-13, y - 5), Vector2(15, y - 5), Vector2(13, y - 19), Vector2(1, y - 21), Vector2(-11, y - 19)], hc.lightened(0.06))
+			_poly([Vector2(-13, y - 5), Vector2(15, y - 5), Vector2(14.5, y - 10), Vector2(-12.5, y - 10)], band)
+		_:
+			_poly([Vector2(-34, y + 2), Vector2(-26, y - 5), Vector2(17, y - 5), Vector2(34, y + 3), Vector2(22, y + 4), Vector2(-22, y + 4)], hc)
+			_poly([Vector2(-14, y - 5), Vector2(16, y - 5), Vector2(14, y - 24), Vector2(1, y - 28), Vector2(-12, y - 24)], hc.lightened(0.06))
+			_poly([Vector2(-14, y - 5), Vector2(16, y - 5), Vector2(15.5, y - 11), Vector2(-13.5, y - 11)], band)
 
 
 func _weapon(kind: String, hand: Vector2, ang: float, back: bool) -> void:

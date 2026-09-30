@@ -53,6 +53,62 @@ static func run(main: Main, args: Dictionary) -> void:
 				var l := UI.lbl(ids[i], 20, "Bold")
 				l.position = f.position + Vector2(-80, 20)
 				root.add_child(l)
+		"eye_ab":
+			# The same Marshal head with six eye treatments: the approved white oval first,
+			# then five black-only shapes.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var root := Control.new()
+			root.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(root)
+			var bgc := ColorRect.new()
+			bgc.color = Color("#8a7a5e")
+			bgc.set_anchors_preset(Control.PRESET_FULL_RECT)
+			root.add_child(bgc)
+			var labels: Array = ["0 white oval", "1 black dot", "2 tall oval", "3 wide oval", "4 dot + lid", "5 L bracket"]
+			for i in 6:
+				var f := Figure.new()
+				f.crafted = true
+				f.eye_style = i
+				f.setup(DB.classes["marshal"].look, 7, 1)
+				f.scale *= 2.4
+				f.position = Vector2(210 + i * 300, 760)
+				root.add_child(f)
+				var txt: String = labels[i]
+				var l := UI.lbl(txt, 20, "Bold")
+				l.position = Vector2(120 + i * 300, 776)
+				root.add_child(l)
+		"hat_ab":
+			# Marshal, Gunslinger and Wrangler: the old shared hat on top, the distinct
+			# silhouettes underneath. These three are the classes that looked identical.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var root := Control.new()
+			root.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(root)
+			var bgc := ColorRect.new()
+			bgc.color = Color("#8a7a5e")
+			bgc.set_anchors_preset(Control.PRESET_FULL_RECT)
+			root.add_child(bgc)
+			var ids: Array = ["marshal", "gunslinger", "wrangler"]
+			for row in 2:
+				var feet: float = 500.0 + row * 450.0
+				var tag: String = "BEFORE  shared shape" if row == 0 else "NEW  distinct silhouettes"
+				var t := UI.lbl(tag, 22, "Bold")
+				t.position = Vector2(20, feet - 420.0)
+				root.add_child(t)
+				for i in ids.size():
+					var cid: String = ids[i]
+					var f := Figure.new()
+					f.crafted = true
+					f.hat_style = row
+					f.setup(DB.cls(cid).look, 7, 1)
+					f.scale *= 1.6
+					f.position = Vector2(420 + i * 520, feet)
+					root.add_child(f)
+					var l := UI.lbl(cid, 20, "Bold")
+					l.position = Vector2(360 + i * 520, feet + 14.0)
+					root.add_child(l)
 		"face_shift":
 			# The approved face at four forward offsets, to pick how far off the head it sits.
 			await main.goto("menu", {}, true)

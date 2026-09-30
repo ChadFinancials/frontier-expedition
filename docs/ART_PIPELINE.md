@@ -439,8 +439,16 @@ Two failed attempts are worth recording:
 2. Mask plates over the face were rejected outright: "1 and 3 are awful and have like a white
    blob taking up the space". Do not put a plate over the face.
 
-Eyes are a **white oval with a black pupil**, not the reverse. A black disc with a white speck
-reads as a hole rather than an eye. They are deliberately small, about 3.5 x 4.0 px at scale 1.
+Eyes are a **wide black oval with no white**, `eye_style = 3`. History: a black disc with a
+white speck read as a hole, so it became a white oval with a black pupil, and the owner then
+chose to drop the white entirely. The alternatives are still in `_face` for later:
+0 white oval with a pupil, 1 plain dot, 2 tall oval, 4 dot with a lid line, 5 an L bracket.
+**Style 5 reads as a closed or winking eye**, so it suits a squint state such as `hurt` better
+than a base eye, and it is not wired up yet.
+
+Sizes are deliberately small, about 3.4px at scale 1. Note that the vision check judged the
+white oval as reading more clearly as an eye than any black-only shape, so the black-only
+choice is a style decision rather than a legibility win.
 
 `_face_expr()` changes brows, eye openness and mouth shape per pose, so one face carries every
 pose:
