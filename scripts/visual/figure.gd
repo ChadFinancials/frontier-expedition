@@ -43,6 +43,11 @@ var hat_style: int = 0
 ## Eye variant. 3 is the approved look: a wide black oval, no white. 0 is the older white
 ## oval with a black pupil. 1 dot, 2 tall oval, 4 dot with a lid, 5 L bracket. See docs/ART_PIPELINE.md.
 var eye_style: int = 3
+## Body construction experiment (A/B). 0 is the current body. 1 tailored curves, 2 curves plus
+## costume detail, 3 jointed paper puppet, 4 ink illustration, 5 painted volume.
+## Head, face, hat and weapon are shared. See docs/ART_PIPELINE.md and shot=body_ab.
+static var default_body := 0
+var body_style: int = default_body
 
 var _shapes: Array = []
 var _t: float = 0.0
@@ -116,9 +121,16 @@ func _draw() -> void:
 	if _dirty:
 		_shapes.clear()
 		_build()
-		if crafted:
+		if crafted and body_style < 4:
 			_add_hatching()
+		if body_style == 3:
+			_add_deckle()
+		if body_style == 5:
+			_add_light_bands()
 		_dirty = false
+	if body_style >= 3:
+		_draw_layered()
+		return
 	var breathe := 1.0 + 0.012 * sin(_t * 2.2 + look_seed % 7) if idle_anim and pose != "dead" else 1.0
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, breathe))
 	# Shadow pass.
@@ -503,67 +515,70 @@ func _build_human() -> void:
 		_line([Vector2(-w / 2 - 2, hip + 2), Vector2(-w / 2 - 8, hip + 18)], 2.0, DARK_METAL)
 		_circle(Vector2(-w / 2 - 8, hip + 30), 22.0, Color(1, 0.8, 0.3, 0.18), {"glow": true})
 		_poly([Vector2(-w / 2 - 15, hip + 18), Vector2(-w / 2 - 1, hip + 18), Vector2(-w / 2 - 3, hip + 40), Vector2(-w / 2 - 13, hip + 40)], Color("#f2c14e"))
-	# Coat tails behind the legs.
-	var tail_y: float = {"duster": -34.0, "long": -44.0, "frock": -54.0}.get(coat_kind, 0.0)
-	if tail_y != 0.0:
-		_poly([Vector2(-w / 2 - 3, hip - 6), Vector2(w / 2 + 3, hip - 6), Vector2(w / 2 + 12, tail_y), Vector2(-w / 2 - 14, tail_y)], coat.darkened(0.12))
-	# Back arm (behind the body).
-	_arm(shoulder_b, hand_b, coat.darkened(0.25), false)
-	if weapon == "pistols":
-		_weapon("pistol", hand_b, 0.0 if pose == "aim" else 1.2, true)
-	# Legs.
-	var leg_c := pants
-	if crafted:
-		# Storybook legs: tapered, a little bend at the knee, big boots with heels.
-		_poly([Vector2(-17, hip), Vector2(1, hip), Vector2(-1, -52), Vector2(-4, -12), Vector2(-15, -12), Vector2(-18, -52)], leg_c.darkened(0.15))
-		_poly([Vector2(-2, hip), Vector2(16, hip), Vector2(15, -52), Vector2(13, -12), Vector2(2, -12), Vector2(0, -52)], leg_c)
-		if coat_kind == "chaps":
-			_poly([Vector2(0, hip + 10), Vector2(17, hip + 8), Vector2(15, -16), Vector2(3, -16)], coat)
-		_poly([Vector2(-19, -15), Vector2(-3, -15), Vector2(-1, -7), Vector2(4, -5), Vector2(4, 0), Vector2(-21, 0), Vector2(-21, -5)], BOOT)
-		_poly([Vector2(0, -15), Vector2(15, -15), Vector2(17, -8), Vector2(25, -5), Vector2(26, 0), Vector2(-1, 0), Vector2(-1, -5)], BOOT)
+	if body_style > 0:
+		_body_v(w, hip, sh, shoulder_f, shoulder_b, hand_b, coat, pants, shirt, coat_kind, build, weapon)
 	else:
-		_poly([Vector2(-16, hip), Vector2(0, hip), Vector2(-3, -9), Vector2(-15, -9)], leg_c.darkened(0.15))
-		_poly([Vector2(-2, hip), Vector2(15, hip), Vector2(13, -9), Vector2(1, -9)], leg_c)
-		if coat_kind == "chaps":
-			_poly([Vector2(0, hip + 10), Vector2(16, hip + 8), Vector2(15, -14), Vector2(3, -14)], coat)
-		_poly([Vector2(-18, -11), Vector2(-1, -11), Vector2(2, 0), Vector2(-19, 0)], BOOT)
-		_poly([Vector2(-1, -11), Vector2(15, -11), Vector2(22, 0), Vector2(-1, 0)], BOOT)
-	# Torso.
-	var torso := [Vector2(-w / 2, hip + 4), Vector2(w / 2, hip + 4)]
-	if crafted:
-		# Broad rounded shoulders over a narrower waist.
-		torso = [Vector2(-w / 2 + 3, hip + 4), Vector2(w / 2 - 3, hip + 4)]
-		if build == "heavy":
-			torso.append(Vector2(w / 2 + 8, hip - 28))
-		torso.append_array([Vector2(w / 2 + 5, sh + 16), Vector2(w / 2 + 2, sh + 5), Vector2(w / 2 - 6, sh - 1),
-			Vector2(-w / 2 + 6, sh - 1), Vector2(-w / 2 - 2, sh + 5), Vector2(-w / 2 - 5, sh + 16)])
-	else:
-		if build == "heavy":
-			torso.append(Vector2(w / 2 + 7, hip - 26))
-		torso.append_array([Vector2(w / 2 + 2, sh + 8), Vector2(w / 2 - 6, sh), Vector2(-w / 2 + 6, sh), Vector2(-w / 2 - 2, sh + 8)])
-	match coat_kind:
-		"vest", "overalls":
-			_poly(torso, shirt)
-			if coat_kind == "vest":
-				_poly([Vector2(-w / 2, hip + 4), Vector2(2, hip + 4), Vector2(-2, sh + 2), Vector2(-w / 2 + 6, sh), Vector2(-w / 2 - 2, sh + 8)], coat)
-				_poly([Vector2(8, hip + 4), Vector2(w / 2, hip + 4), Vector2(w / 2 + 2, sh + 8), Vector2(w / 2 - 6, sh), Vector2(12, sh + 2)], coat)
-			else:
-				_poly([Vector2(-w / 2 + 4, hip + 4), Vector2(w / 2 - 4, hip + 4), Vector2(w / 2 - 8, sh + 30), Vector2(-w / 2 + 8, sh + 30)], coat)
-				_line([Vector2(-w / 2 + 10, sh + 32), Vector2(-w / 2 + 12, sh + 2)], 4.0, coat)
-				_line([Vector2(w / 2 - 10, sh + 32), Vector2(w / 2 - 12, sh + 2)], 4.0, coat)
-		_:
-			_poly(torso, coat)
-			if coat_kind in ["duster", "long", "frock"]:
-				_line([Vector2(6, hip + 4), Vector2(2, sh + 4)], 2.0, coat.darkened(0.3))
-			if coat_kind == "buckskin":
-				for i in 7:
-					var x := -w / 2 + 4 + i * (w - 8) / 6.0
-					_line([Vector2(x, hip + 4), Vector2(x + 1, hip + 16)], 2.0, coat.darkened(0.2))
-	# Belt.
-	_poly([Vector2(-w / 2 - 1, hip + 6), Vector2(w / 2 + 1, hip + 6), Vector2(w / 2 + 1, hip - 2), Vector2(-w / 2 - 1, hip - 2)], Color("#2e2118"))
-	_poly([Vector2(2, hip + 5), Vector2(10, hip + 5), Vector2(10, hip - 1), Vector2(2, hip - 1)], Color("#c9a227"))
-	# Neck & head.
-	_poly([Vector2(-5, sh + 2), Vector2(8, sh + 2), Vector2(8, sh - 10), Vector2(-5, sh - 10)], _skin.darkened(0.1))
+		# Coat tails behind the legs.
+		var tail_y: float = {"duster": -34.0, "long": -44.0, "frock": -54.0}.get(coat_kind, 0.0)
+		if tail_y != 0.0:
+			_poly([Vector2(-w / 2 - 3, hip - 6), Vector2(w / 2 + 3, hip - 6), Vector2(w / 2 + 12, tail_y), Vector2(-w / 2 - 14, tail_y)], coat.darkened(0.12))
+		# Back arm (behind the body).
+		_arm(shoulder_b, hand_b, coat.darkened(0.25), false)
+		if weapon == "pistols":
+			_weapon("pistol", hand_b, 0.0 if pose == "aim" else 1.2, true)
+		# Legs.
+		var leg_c := pants
+		if crafted:
+			# Storybook legs: tapered, a little bend at the knee, big boots with heels.
+			_poly([Vector2(-17, hip), Vector2(1, hip), Vector2(-1, -52), Vector2(-4, -12), Vector2(-15, -12), Vector2(-18, -52)], leg_c.darkened(0.15))
+			_poly([Vector2(-2, hip), Vector2(16, hip), Vector2(15, -52), Vector2(13, -12), Vector2(2, -12), Vector2(0, -52)], leg_c)
+			if coat_kind == "chaps":
+				_poly([Vector2(0, hip + 10), Vector2(17, hip + 8), Vector2(15, -16), Vector2(3, -16)], coat)
+			_poly([Vector2(-19, -15), Vector2(-3, -15), Vector2(-1, -7), Vector2(4, -5), Vector2(4, 0), Vector2(-21, 0), Vector2(-21, -5)], BOOT)
+			_poly([Vector2(0, -15), Vector2(15, -15), Vector2(17, -8), Vector2(25, -5), Vector2(26, 0), Vector2(-1, 0), Vector2(-1, -5)], BOOT)
+		else:
+			_poly([Vector2(-16, hip), Vector2(0, hip), Vector2(-3, -9), Vector2(-15, -9)], leg_c.darkened(0.15))
+			_poly([Vector2(-2, hip), Vector2(15, hip), Vector2(13, -9), Vector2(1, -9)], leg_c)
+			if coat_kind == "chaps":
+				_poly([Vector2(0, hip + 10), Vector2(16, hip + 8), Vector2(15, -14), Vector2(3, -14)], coat)
+			_poly([Vector2(-18, -11), Vector2(-1, -11), Vector2(2, 0), Vector2(-19, 0)], BOOT)
+			_poly([Vector2(-1, -11), Vector2(15, -11), Vector2(22, 0), Vector2(-1, 0)], BOOT)
+		# Torso.
+		var torso := [Vector2(-w / 2, hip + 4), Vector2(w / 2, hip + 4)]
+		if crafted:
+			# Broad rounded shoulders over a narrower waist.
+			torso = [Vector2(-w / 2 + 3, hip + 4), Vector2(w / 2 - 3, hip + 4)]
+			if build == "heavy":
+				torso.append(Vector2(w / 2 + 8, hip - 28))
+			torso.append_array([Vector2(w / 2 + 5, sh + 16), Vector2(w / 2 + 2, sh + 5), Vector2(w / 2 - 6, sh - 1),
+				Vector2(-w / 2 + 6, sh - 1), Vector2(-w / 2 - 2, sh + 5), Vector2(-w / 2 - 5, sh + 16)])
+		else:
+			if build == "heavy":
+				torso.append(Vector2(w / 2 + 7, hip - 26))
+			torso.append_array([Vector2(w / 2 + 2, sh + 8), Vector2(w / 2 - 6, sh), Vector2(-w / 2 + 6, sh), Vector2(-w / 2 - 2, sh + 8)])
+		match coat_kind:
+			"vest", "overalls":
+				_poly(torso, shirt)
+				if coat_kind == "vest":
+					_poly([Vector2(-w / 2, hip + 4), Vector2(2, hip + 4), Vector2(-2, sh + 2), Vector2(-w / 2 + 6, sh), Vector2(-w / 2 - 2, sh + 8)], coat)
+					_poly([Vector2(8, hip + 4), Vector2(w / 2, hip + 4), Vector2(w / 2 + 2, sh + 8), Vector2(w / 2 - 6, sh), Vector2(12, sh + 2)], coat)
+				else:
+					_poly([Vector2(-w / 2 + 4, hip + 4), Vector2(w / 2 - 4, hip + 4), Vector2(w / 2 - 8, sh + 30), Vector2(-w / 2 + 8, sh + 30)], coat)
+					_line([Vector2(-w / 2 + 10, sh + 32), Vector2(-w / 2 + 12, sh + 2)], 4.0, coat)
+					_line([Vector2(w / 2 - 10, sh + 32), Vector2(w / 2 - 12, sh + 2)], 4.0, coat)
+			_:
+				_poly(torso, coat)
+				if coat_kind in ["duster", "long", "frock"]:
+					_line([Vector2(6, hip + 4), Vector2(2, sh + 4)], 2.0, coat.darkened(0.3))
+				if coat_kind == "buckskin":
+					for i in 7:
+						var x := -w / 2 + 4 + i * (w - 8) / 6.0
+						_line([Vector2(x, hip + 4), Vector2(x + 1, hip + 16)], 2.0, coat.darkened(0.2))
+		# Belt.
+		_poly([Vector2(-w / 2 - 1, hip + 6), Vector2(w / 2 + 1, hip + 6), Vector2(w / 2 + 1, hip - 2), Vector2(-w / 2 - 1, hip - 2)], Color("#2e2118"))
+		_poly([Vector2(2, hip + 5), Vector2(10, hip + 5), Vector2(10, hip - 1), Vector2(2, hip - 1)], Color("#c9a227"))
+		# Neck & head.
+		_poly([Vector2(-5, sh + 2), Vector2(8, sh + 2), Vector2(8, sh - 10), Vector2(-5, sh - 10)], _skin.darkened(0.1))
 	var extra: String = look.get("extra", "")
 	if extra == "collar":
 		_poly([Vector2(-7, sh + 3), Vector2(10, sh + 3), Vector2(10, sh - 4), Vector2(-7, sh - 4)], Color("#f2efe6"))
@@ -611,7 +626,9 @@ func _build_human() -> void:
 	if extra == "badge":
 		_poly(star_pts(Vector2(w / 2 - 12, sh + 24), 7, 3, 5), col("accent", "#d9b44a"))
 	# Front arm and weapon.
-	if weapon != "pistols" or true:
+	if body_style > 0:
+		_arm_v(shoulder_f, hand_f, coat.darkened(0.05) if coat_kind != "vest" and coat_kind != "overalls" else shirt, true)
+	elif weapon != "pistols" or true:
 		_arm(shoulder_f, hand_f, coat.darkened(0.05) if coat_kind != "vest" and coat_kind != "overalls" else shirt, true)
 	if weapon == "pistols":
 		_weapon("pistol", hand_f, weapon_ang, false)
@@ -1145,3 +1162,331 @@ func _build_giant() -> void:
 	if look.get("eye", "") == "one":
 		var dir := (hand - shoulder).normalized()
 		_poly([hand + dir.orthogonal() * 6, hand - dir.orthogonal() * 6, hand + dir * 110 - dir.orthogonal() * 22, hand + dir * 110 + dir.orthogonal() * 22], Color("#5a3e26"))
+
+
+# --- Body style experiments (body_style 1-5, see shot=body_ab) ---------------------------
+
+const INK := Color("#241a14")
+
+
+## Catmull-Rom spline through control points: smooth curves from a handful of points.
+static func spline(ctrl: Array, per: int = 5, closed: bool = true) -> Array:
+	var out: Array = []
+	var n := ctrl.size()
+	if n < 3:
+		return ctrl.duplicate()
+	var segs := n if closed else n - 1
+	for i in segs:
+		var p0: Vector2 = ctrl[(i - 1 + n) % n] if (closed or i > 0) else ctrl[0]
+		var p1: Vector2 = ctrl[i]
+		var p2: Vector2 = ctrl[(i + 1) % n]
+		var p3: Vector2 = ctrl[(i + 2) % n] if (closed or i + 2 < n) else ctrl[n - 1]
+		for k in per:
+			var tt := float(k) / per
+			var t2 := tt * tt
+			var t3 := t2 * tt
+			out.append(0.5 * ((2.0 * p1) + (-p0 + p2) * tt + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3))
+	if not closed:
+		out.append(ctrl[n - 1])
+	return out
+
+
+## A tapered segment with round ends (radius ra at a, rb at b).
+static func capsule(a: Vector2, b: Vector2, ra: float, rb: float, n: int = 7) -> Array:
+	var d := b - a
+	if d.length_squared() < 0.01:
+		d = Vector2.DOWN
+	var ang := d.angle()
+	var out: Array = []
+	for i in n + 1:
+		out.append(b + Vector2.from_angle(ang - PI / 2 + PI * i / n) * rb)
+	for i in n + 1:
+		out.append(a + Vector2.from_angle(ang + PI / 2 + PI * i / n) * ra)
+	return out
+
+
+static func _area(p: PackedVector2Array) -> float:
+	var s := 0.0
+	for i in p.size():
+		var q: Vector2 = p[(i + 1) % p.size()]
+		s += p[i].x * q.y - q.x * p[i].y
+	return absf(s) * 0.5
+
+
+## One smooth limb through joints (shoulder, elbow, wrist...) with a radius at each joint.
+static func limb_pts(joints: Array, radii: Array) -> Array:
+	var poly := PackedVector2Array(capsule(joints[0], joints[1], radii[0], radii[1]))
+	for i in range(1, joints.size() - 1):
+		var nxt := PackedVector2Array(capsule(joints[i], joints[i + 1], radii[i], radii[i + 1]))
+		var best := PackedVector2Array()
+		for m in Geometry2D.merge_polygons(poly, nxt):
+			if _area(m) > _area(best):
+				best = m
+		if best.size() >= 3:
+			poly = best
+	return Array(poly)
+
+
+## The elbow (or knee) between two joints, pushed sideways so the limb bends naturally.
+static func bend(a: Vector2, b: Vector2, amount: float) -> Vector2:
+	var mid := (a + b) / 2.0
+	var d := (b - a)
+	if d.length_squared() < 0.01:
+		return mid
+	return mid + d.normalized().orthogonal() * amount
+
+
+func _hand_v(at: Vector2, dir: Vector2, c: Color) -> void:
+	var d := dir.normalized() if dir.length_squared() > 0.01 else Vector2.DOWN
+	_poly(ellipse(at + d * 1.5, 7.0, 6.0, 12, 0.0, TAU), c)
+	_circle(at + d.orthogonal() * -5.0 + d * -1.0, 3.0, c.darkened(0.06))
+
+
+## Sleeve from shoulder to wrist with an elbow, a cuff, and a hand.
+func _arm_v(shoulder: Vector2, hand: Vector2, c: Color, front: bool) -> void:
+	var elbow := bend(shoulder, hand, 7.0 if front else -6.0)
+	var wrist := hand + (elbow - hand).normalized() * 6.0
+	if body_style == 3:
+		# Puppet: two separate card pieces pinned at the elbow.
+		_poly(capsule(shoulder, elbow, 9.5, 8.0), c)
+		_poly(capsule(elbow, wrist, 8.0, 6.5), c.darkened(0.04))
+		_pin(shoulder)
+		_pin(elbow)
+	else:
+		_poly(limb_pts([shoulder, elbow, wrist], [9.5, 7.5, 6.5]), c)
+		if body_style == 4:
+			_line([elbow + (shoulder - elbow).normalized() * 3 + Vector2(-3, 2), elbow + Vector2(3, 3)], 1.4, INK, {"no_edge": true})
+	if body_style == 2:
+		# Turned-back cuff.
+		_poly(capsule(wrist + (elbow - wrist).normalized() * 6.0, wrist, 7.8, 7.2, 5), c.darkened(0.18))
+	_hand_v(hand, hand - elbow, _skin if front else _skin.darkened(0.2))
+
+
+## A brass split pin, the fastener of a paper-theater puppet joint.
+func _pin(at: Vector2) -> void:
+	_circle(at, 3.2, Color("#b8923a"), {"no_edge": true})
+	_circle(at + Vector2(-0.8, -0.8), 1.4, Color("#f0d488"), {"no_edge": true})
+
+
+func _boot_v(x: float, c: Color) -> void:
+	# Heeled riding boot, toe to the right.
+	var ctrl := [Vector2(x - 8, -30), Vector2(x + 7, -30), Vector2(x + 8, -13), Vector2(x + 18, -7),
+		Vector2(x + 24, -3), Vector2(x + 23, 1), Vector2(x - 9, 1), Vector2(x - 10, -8)]
+	_poly(spline(ctrl, 3), c)
+	_poly([Vector2(x - 10, -4), Vector2(x - 2, -4), Vector2(x - 2, 1), Vector2(x - 10, 1)], c.darkened(0.3), {"no_edge": true})
+	if body_style == 2:
+		# Boot strap and a spur.
+		_line([Vector2(x - 8, -9), Vector2(x + 8, -11)], 2.0, Color("#5a4028"), {"no_edge": true})
+		_poly(star_pts(Vector2(x - 13, -5), 4.5, 1.8, 6), METAL, {"no_edge": true})
+
+
+## Legs, coat, torso, back arm and neck for body styles 1-5 (the head is shared).
+func _body_v(w: float, hip: float, sh: float, shoulder_f: Vector2, shoulder_b: Vector2, hand_b: Vector2,
+		coat: Color, pants: Color, shirt: Color, coat_kind: String, build: String, weapon: String) -> void:
+	var long_coat: bool = coat_kind in ["duster", "long", "frock"]
+	var hem := {"duster": -40.0, "long": -48.0, "frock": -56.0}.get(coat_kind, hip + 6.0) as float
+	# Coat back panel, flaring behind the legs.
+	if long_coat:
+		_poly(spline([Vector2(-w / 2 + 2, hip - 6), Vector2(w / 2 - 2, hip - 6), Vector2(w / 2 + 8, (hip + hem) / 2),
+			Vector2(w / 2 + 12, hem + 2), Vector2(4, hem - 3), Vector2(-w / 2 - 12, hem + 4), Vector2(-w / 2 - 8, (hip + hem) / 2)], 4), coat.darkened(0.16))
+	# Back arm (behind the body).
+	_arm_v(shoulder_b, hand_b, coat.darkened(0.25), false)
+	if weapon == "pistols":
+		_weapon("pistol", hand_b, 0.0 if pose == "aim" else 1.2, true)
+	# Legs: thigh, knee, ankle.
+	var legs := [[-8.0, pants.darkened(0.16)], [7.0, pants]]
+	for L in legs:
+		var x: float = L[0]
+		var lc: Color = L[1]
+		var hipj := Vector2(x, hip + 2)
+		var knee := Vector2(x + 1.5, -52)
+		var ankle := Vector2(x, -22)
+		if body_style == 3:
+			_poly(capsule(hipj, knee, 10.5, 8.5), lc)
+			_poly(capsule(knee, ankle, 8.5, 6.5), lc.darkened(0.05))
+			_pin(knee)
+		else:
+			_poly(limb_pts([hipj, knee, ankle], [10.5, 8.2, 6.5]), lc)
+			if body_style == 4:
+				_line([knee + Vector2(-4, -2), knee + Vector2(3, 1)], 1.3, INK, {"no_edge": true})
+			if body_style == 2:
+				_line([hipj + Vector2(5, 4), ankle + Vector2(4, 0)], 1.2, lc.darkened(0.3), {"no_edge": true})
+		if coat_kind == "chaps" and x > 0:
+			_poly(limb_pts([hipj + Vector2(1, 6), knee + Vector2(2, 0), ankle + Vector2(1, 4)], [9.0, 8.5, 7.5]), coat)
+		_boot_v(x + 1, BOOT if x > 0 else BOOT.darkened(0.2))
+	# Torso: sloped shoulders, chest, a waist.
+	var bulge := 9.0 if build == "heavy" else 0.0
+	# Sloped trapezius into round shoulders, a chest that pushes forward, a taper to the waist.
+	var ctrl := [Vector2(-8, sh - 5), Vector2(-w / 2 + 7, sh - 1), Vector2(-w / 2 - 1, sh + 7), Vector2(-w / 2 - 4, sh + 20),
+		Vector2(-w / 2 - 2, sh + 44), Vector2(-w / 2 + 4, hip - 12), Vector2(-w / 2 + 3, hip + 7), Vector2(w / 2 - 3, hip + 7),
+		Vector2(w / 2 - 5 + bulge, hip - 14), Vector2(w / 2 + 3, sh + 38), Vector2(w / 2 + 7, sh + 22), Vector2(w / 2 + 3, sh + 8),
+		Vector2(w / 2 - 6, sh - 1), Vector2(11, sh - 5)]
+	var torso_c := shirt if coat_kind in ["vest", "overalls"] else coat
+	_poly(spline(ctrl, 4), torso_c)
+	var open_x := 5.0
+	if long_coat or coat_kind in ["shirt", "buckskin"]:
+		if body_style == 2 and long_coat:
+			# Shirt and vest in the open front of the coat, lapels, buttons, a pocket flap.
+			_poly(spline([Vector2(open_x - 3, sh + 4), Vector2(w / 2 - 6, sh + 4), Vector2(w / 2 - 4, hip + 2), Vector2(open_x + 2, hip + 2)], 3), shirt)
+			_poly([Vector2(open_x - 1, sh + 16), Vector2(w / 2 - 5, sh + 14), Vector2(w / 2 - 4, hip + 2), Vector2(open_x + 2, hip + 2)], Color("#4a3a2c"))
+			for k in 4:
+				_circle(Vector2(open_x + 5, sh + 22 + k * 11), 1.6, Color("#c9a227"), {"no_edge": true})
+			_poly([Vector2(open_x - 4, sh + 2), Vector2(open_x + 5, sh + 4), Vector2(open_x + 1, sh + 34), Vector2(open_x - 5, sh + 20)], coat.darkened(0.22))
+			_poly([Vector2(-w / 2 + 6, hip - 14), Vector2(-4, hip - 14), Vector2(-5, hip - 7), Vector2(-w / 2 + 6, hip - 7)], coat.darkened(0.2))
+		if long_coat:
+			_line([Vector2(open_x, sh + 4), Vector2(open_x + 2, hip + 4)], 1.6 if body_style != 4 else 2.0, coat.darkened(0.35) if body_style != 4 else INK, {"no_edge": true})
+	if coat_kind == "buckskin":
+		for i in 7:
+			var fx := -w / 2 + 4 + i * (w - 8) / 6.0
+			_line([Vector2(fx, hip + 6), Vector2(fx + 1, hip + 16)], 2.0, coat.darkened(0.2))
+	# Front coat panel over the back leg (open coat).
+	if long_coat:
+		_poly(spline([Vector2(-w / 2 + 4, hip - 2), Vector2(open_x, hip - 2), Vector2(open_x - 2, (hip + hem) / 2),
+			Vector2(open_x - 4, hem), Vector2(-w / 2 - 12, hem + 2), Vector2(-w / 2 - 6, (hip + hem) / 2)], 4), coat.darkened(0.04))
+		if body_style == 4:
+			_line([Vector2(-w / 2 + 2, hip + 8), Vector2(-w / 2 - 6, hem - 4)], 1.3, INK, {"no_edge": true})
+			_line([Vector2(-6, hip + 6), Vector2(-9, hem - 2)], 1.3, INK, {"no_edge": true})
+	# Belt: a straight belt, or a low-slung gunbelt with a holster (style 2).
+	if body_style == 2:
+		_poly([Vector2(-w / 2 + 2, hip + 2), Vector2(w / 2, hip + 8), Vector2(w / 2, hip + 15), Vector2(-w / 2 + 2, hip + 9)], Color("#3a2a1c"))
+		for k in 6:
+			_poly([Vector2(-w / 2 + 6 + k * 6, hip + 3 + k), Vector2(-w / 2 + 9 + k * 6, hip + 3 + k), Vector2(-w / 2 + 9 + k * 6, hip + 8 + k), Vector2(-w / 2 + 6 + k * 6, hip + 8 + k)], Color("#b89a52"), {"no_edge": true})
+		_poly(spline([Vector2(w / 2 - 12, hip + 9), Vector2(w / 2 + 2, hip + 11), Vector2(w / 2 + 3, hip + 34), Vector2(w / 2 - 4, hip + 38), Vector2(w / 2 - 10, hip + 30)], 3), Color("#6b4a2e"))
+		_poly([Vector2(w / 2 - 22, hip + 5), Vector2(w / 2 - 14, hip + 7), Vector2(w / 2 - 14, hip + 13), Vector2(w / 2 - 22, hip + 11)], Color("#c9a227"))
+	else:
+		_poly([Vector2(-w / 2 + 2, hip + 7), Vector2(w / 2 - 2, hip + 7), Vector2(w / 2 - 1, hip - 1), Vector2(-w / 2 + 1, hip - 1)], Color("#2e2118"))
+		_poly([Vector2(2, hip + 6), Vector2(10, hip + 6), Vector2(10, hip), Vector2(2, hip)], Color("#c9a227"))
+	# Neck and a turned-up collar.
+	_poly(capsule(Vector2(2, sh + 4), Vector2(3, sh - 10), 6.5, 6.0), _skin.darkened(0.1))
+	if long_coat:
+		_poly([Vector2(-12, sh - 6), Vector2(-3, sh + 2), Vector2(-4, sh + 12), Vector2(-14, sh + 6)], coat.darkened(0.1))
+		_poly([Vector2(13, sh - 6), Vector2(6, sh + 2), Vector2(8, sh + 12), Vector2(16, sh + 5)], coat.darkened(0.06))
+
+
+## Style 3: jitter each paper piece's outline so its edge reads as torn cardstock.
+func _add_deckle() -> void:
+	for s in _shapes:
+		if s.k != "poly" or s.get("no_edge", false) or s.get("glow", false):
+			continue
+		var pts: PackedVector2Array = clean_line(s.pts)
+		if pts.size() < 3:
+			continue
+		var out := PackedVector2Array()
+		for i in pts.size():
+			var a: Vector2 = pts[i]
+			var b: Vector2 = pts[(i + 1) % pts.size()]
+			var steps := maxi(1, int(a.distance_to(b) / 3.5))
+			var nrm := (b - a).normalized().orthogonal()
+			for k in steps:
+				var p := a.lerp(b, float(k) / steps)
+				var jit := sin(p.x * 1.7 + p.y * 2.3 + look_seed) * 0.55 + sin(p.x * 4.1 - p.y * 3.3) * 0.3
+				out.append(p + nrm * jit)
+		s["deckle"] = out
+
+
+## Style 5: a lit rim on the top-left of each piece and a form shadow on the bottom-right.
+func _add_light_bands() -> void:
+	for s in _shapes:
+		if s.k != "poly" or s.get("no_edge", false) or s.get("glow", false):
+			continue
+		var pts: PackedVector2Array = clean_line(s.pts)
+		if pts.size() < 3:
+			continue
+		var bb := _bounds(pts)
+		if bb.size.x * bb.size.y < 120.0:
+			continue
+		var lit_off := Vector2(2.6 * facing, 2.6)
+		var dark_off := Vector2(-9.0 * facing, -8.0)
+		var lit: Array = []
+		var dark: Array = []
+		var moved := PackedVector2Array()
+		for p in pts:
+			moved.append(p + lit_off)
+		lit = Geometry2D.clip_polygons(pts, moved)
+		var moved2 := PackedVector2Array()
+		for p in pts:
+			moved2.append(p + dark_off)
+		dark = Geometry2D.clip_polygons(pts, moved2)
+		s["lit"] = lit
+		s["dark"] = dark
+
+
+## Styles 3-5 draw piece by piece (edge, shadow and fill per piece) instead of pass by pass,
+## so every piece shows its own outline and casts onto the pieces behind it.
+func _draw_layered() -> void:
+	var breathe := 1.0 + 0.012 * sin(_t * 2.2 + look_seed % 7) if idle_anim and pose != "dead" else 1.0
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, breathe))
+	if body_style == 5:
+		# One soft ground shadow for the whole figure, then the paper silhouette edge.
+		for s in _shapes:
+			if not s.get("glow", false):
+				_draw_shape(s, Color(0, 0, 0, 0.18), Vector2(6 * facing, 7), 0.0)
+		for s in _shapes:
+			if not (s.get("glow", false) or s.get("no_edge", false)):
+				_draw_shape(s, PAPER, Vector2.ZERO, 1.4)
+	for s in _shapes:
+		if s.get("glow", false):
+			_draw_shape(s, s.c, Vector2.ZERO, 0.0)
+			continue
+		var edged: bool = not s.get("no_edge", false)
+		match body_style:
+			3:
+				if edged:
+					_draw_shape(s, Color(0, 0, 0, 0.3), Vector2(4 * facing, 5), 0.0)
+					if s.has("deckle"):
+						var d: PackedVector2Array = s.deckle
+						var closed := d.duplicate()
+						closed.append(d[0])
+						draw_polyline(clean_line(closed), PAPER.darkened(0.06), 3.6, true)
+					else:
+						_draw_shape(s, PAPER, Vector2.ZERO, 2.4)
+				if crafted:
+					_draw_sculpted(s)
+				else:
+					_draw_shape(s, s.c, Vector2.ZERO, 0.0)
+			4:
+				if edged:
+					_draw_shape(s, INK, Vector2.ZERO, 1.5)
+				_draw_flat_ink(s)
+			_:
+				if edged:
+					_draw_shape(s, Color(0, 0, 0, 0.22), Vector2(3.5 * facing, 4.5), 0.0)
+				_draw_sculpted(s)
+				var c: Color = s.c
+				for band2 in s.get("dark", []):
+					if band2.size() >= 3:
+						draw_colored_polygon(band2, Color(c.darkened(0.42), 0.8 * c.a))
+				for band in s.get("lit", []):
+					if band.size() >= 3:
+						draw_colored_polygon(band, Color(c.lightened(0.24).lerp(Color("#ffd89a"), 0.12), 0.7 * c.a))
+	if muzzle > 0.05 and _muzzle_pos.is_finite():
+		_draw_star(_muzzle_pos, 10 + 22 * muzzle, 5 + 8 * muzzle, 7, Color(1, 0.85, 0.35, muzzle))
+		draw_circle(_muzzle_pos, 8 * muzzle, Color(1, 1, 0.9, muzzle))
+	if flash > 0.01:
+		for s in _shapes:
+			if not s.get("glow", false):
+				_draw_shape(s, Color(flash_color.r, flash_color.g, flash_color.b, flash * 0.75), Vector2.ZERO, 0.0)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## Style 4 fill: flat color with one hard-edged shadow tone, like a printed comic.
+func _draw_flat_ink(s: Dictionary) -> void:
+	var c: Color = s.c
+	if s.has("a"):
+		c.a *= float(s.a)
+	if s.k != "poly":
+		_draw_shape(s, c, Vector2.ZERO, 0.0)
+		return
+	var pts: PackedVector2Array = clean_line(s.pts)
+	if pts.size() < 3:
+		return
+	draw_colored_polygon(pts, c)
+	var bb := _bounds(pts)
+	if bb.size.x * bb.size.y < 200.0:
+		return
+	var moved := PackedVector2Array()
+	for p in pts:
+		moved.append(p + Vector2(-5.0 * facing, -4.0))
+	for band in Geometry2D.clip_polygons(pts, moved):
+		if band.size() >= 3:
+			draw_colored_polygon(band, Color(c.darkened(0.3), c.a))

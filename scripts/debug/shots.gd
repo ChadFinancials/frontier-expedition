@@ -18,6 +18,8 @@ static func run(main: Main, args: Dictionary) -> void:
 		return
 	if args.has("nopaper"):
 		PaperFX.enabled = false
+	if args.has("body"):
+		Figure.default_body = int(args.body)
 	Game.company = Company.new()
 	Game.company.new_game(int(args.get("seed", "12")))
 	match scenario:
@@ -216,6 +218,56 @@ static func run(main: Main, args: Dictionary) -> void:
 				var l := UI.lbl(txt, 22, "Bold")
 				l.position = Vector2(170 + i * 400, 930)
 				root.add_child(l)
+		"body_ab":
+			# The Marshal in every body style (Figure.body_style 0-5), idle on top, aiming
+			# below, over the Tallgrass backdrop. cls=<class id> to try another class.
+			await main.goto("menu", {}, true)
+			main.screen.queue_free()
+			var root := Control.new()
+			root.set_anchors_preset(Control.PRESET_FULL_RECT)
+			main.add_child(root)
+			var bgd := Backdrop.new()
+			bgd.setup("tallgrass", "trail", 3)
+			root.add_child(bgd)
+			var shade := ColorRect.new()
+			shade.color = Color(0, 0, 0, 0.18)
+			shade.set_anchors_preset(Control.PRESET_FULL_RECT)
+			root.add_child(shade)
+			var names: Array = ["0  CURRENT", "1  TAILORED CURVES", "2  COSTUME DETAIL", "3  PAPER PUPPET", "4  INK ILLUSTRATION", "5  PAINTED VOLUME"]
+			var cid: String = args.get("cls", "marshal")
+			if args.has("grid"):
+				# Close-up: 3 x 2, idle pose, bigger.
+				for i in 6:
+					var fg := Figure.new()
+					fg.crafted = true
+					fg.body_style = i
+					fg.setup(DB.classes[cid].look, 7, 1)
+					fg.position = Vector2(360 + (i % 3) * 630, 500 + (i / 3) * 530)
+					fg.scale *= float(args.get("zoom", "1.9"))
+					root.add_child(fg)
+					var lg := UI.lbl(names[i], 24, "Bold")
+					lg.add_theme_constant_override("outline_size", 6)
+					lg.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+					lg.position = Vector2(20 + (i % 3) * 630, 160 + (i / 3) * 530)
+					root.add_child(lg)
+			for row in (0 if args.has("grid") else 2):
+				for i in 6:
+					var f := Figure.new()
+					f.crafted = true
+					f.body_style = i
+					f.setup(DB.classes[cid].look, 7, 1)
+					if row == 1:
+						f.set_pose("aim")
+					f.position = Vector2(170 + i * 316, 470 + row * 450)
+					f.scale *= float(args.get("zoom", "1.55"))
+					root.add_child(f)
+				if row == 0:
+					for i in 6:
+						var l := UI.lbl(names[i], 20, "Bold")
+						l.add_theme_constant_override("outline_size", 6)
+						l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+						l.position = Vector2(60 + i * 316, 500)
+						root.add_child(l)
 		"settlement":
 			await main.goto("settlement", {"index": 0}, true)
 		"silas":
