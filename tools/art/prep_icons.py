@@ -5,7 +5,7 @@
 
 Writes assets/art/icons/<key>.png: 256 x 256, transparent background, trimmed and centred
 with a small margin. The game shows it in place of the drawn icon for <key> (keys are listed
-in docs/COMFYUI_BRIEF.md). Needs Pillow and numpy: pip install pillow numpy
+in docs/COMFYUI_GUIDE.md section 5). Needs Pillow and numpy: pip install pillow numpy
 
 How the background goes: its colour is read from the image border; everything of that colour
 connected to the border is removed (a loose match, so soft ground shadows go too, stopped by

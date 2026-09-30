@@ -1,9 +1,15 @@
-# Running ComfyUI yourself (icons)
+# Running ComfyUI yourself (icons and backdrops)
 
-A hands-on guide for the owner. ComfyUI is already installed on the PC
-(`C:/Users/btd08/Documents/comfy/ComfyUI`, RTX 4070 Ti Super). The game side is done:
-any PNG saved as `assets/art/icons/<key>.png` replaces that drawn icon automatically
-(keys and subjects are listed in `docs/COMFYUI_BRIEF.md`).
+A hands-on guide for the owner. ComfyUI is installed on the PC
+(`C:/Users/btd08/Documents/comfy/ComfyUI`, RTX 4070 Ti Super). The game side is done: any
+PNG saved as `assets/art/icons/<key>.png` replaces that drawn icon, and a backdrop set
+replaces the drawn scenery for the regions pointed at it. Style rules are in
+`ART_PIPELINE.md`.
+
+**The usual route:** generate, pick, and attach the images in the chat with Claude, saying
+which key or set each is for (up to 5 per message). Claude saves the originals to `art-src/`,
+runs the prep, checks them in a screenshot and commits. Sections 5 and 7 describe what
+happens, for doing it by hand.
 
 ## 1. Start it and open the editor
 
@@ -36,19 +42,10 @@ see what each change does.
 outline, flat colour shapes, one shadow tone, chunky simple silhouette, plain flat cream
 background`. The approved originals are kept in `art-src/icons/` as the reference set.
 
-### Earlier suggestion
-
-Positive (swap the middle part per item):
-
-> storybook game inventory icon, **a small burlap sack tied with twine and a tin can of beans**,
-> single object, centred, three-quarter view, light from the top left, bold thick dark brown
-> outline, flat colour shapes, one shadow tone, chunky simple silhouette, plain flat cream
-> background
-
 Tips that matter more than extra adjectives:
 - **One object.** "sack and a can" is already two; if the model muddles it, drop to one.
 - **Say the outline and flat colour.** That is what makes it match the ink-style characters.
-- **Never ask for words** (labels, "XXX" on a jug): the model can't spell.
+- **Avoid words** on labels: the model can't spell. Simple marks (the whiskey's "XX") are fine.
 - **Plain background** makes the cutout clean.
 
 ## 4. The biggest improvements, in order
@@ -79,13 +76,18 @@ Generate at any size (1024 is fine; don't generate small, the model does worse).
 plain light background: the prep script removes it.
 
 1. Save the picture you like as **`art-src/icons/<key>.png`** (or .webp/.jpg), named by its
-   key: `food`, `bandage`, `vial` (antivenom), `bottle` (whiskey), `oil`, `rope`, `shovel`,
-   `salt`, `wheel` (wagon parts), `timber`, `iron`, `money` (chips), `week`,
-   `wagon`, `xp`, `eye` (scouting), `charter`, `skull`.
+   key. Done: `food`, `bandage`, `vial` (antivenom), `bottle` (whiskey), `oil`, `rope`,
+   `shovel`, `salt`, `wheel` (wagon parts), `timber`, `iron`, `money` (chips), `week`,
+   `wagon`, `xp`, `eye` (scouting), `charter`. Still drawn: `skull` (deaths), the move types
+   `melee`, `ranged`, `heal`, `buff`, `debuff`, and the combat stats `dmg`, `crit`, `dodge`,
+   `prot`, `speed`, `acc`.
 2. Either run `python tools/art/prep_icons.py --dir art-src/icons` (needs
    `pip install pillow numpy`), which writes the game-ready `assets/art/icons/<key>.png`
    (256 px, transparent, trimmed), or just commit and push the `art-src` file and ask Claude
-   to run it.
+   to run it. The script removes the plain background by flood fill from the border, plus
+   soft grey ground shadows. Two per-key settings at its top: `POCKET_KEYS` (see-through
+   gaps inside the outline, like the wheel's spokes) and `SHADOW_COLS` (a coloured ground
+   shadow, like the whiskey bottle's orange one).
 3. Run `play.bat`: the icon replaces the drawn one. Delete the `assets/art/icons` file to
    get the drawn icon back.
 4. Commit and push both files (GitHub Desktop is fine). The original stays in `art-src` so
@@ -103,7 +105,8 @@ The browser editor is the better place to find the recipe; the script is for rep
 ## 7. Backdrops
 
 Scenery images live in `art-src/backdrops/` (originals) and `assets/art/backdrops/`
-(1920 wide, game-ready). A set is numbered, `<key>_1.png`, `<key>_2.png` and so on; the
+(resized to 1920 wide, PNG, game-ready). Current sets: `prairie` (the owner's, on the tutorial
+and all rumors), `tallgrass_trail` (the Tallgrass Sea), `title` (the menu). A set is numbered, `<key>_1.png`, `<key>_2.png` and so on; the
 trail and combat screens step through the set as the company crosses the map (first image
 at the start, last at the end). A region uses a set through its `"backdrop"` field in
 `data/regions.json`; saloon quests use `quest_backdrop` in `data/config.json`. The set

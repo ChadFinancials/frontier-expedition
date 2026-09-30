@@ -1,7 +1,7 @@
 """Paint pose variants from an approved base figure by inpainting only the arms.
 
 Why this exists: prompting alone cannot hold a character across poses. Seven prompts from one
-seed produced three different characters (see docs/ART_PIPELINE.md). Inpainting keeps the head,
+seed produced three different characters (see docs/archive/art_experiments_2026-09.md). Inpainting keeps the head,
 hat, coat and colours **pixel-identical** and repaints only the masked band, so identity is
 preserved by construction.
 

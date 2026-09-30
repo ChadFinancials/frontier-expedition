@@ -26,22 +26,22 @@ var crafted: bool = PaperFX.enabled   # paper-theater detail: sculpted shading a
 
 ## Art pass variant. 3 is the approved look: thin edge, fine hatching, inset contours and
 ## cross-hatch. 0 is the original look, kept so a before/after can still be drawn.
-## 1 thin edge, 2 adds inset contours, 3 adds cross-hatch on top. See docs/ART_PIPELINE.md.
+## 1 thin edge, 2 adds inset contours, 3 adds cross-hatch on top. See docs/archive/art_experiments_2026-09.md.
 var style: int = 3
 
 ## Face variant. 0 is the original nose, brow and eye. 2 is the approved cartoon face:
 ## two button eyes with a paper edge and a small mouth, expression changing with the pose.
-## See docs/ART_PIPELINE.md.
+## See docs/archive/art_experiments_2026-09.md.
 var face_style: int = 2
 ## How far forward of the head centre the face sits, in local pixels. Lower is closer to
 ## the face. 9 read as poking off the front; the approved value is nearer 4.
 var face_shift: float = 4.0
 ## Hat variant. 0 is the old shared shape where cowboy, stetson, stetson_black and
 ## cowboy_wide all drew the same two polygons at different sizes. 1 gives each its own
-## silhouette. See docs/ART_PIPELINE.md.
+## silhouette. See docs/archive/art_experiments_2026-09.md.
 var hat_style: int = 0
 ## Eye variant. 3 is the approved look: a wide black oval, no white. 0 is the older white
-## oval with a black pupil. 1 dot, 2 tall oval, 4 dot with a lid, 5 L bracket. See docs/ART_PIPELINE.md.
+## oval with a black pupil. 1 dot, 2 tall oval, 4 dot with a lid, 5 L bracket. See docs/archive/art_experiments_2026-09.md.
 var eye_style: int = 3
 ## Body construction and render style. 4, the ink illustration look, is the owner's pick and
 ## the default: curved bodies, a bold ink outline on every piece, flat color with cel

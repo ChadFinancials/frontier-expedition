@@ -5,7 +5,7 @@ extends Control
 
 var kind: String = "money"
 
-## Painted icons (docs/COMFYUI_BRIEF.md): assets/art/icons/<kind>.png replaces the drawn
+## Painted icons (docs/COMFYUI_GUIDE.md): assets/art/icons/<kind>.png replaces the drawn
 ## icon when the file exists. They are 256 px and shown at 20-50 px, so each is shrunk once
 ## per size with a Lanczos filter (crisper than the GPU's linear filter) and cached.
 const ART_DIR := "res://assets/art/icons/"

@@ -8,7 +8,7 @@ injects the prompt pair for the subject, and downloads every output PNG.
     python tools/art/generate.py --subject cave --seed 1234 --out art-tests/cave-pick
 
 Requires ComfyUI running (comfy launch --background) on --host.
-See docs/ART_PIPELINE.md. Edit the style in tools/art/prompts.py.
+See docs/archive/art_experiments_2026-09.md. Edit the style in tools/art/prompts.py.
 """
 
 import argparse

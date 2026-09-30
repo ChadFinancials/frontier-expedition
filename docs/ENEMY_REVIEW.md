@@ -59,7 +59,7 @@ Notes:
 
 ## Prairie Wolf  (Regular)
 
-`prairie_wolf` | HP **10** | dodge 15 | prot 0 | speed 7 | acc +0 | crit 5% | dmg 3-5 | tags: beast
+`prairie_wolf` | HP **8** | dodge 15 | prot 0 | speed 7 | acc +0 | crit 5% | dmg 3-5 | tags: beast
 Resists: stun 20, bleed 40, poison 40, move 35, debuff 25
 Found in: The Crow's Nest, The Tallgrass Sea, The Thunder Peaks, Quests
 
@@ -427,7 +427,7 @@ Found in: Dry Gulch Mine
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Cave-In**: Old Jeb knocks twice on the ceiling, and the ceiling answers. | 1234 | ALL of 1234 | 90 | 2-4 each | stun (40%) | 2 |
+| **Cave-In**: Old Jeb knocks twice on the ceiling, and the ceiling answers. | 1234 | one of 1234 | 90 | 2-4 | stun (40%) | 2 |
 | **Oversized Pick**: A full-size miner's pick swung by a very small, very angry miner. It takes a moment to recover. | 123 | one of 123 | 80 | 7-10 | stun; stun | 2 |
 
 Notes: 

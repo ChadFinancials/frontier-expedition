@@ -1,7 +1,7 @@
 """Shared prompt blocks for Frontier Expedition art generation.
 
 One style string, reused by every generation, so the whole art set stays coherent.
-Edit STYLE here rather than in individual calls. See docs/ART_PIPELINE.md.
+Edit STYLE here rather than in individual calls. See docs/archive/art_experiments_2026-09.md.
 
 Keep this simple. Owner note Sept 29: "maybe dont try and dictate which colors go where and
 just revert back to a more simple prompt". So do NOT list which colour goes where. Describe

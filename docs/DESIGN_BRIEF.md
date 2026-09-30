@@ -1,6 +1,6 @@
 # Frontier Expedition — Design Brief
 
-Living summary of the creative direction agreed before the build. Heavily inspired by
+The creative direction agreed with the owner before the build. Heavily inspired by
 Darkest Dungeon 1 & 2 mechanics, but **not a copy**: the theme is an Oregon Trail–style
 push west into a frontier that grows stranger the farther you go.
 
@@ -71,13 +71,16 @@ push west into a frontier that grows stranger the farther you go.
   sacred figures; Native peoples are not portrayed as enemies.
 
 ## Audio
-- Basic generated clips: gunshots, slashes, impacts, animal noises, eerie stingers,
-  UI clicks. Real audio can replace them later.
+- Generated clips (gunshots, impacts, tones, music) plus free CC0 recordings for creatures
+  and objects, all levelled to one loudness.
 
 ## Delivery
 - A Windows `.exe` you can double-click to play, plus the Godot project itself.
 
 ## Art
-- Stylized paper-cutout / woodcut-silhouette figures, layered parallax frontier
-  backgrounds, drawn in code so real art can replace it later. Simple, but it should
-  look good.
+- Storybook and handmade. Characters, the map, the town and the wood-and-rope UI are drawn in
+  code (an ink-illustration look for figures, a paper-theater look for scenery); icons and
+  some backdrops are painted by the owner in a flat, bold-outlined storybook style. Details
+  and the owner's style calls: `ART_PIPELINE.md`.
+
+Decisions made since the brief (rounds of playtesting) are recorded in `PLAYTEST_NOTES.md`.
