@@ -48,8 +48,13 @@ func _bg_candidates() -> Array:
 	if bg_key != "":
 		keys.append(bg_key)
 	var r: Dictionary = DB.regions.get(region_id, {})
+	# The shared art is daylight scenery, so it stands in for the outdoor scenes only:
+	# caves and the night camp keep their own art or the drawn layers. Saloon quests
+	# have no field of their own and take config quest_backdrop.
 	var alias: String = str(r.get("backdrop", ""))
-	if alias != "" and not keys.has(alias):
+	if alias == "" and r.get("quest", false):
+		alias = str(DB.cfg("quest_backdrop", ""))
+	if mode == "trail" and alias != "" and not keys.has(alias):
 		keys.append(alias)
 	var own: String = "%s_%s" % [region_id, mode]
 	if not keys.has(own):

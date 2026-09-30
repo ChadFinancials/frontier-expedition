@@ -178,11 +178,7 @@ func refresh() -> void:
 func _sync_backdrop() -> void:
 	if backdrop == null or run == null:
 		return
-	var max_col: int = 1
-	for n: Dictionary in run.nodes:
-		max_col = maxi(max_col, int(n.get("col", 0)))
-	var col: int = int(run.current_node().get("col", 0))
-	backdrop.set_progress(float(col) / float(max_col))
+	backdrop.set_progress(run.map_progress())
 
 func _process(delta: float) -> void:
 	_sync_backdrop()

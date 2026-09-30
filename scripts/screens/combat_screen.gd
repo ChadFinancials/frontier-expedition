@@ -54,6 +54,8 @@ func setup(p: Dictionary) -> void:
 	backdrop.setup(run.region_id if run != null else "tallgrass", backdrop.mode, 77)
 	# Heroes stand at GROUND 770 and the HUD starts at 835, so keep the horizon high.
 	backdrop.set_bg_horizon(430.0)
+	if run != null and not run.in_cave():
+		backdrop.set_progress(run.map_progress())
 	add_child(backdrop)
 	field = Node2D.new()
 	add_child(field)

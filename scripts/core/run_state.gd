@@ -66,6 +66,14 @@ func current_node() -> Dictionary:
 	return node(current)
 
 
+## How far along the map the company is: 0 at the first column, 1 at the last.
+func map_progress() -> float:
+	var max_col: int = 1
+	for n: Dictionary in nodes:
+		max_col = maxi(max_col, int(n.get("col", 0)))
+	return float(int(current_node().get("col", 0))) / float(max_col)
+
+
 ## Swap two heroes' places in the marching order (party index = rank - 1), outside combat.
 func swap_party(i: int, j: int) -> void:
 	var alive: Array = party.filter(func(u): return company.hero(u) != null and company.hero(u).alive)

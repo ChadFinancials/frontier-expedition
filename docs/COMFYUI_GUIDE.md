@@ -99,3 +99,23 @@ saves numbered results with their seeds, handy for batches of 8-16 once a recipe
     python tools/art/generate.py --subject <key> --count 8 --workflow <workflow.json>
 
 The browser editor is the better place to find the recipe; the script is for repeating it.
+
+## 7. Backdrops
+
+Scenery images live in `art-src/backdrops/` (originals) and `assets/art/backdrops/`
+(1920 wide, game-ready). A set is numbered, `<key>_1.png`, `<key>_2.png` and so on; the
+trail and combat screens step through the set as the company crosses the map (first image
+at the start, last at the end). A region uses a set through its `"backdrop"` field in
+`data/regions.json`; saloon quests use `quest_backdrop` in `data/config.json`. The set
+shows outdoors only (trail and fights): caves and the night camp keep their own scenery.
+
+`assets/art/backdrops/horizons.json` says how far down each image the foot of the mountains
+(the skyline) sits, e.g. `0.36`. The game lines that up with the top of the combat stage, so
+the whole sky and range stay in view and the figures stand on the ground. New images get a
+measured guess; check it in-game and hand-set it if the view looks zoomed into the ground.
+
+Composition that works (16:9, e.g. 1344 x 768): sky and range in the top third, rolling
+ground below, and the **lower middle kept open**, since eight figures stand across it from
+about 10% to 90% of the width. A landmark (cabin, windmill, rocks) belongs small in the
+middle distance or at the far left or right edge, not low in the frame, or it ends up behind
+the fighters.

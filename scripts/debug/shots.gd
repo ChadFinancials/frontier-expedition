@@ -435,6 +435,14 @@ static func run(main: Main, args: Dictionary) -> void:
 			# The first settlement has no store yet: start with the free kit, then pack extras.
 			co.start_run(0, uids, co.free_kit())
 			co.run.supplies.merge({"bandages": 2, "lamp_oil": 2, "shovel": 1, "salt": 1}, true)
+			# region=<id>: dress the run as another region (backdrop checks); far: stand at the
+			# last column, to see the end-of-map backdrop variant.
+			if args.has("region"):
+				co.run.region_id = args.region
+			if args.has("far"):
+				for ni in co.run.nodes.size():
+					if int(co.run.nodes[ni].get("col", 0)) > int(co.run.current_node().get("col", 0)):
+						co.run.current = ni
 			match scenario:
 				"trail":
 					await main.goto("trail", {}, true)

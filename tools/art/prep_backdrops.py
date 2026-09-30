@@ -38,8 +38,11 @@ def write_horizons():
     data = {}
     if HORIZONS.exists():
         data = json.loads(HORIZONS.read_text(encoding='utf-8'))
+    # Only new images are measured: an entry already in the file may be hand-set (the
+    # measure picks the strongest edge, which on flat-colour art can be a path, not the skyline).
     for p in sorted(BG.glob('*.png')):
-        data[p.name] = measure(p)
+        if p.name not in data:
+            data[p.name] = measure(p)
     HORIZONS.write_text(json.dumps(data, indent=1, sort_keys=True) + '\n', encoding='utf-8')
     for k, v in sorted(data.items()):
         print(f'  {k:26s} horizon at {100 * v:.0f}% down')

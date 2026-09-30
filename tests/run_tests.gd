@@ -695,6 +695,15 @@ func test_quest_boss() -> void:
 	for k in res.keepsakes:
 		check(k == "" or DB.keepsakes.has(k), "quest reward trinket %s exists" % k)
 	check(str(DB.regions[co.run.region_id].boss.victory) != "", "quest boss has victory text")
+	# Painted scenery: quests take the shared quest backdrop outdoors, never in a cave.
+	var qb := str(DB.cfg("quest_backdrop", ""))
+	var bd := Backdrop.new()
+	bd.region_id = "q_test"
+	bd.mode = "trail"
+	check(qb == "" or bd._bg_candidates().has(qb), "quest uses the quest backdrop on the trail")
+	bd.mode = "cave"
+	check(not bd._bg_candidates().has(qb), "quest keeps its cave art in caves")
+	bd.free()
 	var summary := co.finish_run("victory")
 	check(summary.status == "victory", "quest expedition settles")
 	var d := JSON.parse_string(JSON.stringify(co.to_dict()))
