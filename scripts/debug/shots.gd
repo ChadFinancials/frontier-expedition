@@ -18,6 +18,9 @@ static func run(main: Main, args: Dictionary) -> void:
 		return
 	if args.has("nopaper"):
 		PaperFX.enabled = false
+	# side: the old side-on body build instead of the three-quarter turn (before/after).
+	if args.has("side"):
+		Figure.three_quarter = false
 	if args.has("body"):
 		Figure.default_body = int(args.body)
 	Game.company = Company.new()
@@ -324,7 +327,7 @@ static func run(main: Main, args: Dictionary) -> void:
 			var obg := Backdrop.new()
 			obg.setup("tallgrass", "trail", 3)
 			oroot.add_child(obg)
-			var ocls: Array = ["marshal", "mountain_man", "rail_driver", "gunslinger", "wrangler", "gambler", "prospector", "sharpshooter", "frontier_doctor", "preacher"]
+			var ocls: Array = ["marshal", "mountain_man", "rail_driver", "gunslinger", "wrangler", "gambler", "prospector", "sharpshooter", "frontier_doctor", "preacher", "train_hopper"]
 			for ci in ocls.size():
 				var olook: Dictionary = DB.classes[ocls[ci]].look
 				var ol: Array = olook.get("outfits", [{}])
@@ -332,13 +335,13 @@ static func run(main: Main, args: Dictionary) -> void:
 					var fo := Figure.new()
 					fo.outfit = oi
 					fo.setup(olook, 5 + ci, 1)
-					fo.position = Vector2(88 + ci * 190, 318 + oi * 352)
+					fo.position = Vector2(80 + ci * 172, 318 + oi * 352)
 					fo.scale *= 1.0
 					oroot.add_child(fo)
 					var lo := UI.lbl(str(ol[oi].get("name", "")), 16, "Bold")
 					lo.add_theme_constant_override("outline_size", 6)
 					lo.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-					lo.position = Vector2(10 + ci * 190, 326 + oi * 352)
+					lo.position = Vector2(8 + ci * 172, 326 + oi * 352)
 					oroot.add_child(lo)
 		"body_ab":
 			# The Marshal in every body style (Figure.body_style 0-5), idle on top, aiming

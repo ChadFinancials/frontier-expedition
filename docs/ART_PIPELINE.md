@@ -30,6 +30,12 @@ code-drawn fallback, so the game runs with any fraction of the art done.
   knees, heeled boots, flaring coats; every piece rounded (Chaikin). Rendered piece by piece:
   a small cast shadow, a bold ink outline, a flat fill, cel bands (shadow on the far side, a
   core line, a warm highlight on the lit top-left edge) and sparse hatching in big shadows.
+- `Figure.three_quarter = true` (owner, after Darkest Dungeon): bodies turn three-quarter
+  toward the facing side. The chest opens forward (coat opening, buckle and badge shift
+  front), the near arm holds the weapon from the back shoulder across the body, the far arm
+  sits behind the chest and steadies the weapon (rifles: out along the barrel), and the back
+  leg is the near one. At rest weapons are held low and ready at the waist. Screenshot arg
+  `side` renders the old side-on build for comparison.
 - Faces: `Figure.face_look = 6`: a side-view **profile** at rest (idle, dead) that switches to
   **storybook reactions** in action poses: windup (eyes wide, brows up, mouth open), strike
   (scowl, a shout with teeth), aim (squint, gritted mouth), cast (eyes rolled up, a small

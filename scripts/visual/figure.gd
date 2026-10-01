@@ -48,6 +48,10 @@ var eye_style: int = 3
 ## highlights and shadows. 0 is the older look; 1 tailored curves, 2 curves plus costume
 ## detail, 3 jointed paper puppet, 5 painted volume. See docs/ART_PIPELINE.md, shot=body_ab.
 static var default_body := 4
+## Three-quarter view (owner, after Darkest Dungeon): the torso turns toward the facing
+## direction, the chest opens forward, the near (weapon) arm hangs from the back shoulder
+## across the body, and the far arm tucks behind the chest. false: the old side-on build.
+static var three_quarter := true
 var body_style: int = default_body
 ## Face experiment (A/B). 0 is the current button-eyed face. 1 profile, 2 ligne claire,
 ## 3 rugged western, 4 storybook, 5 brim shadow. See shot=faces.
@@ -515,7 +519,9 @@ func _build_human() -> void:
 			lean = -0.05
 	var pivot := Vector2(0, -10)
 
-	# Hand positions per pose.
+	# Hand positions per pose. "_f" is the near arm (drawn over the body, holds the weapon),
+	# "_b" the far one (drawn behind it).
+	var tq := three_quarter and body_style > 0
 	var shoulder_f := Vector2(w / 2 - 6, sh + 8)
 	var shoulder_b := Vector2(-w / 2 + 8, sh + 8)
 	var hand_f := Vector2(w / 2 + 12, hip + 4)
@@ -524,34 +530,57 @@ func _build_human() -> void:
 	var weapon: String = look.get("weapon", "none")
 	var long_melee: bool = weapon in ["axe", "hammer", "pickaxe", "big_pickaxe", "club"]
 	var long_gun: bool = weapon in ["rifle", "shotgun", "blowgun"]
+	if tq:
+		# Turned toward the facing side: the near shoulder sits at the back of the silhouette,
+		# the far one at the front edge of the chest.
+		shoulder_f = Vector2(-w / 2 + 7, sh + 10)
+		shoulder_b = Vector2(w / 2 - 6, sh + 9)
+		# At rest the weapon is held forward at the waist, low and ready, the far hand
+		# steadying it (two pistols: one in each hand).
+		hand_f = Vector2(9, hip - 5)
+		weapon_ang = 0.7
+		hand_b = hand_f + Vector2(9, -3) if weapon != "pistols" else Vector2(w / 2 + 9, hip - 2)
 	if long_melee:
-		hand_f = Vector2(w / 2 + 10, hip - 6)
+		hand_f = Vector2(w / 2 + 10, hip - 6) if not tq else Vector2(4, hip - 2)
 		weapon_ang = 1.05
 	if long_gun:
-		hand_f = Vector2(w / 2 + 10, hip - 8)
-		hand_b = Vector2(w / 2 - 14, hip - 18)
 		weapon_ang = -0.45
+		if tq:
+			hand_f = Vector2(2, hip - 6)
+			hand_b = hand_f + Vector2.RIGHT.rotated(weapon_ang) * 30
+		else:
+			hand_f = Vector2(w / 2 + 10, hip - 8)
+			hand_b = Vector2(w / 2 - 14, hip - 18)
+	# The near arm starts further back in three-quarter view, so it reaches further.
+	var reach := 16.0 if tq else 0.0
 	match pose:
 		"aim":
-			hand_f = shoulder_f + Vector2(40, 4)
+			hand_f = shoulder_f + Vector2(40 + reach, 4 - reach * 0.4)
 			weapon_ang = 0.0
 			if long_gun:
-				hand_b = shoulder_f + Vector2(14, 10)
-				hand_f = shoulder_f + Vector2(30, 6)
+				if tq:
+					# Stock at the near shoulder, the far hand out along the barrel.
+					hand_f = shoulder_f + Vector2(36, -2)
+					hand_b = shoulder_f + Vector2(64, -4)
+				else:
+					hand_b = shoulder_f + Vector2(14, 10)
+					hand_f = shoulder_f + Vector2(30, 6)
 			if weapon == "pistols":
-				hand_b = shoulder_b + Vector2(44, 14)
+				hand_b = shoulder_b + Vector2(44, 14) if not tq else shoulder_b + Vector2(34, 2)
 		"windup":
 			# Cocked back behind the head, so the arm doesn't hide the face.
-			hand_f = shoulder_f + Vector2(-26, -40)
+			hand_f = shoulder_f + Vector2(-26 + reach * 0.5, -40 - reach * 0.25)
 			weapon_ang = -2.4 if long_melee else -1.2
 		"strike":
-			hand_f = shoulder_f + Vector2(38, 18)
+			hand_f = shoulder_f + Vector2(38 + reach * 1.2, 18 - reach * 0.4)
 			weapon_ang = 0.5 if long_melee else 0.2
+			if tq:
+				hand_b = shoulder_b + Vector2(-6, 30)
 		"cast":
-			hand_f = shoulder_f + Vector2(38, -32)
+			hand_f = shoulder_f + Vector2(38 + reach, -32 - reach * 0.25)
 			weapon_ang = -1.4
 		"hurt":
-			hand_f = shoulder_f + Vector2(10, 30)
+			hand_f = shoulder_f + Vector2(10 + reach * 0.5, 30)
 			weapon_ang = 1.5
 
 	var parts_start := _shapes.size()
@@ -687,7 +716,7 @@ func _build_human() -> void:
 		_circle(cp + Vector2(12, -20), 1.6, Color("#d9d2c0"), {"no_edge": true})
 	# Badge on the chest.
 	if extra == "badge":
-		_poly(star_pts(Vector2(w / 2 - 12, sh + 24), 7, 3, 5), col("accent", "#d9b44a"))
+		_poly(star_pts(Vector2(w / 2 - 12, sh + 24) if not (three_quarter and body_style > 0) else Vector2(w / 2 - 4, sh + 22), 7, 3, 5), col("accent", "#d9b44a"))
 	# Front arm and weapon.
 	if body_style > 0:
 		_arm_v(shoulder_f, hand_f, coat.darkened(0.05) if coat_kind != "vest" and coat_kind != "overalls" else shirt, true)
@@ -1392,7 +1421,10 @@ func _body_v(w: float, hip: float, sh: float, shoulder_f: Vector2, shoulder_b: V
 	if weapon == "pistols":
 		_weapon("pistol", hand_b, 0.0 if pose == "aim" else 1.2, true)
 	# Legs: thigh, knee, ankle.
+	# Side-on, the front leg (x 7) is the near one; turned three-quarter, the back one is.
 	var legs := [[-8.0, pants.darkened(0.16)], [7.0, pants]]
+	if three_quarter:
+		legs = [[7.0, pants.darkened(0.16)], [-8.0, pants]]
 	for L in legs:
 		var x: float = L[0]
 		var lc: Color = L[1]
@@ -1411,17 +1443,20 @@ func _body_v(w: float, hip: float, sh: float, shoulder_f: Vector2, shoulder_b: V
 				_line([hipj + Vector2(5, 4), ankle + Vector2(4, 0)], 1.2, lc.darkened(0.3), {"no_edge": true})
 		if coat_kind == "chaps" and x > 0:
 			_poly(limb_pts([hipj + Vector2(1, 6), knee + Vector2(2, 0), ankle + Vector2(1, 4)], [9.0, 8.5, 7.5]), coat)
-		_boot_v(x + 1, BOOT if x > 0 else BOOT.darkened(0.2))
+		_boot_v(x + 1, BOOT if (x > 0) != three_quarter else BOOT.darkened(0.2))
 	# Torso: sloped shoulders, chest, a waist.
 	var bulge := 9.0 if build == "heavy" else 0.0
+	# Three-quarter: the chest pushes further forward and everything on the front of the body
+	# (coat opening, buttons, buckle, collar) slides toward the facing side.
+	var fwd := 6.0 if three_quarter else 0.0
 	# Sloped trapezius into round shoulders, a chest that pushes forward, a taper to the waist.
 	var ctrl := [Vector2(-8, sh - 5), Vector2(-w / 2 + 7, sh - 1), Vector2(-w / 2 - 1, sh + 7), Vector2(-w / 2 - 4, sh + 20),
 		Vector2(-w / 2 - 2, sh + 44), Vector2(-w / 2 + 4, hip - 12), Vector2(-w / 2 + 3, hip + 7), Vector2(w / 2 - 3, hip + 7),
-		Vector2(w / 2 - 5 + bulge, hip - 14), Vector2(w / 2 + 3, sh + 38), Vector2(w / 2 + 7, sh + 22), Vector2(w / 2 + 3, sh + 8),
+		Vector2(w / 2 - 5 + bulge, hip - 14), Vector2(w / 2 + 3 + fwd * 0.5, sh + 38), Vector2(w / 2 + 7 + fwd * 0.6, sh + 22), Vector2(w / 2 + 3, sh + 8),
 		Vector2(w / 2 - 6, sh - 1), Vector2(11, sh - 5)]
 	var torso_c := shirt if coat_kind in ["vest", "overalls"] else coat
 	_poly(spline(ctrl, 4), torso_c)
-	var open_x := 5.0
+	var open_x := 5.0 + fwd
 	if long_coat or coat_kind in ["shirt", "buckskin"]:
 		if body_style == 2 and long_coat:
 			# Shirt and vest in the open front of the coat, lapels, buttons, a pocket flap.
@@ -1453,12 +1488,13 @@ func _body_v(w: float, hip: float, sh: float, shoulder_f: Vector2, shoulder_b: V
 		_poly([Vector2(w / 2 - 22, hip + 5), Vector2(w / 2 - 14, hip + 7), Vector2(w / 2 - 14, hip + 13), Vector2(w / 2 - 22, hip + 11)], Color("#c9a227"))
 	else:
 		_poly([Vector2(-w / 2 + 2, hip + 7), Vector2(w / 2 - 2, hip + 7), Vector2(w / 2 - 1, hip - 1), Vector2(-w / 2 + 1, hip - 1)], Color("#2e2118"))
-		_poly([Vector2(2, hip + 6), Vector2(10, hip + 6), Vector2(10, hip), Vector2(2, hip)], Color("#c9a227"))
+		_poly([Vector2(2 + fwd, hip + 6), Vector2(10 + fwd, hip + 6), Vector2(10 + fwd, hip), Vector2(2 + fwd, hip)], Color("#c9a227"))
 	# Neck and a turned-up collar.
 	_poly(capsule(Vector2(2, sh + 4), Vector2(3, sh - 10), 6.5, 6.0), _skin.darkened(0.1))
 	if long_coat:
-		_poly([Vector2(-12, sh - 6), Vector2(-3, sh + 2), Vector2(-4, sh + 12), Vector2(-14, sh + 6)], coat.darkened(0.1))
-		_poly([Vector2(13, sh - 6), Vector2(6, sh + 2), Vector2(8, sh + 12), Vector2(16, sh + 5)], coat.darkened(0.06))
+		var cx := fwd * 0.5
+		_poly([Vector2(-12 + cx, sh - 6), Vector2(-3 + cx, sh + 2), Vector2(-4 + cx, sh + 12), Vector2(-14 + cx, sh + 6)], coat.darkened(0.1))
+		_poly([Vector2(13 + cx, sh - 6), Vector2(6 + cx, sh + 2), Vector2(8 + cx, sh + 12), Vector2(16 + cx, sh + 5)], coat.darkened(0.06))
 
 
 ## Style 3: jitter each paper piece's outline so its edge reads as torn cardstock.
