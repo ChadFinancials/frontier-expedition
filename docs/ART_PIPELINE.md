@@ -34,7 +34,9 @@ code-drawn fallback, so the game runs with any fraction of the art done.
   toward the facing side. The chest opens forward (coat opening, buckle and badge shift
   front), the near arm holds the weapon from the back shoulder across the body, the far arm
   sits behind the chest and steadies the weapon (rifles: out along the barrel), and the back
-  leg is the near one. At rest weapons are held low and ready at the waist. Screenshot arg
+  leg is the near one. At rest weapons are held low and ready at the waist. The turned torso
+  is slimmer up top (sloped shoulders, a gentle taper; no broad yoke), and the far shoulder
+  sits on the chest's front edge with its hand out in front, so both arms always show. Screenshot arg
   `side` renders the old side-on build for comparison.
 - Faces: `Figure.face_look = 6`: a side-view **profile** at rest (idle, dead) that switches to
   **storybook reactions** in action poses: windup (eyes wide, brows up, mouth open), strike

@@ -533,13 +533,14 @@ func _build_human() -> void:
 	if tq:
 		# Turned toward the facing side: the near shoulder sits at the back of the silhouette,
 		# the far one at the front edge of the chest.
-		shoulder_f = Vector2(-w / 2 + 7, sh + 10)
-		shoulder_b = Vector2(w / 2 - 6, sh + 9)
+		shoulder_f = Vector2(-w / 2 + 9, sh + 12)
+		shoulder_b = Vector2(w / 2 - 2, sh + 11)
 		# At rest the weapon is held forward at the waist, low and ready, the far hand
 		# steadying it (two pistols: one in each hand).
-		hand_f = Vector2(9, hip - 5)
+		# The far hand rests out in front of the chest, so that arm always shows.
+		hand_f = Vector2(7, hip - 5)
 		weapon_ang = 0.7
-		hand_b = hand_f + Vector2(9, -3) if weapon != "pistols" else Vector2(w / 2 + 9, hip - 2)
+		hand_b = Vector2(w / 2 + 13, hip - 8) if weapon != "pistols" else Vector2(w / 2 + 12, hip - 2)
 	if long_melee:
 		hand_f = Vector2(w / 2 + 10, hip - 6) if not tq else Vector2(4, hip - 2)
 		weapon_ang = 1.05
@@ -1454,6 +1455,13 @@ func _body_v(w: float, hip: float, sh: float, shoulder_f: Vector2, shoulder_b: V
 		Vector2(-w / 2 - 2, sh + 44), Vector2(-w / 2 + 4, hip - 12), Vector2(-w / 2 + 3, hip + 7), Vector2(w / 2 - 3, hip + 7),
 		Vector2(w / 2 - 5 + bulge, hip - 14), Vector2(w / 2 + 3 + fwd * 0.5, sh + 38), Vector2(w / 2 + 7 + fwd * 0.6, sh + 22), Vector2(w / 2 + 3, sh + 8),
 		Vector2(w / 2 - 6, sh - 1), Vector2(11, sh - 5)]
+	if three_quarter:
+		# Turned, the body shows less width up top: sloped shoulders and a gentle taper to
+		# the waist instead of a broad rounded yoke (which read as a hump over small legs).
+		ctrl = [Vector2(-6, sh - 4), Vector2(-w / 2 + 9, sh), Vector2(-w / 2 + 4, sh + 9), Vector2(-w / 2 + 2, sh + 24),
+			Vector2(-w / 2 + 3, sh + 44), Vector2(-w / 2 + 5, hip - 12), Vector2(-w / 2 + 4, hip + 7), Vector2(w / 2 - 3, hip + 7),
+			Vector2(w / 2 - 4 + bulge, hip - 14), Vector2(w / 2 + 1, sh + 40), Vector2(w / 2 + 3, sh + 24), Vector2(w / 2, sh + 10),
+			Vector2(w / 2 - 7, sh + 1), Vector2(10, sh - 4)]
 	var torso_c := shirt if coat_kind in ["vest", "overalls"] else coat
 	_poly(spline(ctrl, 4), torso_c)
 	var open_x := 5.0 + fwd
