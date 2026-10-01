@@ -44,8 +44,10 @@ These notes are for any agent (or person) picking up work on it.
 ## Workflow (owner's rules)
 
 - The owner plays from source with `play.bat` (Godot 4.7.2 installed on their PC), after
-  pulling `main`. `play_vulkan.bat` is the same with the Vulkan renderer (a crash test; the
-  project default is OpenGL Compatibility, which the cloud container also renders with). Commit and push source changes to `main`; that is how they reach the game.
+  pulling `main`. The game renders with Vulkan (Forward+, the default since round 8: smoother
+  on the owner's NVIDIA card than OpenGL, which crashed mid-battle twice). `play_opengl.bat`
+  forces OpenGL as a fallback. The cloud container has no Vulkan, so `tools/shot.sh` renders
+  with OpenGL (Compatibility); small differences between the two are possible. Commit and push source changes to `main`; that is how they reach the game.
 - Do **not** rebuild or commit `download/FrontierExpedition-windows.zip` for routine
   changes. Only refresh it for a major version, when the owner asks.
 - More than one agent pushes to `main`: pull (`git pull --ff-only origin main`) before

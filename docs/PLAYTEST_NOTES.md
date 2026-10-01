@@ -9,20 +9,14 @@ decided, and what shipped. Update both at the end of every round.
 ## Open backlog
 
 ### Bugs
-- [ ] **Crashes in combat**: on the killing blow against "Mad Dog" Mulligan (round 7) and
-      mid-battle while idle, deciding on a move (round 8). Not reproduced here: the headless
-      quest test wins and saves, and a 5-minute idle soak (`shot=combat soak=300`) shows flat
-      memory, objects and draw calls with no errors. Points to the graphics driver. Hardened:
-      every polyline goes through `Figure.clean_line`; idle figures and HUDs no longer redraw
-      every frame. The owner's PC runs Godot's OpenGL renderer (Compatibility) on an RTX 4070
-      Ti Super, NVIDIA driver 581.57. Test: `play_vulkan.bat` launches with the Vulkan
-      renderer (Forward+; falls back to OpenGL if Vulkan fails). Still wanted: the log of a
-      crashed session (the timestamped `godot*.log` from before the crash, in
-      `%APPDATA%\Godot\app_userdata\Frontier Expedition\logs\`); one that just stops with
-      no backtrace means the driver killed the game.
-- [ ] 2D MSAA (smooth edges) is set in the project but unsupported by the OpenGL renderer
-      (the startup warning); it would work under Vulkan. Ties in with the jagged-edges item.
-- [ ] Jagged edges on circles and cut-outs (aliasing). Later.
+- [ ] **Crashes in combat** (round 7 Mad Dog killing blow, round 8 idle mid-battle). Not a
+      game bug: both crashed sessions' logs stop after startup with no error or backtrace, so
+      the NVIDIA OpenGL driver killed the game. Round 8 switched the default renderer to
+      **Vulkan** (Forward+); the owner reports it noticeably smoother. Watch for any further
+      crash; `play_opengl.bat` is the fallback. Idle figures and HUDs also no longer redraw
+      every frame.
+- [ ] Jagged edges on circles and cut-outs: the project's 2D MSAA now takes effect under
+      Vulkan (OpenGL ignored it). Check whether that is enough.
 
 ### Gameplay
 - [ ] **Wagon as a "5th member" in battles**: some enemies attack or sabotage it; tie it to
@@ -68,7 +62,11 @@ decided, and what shipped. Update both at the end of every round.
   fighters stand 25 px higher so three rows fit, overflow folds into "+N"; idle figures and
   HUDs stop redrawing every frame. Backdrops: not stretched (the aspect is kept), just a
   1344-wide image blown up 1.5-2x; the owner is regenerating them at 1344 x 768 plus a 2x
-  model upscale (`COMFYUI_GUIDE.md` §7). New screenshot args: `statuses`, `with=`, `soak=`.
+  model upscale (`COMFYUI_GUIDE.md` §7); the first larger pair replaced the prairie set.
+  New screenshot args: `statuses`, `with=`, `soak=`.
+- Crash logs showed no backtrace (a driver kill under OpenGL). `play_vulkan.bat` tested the
+  Vulkan renderer; the owner found it much smoother, so **Vulkan is now the default**, with
+  OpenGL as the automatic fallback and `play_opengl.bat` to force it.
 
 ### Round 7 (continuing the owner's save from here on)
 - Owner: text on the wood is hard to read; the map looks much better; ambushed in the first

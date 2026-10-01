@@ -32,7 +32,7 @@ Three rules hold the codebase together:
 
 | Path | What |
 |---|---|
-| `project.godot` | Engine settings, version (`config/version`), the three autoloads, main scene |
+| `project.godot` | Engine settings, version (`config/version`), the three autoloads, main scene. Renderer: Vulkan (Forward+) with 2D MSAA, falling back to OpenGL (Compatibility) |
 | `scenes/main.tscn` | The only scene: a `Main` node. Every screen is built in code |
 | `data/` | All content and balance (16 JSON tables, listed below) |
 | `scripts/autoload/` | `DB` (data), `Game` (company, save, settings), `Audio` (sound) |
@@ -52,7 +52,7 @@ Three rules hold the codebase together:
 | `art-src/` | The owner's original art (icons, backdrops) before prep. Ignored by Godot (`.gdignore`) |
 | `download/` | The Windows build zip. Only refreshed for a major version, when the owner asks |
 | `.github/workflows/build.yml` | On a `v*` tag: run tests, export Windows, publish a release |
-| `play.bat` | The owner's launcher: pull `main`, import, run from source |
+| `play.bat` | The owner's launcher: pull `main`, import, run from source (`play_opengl.bat` forces OpenGL) |
 | `docs/` | Design, architecture, content guide, art, backlog (see `docs/README.md`) |
 
 ## Autoloads

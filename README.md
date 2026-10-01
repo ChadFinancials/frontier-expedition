@@ -14,8 +14,8 @@ bottom right in game).
 
 **From source (how the owner plays):** install Godot 4.7.2, clone this repo and run
 `play.bat`. It pulls the latest `main`, imports new files and starts the game. Edit the
-`GODOT=` line in it if Godot lives somewhere else. `play_vulkan.bat` does the same with
-Godot's Vulkan renderer instead of OpenGL. Or open the folder in Godot and press F5.
+`GODOT=` line in it if Godot lives somewhere else. The game uses Godot's Vulkan renderer and
+falls back to OpenGL if Vulkan can't start; `play_opengl.bat` forces OpenGL. Or open the folder in Godot and press F5.
 
 **Windows build:** [`download/FrontierExpedition-windows.zip`](download/FrontierExpedition-windows.zip)
 holds a single `.exe` (refreshed for major versions only, so it can lag behind `main`).
