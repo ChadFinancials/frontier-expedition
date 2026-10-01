@@ -59,7 +59,7 @@ decided, and what shipped. Update both at the end of every round.
 
 ### Round 9
 - **Trinket pass** (owner's picks, TRINKET_PROPOSALS.md): 22 class trinkets (2 per class,
-  class-locked, twice as likely while that class is on the roster), 4 general trinkets
+  class-locked, dropping at their rarity like any trinket; the owner turned down a roster bias), 4 general trinkets
   reworked off their quirk copies, 5 new general ones; 49 in all. Hooks: `class`,
   `skill_mods`, conditions `guarding` and `poisoned`, stats `heal_out_pct`, `stun_chance`,
   `poison_dot`, `momentum_start`, `momentum_bonus`, `card_pct`.

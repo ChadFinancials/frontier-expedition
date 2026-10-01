@@ -222,8 +222,8 @@ of `mods`: `{"stat": "dmg_pct", "value": 15, "cond": "vs:beast"}`.
   true}`, `bar_lock` (% chance of a week at the saloon after an expedition) and
   `after_battle_fatigue`.
 - Trinkets take a `rarity` (common, uncommon, rare) and a `price`. A class trinket adds
-  `"class": "<class id>"` (only that class can wear it; it drops twice as often while that
-  class is on the roster) and may add `"skill_mods": {"<move id>": {"dmg_pct": 15}}` with keys
+  `"class": "<class id>"` (only that class can wear it; it drops at its rarity like any
+  other trinket) and may add `"skill_mods": {"<move id>": {"dmg_pct": 15}}` with keys
   `dmg_pct`, `acc`, `crit`, `effect_chance`, `mark_rounds`, `dot`, `heal`, `heal_pct`, `move`.
 
 ## Add a survival skill

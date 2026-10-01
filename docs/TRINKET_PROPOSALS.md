@@ -81,8 +81,8 @@ That makes 24 general + 3 boss + 22 class = 49 trinkets.
 ## How class trinkets are found
 - They join the normal trinket pool at their rarity, so curios, elites, the trinket peddler and
   bosses can all turn them up.
-- 🛠 A little weighting toward classes you actually have in the roster, so they don't feel
-  wasted (for example, double weight for a class you own).
+- ~~A little weighting toward classes you actually have in the roster.~~ Owner: no, drops are
+  purely random by rarity.
 - A class trinket in the stash shows which class can wear it; only that class can equip it.
 
 ## Engine hooks the 🛠 rows need

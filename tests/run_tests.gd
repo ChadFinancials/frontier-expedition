@@ -1070,12 +1070,6 @@ func test_trinket_pass() -> void:
 	gc.buffs.clear()
 	e2._apply_effect(gc, "gb_stacked", {"type": "random_buff", "pool": [{"stat": "acc", "value": 10}], "rounds": 3}, gc, [], false)
 	check(gc.buffs.any(func(b): return b.stat == "acc" and int(b.value) == 15), "Marked Deck: a +10 card deals +15")
-	# Class trinkets for classes on the roster turn up twice as often.
-	var seen := {}
-	for i in 600:
-		var kp := co.random_keepsake(["rare"])
-		seen[kp] = seen.get(kp, 0) + 1
-	check(seen.get("tin_star", 0) > seen.get("pearl_grips", 0), "roster classes' trinkets drop more (Tin Star %d vs Grips %d)" % [seen.get("tin_star", 0), seen.get("pearl_grips", 0)])
 
 
 ## Round 9 quirk pass (owner's numbers): conditional quirks and the behaviour ones.

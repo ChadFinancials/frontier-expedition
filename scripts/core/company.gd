@@ -725,10 +725,6 @@ func random_keepsake(rarities: Array = ["common", "uncommon", "rare"]) -> String
 		var r: String = DB.keepsakes[k].get("rarity", "common")
 		if r in rarities:
 			var w := 6 if r == "common" else (3 if r == "uncommon" else 1)
-			# Class trinkets turn up twice as often for classes on the roster.
-			var kc: String = DB.keepsakes[k].get("class", "")
-			if kc != "" and heroes.any(func(h): return h.class_id == kc):
-				w *= 2
 			pool.append({"id": k, "weight": w})
 	var pick = Stats.pick_weighted(rng, pool)
 	return pick.id if pick != null else ""
