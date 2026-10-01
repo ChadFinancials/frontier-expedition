@@ -580,9 +580,28 @@ static func quirk_effects(q: String) -> Array:
 static func keepsake_tooltip(k: String) -> String:
 	var d: Dictionary = DB.keepsakes.get(k, {})
 	var lines := ["%s (%s)" % [d.get("name", k), d.get("rarity", "")], d.get("desc", "")]
-	for m in d.get("mods", []):
-		lines.append(Stats.mod_text(m))
+	lines.append_array(keepsake_effects(k))
 	return "\n".join(lines)
+
+
+## Everything a trinket does, one line each: who can wear it, stat changes, move bonuses.
+static func keepsake_effects(k: String) -> Array:
+	var d: Dictionary = DB.keepsakes.get(k, {})
+	var out: Array = []
+	if str(d.get("class", "")) != "":
+		out.append("%s only" % DB.classes.get(d["class"], {}).get("name", d["class"]))
+	for m in d.get("mods", []):
+		out.append(Stats.mod_text(m))
+	var words := {"dmg_pct": "%+d%% Damage", "acc": "%+d Accuracy", "crit": "%+d%% Crit",
+		"effect_chance": "%+d%% effect chance", "mark_rounds": "Marks %+d round", "dot": "%+d Bleed/Poison a turn",
+		"heal": "heals %+d", "heal_pct": "heals %+d%%", "move": "moves the target %+d more rank"}
+	var sm: Dictionary = d.get("skill_mods", {})
+	for sid in sm:
+		var parts: Array = []
+		for key in sm[sid]:
+			parts.append(str(words.get(key, key + " %+d")) % int(sm[sid][key]))
+		out.append("%s: %s" % [DB.skill(sid).get("name", sid), ", ".join(parts)])
+	return out
 
 
 static func survival_tooltip(sid: String, rank: int) -> String:

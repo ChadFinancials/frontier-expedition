@@ -695,8 +695,16 @@ func buy_keepsake(i: int, kid: String) -> bool:
 	return true
 
 
+## "" if the hero can wear this trinket, else why not (class trinkets are one class only).
+func keepsake_block(h: Hero, kid: String) -> String:
+	var need: String = DB.keepsakes.get(kid, {}).get("class", "")
+	if need != "" and h.class_id != need:
+		return "%s only" % DB.classes.get(need, {}).get("name", need)
+	return ""
+
+
 func equip_keepsake(h: Hero, kid: String) -> bool:
-	if not kid in stash or h.keepsakes.size() >= 2:
+	if not kid in stash or h.keepsakes.size() >= 2 or keepsake_block(h, kid) != "":
 		return false
 	stash.erase(kid)
 	h.keepsakes.append(kid)
@@ -717,6 +725,10 @@ func random_keepsake(rarities: Array = ["common", "uncommon", "rare"]) -> String
 		var r: String = DB.keepsakes[k].get("rarity", "common")
 		if r in rarities:
 			var w := 6 if r == "common" else (3 if r == "uncommon" else 1)
+			# Class trinkets turn up twice as often for classes on the roster.
+			var kc: String = DB.keepsakes[k].get("class", "")
+			if kc != "" and heroes.any(func(h): return h.class_id == kc):
+				w *= 2
 			pool.append({"id": k, "weight": w})
 	var pick = Stats.pick_weighted(rng, pool)
 	return pick.id if pick != null else ""

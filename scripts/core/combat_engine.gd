@@ -65,6 +65,10 @@ func setup(party: Array, enemy_ids: Array, opts: Dictionary = {}) -> Array:
 		enemies = Stats.shuffled(rng, enemies)
 		ev.append({"t": "surprise", "who": "enemies"})
 	_reindex()
+	# Trinkets that start the gauge part full (Brakeman's Lantern).
+	for c in heroes:
+		if c.uses_momentum():
+			c.momentum = clampi(int(c.stat("momentum_start")), 0, int(DB.cfg("momentum_max", 100)))
 	ev.append({"t": "start"})
 	return ev
 
@@ -446,6 +450,8 @@ func mega_skill(c: Combatant) -> String:
 
 
 func _momentum(c: Combatant, n: int, why: String, ev: Array) -> void:
+	if n > 0:
+		n += int(c.stat("momentum_bonus"))
 	var d := c.add_momentum(n)
 	if d != 0:
 		ev.append({"t": "momentum", "target": c.id, "amount": d, "value": c.momentum, "why": why})
@@ -470,7 +476,7 @@ func hit_chance(a: Combatant, sid: String, t: Combatant) -> int:
 	var sk := DB.skill(sid)
 	if not is_hostile(sk):
 		return 100
-	var acc := float(sk.get("acc", 85)) + a.stat("acc", t)
+	var acc := float(sk.get("acc", 85)) + a.stat("acc", t) + a.skill_mod(sid, "acc")
 	acc += DB.cfg("skill_level_acc", 4) * (a.skill_level(sid) - 1)
 	acc += _class_vs(a, t, "acc")
 	var dodge := t.stat("dodge", a)
@@ -494,7 +500,7 @@ func crit_chance(a: Combatant, sid: String, t: Combatant) -> int:
 	var sk := DB.skill(sid)
 	if sk.get("no_damage", false) and is_hostile(sk):
 		return 0
-	var cr := a.stat("crit", t) + float(sk.get("crit", 0))
+	var cr := a.stat("crit", t) + float(sk.get("crit", 0)) + a.skill_mod(sid, "crit")
 	if in_cave and a.is_hero():
 		cr += _light_row().get("hero_crit", 0)
 	return clampi(int(round(cr)), 0, 100)
@@ -513,6 +519,7 @@ func dmg_mult(a: Combatant, sid: String, t: Combatant) -> float:
 	var m := 1.0 + float(sk.get("dmg", 0.0))
 	m += DB.cfg("skill_level_dmg_pct", 8) / 100.0 * (a.skill_level(sid) - 1)
 	m += a.stat("dmg_pct", t) / 100.0
+	m += a.skill_mod(sid, "dmg_pct") / 100.0
 	if t != null and t.mark > 0:
 		m += float(sk.get("vs_marked", 0.0))
 	if a.hp_ratio() < 0.5:
@@ -572,6 +579,9 @@ func effect_chance(a: Combatant, sid: String, e: Dictionary, t: Combatant) -> in
 			base = float(e.chance_vs[tag])
 	if a.is_hero():
 		base += DB.cfg("skill_level_effect", 6) * (a.skill_level(sid) - 1)
+		base += a.skill_mod(sid, "effect_chance")
+		if kind == "stun":
+			base += a.stat("stun_chance", t)
 	else:
 		base += DB.cfg("tier_effect", 5) * (a.tier - 1)
 	var res_stat := ""
@@ -750,6 +760,10 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 				var amt := float(e.get("amount", 2))
 				if a.is_poisoned() and t != a and e.has("amount_if_self_poisoned"):
 					amt = float(e.amount_if_self_poisoned)
+				# Trinkets: +N on this move's bleed/poison, +N on every poison the hero applies.
+				amt += a.skill_mod(sid, "dot")
+				if kind == "poison" and t != a:
+					amt += a.stat("poison_dot")
 				if a.is_hero():
 					amt *= 1.0 + DB.cfg("skill_level_dot_pct", 15) / 100.0 * (lvl - 1)
 				elif not a.boss:
@@ -763,7 +777,7 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 				t.stunned = true
 				ev.append({"t": "status", "target": t.id, "status": "stun"})
 		"mark":
-			t.mark = maxi(t.mark, int(e.get("rounds", 3)))
+			t.mark = maxi(t.mark, int(e.get("rounds", 3)) + int(a.skill_mod(sid, "mark_rounds")))
 			ev.append({"t": "status", "target": t.id, "status": "mark"})
 		"debuff":
 			if _roll_effect(a, sid, e, t, ev):
@@ -783,13 +797,17 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 			var pool: Array = e.get("pool", [])
 			var b: Dictionary = Stats.pick(rng, pool)
 			if b != null:
-				t.buffs.append({"stat": b.stat, "value": b.value, "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", ""), "fresh": t == a})
-				ev.append({"t": "buff", "target": t.id, "stat": b.stat, "value": b.value, "card": b.get("card", "")})
+				# Marked Deck: the dealt boons are bigger.
+				var bv: int = int(round(float(b.value) * (1.0 + a.stat("card_pct") / 100.0)))
+				t.buffs.append({"stat": b.stat, "value": bv, "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", ""), "fresh": t == a})
+				ev.append({"t": "buff", "target": t.id, "stat": b.stat, "value": bv, "card": b.get("card", "")})
 		"heal":
 			var hmin := float(e.get("min", 3))
 			var hmax := float(e.get("max", 6))
 			var amt := float(rng.randi_range(int(hmin), int(hmax))) * float(DB.cfg("heal_mult", 1.0))
 			amt *= 1.0 + DB.cfg("skill_level_heal_pct", 15) / 100.0 * (lvl - 1)
+			# Trinkets: flat and % bonuses to this move's heal (Good Boy, Take a Piece of Me).
+			amt = (amt + a.skill_mod(sid, "heal")) * (1.0 + a.skill_mod(sid, "heal_pct") / 100.0)
 			var hcrit := a.is_hero() and rng.randi_range(1, 100) <= int(a.stat("crit"))
 			if hcrit:
 				amt *= 1.5
@@ -809,7 +827,7 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 				ev.append_array(Fatigue.add(t.hero, amt, rng, {"tags": a.tags}))
 		"knockback", "pull":
 			if _roll_effect(a, sid, e, t, ev):
-				var n := int(e.get("amount", 1))
+				var n := int(e.get("amount", 1)) + int(a.skill_mod(sid, "move"))
 				_shift(t, -n if kind == "knockback" else n, ev)
 		"guard":
 			if t != a:
@@ -959,6 +977,9 @@ func _heal(a: Combatant, t: Combatant, amount: int, crit: bool, ev: Array) -> vo
 	if t.dead:
 		return
 	var amt := amount
+	# Healing given (Silver Surgical Kit, Family Hymnal), then healing received.
+	if a != null and a.hero != null:
+		amt = int(round(amt * (1.0 + a.stat("heal_out_pct") / 100.0)))
 	if t.hero != null:
 		amt = int(round(amt * (1.0 + t.hero.stat("heal_pct") / 100.0)))
 	amt = maxi(0, amt)

@@ -63,6 +63,8 @@ func _ready() -> void:
 	test_train_hopper()
 	print("> test_quirk_pass()")
 	test_quirk_pass()
+	print("> test_trinket_pass()")
+	test_trinket_pass()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -944,6 +946,138 @@ func test_round8_balance() -> void:
 
 ## Vulnerable (+% damage taken, all sources), dispel, tag-conditioned effects, refresh and
 ## Transfusion (owner's round 8 picks).
+## Round 9 trinket pass: class trinkets (class lock, move bonuses) and the new hooks.
+func test_trinket_pass() -> void:
+	var n_class := 0
+	for k in DB.keepsakes:
+		var d = DB.keepsakes[k]
+		if not d is Dictionary:
+			continue
+		var kc: String = d.get("class", "")
+		if kc != "":
+			n_class += 1
+			check(DB.classes.has(kc), "%s: class %s exists" % [k, kc])
+		for sid in d.get("skill_mods", {}):
+			check(DB.skills.has(sid) and (kc == "" or sid in DB.classes[kc].skills or DB.classes[kc].get("mega", "") == sid), "%s: move %s belongs to its class" % [k, sid])
+	check(n_class == 22, "22 class trinkets (got %d)" % n_class)
+	var co := Company.new()
+	co.new_game(23)
+	var mar := co.make_hero("marshal", 1)
+	var wr := co.make_hero("wrangler", 1)
+	var rd := co.make_hero("rail_driver", 1)
+	var doc := co.make_hero("frontier_doctor", 1)
+	for h in [mar, wr, rd, doc]:
+		h.quirks.clear()
+	co.heroes = [mar, wr, rd, doc]
+	# Class lock.
+	co.stash = ["tin_star", "tin_star"]
+	check(co.keepsake_block(wr, "tin_star") == "Marshal only" and not co.equip_keepsake(wr, "tin_star"), "a Wrangler can't wear the Tin Star")
+	check(co.equip_keepsake(mar, "tin_star"), "the Marshal can")
+	var e := CombatEngine.new()
+	e.setup([mar, wr, rd, doc], ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman", "outlaw_knifeman"], {})
+	var m: Combatant = e.heroes[0]
+	var w: Combatant = e.heroes[1]
+	var r: Combatant = e.heroes[2]
+	var dc: Combatant = e.heroes[3]
+	var foe: Combatant = e.enemies[0]
+	# No resisting in these checks (effect chances cap at 95%).
+	for en in e.enemies:
+		for rs in ["move_res", "bleed_res", "poison_res"]:
+			en.buffs.append({"stat": rs, "value": -500, "rounds": 99, "name": "test"})
+	# Tin Star: +15 Prot while Guarding or Taunting.
+	var p0 := m.stat("prot")
+	m.taunt = 2
+	check(m.stat("prot") == minf(80.0, p0 + 15), "Tin Star: +15 Prot while Taunting")
+	m.taunt = 0
+	# Bench Warrant Book: Warrant marks a round longer; Iron Justice +15% damage.
+	mar.keepsakes = ["warrant_book"]
+	e._apply_effect(m, "marshal_warrant", {"type": "mark", "rounds": 3}, foe, [], false)
+	check(foe.mark == 4, "Warrant Book: the Warrant marks 4 rounds (got %d)" % foe.mark)
+	foe.mark = 0
+	mar.keepsakes = []
+	var ij0 := e.dmg_mult(m, "marshal_iron_justice", foe)
+	mar.keepsakes = ["warrant_book"]
+	check(is_equal_approx(e.dmg_mult(m, "marshal_iron_justice", foe) - ij0, 0.15), "Warrant Book: Iron Justice +15%")
+	# Golden Spike: Hammerfell knocks back one more rank.
+	rd.keepsakes = ["golden_spike"]
+	for tries in 20:
+		e._apply_effect(r, "rd_hammer_blow", {"type": "knockback", "amount": 1, "chance": 1000}, foe, [], false)
+		if foe.rank != 1:
+			break
+	check(foe.rank == 3, "Golden Spike: knocked back 2 ranks (rank %d)" % foe.rank)
+	e._shift(foe, 2, [])
+	# Collar: Sic 'Em bleeds 1 more.
+	wr.keepsakes = ["biscuit_collar"]
+	foe.dots.clear()
+	for tries in 20:
+		e._apply_effect(w, "wr_sic_em", {"type": "bleed", "amount": 2, "rounds": 3, "chance": 1000}, foe, [], false)
+		if not foe.dots.is_empty():
+			break
+	check(not foe.dots.is_empty() and int(foe.dots[0].amount) == 3, "Collar: Sic 'Em bleeds 3")
+	# Riata: Lasso pulls one more rank.
+	wr.keepsakes = ["rawhide_riata"]
+	var back: Combatant = e.enemies[3]
+	for tries in 20:
+		e._apply_effect(w, "wr_lasso", {"type": "pull", "amount": 2, "chance": 1000}, back, [], false)
+		if back.rank != 4:
+			break
+	check(back.rank == 1, "Riata: Lasso pulls 3 ranks (rank %d)" % back.rank)
+	# Surgical Kit: heals given +20%.
+	doc.keepsakes = []
+	r.set_hp(1)
+	var evh: Array = []
+	e._heal(dc, r, 10, false, evh)
+	var h0 := r.hp - 1
+	doc.keepsakes = ["surgical_kit"]
+	r.set_hp(1)
+	e._heal(dc, r, 10, false, evh)
+	check(r.hp - 1 == int(round(h0 * 1.2)), "Surgical Kit: heals 20%% more (%d -> %d)" % [h0, r.hp - 1])
+	# Prospector caps, Poisoner dart case, Gris-Gris, Hopper lantern and watch, Gambler deck.
+	var pr := co.make_hero("prospector", 1)
+	var bp := co.make_hero("sharpshooter", 1)
+	var th := co.make_hero("train_hopper", 1)
+	var gb := co.make_hero("gambler", 1)
+	for h in [pr, bp, th, gb]:
+		h.quirks.clear()
+	var e2 := CombatEngine.new()
+	th.keepsakes = ["brakemans_lantern", "pocket_watch"]
+	e2.setup([pr, bp, th, gb], ["outlaw_brawler", "outlaw_gunhand"], {})
+	var pc: Combatant = e2.heroes[0]
+	var bc: Combatant = e2.heroes[1]
+	var tc: Combatant = e2.heroes[2]
+	var gc: Combatant = e2.heroes[3]
+	var f2: Combatant = e2.enemies[0]
+	f2.buffs.append({"stat": "poison_res", "value": -500, "rounds": 99, "name": "test"})
+	check(tc.momentum == 20, "Brakeman's Lantern: starts at 20 Momentum (got %d)" % tc.momentum)
+	e2._momentum(tc, 20, "", [])
+	check(tc.momentum == 45, "Pocket Watch: a 20 gain gives 25 (got %d)" % tc.momentum)
+	var st := {"type": "stun", "chance": 50}
+	var s0 := e2.effect_chance(pc, "pr_blasting_cap", st, f2)
+	pr.keepsakes = ["blasting_caps"]
+	check(e2.effect_chance(pc, "pr_blasting_cap", st, f2) == s0 + 15, "Blasting Caps: +15% stun")
+	bp.keepsakes = ["gator_darts"]
+	f2.dots.clear()
+	for tries in 20:
+		e2._apply_effect(bc, "ss_sacrament", {"type": "poison", "amount": 3, "rounds": 3, "chance": 1000}, f2, [], false)
+		if not f2.dots.is_empty():
+			break
+	check(int(f2.dots[0].amount) == 4, "Gator-Tooth Darts: poison +1")
+	bp.keepsakes = ["gris_gris"]
+	var gd0 := e2.dmg_mult(bc, "ss_suppress", f2)
+	bc.dots.append({"kind": "poison", "amount": 1, "rounds": 2})
+	check(is_equal_approx(e2.dmg_mult(bc, "ss_suppress", f2) - gd0, 0.2), "Gris-Gris: +20% while poisoned")
+	gb.keepsakes = ["marked_deck"]
+	gc.buffs.clear()
+	e2._apply_effect(gc, "gb_stacked", {"type": "random_buff", "pool": [{"stat": "acc", "value": 10}], "rounds": 3}, gc, [], false)
+	check(gc.buffs.any(func(b): return b.stat == "acc" and int(b.value) == 15), "Marked Deck: a +10 card deals +15")
+	# Class trinkets for classes on the roster turn up twice as often.
+	var seen := {}
+	for i in 600:
+		var kp := co.random_keepsake(["rare"])
+		seen[kp] = seen.get(kp, 0) + 1
+	check(seen.get("tin_star", 0) > seen.get("pearl_grips", 0), "roster classes' trinkets drop more (Tin Star %d vs Grips %d)" % [seen.get("tin_star", 0), seen.get("pearl_grips", 0)])
+
+
 ## Round 9 quirk pass (owner's numbers): conditional quirks and the behaviour ones.
 func test_quirk_pass() -> void:
 	var co := Company.new()

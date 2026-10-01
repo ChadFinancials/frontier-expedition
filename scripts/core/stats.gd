@@ -5,7 +5,8 @@ extends RefCounted
 ##
 ## Conditions: always (default), in_cave, on_trail, front (ranks 1-2), back (ranks 3-4),
 ## low_hp (below 50%), vs:<tag> (the opponent has the tag), marked (this unit is Marked),
-## vs_marked / vs_vulnerable (the opponent is), deaths_door, round1 (first round of a fight).
+## vs_marked / vs_vulnerable (the opponent is), deaths_door, round1 (first round of a fight),
+## guarding (Guarding an ally or Taunting), poisoned.
 
 const STAT_NAMES := {
 	"max_hp_pct": "Max HP", "acc": "Accuracy", "dodge": "Dodge", "prot": "Protection",
@@ -15,10 +16,13 @@ const STAT_NAMES := {
 	"heal_pct": "Healing Received", "resolve": "Second Wind Chance", "scout": "Scouting",
 	"surprise": "Surprise Chance", "food_pct": "Food Eaten", "loot_pct": "Loot Found",
 	"vulnerable": "Vulnerable", "xp_pct": "XP Gained",
+	"heal_out_pct": "Healing Given", "stun_chance": "Stun Chance", "poison_dot": "Poison Dealt per Turn",
+	"momentum_start": "Starting Momentum", "momentum_bonus": "Momentum per Gain", "card_pct": "Stacked Deck Boons",
 }
 const PERCENT_STATS := ["max_hp_pct", "prot", "pierce", "dmg_pct", "crit", "stun_res", "bleed_res",
 	"poison_res", "move_res", "debuff_res", "deathblow", "fatigue_pct", "heal_pct", "resolve",
-	"scout", "surprise", "food_pct", "loot_pct", "vulnerable", "xp_pct"]
+	"scout", "surprise", "food_pct", "loot_pct", "vulnerable", "xp_pct", "heal_out_pct", "stun_chance",
+	"card_pct"]
 ## For these stats a positive number is bad for the hero.
 const INVERTED_STATS := ["fatigue_pct", "food_pct", "vulnerable"]
 
@@ -46,6 +50,10 @@ static func cond_ok(cond: String, ctx: Dictionary) -> bool:
 		return ctx.get("deaths_door", false)
 	if cond == "round1":
 		return ctx.get("round", 0) == 1
+	if cond == "guarding":
+		return ctx.get("guarding", false)
+	if cond == "poisoned":
+		return ctx.get("poisoned", false)
 	if cond.begins_with("vs:"):
 		return cond.substr(3) in ctx.get("tags", [])
 	return false
@@ -83,6 +91,10 @@ static func cond_text(cond: String) -> String:
 			return " on Death's Door"
 		"round1":
 			return " in the first round"
+		"guarding":
+			return " while Guarding or Taunting"
+		"poisoned":
+			return " while poisoned"
 	if cond.begins_with("vs:"):
 		return " vs %s" % cond.substr(3).capitalize()
 	return ""

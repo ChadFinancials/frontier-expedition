@@ -293,7 +293,7 @@ func _store(body: VBoxContainer) -> void:
 		var nl := UI.lbl(DB.keepsakes[k].name, 20, "InkBold")
 		nl.custom_minimum_size.x = 300
 		row.add_child(nl)
-		var ml := UI.lbl(", ".join(DB.keepsakes[k].get("mods", []).map(func(m): return Stats.mod_text(m))), 17, "Ink")
+		var ml := UI.lbl(", ".join(UI.keepsake_effects(k)), 17, "Ink")
 		ml.custom_minimum_size.x = 560
 		ml.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(ml)

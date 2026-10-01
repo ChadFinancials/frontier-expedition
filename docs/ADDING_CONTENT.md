@@ -212,11 +212,19 @@ In `data/curios.json`, then add its id to a region's `curios` or `cave_curios`:
 
 `data/quirks.json` / `data/keepsakes.json` (trinkets are called keepsakes in the data): a list
 of `mods`: `{"stat": "dmg_pct", "value": 15, "cond": "vs:beast"}`.
-- Conditions: always, in_cave, on_trail, front, back, low_hp, vs:<tag>.
+- Conditions: always, in_cave, on_trail, front, back, low_hp, vs:<tag>, marked, vs_marked,
+  vs_vulnerable, deaths_door, round1, guarding (Guarding or Taunting), poisoned.
 - Extra stats beyond the combat ones: `fatigue_pct` (Fatigue taken), `heal_pct` (healing
-  received), `resolve` (Second Wind chance), `scout`, `surprise`, `food_pct`, `loot_pct`.
-- A quirk can add `"compulsion": {"tag": "whiskey", "chance": 50, "text": "..."}`.
-- Trinkets take a `rarity` (common, uncommon, rare) and a `price`.
+  received), `heal_out_pct` (healing given), `resolve` (Second Wind chance), `scout`,
+  `surprise`, `food_pct`, `loot_pct`, `xp_pct`, `vulnerable`, `stun_chance`, `poison_dot`,
+  `momentum_start`, `momentum_bonus`, `card_pct` (Stacked Deck boons).
+- A quirk can add `"compulsion": {"tag": "whiskey", "chance": 50, "text": "...", "steals":
+  true}`, `bar_lock` (% chance of a week at the saloon after an expedition) and
+  `after_battle_fatigue`.
+- Trinkets take a `rarity` (common, uncommon, rare) and a `price`. A class trinket adds
+  `"class": "<class id>"` (only that class can wear it; it drops twice as often while that
+  class is on the roster) and may add `"skill_mods": {"<move id>": {"dmg_pct": 15}}` with keys
+  `dmg_pct`, `acc`, `crit`, `effect_chance`, `mark_rounds`, `dot`, `heal`, `heal_pct`, `move`.
 
 ## Add a survival skill
 

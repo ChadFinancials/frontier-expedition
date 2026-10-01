@@ -101,6 +101,18 @@ static func bones(of: Combatant, uid: int) -> Combatant:
 	return c
 
 
+## A trinket's bonus to one move ("skill_mods": {move: {key: value}}), summed over the
+## hero's trinkets. Keys: dmg_pct, acc, crit, effect_chance, mark_rounds, dot, heal,
+## heal_pct, move.
+func skill_mod(sid: String, key: String) -> float:
+	if hero == null:
+		return 0.0
+	var v := 0.0
+	for k in hero.keepsakes:
+		v += float(DB.keepsakes.get(k, {}).get("skill_mods", {}).get(sid, {}).get(key, 0))
+	return v
+
+
 ## Classes with "momentum": true (the Train Hopper) fill a gauge by moving.
 func uses_momentum() -> bool:
 	return hero != null and data.get("momentum", false)
@@ -144,6 +156,7 @@ func ctx(vs: Combatant = null) -> Dictionary:
 	return {"in_cave": in_cave, "rank": rank, "hp_ratio": hp_ratio(),
 		"tags": vs.tags if vs != null else [], "marked": mark > 0, "deaths_door": deaths_door(),
 		"round": round_num, "vs_marked": vs != null and vs.mark > 0,
+		"guarding": guarding >= 0 or taunt > 0, "poisoned": is_poisoned(),
 		"vs_vulnerable": vs != null and vs.buff_total("vulnerable") > 0}
 
 

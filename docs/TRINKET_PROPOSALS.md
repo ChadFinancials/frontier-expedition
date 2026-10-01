@@ -1,4 +1,9 @@
-# Trinket proposals (round 9)
+# Trinket proposals (round 9) — ✅ shipped with the owner's edits
+
+**Owner's revisions:** Bench Warrant Book -2 Dodge; Pearl-Handled Grips +4% Crit, downside
+-4 Acc (not Dodge); Quick-Draw Holster no downside; Braided Rawhide Riata downside -5% Dmg;
+Lucky Silver Dollar +8% Crit; Assayer's Loupe -3 Dodge (not Acc); Ether Bottle -2 Speed;
+Vial of River Water renamed **Holy Water**, no downside. Everything else as proposed below.
 
 Two class trinkets per class (22), then the general trinkets anyone can wear (19 existing
 with an edit each, plus 5 new). Boss trinkets (Crane's Revolver, Cyclops' Eye-Stone, Shard

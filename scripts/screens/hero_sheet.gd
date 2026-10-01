@@ -234,7 +234,7 @@ func _pool() -> Array:
 
 
 func _equip(k: String) -> void:
-	if hero.keepsakes.size() >= 2:
+	if hero.keepsakes.size() >= 2 or Game.company.keepsake_block(hero, k) != "":
 		return
 	if _on_trail():
 		Game.company.run.loot.keepsakes.erase(k)
@@ -265,12 +265,18 @@ func _pick_keepsake() -> void:
 		var l := UI.lbl(DB.keepsakes[k].name, 20, "InkBold")
 		l.custom_minimum_size.x = 260
 		row.add_child(l)
-		row.add_child(UI.lbl(", ".join(DB.keepsakes[k].get("mods", []).map(func(m): return Stats.mod_text(m))), 16, "Ink"))
+		var fx := UI.wrap(UI.lbl(", ".join(UI.keepsake_effects(k)), 16, "Ink"), 300)
+		row.add_child(fx)
 		var kk: String = k
-		row.add_child(UI.btn("Equip", func():
+		var eb := UI.btn("Equip", func():
 			_equip(kk)
 			Main.inst.close_modal(holder.wrap)
-			_changed(), "Small"))
+			_changed(), "Small")
+		var why := co.keepsake_block(hero, k)
+		eb.disabled = why != ""
+		if why != "":
+			eb.tooltip_text = "Only a %s can wear this." % why.trim_suffix(" only")
+		row.add_child(eb)
 		v.add_child(row)
 	v.add_child(UI.btn("Cancel", func(): Main.inst.close_modal(holder.wrap)))
 	holder.wrap = Main.inst.modal(p)
