@@ -117,6 +117,14 @@ shows outdoors only (trail and fights): caves and the night camp keep their own 
 the whole sky and range stay in view and the figures stand on the ground. New images get a
 measured guess; check it in-game and hand-set it if the view looks zoomed into the ground.
 
+**The owner's prompt for area 1 backdrops** (Fort Providence, the Tallgrass Sea, the tutorial
+and rumors; verbatim, as used):
+
+> flat colour shapes, simple shadow tone, chunky simple silhouettes,  animated stoybook, handmade, papermache, map styling, wild west ,frontier, western mountains, light clouds,grasses, shrubery, abundant dirt, Horizon in the upper-middle, emptyof major objects in foreground,Clear depth layers,prominent running river that snakes off and fades into the distance, larger depth of field distortion from foreground, dirt trail,
+
+It produced the second prairie pair (the river crossing and the mesa road). For other areas,
+keep the style half and swap the scenery words.
+
 **Size.** Generate at **1344 x 768** (SDXL's native 16:9 size; asking SDXL for 1920 or more
 straight away gives muddled compositions), then **upscale 2x with a model upscaler** before
 saving: add an **Upscale Image (using Model)** box with `RealESRGAN_x4plus` (in

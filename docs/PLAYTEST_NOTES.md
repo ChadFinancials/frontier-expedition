@@ -34,6 +34,23 @@ decided, and what shipped. Update both at the end of every round.
       level adds the same accuracy, damage, effect and healing bonuses).
 - [ ] Stacked Deck "probably needs tuning" (round 8; owner: save for a later balancing pass). A second deal stacks on the first (two
       Jacks of Clubs = +24 Dodge). Proposed: a new deal replaces that hero's previous card.
+- [ ] **Hero balance proposals** (round 8 review, not applied; for the balancing pass).
+      Model: `python3 tools/hero_power.py` (each move vs the average tier-1 enemy: 14.5 HP,
+      12 dodge, 4% prot; stun res 33, bleed 30, poison 44; enemies hit for ~3.8 at ~88 acc).
+      Ranking 1-10: Gambler 9, Bayou Poisoner 8, Rail Driver 7, Mountain Mystic 7,
+      Gunslinger 7, Prospector 6, Wrangler 6, Marshal 6, Frontier Doctor 5, Preacher 4.
+      - Gambler: Deal 'Em is the outlier, ~22 expected damage per cast (2.6 direct + 3.4 bleed
+        on all 4 ranks; bleeds stack on recast). Hit a pair instead (`aoe_groups`
+        [[1,2],[3,4]]): ~11. Stacked Deck: a new deal replaces that hero's card, no stacking.
+      - Bayou Poisoner: Bola Shot stuns two targets, 0.70 expected stuns per cast (best in
+        the game). Stun chance 80 -> 60: 0.41, level with Dynamite (0.38) and Blasting
+        Charge (0.41).
+      - Preacher: offense ~3/turn, speed 1, heals 5.6 (single) / 8 (party) a turn against
+        ~12 incoming. Laying On of Hands 5-9 -> 7-11 (5.6 -> 7.2), Revival Meeting 1-4 ->
+        2-4 (8.0 -> 9.6 party), speed 1 -> 3.
+      - Frontier Doctor: lowest EHP (20.6). Battlefield Surgery's stun costs the patient a
+        turn (~6 of value), so its 10 HP nets ~4. Drop the stun, heal 10-15 -> 8-12 (8.0
+        net, cures and +25 prot kept); HP 16 -> 18 (EHP 23.2).
 - [ ] Watch: Ruby Blackwing is hard and the crow summon strong; probably right (round 7).
 - [ ] Second region onward (Red Canyons, Thunder Peaks, Redwater Ford) waits until the first
       region is crisp.

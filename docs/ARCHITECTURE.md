@@ -246,6 +246,7 @@ while not engine.is_over():
 | `tools/shot.sh <scenario> out.png [args]` | Screenshot under xvfb. Scenarios in `scripts/debug/shots.gd`: `menu, settlement, embark, trail, combat, camp, cave, event, curio, results, hero, building, tutorial, silas, lineup, faces, outfits`, plus A/B comparisons. Useful args: `full` (party of 4), `region=<id>`, `far` (end of map), `enemies=a,b`, `ehp=N`, `act`, `statuses`, `with=<class> skill=<id>`, `soak=N` (idle and print memory, objects and draw calls) |
 | `python3 tools/hero_sheet.py` | Regenerates `docs/HERO_REVIEW.md` from the data |
 | `python3 tools/enemy_sheet.py` | Regenerates `docs/ENEMY_REVIEW.md` |
+| `python3 tools/hero_power.py` | Rough power model: every hero move scored against the average tier-1 enemy (balance aid) |
 | `python3 tools/gen_audio.py [name]` | Regenerates generated sounds and music |
 | `python3 tools/level_audio.py` | Re-measures loudness into `levels.json` |
 | `python3 tools/art/prep_icons.py --dir art-src/icons` | Cuts out and sizes painted icons |

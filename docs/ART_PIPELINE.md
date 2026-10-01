@@ -85,6 +85,10 @@ code-drawn fallback, so the game runs with any fraction of the art done.
   ground). 16:9. Sky and mountains in the top third, open ground below; keep the **lower
   middle clear** because the fighters stand across it; landmarks small in the distance or at
   the edges.
+- **Area 1 backdrop prompt** (the owner's, verbatim): see `COMFYUI_GUIDE.md` §7. Key parts:
+  flat colour shapes, simple shadow tone, chunky silhouettes, animated storybook, handmade,
+  papier-mache, map styling; horizon in the upper middle, foreground empty of major objects,
+  clear depth layers, a river snaking into the distance, a dirt trail.
 - **Never**: tipis, totem poles, dreamcatchers, feather headdresses or war bonnets. Native
   peoples are never cast as enemies, and the art must not imply it.
 - Characters stay clean and sculpted (no patchwork collage on figures). Don't prompt for paper
