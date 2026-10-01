@@ -560,6 +560,19 @@ func _build_human() -> void:
 		_line([Vector2(-w / 2 - 2, hip + 2), Vector2(-w / 2 - 8, hip + 18)], 2.0, DARK_METAL)
 		_circle(Vector2(-w / 2 - 8, hip + 30), 22.0, Color(1, 0.8, 0.3, 0.18), {"glow": true})
 		_poly([Vector2(-w / 2 - 15, hip + 18), Vector2(-w / 2 - 1, hip + 18), Vector2(-w / 2 - 3, hip + 40), Vector2(-w / 2 - 13, hip + 40)], Color("#f2c14e"))
+	# Bindle: a bundle on a stick over the back shoulder (the Train Hopper).
+	if look.get("extra", "") == "bindle":
+		var s0 := Vector2(-w / 2 + 2, sh + 26)
+		var s1 := Vector2(-w / 2 - 44, sh - 34)
+		var cloth := Color("#9e3328")
+		var c0 := s1 + Vector2(-4, 16)
+		_line([s0, s1 + Vector2(-6, -6)], 4.0, WOOD)
+		# A red polka-dot bandana tied round the stick: the sack, then the knotted ears.
+		_poly(ellipse(c0, 15, 13, 16), cloth)
+		_poly([s1 + Vector2(-8, 4), s1 + Vector2(-16, -8), s1 + Vector2(-3, 1)], cloth.darkened(0.15))
+		_poly([s1 + Vector2(0, 4), s1 + Vector2(8, -7), s1 + Vector2(3, 7)], cloth.darkened(0.15))
+		for d in [Vector2(-7, -4), Vector2(5, -2), Vector2(-2, 6), Vector2(-10, 5), Vector2(8, 7)]:
+			_circle(c0 + d, 2.0, Color("#efe4c8"), {"no_edge": true})
 	if body_style > 0:
 		_body_v(w, hip, sh, shoulder_f, shoulder_b, hand_b, coat, pants, shirt, coat_kind, build, weapon)
 	else:
@@ -933,6 +946,12 @@ func _weapon(kind: String, hand: Vector2, ang: float, back: bool) -> void:
 			_circle(tip + dir * 6, 3.0, Color("#ffd166"), {"no_edge": true})
 		"fists":
 			_circle(hand, 8.0, _skin)
+		"railspike":
+			# A pried-loose railroad spike: a square iron shank with a hooked head.
+			var tip := hand + dir * 34
+			var n5 := dir.orthogonal()
+			_poly([hand - dir * 8 + n5 * 3, tip + n5 * 2, tip + dir * 7, tip - n5 * 2, hand - dir * 8 - n5 * 3], DARK_METAL.lightened(0.1))
+			_poly([hand - dir * 8 + n5 * 7, hand - dir * 8 - n5 * 4, hand - dir * 14 - n5 * 4, hand - dir * 14 + n5 * 9], DARK_METAL)
 
 
 func _dog(at: Vector2) -> void:

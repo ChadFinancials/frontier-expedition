@@ -160,5 +160,23 @@
         {"name": "Oxblood", "coat": "#4a1a1c", "pants": "#1e1e1e", "hat": "#1a1212"},
         {"name": "Ash Gray", "coat": "#4a4a4c", "pants": "#2a2a2c", "hat": "#2a2a2a"}
       ]}
+    },
+  "train_hopper": {
+    "name": "Train Hopper",
+    "role": "Burster",
+    "desc": "A drifter who rides the rails and never stays in one car. Builds Momentum by moving every turn, then spends it all on one enormous blow: End of the Line.",
+    "hp": 18, "dodge": 14, "prot": 0, "speed": 7, "acc": 0, "crit": 7, "dmg": [4, 8],
+    "res": {"stun": 30, "bleed": 30, "poison": 30, "move": 30, "debuff": 30, "deathblow": 67},
+    "ranks": [1, 2, 3, 4],
+    "momentum": true,
+    "mega": "th_end_of_line",
+    "skills": ["th_boxcar_leap", "th_stowaway", "th_chart_hills", "th_railspike", "th_emergency_brake", "th_dancing_man", "th_ride_rods", "th_catch_out"],
+    "look": {"body": "human", "build": "slim", "hat": "flat_cap", "coat": "long", "weapon": "railspike", "extra": "bindle",
+      "colors": {"coat": "#4a3f36", "pants": "#3a3a40", "hat": "#2f2a26", "accent": "#d4a23a"},
+      "outfits": [
+        {"name": "Coal Smudge"},
+        {"name": "Boxcar Red", "coat": "#6e2e24", "pants": "#3b342e", "hat": "#3a2a22", "accent": "#d9c08a"},
+        {"name": "Rail Blue", "coat": "#34495e", "pants": "#2b2f36", "hat": "#3b3b3b", "accent": "#e0a83a"}
+      ]}
   }
 }

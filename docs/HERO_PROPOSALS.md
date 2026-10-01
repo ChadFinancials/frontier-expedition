@@ -180,7 +180,10 @@ tooltip.
 **Art:** a new character look (a drifter in a long coat and flat cap, a bindle, coal-smudged),
 three outfits, and a steam-gold palette for the gauge.
 
-### The Train Hopper: revision 4 (owner's kit, single-target burster)
+### The Train Hopper: revision 4 (owner's kit, single-target burster) — ✅ shipped
+
+*Final owner tweaks: Ride the Rods +4% crit; Catch Out is a flat +20 Momentum and gives the
+ally +10 Protection (no Speed). See HERO_REVIEW.md for the live numbers.*
 
 **Identity:** a drifter who rides the rails. She builds Momentum by moving and spends it on
 one huge single-target hit. The rhythm is forward from the back, back from the front, then

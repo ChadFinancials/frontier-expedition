@@ -365,6 +365,8 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 			parts.append("Crit +%d%%" % int(sk.crit))
 		if float(sk.get("vs_marked", 0)) > 0:
 			parts.append("+%d%% vs Marked" % int(round(float(sk.vs_marked) * 100)))
+		if int(sk.get("ignore_prot_pct", 0)) > 0:
+			parts.append("ignores %d%% of Protection" % int(sk.ignore_prot_pct))
 		if sk.get("hits", 1) > 1:
 			parts.append("%d hits" % int(sk.hits))
 		if sk.get("random_hits", 0) > 0:
@@ -376,6 +378,10 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 		lines.append(", ".join(parts))
 	if sk.has("transfuse_pct"):
 		lines.append("• Heals your most wounded ally for %d%% of the damage dealt" % int(sk.transfuse_pct))
+	if sk.get("spend_momentum", false):
+		lines.append("• Needs a full Momentum gauge, and spends all of it")
+	if int(sk.get("momentum", 0)) != 0:
+		lines.append("• Momentum %+d" % int(sk.momentum))
 	for e in sk.get("effects", []):
 		var t := effect_text(e, level)
 		if t != "":
@@ -467,6 +473,10 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "Poisons, bleeds and debuffs already on the target last %d more round%s" % [int(e.get("rounds", 1)), "" if int(e.get("rounds", 1)) == 1 else "s"]
 		"light":
 			return "Lamplight %+d" % int(e.get("amount", 10))
+		"momentum":
+			return "Momentum %+d" % int(e.get("amount", 0))
+		"swap_places":
+			return "Swaps places with the ally, however far apart"
 		"summon":
 			var who: String = DB.enemies.get(e.get("enemy", ""), {}).get("name", "help")
 			return "Calls in %s" % (who if int(e.get("count", 1)) <= 1 else "%d x %s" % [int(e.count), who])

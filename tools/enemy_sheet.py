@@ -77,6 +77,10 @@ def _effect_text(fx):
 	t = fx.get("type")
 	ch = fx.get("chance")
 	chance = " (%d%%)" % ch if ch is not None and ch < 100 else ""
+	if t == "swap_places":
+		return "swaps places with the ally (any rank)"
+	if t == "momentum":
+		return "momentum %+d" % fx.get("amount", 0)
 	if t in ("bleed", "poison"):
 		extra = " (%d if user poisoned)" % fx["amount_if_self_poisoned"] if "amount_if_self_poisoned" in fx else ""
 		return "%s %d x%d rounds%s%s" % (t, fx.get("amount", 0), fx.get("rounds", 3), extra, chance)

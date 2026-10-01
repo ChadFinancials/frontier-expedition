@@ -28,6 +28,7 @@ var story_script: Dictionary = {}     # scripted ending (a boss's first meeting)
 var _next_id: int = 1
 var _fresh_dd: Array = []       # heroes knocked onto Death's Door by the move being resolved
 var bounty: int = 0             # chips earned mid-fight (Money Shot kills), paid out with the loot
+var _actor: Combatant = null    # whoever's move is resolving (so a move's own shift isn't "moved by others")
 
 
 func setup(party: Array, enemy_ids: Array, opts: Dictionary = {}) -> Array:
@@ -114,6 +115,8 @@ func step() -> Array:
 		return ev
 	current.actions_left -= 1
 	current.actions_used += 1
+	current.turn_rank = current.rank
+	current.spent_mega = false
 	queue = _turn_order()
 	_check_script(ev)
 	if is_over():
@@ -129,6 +132,8 @@ func step() -> Array:
 		current.stunned = false
 		current.stun_guard = 1
 		ev.append({"t": "stun_skip", "actor": current.id})
+		current.turn_rank = -1
+		_momentum(current, -int(DB.cfg("momentum_stunned", 25)), "stunned", ev)
 		_end_turn(current, ev)
 		return ev
 	if current.is_hero():
@@ -283,6 +288,9 @@ func _maybe_act_out(c: Combatant, ev: Array) -> bool:
 
 
 func _end_turn(c: Combatant, ev: Array) -> void:
+	# Losing steam: a Momentum unit that ends its turn where it started bleeds off some gauge.
+	if not c.dead and c.uses_momentum() and c.turn_rank > 0 and c.rank == c.turn_rank and not c.spent_mega:
+		_momentum(c, -int(DB.cfg("momentum_idle", 10)), "losing steam", ev)
 	if not c.dead:
 		var kept: Array = []
 		for b in c.buffs:
@@ -399,6 +407,8 @@ func valid_targets(c: Combatant, sid: String) -> Array:
 		return []
 	if (sk.get("once_per_fight", false) or sk.get("ai", {}).get("once", false)) and sid in c.used_skills:
 		return []
+	if sk.get("mega", false) and mega_skill(c) != sid:
+		return []
 	var out: Array = []
 	match sk.get("target", "enemy"):
 		"enemy":
@@ -425,6 +435,19 @@ func valid_targets(c: Combatant, sid: String) -> Array:
 		if e.get("type", "") == "summon" and not _has_room(side_of(c)):
 			return []
 	return out
+
+
+## The unit's mega move (End of the Line), if its gauge is full; "" otherwise.
+func mega_skill(c: Combatant) -> String:
+	if c.uses_momentum() and c.momentum >= int(DB.cfg("momentum_max", 100)):
+		return str(c.data.get("mega", ""))
+	return ""
+
+
+func _momentum(c: Combatant, n: int, why: String, ev: Array) -> void:
+	var d := c.add_momentum(n)
+	if d != 0:
+		ev.append({"t": "momentum", "target": c.id, "amount": d, "value": c.momentum, "why": why})
 
 
 ## A line has room for a newcomer if it's short of 4, or if bones can be swept aside.
@@ -514,9 +537,17 @@ func dmg_preview(a: Combatant, sid: String, t: Combatant) -> Array:
 	var r := skill_dmg_range(a, sid)
 	var m := dmg_mult(a, sid, t)
 	var flat := a.stat("dmg_flat", t)
-	var prot := maxf(0.0, t.stat("prot", a) - a.stat("pierce", t)) / 100.0
+	var prot := _prot_taken(a, sk, t)
 	var vm := t.vuln_mult() if t != null else 1.0
 	return [maxi(1, int(round(maxf(0.0, r[0] * m + flat) * (1.0 - prot) * vm))), maxi(1, int(round(maxf(0.0, r[1] * m + flat) * (1.0 - prot) * vm)))]
+
+
+## Share of a hit the target's Protection stops: after the attacker's pierce, and less again
+## for a move with "ignore_prot_pct" (End of the Line ignores half).
+func _prot_taken(a: Combatant, sk: Dictionary, t: Combatant) -> float:
+	var p := maxf(0.0, t.stat("prot", a) - a.stat("pierce", t))
+	p *= 1.0 - float(sk.get("ignore_prot_pct", 0)) / 100.0
+	return p / 100.0
 
 
 ## Base damage for a move. A move may set "dmg_range": [lo, hi], its damage as written at
@@ -611,6 +642,12 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 		if not t.id in ids:
 			ids.append(t.id)
 	a.used_skills.append(sid)
+	var prev_actor := _actor
+	_actor = a
+	if sk.get("spend_momentum", false):
+		a.momentum = 0
+		a.spent_mega = true
+		ev.append({"t": "momentum", "target": a.id, "amount": 0, "value": 0, "why": "spent"})
 	ev.append({"t": "action", "actor": a.id, "skill": sid, "targets": ids, "anim": sk.get("anim", "melee"),
 		"sfx": sk.get("sfx", ""), "hostile": is_hostile(sk)})
 
@@ -624,6 +661,9 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 			_resolve_support(a, sid, sk, t, ev)
 	for e in sk.get("self_effects", []):
 		_apply_self_effect(a, sid, e, ev)
+	if sk.has("momentum") and not a.dead:
+		_momentum(a, int(sk.momentum), "", ev)
+	_actor = prev_actor
 	# Fatigue from crits.
 	if crit_any and a.is_hero():
 		ev.append({"t": "crit_relief", "actor": a.id})
@@ -657,7 +697,7 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 				gamble_text = "Bust..."
 		if crit:
 			dmg *= DB.cfg("crit_mult", 1.5)
-		dmg *= 1.0 - maxf(0.0, t.stat("prot", a) - a.stat("pierce", t)) / 100.0
+		dmg *= 1.0 - _prot_taken(a, sk, t)
 		dmg *= t.vuln_mult()
 		var amount := maxi(1, int(round(dmg)))
 		ev.append({"t": "hit", "actor": a.id, "target": t.id, "amount": amount, "crit": crit, "note": gamble_text})
@@ -804,6 +844,21 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 			t.buffs = t.buffs.filter(func(b): return not Stats.mod_is_good({"stat": b.stat, "value": b.value}))
 			if t.buffs.size() < had:
 				ev.append({"t": "status", "target": t.id, "status": "dispel"})
+		"momentum":
+			_momentum(t, int(e.get("amount", 0)), DB.skill(sid).get("name", ""), ev)
+		"swap_places":
+			# Catch Out: the user and the target trade ranks, however far apart.
+			var line := side_of(a)
+			var ia := line.find(a)
+			var it := line.find(t)
+			if ia >= 0 and it >= 0 and ia != it:
+				var before := _ranks_before(line)
+				line[ia] = t
+				line[it] = a
+				_reindex()
+				ev.append({"t": "moved", "target": a.id, "rank": a.rank})
+				ev.append({"t": "moved", "target": t.id, "rank": t.rank})
+				_moved_by_others(line, before, ev)
 		"extend":
 			# Existing poisons, bleeds and debuffs on the target last longer.
 			var n := int(e.get("rounds", 1))
@@ -963,10 +1018,28 @@ func _shift(c: Combatant, amount: int, ev: Array) -> void:
 	var target_idx := clampi(idx - amount, 0, line.size() - 1)
 	if target_idx == idx:
 		return
+	var before := _ranks_before(line)
 	line.remove_at(idx)
 	line.insert(target_idx, c)
 	_reindex()
 	ev.append({"t": "moved", "target": c.id, "rank": c.rank})
+	_moved_by_others(line, before, ev)
+
+
+func _ranks_before(line: Array) -> Dictionary:
+	var r := {}
+	for x in line:
+		if x.uses_momentum():
+			r[x] = x.rank
+	return r
+
+
+## Rolling with it: a Momentum unit shoved, pulled or swapped by anyone else gains a little.
+func _moved_by_others(line: Array, before: Dictionary, ev: Array) -> void:
+	var mover: Combatant = _actor if _actor != null else current
+	for x in before:
+		if x != mover and x in line and x.rank != before[x]:
+			_momentum(x, int(DB.cfg("momentum_moved", 10)), "moved", ev)
 
 
 func _clear_guard(g: Combatant) -> void:

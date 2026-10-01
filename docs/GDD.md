@@ -137,7 +137,7 @@ exist but wait until the start is crisp.
 - Class matchups: a class can carry `vs_tags` (the Mountain Mystic gets +20% damage and +2
   accuracy against beasts) or `cave_loot_pct` (the Prospector finds +25% loot in caves).
 
-### The 10 classes
+### The 11 classes
 | Class | Role | Ranks | Signature moves |
 |---|---|---|---|
 | Marshal | Protector | 1-2 | Hold the Line, Flash the Badge, Serve a Warrant, Weighted Shot |
@@ -150,6 +150,15 @@ exist but wait until the start is crisp.
 | Bayou Poisoner | Poisoner | 3-4 | Poison Darts, Gas Cloud, Blighted Sacrament, Sticky Frog |
 | Frontier Doctor | Medic / poisoner | 3-4 | Battlefield Surgery, Smelling Salts, Flask of Vileness, Chloroform Rag |
 | Preacher | Healer | 3-4 | Laying On of Hands, Revival Meeting, Sermon on the Trail, Righteous Smite |
+| Train Hopper | Burster | 1-4 | Boxcar Leap, Stowaway, Chart the Hills, Catch Out; **End of the Line** (mega) |
+
+**Momentum (Train Hopper):** a 0-100 gauge, reset every fight. Each of her moves adds its
+own amount (+20 or +30; every one moves her); +10 when someone else moves her; -10 for a
+turn that ends where it began; -25 for a turn lost to a stun. At 50+ she's at **Full
+Steam** (+3 Speed, +5 Dodge). At 100 an extra button lights: **End of the Line**, any rank
+at one enemy in ranks 1-4, 10-18 damage, +50% vs Marked, ignores half Protection; she lands
+in rank 1 and the gauge empties, but a kill keeps 50. Tunable in config (`momentum_*`,
+`full_steam_*`).
 
 Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
 

@@ -481,6 +481,13 @@ static func run(main: Main, args: Dictionary) -> void:
 							for m in [["acc", 10], ["dodge", -8], ["dmg_pct", 15], ["speed", -2], ["prot", 10]]:
 								u.buffs.append({"stat": m[0], "value": m[1], "rounds": 3, "name": "Test"})
 							u.mark = 2
+					# momentum=N: Momentum heroes (the Train Hopper) start with N in the gauge.
+					if args.has("momentum"):
+						for hc in main.screen.engine.heroes:
+							if hc.uses_momentum():
+								hc.momentum = int(args.momentum)
+								if main.screen.engine.current == hc:
+									main.screen._show_controls()
 					# bones=N: the first N enemies fall and leave their bones (DD-style corpses).
 					if args.has("bones"):
 						var eb: CombatEngine = main.screen.engine

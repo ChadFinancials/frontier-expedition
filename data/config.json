@@ -29,6 +29,13 @@
   "stock_moves": 2,
   "initiative_roll": 3,
   "bones_hp": 2,
+  "momentum_max": 100,
+  "full_steam_at": 50,
+  "full_steam_speed": 3,
+  "full_steam_dodge": 5,
+  "momentum_idle": 10,
+  "momentum_stunned": 25,
+  "momentum_moved": 10,
   "learn_cost": 300,
 
   "skill_level_acc": 4,

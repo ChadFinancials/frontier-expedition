@@ -24,6 +24,9 @@ var guarded_by: int = -1
 var taunt: int = 0
 var dead: bool = false
 var corpse: bool = false         # an enemy's bones: holds its rank until destroyed
+var momentum: int = 0            # Train Hopper gauge, 0-100; resets every fight
+var turn_rank: int = 0           # rank at the start of this unit's turn (-1: turn lost to a stun)
+var spent_mega: bool = false     # used its mega move this turn
 var initiative: int = 0          # round-1 surprise bonus (+100 for the side that got the jump)
 var actions_left: int = 0        # turns still to take this round (heroes 1; some bosses more)
 var actions_used: int = 0        # turns taken this round
@@ -97,6 +100,25 @@ static func bones(of: Combatant, uid: int) -> Combatant:
 	return c
 
 
+## Classes with "momentum": true (the Train Hopper) fill a gauge by moving.
+func uses_momentum() -> bool:
+	return hero != null and data.get("momentum", false)
+
+
+## Add to the gauge (clamped 0..momentum_max); returns the change actually made.
+func add_momentum(n: int) -> int:
+	if not uses_momentum():
+		return 0
+	var before := momentum
+	momentum = clampi(momentum + n, 0, int(DB.cfg("momentum_max", 100)))
+	return momentum - before
+
+
+## Full Steam: at half a gauge or more, extra Speed and Dodge.
+func full_steam() -> bool:
+	return uses_momentum() and momentum >= int(DB.cfg("full_steam_at", 50))
+
+
 func is_poisoned() -> bool:
 	return dots.any(func(d): return d.kind == "poison")
 
@@ -156,6 +178,11 @@ func stat(s: String, vs: Combatant = null) -> float:
 			"stun_res", "bleed_res", "poison_res", "move_res", "debuff_res":
 				v = data.get("res", {}).get(s.trim_suffix("_res"), 25) + DB.cfg("tier_res", 5) * scale
 	v += buff_total(s)
+	if full_steam():
+		if s == "speed":
+			v += DB.cfg("full_steam_speed", 3)
+		elif s == "dodge":
+			v += DB.cfg("full_steam_dodge", 5)
 	if s == "stun_res" and stun_guard > 0:
 		v += DB.cfg("stun_guard_res", 50)
 	if s == "prot":

@@ -54,7 +54,7 @@ def main():
 		out.append("| Move | From | Hits | Acc | Damage | Effects |")
 		out.append("|---|---|---|---|---|---|")
 		eq = c.get("skills", [])[:2]
-		for sid in c.get("skills", []):
+		for sid in c.get("skills", []) + ([c["mega"]] if c.get("mega") else []):
 			s = skills.get(sid, {})
 			hostile = s.get("target", "enemy") == "enemy"
 			if not hostile or s.get("no_damage"):
@@ -76,6 +76,8 @@ def main():
 					dmg += ", %+d%% crit" % s["crit"]
 				if s.get("vs_marked"):
 					dmg += ", +%d%% vs marked" % round(s["vs_marked"] * 100)
+				if s.get("ignore_prot_pct"):
+					dmg += ", ignores %d%% prot" % s["ignore_prot_pct"]
 				if s.get("self_poisoned_bonus"):
 					dmg += ", +%d%% while user is poisoned" % round(s["self_poisoned_bonus"] * 100)
 				if s.get("low_hp_bonus"):
@@ -87,6 +89,10 @@ def main():
 			fx = [effect_text(x) for x in s.get("effects", [])] + ["self: " + effect_text(x) for x in s.get("self_effects", [])] + ["on kill: " + effect_text(x) for x in s.get("on_kill", [])]
 			if "transfuse_pct" in s:
 				fx.insert(0, "heals most wounded ally %d%% of damage dealt" % s["transfuse_pct"])
+			if s.get("momentum"):
+				fx.append("**momentum %+d**" % s["momentum"])
+			if s.get("spend_momentum"):
+				fx.insert(0, "**MEGA: needs a full Momentum gauge, spends it all**")
 			acc = str(s.get("acc", "-")) if hostile else "-"
 			name = ("★ " if sid in eq else "") + "**%s**: %s" % (s.get("name", sid), s.get("desc", "")) + (" *(once per fight)*" if s.get("once_per_fight") else "")
 			out.append("| %s | %s | %s | %s | %s | %s |" % (name, ranks(s.get("use_ranks")), hits_text(s), acc, dmg, "; ".join(fx) or "-"))

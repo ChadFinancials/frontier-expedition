@@ -106,6 +106,9 @@ In `data/skills.json` (hero and enemy moves share the file; enemy ids start with
 | `gamble` | Double-or-nothing damage |
 | `on_kill` | Effects when it kills: `{"type": "money", "amount": 50}` pays a bounty; others apply to the user |
 | `once_per_fight` | Usable once per battle |
+| `momentum` | Momentum this move adds for a class with `"momentum": true` (Train Hopper) |
+| `mega`, `spend_momentum` | The class's mega move (named by the class's `"mega"` field, not in its `skills`): usable only on a full gauge, which it empties |
+| `ignore_prot_pct` | Ignores this % of the target's Protection (End of the Line: 50) |
 | `transfuse_pct` | Heals the user's most wounded ally (lowest HP share, the user included) for this % of the damage dealt (Transfusion: 150) |
 | `anim` | melee, shoot, throw, cast, buff, heal, dog |
 | `sfx` | A clip name in `assets/audio/` without extension (`gunshot` plays `gunshot.wav` or a random `gunshot_N.ogg`) |

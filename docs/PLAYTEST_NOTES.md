@@ -94,6 +94,14 @@ decided, and what shipped. Update both at the end of every round.
     Point Blank and Sledge Toss, and for 1 round on Axe Cleave. Marked payoffs on Iron Justice
     (+40%), Money Shot (+40%, bounty stays 50), Hammerfell (+30%) and Book of Judgment (+40%),
     so every marking hero can cash in their own mark. Move tooltips now show "+N% vs Marked".
+- **Train Hopper** (new class, owner's kit; design in HERO_PROPOSALS revision 4): a
+  single-target burster. Momentum gauge (moves +20/+30, moved by others +10, idle turn -10,
+  stunned -25; Full Steam at 50: +3 Speed, +5 Dodge) and the mega **End of the Line** at 100
+  (10-18, +50% vs Marked, ignores half Protection, lands in rank 1, a kill keeps 50).
+  Moves: Boxcar Leap, Stowaway, Chart the Hills, Railspike Toss, Emergency Brake, The Dancing
+  Man, Ride the Rods (+4% crit), Catch Out (swap with any ally, ally +10 Prot, flat +20).
+  Look: flat cap, long coat, a railspike and a polka-dot bindle; three outfits. In the bot
+  sims she reaches End of the Line in about 7 of 12 fights.
 - **Bones** (owner, Darkest Dungeon's corpses): a fallen enemy leaves 2-HP bones in its rank;
   the line only slides up once they're destroyed. Back-liners stay harder to reach, AoE and
   random hits can clear them, they never act or take effects, smashing them isn't a kill,

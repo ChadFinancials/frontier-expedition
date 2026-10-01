@@ -71,7 +71,8 @@ func sync() -> void:
 	if u == null:
 		return
 	shown = {"hp": u.hp, "max_hp": u.max_hp, "dd": u.deaths_door(), "fatigue": u.hero.fatigue if u.hero != null else 0.0,
-		"fstate": u.hero.fatigue_state if u.hero != null else "", "chips": u.status_chips(), "actions": u.actions_left}
+		"fstate": u.hero.fatigue_state if u.hero != null else "", "chips": u.status_chips(), "actions": u.actions_left,
+		"momentum": u.momentum if u.uses_momentum() else -1}
 
 
 ## A hit or heal landing on screen: move the shown HP now, before the full sync.
@@ -168,6 +169,20 @@ class _Hud extends Node2D:
 			draw_rect(Rect2(-w / 2 + 1, y + 1, (w - 2) * ff, 6), UI.FATIGUE)
 			draw_line(Vector2(0, y), Vector2(0, y + 8), Color(1, 1, 1, 0.7), 1.5)
 			y += 10
+			# Momentum (Train Hopper): steam-gold, brighter at Full Steam, white-gold when full.
+			if int(sh.get("momentum", -1)) >= 0:
+				var mx := float(DB.cfg("momentum_max", 100))
+				var mf := clampf(float(sh.momentum) / mx, 0.0, 1.0)
+				var mc := Color("#b8862e")
+				if mf >= 1.0:
+					mc = Color("#ffe08a")
+				elif float(sh.momentum) >= float(DB.cfg("full_steam_at", 50)):
+					mc = Color("#f0c24a")
+				draw_rect(Rect2(-w / 2, y, w, 8), Color(0, 0, 0, 0.7))
+				draw_rect(Rect2(-w / 2 + 1, y + 1, (w - 2) * mf, 6), mc)
+				var nx := -w / 2 + w * float(DB.cfg("full_steam_at", 50)) / mx
+				draw_line(Vector2(nx, y), Vector2(nx, y + 8), Color(1, 1, 1, 0.7), 1.5)
+				y += 10
 			if str(sh.fstate) != "" and DB.fatigue_states.has(str(sh.fstate)):
 				var st: Dictionary = DB.fatigue_states[str(sh.fstate)]
 				_text(font, Vector2(0, y + 14), st.name, 15, Color(st.get("color", "#ffffff")))

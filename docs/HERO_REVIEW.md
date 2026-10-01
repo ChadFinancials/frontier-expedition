@@ -203,3 +203,24 @@ Resists: stun 40, bleed 30, poison 30, move 35, debuff 45, deathblow 67
 | **Baptism in the River**: Plunges the wicked under. Washes away every boon on the target and leaves it Soaked: slower and easier to hit. Mythic creatures may be stunned outright. | 234 | one of 123 | 95 | - | washes away all boons; speed -2 for 2 rounds; dodge -10 for 2 rounds; vs mythic: stun (80%) |
 
 Notes: 
+
+## Train Hopper  (Burster)
+
+A drifter who rides the rails and never stays in one car. Builds Momentum by moving every turn, then spends it all on one enormous blow: End of the Line.
+
+`train_hopper` | HP **18** | dodge 14 | prot 0 | speed 7 | acc +0 | crit 7% | dmg 4-8 | prefers ranks 1234
+Resists: stun 30, bleed 30, poison 30, move 30, debuff 30, deathblow 67
+
+| Move | From | Hits | Acc | Damage | Effects |
+|---|---|---|---|---|---|
+| ★ **Boxcar Leap**: Takes a running jump across the gap between cars: moves forward 1 and comes down swinging. | 34 | one of 12 | 92 | 4-8 | self: user moves forward 1; **momentum +30** |
+| ★ **Stowaway**: Ducks into an empty boxcar for a breather: moves back 1, patches up a little and stops any Bleeding. | 12 | self | - | - | heals 2-3 HP; cures bleed; self: user moves back 1; **momentum +30** |
+| **Chart the Hills**: Reads the lie of the land and chalks a hobo sign for the company: the target is Marked. Moves forward 1. | 1234 | one of 1234 | 100 | - | mark 3 rounds; self: user moves forward 1; **momentum +20** |
+| **Railspike Toss**: A pried-loose railroad spike, thrown hard: the target is Vulnerable. Moves forward 1. | 234 | one of 234 | 90 | 3-5 | vulnerable +10 for 2 rounds; self: user moves forward 1; **momentum +20** |
+| **Emergency Brake**: Throws the brake and lets the train go on without her: moves back 2, gains Dodge and shakes off every debuff. | 12 | self | - | - | dodge +10 for 2 rounds; cures debuff; self: user moves back 2; **momentum +30** |
+| **The Dancing Man**: Hops and jigs on the car roof, daring them to try: Marks herself, gains Dodge, and moves forward 1. | 34 | self | - | - | mark 2 rounds; dodge +12 for 2 rounds; self: user moves forward 1; **momentum +20** |
+| **Ride the Rods**: Slips under the front line the way she rides under a freight car, strikes whoever's behind it, then rolls back 1. | 12 | one of 23 | 92 | 4-8, +4% crit | self: user moves back 1; **momentum +30** |
+| **Catch Out**: Catches a departing train to reach a friend: swaps places with any ally, who gains Protection. | 1234 | one ally in 1234 | - | - | swaps places with the ally (any rank); prot +10 for 2 rounds; **momentum +20** |
+| **End of the Line**: Spends every scrap of Momentum on one blow from any rank: huge damage, more against a Marked target, and it ignores half their Protection. She lands in rank 1. A kill keeps half her Momentum. | 1234 | one of 1234 | 100 | 10-18, +50% vs marked, ignores 50% prot | **MEGA: needs a full Momentum gauge, spends it all**; self: user moves forward 3; on kill: momentum +50 |
+
+Notes: 

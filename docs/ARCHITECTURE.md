@@ -144,6 +144,13 @@ while not engine.is_over():
   `effect_chance` in the engine, fed by `Combatant.stat` (class stats, level, gear, quirks,
   trinkets, buffs) and constants in `config.json`. Class matchups (`vs_tags` on a class, e.g.
   the Mountain Mystic against beasts) go through `_class_vs`.
+- **Momentum** (Train Hopper, classes with `"momentum": true`): `Combatant.momentum`, reset
+  each fight. Gains: a move's `momentum` field (in `use_skill`), `_moved_by_others` (+10 when
+  shoved or swapped by anyone but the mover, via `_actor`); losses in `_end_turn` (turn ends
+  at `turn_rank`) and on a stun skip. `Combatant.full_steam()` adds Speed/Dodge in `stat()`.
+  The class's `mega` move is gated by `mega_skill()` in `valid_targets`; the combat screen
+  shows it as an extra action-row button; `momentum` events drive the HUD gauge
+  (`UnitView.shown.momentum`) and popups. `swap_places` (Catch Out) trades two ranks.
 - **Bones** (Darkest Dungeon's corpses): `_cleanup` swaps a fallen enemy for a
   `Combatant.bones()` unit (`corpse = true`, `bones_hp` HP, 0 turns it off) in the same rank,
   so the line behind doesn't step up until the bones are destroyed. Bones never act, take

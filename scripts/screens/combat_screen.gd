@@ -234,6 +234,18 @@ func _show_controls() -> void:
 		i += 1
 		skill_row.add_child(_skill_button(c, sid, i))
 	UI.clear(action_row)
+	# The Train Hopper's mega move: an extra button, lit once her Momentum gauge is full.
+	var mega_id: String = str(c.data.get("mega", "")) if c.uses_momentum() else ""
+	if mega_id != "":
+		var ready := engine.mega_skill(c) != "" and not engine.valid_targets(c, mega_id).is_empty()
+		var mname: String = DB.skill(mega_id).get("name", mega_id)
+		var mbtn := UI.btn("★ %s" % mname if ready else "%s (%d/%d)" % [mname, c.momentum, int(DB.cfg("momentum_max", 100))],
+			func(): Audio.play("click", 0.5); _select_skill(mega_id), "Small")
+		mbtn.disabled = not ready
+		mbtn.tooltip_text = UI.skill_tooltip(mega_id, 1)
+		if ready:
+			mbtn.modulate = Color(1.25, 1.1, 0.7)
+		action_row.add_child(mbtn)
 	var back := UI.btn("<< Swap Back", func(): chosen.emit("swap", -1, null), "Small")
 	back.disabled = c.rank >= engine.heroes.size()
 	back.tooltip_text = "Trade places with the hero behind you. Uses your turn."
@@ -370,6 +382,16 @@ func _fill_hero_info(c: Combatant) -> void:
 	fb2.notch = 100
 	fb2.text_override = "Fatigue %d/200" % h.fatigue
 	v.add_child(fb2)
+	if c.uses_momentum():
+		var mmax := int(DB.cfg("momentum_max", 100))
+		var mb := UI.bar(c.momentum, mmax, Color("#d4a23a"), 300, 12, true)
+		mb.notch = int(DB.cfg("full_steam_at", 50))
+		mb.text_override = "Momentum %d/%d%s" % [c.momentum, mmax, "  FULL STEAM" if c.full_steam() else ""]
+		mb.tooltip_text = "Momentum fills as she moves (each move says how much), +%d when someone else moves her; -%d for a turn ending where it began, -%d for a turn lost to a stun. At %d: Full Steam (+%d Speed, +%d Dodge). At %d: End of the Line. Resets every fight." % [
+			int(DB.cfg("momentum_moved", 10)), int(DB.cfg("momentum_idle", 10)), int(DB.cfg("momentum_stunned", 25)),
+			int(DB.cfg("full_steam_at", 50)), int(DB.cfg("full_steam_speed", 3)), int(DB.cfg("full_steam_dodge", 5)), mmax]
+		mb.mouse_filter = Control.MOUSE_FILTER_STOP
+		v.add_child(mb)
 	var r := c.dmg_range()
 	var m := 1.0 + c.stat("dmg_pct") / 100.0
 	hero_info.add_child(UI.stat_row([
@@ -871,6 +893,16 @@ func _result(e: Dictionary) -> void:
 				twb.tween_interval(0.35 / speed)
 				twb.tween_property(bv, "modulate:a", 1.0, 0.4 / speed)
 				twb.tween_callback(func(): if is_instance_valid(bv): bv.repaper())
+		"momentum":
+			var mu := engine.unit(e.target)
+			if mu != null and views.has(mu.id):
+				views[mu.id].shown["momentum"] = int(e.value)
+				if int(e.amount) != 0:
+					_popup(mu, "%+d Momentum" % int(e.amount), Color("#f0c24a") if int(e.amount) > 0 else Color("#c9a27a"), 20, 80)
+				if e.why in ["losing steam", "stunned"]:
+					_log("%s loses steam (%d Momentum)." % [mu.display_name, int(e.amount)])
+				elif int(e.value) >= int(DB.cfg("momentum_max", 100)) and int(e.amount) > 0:
+					_log("[color=#f0c24a]%s is at full Momentum: End of the Line is ready![/color]" % mu.display_name)
 		"light":
 			backdrop.light = e.light / 100.0
 			_log("The lamp flares brighter.")

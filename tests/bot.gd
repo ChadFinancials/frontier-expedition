@@ -46,6 +46,16 @@ func fight(party: Array, enemies: Array, opts: Dictionary) -> CombatEngine:
 func hero_turn(e: CombatEngine) -> void:
 	var c: Combatant = e.current
 	var usable := e.usable_skills(c)
+	# A full Momentum gauge goes straight into the mega move, at a Marked target if any.
+	var mega := e.mega_skill(c)
+	if mega != "" and not e.valid_targets(c, mega).is_empty():
+		var mt := e.valid_targets(c, mega)
+		var pick: int = mt[0]
+		for t in mt:
+			if e.unit(t).mark > 0 and not e.unit(t).corpse:
+				pick = t
+		e.hero_skill(mega, pick)
+		return
 	# Heal someone badly hurt.
 	var hurt: Combatant = null
 	for h in e.heroes:

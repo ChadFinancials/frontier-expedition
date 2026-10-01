@@ -55,6 +55,8 @@ func _ready() -> void:
 	test_vulnerable_and_new_moves()
 	print("> test_bones()")
 	test_bones()
+	print("> test_train_hopper()")
+	test_train_hopper()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -80,7 +82,7 @@ func test_data_valid() -> void:
 	for e in errs:
 		print("  data: ", e)
 	check(errs.is_empty(), "data validation (%d problems)" % errs.size())
-	check(DB.classes.size() == 10, "10 classes (got %d)" % DB.classes.size())
+	check(DB.classes.size() == 11, "11 classes (got %d)" % DB.classes.size())
 	for cid in DB.classes:
 		check(DB.classes[cid].skills.size() >= 6 and DB.classes[cid].skills.size() <= 8, "%s has 6-8 moves" % cid)
 		# Outfits: three colorings per class, colors only, all valid colors.
@@ -924,6 +926,115 @@ func test_round8_balance() -> void:
 
 ## Vulnerable (+% damage taken, all sources), dispel, tag-conditioned effects, refresh and
 ## Transfusion (owner's round 8 picks).
+## The Train Hopper: a Momentum gauge filled by moving, spent on End of the Line.
+func test_train_hopper() -> void:
+	var co := Company.new()
+	co.rng.seed = 33
+	var th_h := co.make_hero("train_hopper", 1)
+	var mar_h := co.make_hero("marshal", 1)
+	var gs_h := co.make_hero("gunslinger", 1)
+	var doc_h := co.make_hero("frontier_doctor", 1)
+	for h in [th_h, mar_h, gs_h, doc_h]:
+		h.quirks.clear()
+	check(th_h.known.slice(0, 2) == ["th_boxcar_leap", "th_stowaway"], "Boxcar Leap and Stowaway are her stock moves")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 2
+	var e := CombatEngine.new()
+	# Party order: Marshal, Gunslinger, Doctor, Hopper (rank 4).
+	e.setup([mar_h, gs_h, doc_h, th_h], ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], {"rng": rng})
+	var th: Combatant = e.heroes[3]
+	var doc: Combatant = e.heroes[2]
+	check(th.uses_momentum() and th.momentum == 0 and not doc.uses_momentum(), "only the Hopper has a gauge, and it starts empty")
+	# Boxcar Leap from rank 4: +30 and she moves forward 1.
+	e.current = th
+	e.use_skill(th, "th_boxcar_leap", e.enemies[0].id)
+	check(th.momentum == 30 and th.rank == 3, "Boxcar Leap: +30 Momentum, forward 1 (got %d, rank %d)" % [th.momentum, th.rank])
+	check(doc.momentum == 0, "the ally she displaced has no gauge")
+	# Moved by someone else: +10. The Doctor swaps her back.
+	e.current = doc
+	var ev: Array = []
+	e._shift(doc, 1, ev)
+	check(th.momentum == 40 and ev.any(func(x): return x.t == "momentum" and x.why == "moved"), "shoved by an ally: +10 (got %d)" % th.momentum)
+	# Losing steam: a turn that ends where it began costs 10.
+	th.turn_rank = th.rank
+	e._end_turn(th, ev)
+	check(th.momentum == 30, "ending a turn without moving: -10 (got %d)" % th.momentum)
+	# Full Steam at 50+: +3 Speed, +5 Dodge.
+	var spd := th.stat("speed")
+	var ddg := th.stat("dodge")
+	th.momentum = 50
+	check(th.stat("speed") == spd + 3 and th.stat("dodge") == ddg + 5, "Full Steam: +3 Speed, +5 Dodge")
+	# Catch Out: swaps with any ally (not just a neighbour), who gains +10 Protection; +20.
+	th.momentum = 0
+	var mar: Combatant = e.heroes[0]
+	var r_th := th.rank
+	var prot0 := mar.stat("prot")
+	e.current = th
+	e.use_skill(th, "th_catch_out", mar.id)
+	check(th.rank == 1 and mar.rank == r_th and mar.stat("prot") == prot0 + 10 and th.momentum == 20, "Catch Out swaps with a far ally, +10 Prot, +20 Momentum")
+	# End of the Line only exists on a full gauge.
+	check(e.mega_skill(th) == "" and e.valid_targets(th, "th_end_of_line").is_empty(), "no mega below 100")
+	th.momentum = 100
+	check(e.mega_skill(th) == "th_end_of_line" and e.valid_targets(th, "th_end_of_line").size() == 3, "End of the Line at 100, any rank")
+	# Half Protection, and +50% vs Marked.
+	var tgt: Combatant = e.enemies[2]
+	tgt.buffs.append({"stat": "prot", "value": 40, "rounds": 3, "name": "Test"})
+	check(is_equal_approx(e._prot_taken(th, DB.skill("th_end_of_line"), tgt), 0.2), "End of the Line ignores half of 40 Protection")
+	var unm: Array = e.dmg_preview(th, "th_end_of_line", tgt)
+	tgt.mark = 2
+	var mk: Array = e.dmg_preview(th, "th_end_of_line", tgt)
+	check(mk[1] > unm[1], "End of the Line hits a Marked target harder (%s -> %s)" % [unm, mk])
+	tgt.buffs.clear()
+	# Spending it: the gauge empties, she lands in rank 1; a kill keeps 50.
+	tgt.hp = 1
+	_swap_to(e, th, 3)
+	e.current = th
+	th.turn_rank = th.rank
+	ev = e.use_skill(th, "th_end_of_line", tgt.id)
+	var killed := tgt.dead or ev.any(func(x): return x.t == "death" and x.target == tgt.id)
+	check(th.rank == 1, "she lands in rank 1 (rank %d)" % th.rank)
+	check(th.momentum == (50 if killed else 0), "gauge empties, keeps 50 on a kill (killed %s, got %d)" % [killed, th.momentum])
+	e._end_turn(th, ev)
+	check(th.momentum == (50 if killed else 0), "no steam lost on the turn she spent it")
+	# Stunned: -25.
+	th.momentum = 40
+	th.stunned = true
+	e.current = null
+	var guard := 0
+	while e.current != th and guard < 20:
+		guard += 1
+		e.state = "running"
+		th.actions_left = 1
+		for o in e.heroes + e.enemies:
+			if o != th:
+				o.actions_left = 0
+		e.step()
+	check(th.momentum == 15, "a lost turn to a stun: -25 (got %d)" % th.momentum)
+	# A bot fight with her in the party still finishes, and she gets her mega off sometimes.
+	var bot := Bot.new(6)
+	var party: Array = [co.make_hero("rail_driver", 2), co.make_hero("train_hopper", 2), co.make_hero("gunslinger", 2), co.make_hero("preacher", 2)]
+	var e2 := bot.fight(party, ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman", "outlaw_knifeman"], {"rng": rng})
+	check(e2.is_over(), "bot fight with a Train Hopper finishes (%s)" % e2.state)
+	var megas := 0
+	var fights := 0
+	for k in 12:
+		var p2: Array = [co.make_hero("rail_driver", 2), co.make_hero("train_hopper", 2), co.make_hero("gunslinger", 2), co.make_hero("preacher", 2)]
+		var ek := bot.fight(p2, ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman", "outlaw_knifeman"], {"rng": rng})
+		fights += 1
+		for hc in ek.heroes:
+			if hc.uses_momentum() and "th_end_of_line" in hc.used_skills:
+				megas += 1
+	print("    Train Hopper reached End of the Line in %d of %d bot fights" % [megas, fights])
+	check(megas > 0, "the bot fills the gauge and fires End of the Line")
+
+
+func _swap_to(e: CombatEngine, c: Combatant, rank: int) -> void:
+	var line := e.side_of(c)
+	line.erase(c)
+	line.insert(rank - 1, c)
+	e._reindex()
+
+
 ## Owner's DD rule: a fallen enemy leaves 2-HP bones in its rank; the line only slides up
 ## once they're destroyed.
 func test_bones() -> void:
