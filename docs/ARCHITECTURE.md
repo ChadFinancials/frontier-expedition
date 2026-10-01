@@ -257,7 +257,7 @@ while not engine.is_over():
 | `... test_runner.tscn -- balance=40 weeks=6` | Balance report over many simulated campaigns (`tests/bot.gd` plays them) |
 | `... test_runner.tscn -- simtut=50` | Plays the tutorial many times and reports win rate and health left |
 | `$G --headless --path . -- shot=autoplay expeditions=3` | UI smoke test: `tests/autopilot.gd` clicks through the real screens |
-| `tools/shot.sh <scenario> out.png [args]` | Screenshot under xvfb. Scenarios in `scripts/debug/shots.gd`: `menu, settlement, embark, trail, combat, camp, cave, event, curio, results, hero, building, tutorial, silas, lineup, faces, outfits`, plus A/B comparisons. Useful args: `full` (party of 4), `region=<id>`, `far` (end of map), `enemies=a,b`, `ehp=N`, `bones=N` (first N enemies fall, leaving bones), `act`, `statuses`, `with=<class> skill=<id>`, `soak=N` (idle and print memory, objects and draw calls) |
+| `tools/shot.sh <scenario> out.png [args]` | Screenshot under xvfb. Scenarios in `scripts/debug/shots.gd`: `menu, settlement, embark, trail, combat, camp, cave, event, curio, results, hero, building, tutorial, silas, lineup, faces, outfits`, plus A/B comparisons. Useful args: `full` (party of 4), `region=<id>`, `far` (end of map), `enemies=a,b`, `ehp=N`, `bones=N` (first N enemies fall, leaving bones), `act` (with `frames=N` to save frames while the move plays), `statuses`, `with=<class> skill=<id>`, `soak=N` (idle and print memory, objects and draw calls) |
 | `python3 tools/hero_sheet.py` | Regenerates `docs/HERO_REVIEW.md` from the data |
 | `python3 tools/enemy_sheet.py` | Regenerates `docs/ENEMY_REVIEW.md` |
 | `python3 tools/hero_power.py` | Rough power model: every hero move scored against the average tier-1 enemy (balance aid) |

@@ -1086,7 +1086,7 @@ func test_train_hopper() -> void:
 	var mk: Array = e.dmg_preview(th, "th_end_of_line", tgt)
 	check(mk[1] > unm[1], "End of the Line hits a Marked target harder (%s -> %s)" % [unm, mk])
 	tgt.buffs.clear()
-	# Spending it: the gauge empties, she lands in rank 1; a kill keeps 50.
+	# Spending it: the gauge empties, she lands in rank 1; a kill gives back 20.
 	tgt.hp = 1
 	_swap_to(e, th, 3)
 	e.current = th
@@ -1094,9 +1094,9 @@ func test_train_hopper() -> void:
 	ev = e.use_skill(th, "th_end_of_line", tgt.id)
 	var killed := tgt.dead or ev.any(func(x): return x.t == "death" and x.target == tgt.id)
 	check(th.rank == 1, "she lands in rank 1 (rank %d)" % th.rank)
-	check(th.momentum == (50 if killed else 0), "gauge empties, keeps 50 on a kill (killed %s, got %d)" % [killed, th.momentum])
+	check(th.momentum == (20 if killed else 0), "gauge empties, gets 20 back on a kill (killed %s, got %d)" % [killed, th.momentum])
 	e._end_turn(th, ev)
-	check(th.momentum == (50 if killed else 0), "no steam lost on the turn she spent it")
+	check(th.momentum == (20 if killed else 0), "no steam lost on the turn she spent it")
 	# Stunned: -25.
 	th.momentum = 40
 	th.stunned = true

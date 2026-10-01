@@ -599,6 +599,12 @@ static func _act(main: Main, args: Dictionary) -> void:
 			cs.chosen.emit("pass", null, null)
 		else:
 			cs.chosen.emit("skill", sid, vt[0])
+			# frames=N: save N frames 0.15 s apart while the move plays (<out>_f0.png ...).
+			if args.has("frames"):
+				for f in int(args.frames):
+					await tree.create_timer(float(args.get("frame_gap", "0.15"))).timeout
+					var fimg := main.get_viewport().get_texture().get_image()
+					fimg.save_png(str(args.get("out", "user://shot.png")).trim_suffix(".png") + "_f%d.png" % f)
 		await tree.create_timer(float(args.get("gap", "4.0"))).timeout
 		if not is_instance_valid(cs) or main.screen != cs:
 			print("ACT: fight over (left combat)")

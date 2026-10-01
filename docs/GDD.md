@@ -157,7 +157,7 @@ own amount (+20 or +30; every one moves her); +10 when someone else moves her; -
 turn that ends where it began; -25 for a turn lost to a stun. At 50+ she's at **Full
 Steam** (+3 Speed, +5 Dodge). At 100 an extra button lights: **End of the Line**, any rank
 at one enemy in ranks 1-4, 10-18 damage, +50% vs Marked, ignores half Protection; she lands
-in rank 1 and the gauge empties, but a kill keeps 50. Tunable in config (`momentum_*`,
+in rank 1 and the gauge empties; a kill gives back 20. Tunable in config (`momentum_*`,
 `full_steam_*`).
 
 Every move with its numbers: `HERO_REVIEW.md` (generated from the data).

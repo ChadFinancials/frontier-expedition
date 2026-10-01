@@ -942,6 +942,12 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 		if views.has(tid) and tid != a.id:
 			targets.append(views[tid])
 	_log("[color=#e0bd4f]%s[/color] uses [b]%s[/b]." % [a.display_name, sk.get("name", e.skill)])
+	# A mega move (End of the Line) gets its own wind-up, charge and impact.
+	var mega: bool = sk.get("mega", false) and e.hostile and not targets.is_empty()
+	if mega:
+		Audio.play("whistle", 1.2, 0.0)
+		_screen_flash(Color(1, 0.82, 0.4), 0.35)
+		_shake(6)
 	# Telegraph: who is acting, on whom, before anything moves.
 	var tnames: Array = []
 	for v in targets:
@@ -949,7 +955,10 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 	var who := a.display_name
 	if not tnames.is_empty():
 		who += "  →  " + (", ".join(tnames) if tnames.size() <= 2 else "%d targets" % tnames.size())
-	_banner_skill(sk.get("name", ""), a.is_hero(), who)
+	if mega:
+		_banner_skill(str(sk.get("name", "")).to_upper() + "!", true, who, 72)
+	else:
+		_banner_skill(sk.get("name", ""), a.is_hero(), who)
 	av.set_glow("active")
 	for v in targets:
 		v.set_glow("enemy" if e.hostile else "ally")
@@ -976,6 +985,10 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 			gap += 220.0
 		var center := 960.0
 		a_to = Vector2(center - dir * gap / 2.0, GROUND)
+		if mega:
+			# She stays back for a run-up; the target waits at center stage.
+			gap = 520.0
+			a_to = Vector2(center - dir * gap / 2.0, GROUND)
 		if targets.size() == 1:
 			tw.tween_property(t0, "position", Vector2(center + dir * gap / 2.0, GROUND), 0.2 / speed)
 	elif not e.hostile:
@@ -989,6 +1002,9 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 		tw.tween_property(v, "scale", big, 0.2 / speed)
 	await tw.finished
 	# Pose and sound.
+	if mega:
+		await _mega_charge(av, targets[0], dir)
+		anim = "mega"
 	match anim:
 		"melee", "throw":
 			av.figure.set_pose("windup")
@@ -1001,9 +1017,12 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 			create_tween().tween_property(av.figure, "muzzle", 0.0, 0.25 / speed)
 		"dog":
 			av.figure.set_pose("strike")
+		"mega":
+			pass
 		_:
 			av.figure.set_pose("cast")
-	Audio.play(e.get("sfx", ""))
+	if anim != "mega":
+		Audio.play(e.get("sfx", ""))
 	if anim == "throw" and not targets.is_empty():
 		_projectile(av.position + Vector2(0, -160), targets[0].position + Vector2(0, -120))
 	await _wait(0.12)
@@ -1061,6 +1080,53 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 			v.z_index = 0
 	_layout()
 	await _wait(0.15)
+
+
+## End of the Line: steam and the rumble of wheels, a crouch, then a dash across the stage
+## trailing speed streaks, and a heavy impact (flash, shake, sparks).
+func _mega_charge(av: UnitView, tv: UnitView, dir: float) -> void:
+	av.figure.set_pose("windup")
+	Audio.play("wagon", 1.0, 0.0)
+	for k in 3:
+		_burst(av.unit, Color(0.85, 0.82, 0.78), true)
+		await _wait(0.13)
+	var start := av.position
+	var hit_at := tv.position - Vector2(dir * 120.0, 0)
+	var streaks := _Streaks.new()
+	streaks.z_index = 9
+	streaks.dir = dir
+	field.add_child(streaks)
+	var tw := create_tween()
+	tw.tween_method(func(x: float):
+		av.position = start.lerp(hit_at, x)
+		streaks.from = start + Vector2(0, -120)
+		streaks.to = av.position + Vector2(0, -120), 0.0, 1.0, 0.16 / speed).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await tw.finished
+	av.figure.set_pose("strike")
+	Audio.play("hammer", 1.2)
+	Audio.play("explosion", 0.55)
+	Audio.play("crit", 0.9)
+	_screen_flash(Color(1, 0.95, 0.75), 0.5)
+	_shake(24)
+	_flinch(tv.unit, true)
+	for k in 3:
+		_burst(tv.unit, Color(1, 0.8, 0.35), true)
+	streaks.fade()
+	# Hit-stop: hold the impact a beat.
+	await _wait(0.18)
+
+
+## A full-screen flash of color that fades out.
+func _screen_flash(c: Color, peak: float) -> void:
+	var fl := ColorRect.new()
+	fl.color = Color(c.r, c.g, c.b, peak)
+	fl.size = Vector2(1920, 1080)
+	fl.z_index = 45
+	fl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(fl)
+	var tw := create_tween()
+	tw.tween_property(fl, "color:a", 0.0, 0.45 / speed)
+	tw.tween_callback(fl.queue_free)
 
 
 func _projectile(from: Vector2, to: Vector2) -> void:
@@ -1173,7 +1239,7 @@ func _banner_async(text: String, bad: bool) -> void:
 	tw.tween_callback(l.queue_free)
 
 
-func _banner_skill(text: String, hero: bool, sub: String = "") -> void:
+func _banner_skill(text: String, hero: bool, sub: String = "", size: int = 40) -> void:
 	if sub != "":
 		var sl := UI.lbl(sub, 24, "Bold")
 		sl.position = Vector2(0, 148)
@@ -1187,10 +1253,15 @@ func _banner_skill(text: String, hero: bool, sub: String = "") -> void:
 		tw0.tween_interval(1.5 * PACE / speed)
 		tw0.tween_property(sl, "modulate:a", 0.0, 0.3)
 		tw0.tween_callback(sl.queue_free)
-	var l := UI.hdr(text, 40)
+	var l := UI.hdr(text, size)
 	l.add_theme_color_override("font_color", Color("#f1d38a") if hero else Color("#f0a080"))
-	l.position = Vector2(0, 90)
-	l.size = Vector2(1920, 60)
+	l.position = Vector2(0, 90 - (size - 40))
+	l.size = Vector2(1920, 60 + (size - 40))
+	if size > 40:
+		# A big banner punches in.
+		l.pivot_offset = l.size / 2
+		l.scale = Vector2(1.4, 1.4)
+		create_tween().tween_property(l, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.z_index = 40
 	add_child(l)
@@ -1293,6 +1364,36 @@ func _scripted_cutscene(sc: Dictionary) -> void:
 		var summary := Game.company.finish_run("driven_back")
 		Game.save_game()
 		Main.inst.goto("results", {"summary": summary}), "Good"]])
+
+
+class _Streaks extends Node2D:
+	## Speed lines behind a charging unit, from where it started to where it is now.
+	var from := Vector2.ZERO
+	var to := Vector2.ZERO:
+		set(v):
+			to = v
+			queue_redraw()
+	var dir := 1.0
+	var alpha := 1.0
+
+	func fade() -> void:
+		var tw := create_tween()
+		tw.tween_property(self, "alpha", 0.0, 0.4)
+		tw.tween_callback(queue_free)
+
+	func _process(_d: float) -> void:
+		if alpha < 1.0:
+			queue_redraw()
+
+	func _draw() -> void:
+		for i in 7:
+			var y := -70.0 + i * 24.0
+			var len := (to.x - from.x) * (0.55 + 0.45 * sin(i * 1.7) * sin(i * 1.7))
+			var a := Vector2(to.x - len, to.y + y)
+			var b := Vector2(to.x - dir * 30.0, to.y + y)
+			var w := 3.0 + (i % 3) * 2.0
+			draw_line(a, b, Color(1, 0.92, 0.7, 0.55 * alpha), w, true)
+			draw_line(a + Vector2(0, 2), b + Vector2(0, 2), Color(0.25, 0.18, 0.1, 0.25 * alpha), w * 0.5, true)
 
 
 class _Spark extends Node2D:

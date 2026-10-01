@@ -221,6 +221,6 @@ Resists: stun 30, bleed 30, poison 30, move 30, debuff 30, deathblow 67
 | **The Dancing Man**: Hops and jigs on the car roof, daring them to try: Marks herself, gains Dodge, and moves forward 1. | 34 | self | - | - | mark 2 rounds; dodge +12 for 2 rounds; self: user moves forward 1; **momentum +20** |
 | **Ride the Rods**: Slips under the front line the way she rides under a freight car, strikes whoever's behind it, then rolls back 1. | 12 | one of 23 | 92 | 4-8, +4% crit | self: user moves back 1; **momentum +30** |
 | **Catch Out**: Catches a departing train to reach a friend: swaps places with any ally, who gains Protection. | 1234 | one ally in 1234 | - | - | swaps places with the ally (any rank); prot +10 for 2 rounds; **momentum +20** |
-| **End of the Line**: Spends every scrap of Momentum on one blow from any rank: huge damage, more against a Marked target, and it ignores half their Protection. She lands in rank 1. A kill keeps half her Momentum. | 1234 | one of 1234 | 100 | 10-18, +50% vs marked, ignores 50% prot | **MEGA: needs a full Momentum gauge, spends it all**; self: user moves forward 3; on kill: momentum +50 |
+| **End of the Line**: Spends every scrap of Momentum on one blow from any rank: huge damage, more against a Marked target, and it ignores half their Protection. She lands in rank 1. A kill gives back 20 Momentum. | 1234 | one of 1234 | 100 | 10-18, +50% vs marked, ignores 50% prot | **MEGA: needs a full Momentum gauge, spends it all**; self: user moves forward 3; on kill: momentum +20 |
 
 Notes: 
