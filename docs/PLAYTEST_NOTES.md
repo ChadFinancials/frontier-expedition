@@ -27,10 +27,9 @@ decided, and what shipped. Update both at the end of every round.
 - [ ] Money supply may be too high (round 1 note; recheck with the current economy).
 - [ ] Gunslinger bullet system: 6 rounds in the cylinder shown overhead, moves spend bullets,
       a Reload move.
-- [ ] Class workshop, second half: options for the Prospector, Frontier Doctor and
-      Preacher (2 moves each) and the Bayou Poisoner (1), plus two new hero designs (the
-      Shotgun Guard tank, the Pony Express Rider), in `docs/HERO_PROPOSALS.md`. Waiting on
-      the owner's picks.
+- [ ] Class workshop, second half (`docs/HERO_PROPOSALS.md`): Preacher and Doctor done.
+      Open: the Bayou Poisoner's 8th (Mosquito Swarm too close to Poison Darts; keep
+      workshopping), the Prospector (on hold), the Shotgun Guard and the Train Hopper.
 - [ ] Decide whether utility moves need their own per-level upgrade paths (today every move
       level adds the same accuracy, damage, effect and healing bonuses).
 - [ ] Stacked Deck "probably needs tuning" (round 8; owner: save for a later balancing pass). A second deal stacks on the first (two
@@ -85,6 +84,14 @@ decided, and what shipped. Update both at the end of every round.
   and heal ranges read in the data exactly as they play (gameplay unchanged). The hero dial
   now also covers moves with their own damage range. `enemy_dmg_mult` stays 0.9. The review
   sheets now round like Godot (halves up), fixing a few ranges they had shown one too low.
+- **Vulnerable** (new): +10% damage taken from every source, damage over time included, as a
+  debuff on Serve a Warrant, Quarrel, Hogtie, Assign the Joker, Peck at the Eyes, Locking Bite
+  and Tree-Trunk Club. Recasts refresh rather than stack. Cures remove it.
+- **New moves** (owner's picks): Preacher **Hellfire Sermon** and **Baptism in the River**
+  (dispels boons, Soaked, stuns mythic foes); Frontier Doctor **Transfusion** (heals the most
+  wounded ally for 150% of damage dealt) and **Scalpel Toss** (in place of Adrenaline Shot, to
+  keep the Doctor from being all heals). Both classes now have 8 moves. Engine: `dispel`,
+  `if_tag`, `chance_vs`, `refresh`, `transfuse_pct`.
 - **Town painting** for Fort Providence (owner's): its painted buildings are the plots.
   Each building has a spot that suits it (the two-storey yellow one is the Saloon, the big
   barn the Smithy, the front house with a porch the Hiring Board...); empty lots take the most

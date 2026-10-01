@@ -51,6 +51,8 @@ func _ready() -> void:
 	test_quest_boss()
 	print("> test_round8_balance()")
 	test_round8_balance()
+	print("> test_vulnerable_and_new_moves()")
+	test_vulnerable_and_new_moves()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -916,3 +918,71 @@ func test_round8_balance() -> void:
 	var deal: Dictionary = DB.skill("gb_card_toss")
 	check(int(deal.acc) == 85 and int(deal.effects[0].amount) == 1, "Deal 'Em: acc 85, bleed 1")
 	check(int(DB.skill("ss_kill_shot").effects[0].chance) == 70, "Bola Shot stun 70%")
+
+
+## Vulnerable (+% damage taken, all sources), dispel, tag-conditioned effects, refresh and
+## Transfusion (owner's round 8 picks).
+func test_vulnerable_and_new_moves() -> void:
+	var co := Company.new()
+	co.new_game(41)
+	var mar := co.make_hero("marshal", 1)
+	var gs := co.make_hero("gunslinger", 1)
+	var doc := co.make_hero("frontier_doctor", 1)
+	var pre := co.make_hero("preacher", 1)
+	var e := CombatEngine.new()
+	e.setup([mar, gs, doc, pre], ["outlaw_brawler", "prairie_haint"], {})
+	var by := {}
+	for hc in e.heroes:
+		by[hc.hero.cls().name] = hc
+	var brawler: Combatant = e.enemies[0]
+	var haint: Combatant = e.enemies[1]
+	# Vulnerable raises hit damage (preview and real) and damage over time.
+	var before: Array = e.dmg_preview(by["Gunslinger"], "gs_quick_draw", brawler)
+	brawler.buffs.append({"stat": "vulnerable", "value": 50, "rounds": 2, "name": "Test"})
+	var after: Array = e.dmg_preview(by["Gunslinger"], "gs_quick_draw", brawler)
+	check(after[1] > before[1], "Vulnerable raises damage (%s -> %s)" % [before, after])
+	brawler.dots = [{"kind": "bleed", "amount": 4, "rounds": 1}]
+	var hp0 := brawler.hp
+	e._start_turn(brawler)
+	check(hp0 - brawler.hp == 6, "Vulnerable 50% makes a 4 bleed tick hit for 6 (got %d)" % (hp0 - brawler.hp))
+	check(not Stats.mod_is_good({"stat": "vulnerable", "value": 10}), "Vulnerable counts as a debuff")
+	# A debuff cure clears it.
+	e._apply_effect(by["Marshal"], "marshal_flash_badge", {"type": "cure", "kinds": ["debuff"]}, brawler, [], false)
+	check(not brawler.buffs.any(func(b): return b.stat == "vulnerable"), "cure debuff removes Vulnerable")
+	# Dispel washes away boons and leaves debuffs.
+	haint.buffs = [{"stat": "dodge", "value": 20, "rounds": 3, "name": "Boon"}, {"stat": "acc", "value": -5, "rounds": 3, "name": "Bane"}]
+	e._apply_effect(by["Preacher"], "pc_baptism", {"type": "dispel"}, haint, [], false)
+	check(haint.buffs.size() == 1 and float(haint.buffs[0].value) < 0, "dispel strips boons, keeps debuffs")
+	# chance_vs: Hellfire is base 100% vs mythic, 75% otherwise (minus resistance).
+	var hf: Dictionary = DB.skill("pc_hellfire").effects[0]
+	check(e.effect_chance(by["Preacher"], "pc_hellfire", hf, haint) > e.effect_chance(by["Preacher"], "pc_hellfire", hf, brawler), "Hellfire sticks better on mythic foes")
+	# if_tag: Baptism's stun only ever lands on mythic targets.
+	var stunned_plain := false
+	for k in 30:
+		brawler.stunned = false
+		var ev: Array = []
+		for ef in DB.skill("pc_baptism").effects:
+			if ef.has("if_tag") and not str(ef.if_tag) in brawler.tags:
+				continue
+			e._apply_effect(by["Preacher"], "pc_baptism", ef, brawler, ev, false)
+		stunned_plain = stunned_plain or brawler.stunned
+	check(not stunned_plain, "Baptism never stuns a non-mythic foe")
+	# refresh: a recast doesn't stack the same move's debuff.
+	brawler.buffs.clear()
+	for k in 12:
+		e._apply_effect(by["Marshal"], "marshal_warrant", DB.skill("marshal_warrant").effects.back(), brawler, [], false)
+	var vul := brawler.buffs.filter(func(b): return b.stat == "vulnerable").size()
+	check(vul == 1, "Serve a Warrant's Vulnerable lands, and refreshes instead of stacking (got %d)" % vul)
+	# Transfusion heals the most wounded ally.
+	var gsc: Combatant = by["Gunslinger"]
+	gsc.set_hp(3)
+	var gs_hp: int = gsc.hp
+	var dc: Combatant = by["Frontier Doctor"]
+	var healed := false
+	for k in 12:
+		var ev2: Array = []
+		brawler.hp = brawler.max_hp
+		e._transfuse(dc, "dr_transfusion", 6.0, ev2)
+		healed = healed or gsc.hp > gs_hp
+	check(healed, "Transfusion heals the most wounded ally")
+	check(DB.classes.preacher.skills.size() == 8 and DB.classes.frontier_doctor.skills.size() == 8, "Preacher and Doctor have 8 moves")

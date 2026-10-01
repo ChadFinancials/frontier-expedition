@@ -102,6 +102,12 @@ func ctx(vs: Combatant = null) -> Dictionary:
 		"tags": vs.tags if vs != null else []}
 
 
+## Damage taken multiplier from Vulnerable (+% damage taken, all sources, damage over time
+## too). A negative value makes the unit tougher, never below half damage.
+func vuln_mult() -> float:
+	return maxf(0.5, 1.0 + stat("vulnerable") / 100.0)
+
+
 func buff_total(s: String) -> float:
 	var t := 0.0
 	for b in buffs:

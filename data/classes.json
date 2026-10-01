@@ -136,7 +136,7 @@
     "hp": 18, "dodge": 10, "prot": 0, "speed": 4, "acc": 0, "crit": 3, "dmg": [3, 6],
     "res": {"stun": 30, "bleed": 40, "poison": 60, "move": 30, "debuff": 35, "deathblow": 67},
     "ranks": [3, 4],
-    "skills": ["dr_dart", "dr_caustic", "dr_surgery", "dr_salts", "dr_chloroform", "dr_laudanum"],
+    "skills": ["dr_dart", "dr_caustic", "dr_surgery", "dr_salts", "dr_chloroform", "dr_laudanum", "dr_transfusion", "dr_scalpel"],
     "look": {"body": "human", "build": "slim", "hat": "top", "coat": "frock", "weapon": "bag", "extra": "spectacles",
       "colors": {"coat": "#2c3e50", "pants": "#2b2b2b", "hat": "#1b1b1b", "accent": "#7fb069"},
       "outfits": [
@@ -152,7 +152,7 @@
     "hp": 20, "dodge": 3, "prot": 5, "speed": 2, "acc": 0, "crit": 2, "dmg": [4, 7],
     "res": {"stun": 40, "bleed": 30, "poison": 30, "move": 35, "debuff": 45, "deathblow": 67},
     "ranks": [3, 4],
-    "skills": ["pc_hands", "pc_revival", "pc_sermon", "pc_brimstone", "pc_smite", "pc_judgment"],
+    "skills": ["pc_hands", "pc_revival", "pc_sermon", "pc_brimstone", "pc_smite", "pc_judgment", "pc_hellfire", "pc_baptism"],
     "look": {"body": "human", "build": "normal", "hat": "preacher", "coat": "long", "weapon": "bible", "extra": "collar",
       "colors": {"coat": "#1e1e1e", "pants": "#1e1e1e", "hat": "#161616", "accent": "#f2e8cf"},
       "outfits": [

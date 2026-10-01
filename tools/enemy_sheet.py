@@ -65,6 +65,15 @@ def where():
 
 
 def effect_text(fx):
+	s = _effect_text(fx)
+	if "if_tag" in fx:
+		s = "vs %s: %s" % (fx["if_tag"], s)
+	for tag, c in fx.get("chance_vs", {}).items():
+		s += " (%d%% vs %s)" % (c, tag)
+	return s
+
+
+def _effect_text(fx):
 	t = fx.get("type")
 	ch = fx.get("chance")
 	chance = " (%d%%)" % ch if ch is not None and ch < 100 else ""
@@ -111,6 +120,8 @@ def effect_text(fx):
 		return "taunt %d rounds" % fx.get("rounds", 2)
 	if t == "cure":
 		return "cures " + "/".join(fx.get("kinds", ["bleed", "poison"]))
+	if t == "dispel":
+		return "washes away all boons"
 	if t == "clear_mark":
 		return "clears mark"
 	if t == "clear_shaken":

@@ -85,6 +85,8 @@ def main():
 				if s.get("gamble"):
 					dmg += ", 50/50: double or quarter"
 			fx = [effect_text(x) for x in s.get("effects", [])] + ["self: " + effect_text(x) for x in s.get("self_effects", [])] + ["on kill: " + effect_text(x) for x in s.get("on_kill", [])]
+			if "transfuse_pct" in s:
+				fx.insert(0, "heals most wounded ally %d%% of damage dealt" % s["transfuse_pct"])
 			acc = str(s.get("acc", "-")) if hostile else "-"
 			name = ("★ " if sid in eq else "") + "**%s**: %s" % (s.get("name", sid), s.get("desc", "")) + (" *(once per fight)*" if s.get("once_per_fight") else "")
 			out.append("| %s | %s | %s | %s | %s | %s |" % (name, ranks(s.get("use_ranks")), hits_text(s), acc, dmg, "; ".join(fx) or "-"))

@@ -200,8 +200,9 @@ func _start_turn(c: Combatant) -> Array:
 	# Damage over time.
 	var still: Array = []
 	for d in c.dots:
-		ev.append({"t": "dot", "target": c.id, "kind": d.kind, "amount": d.amount})
-		_apply_damage(c, d.amount, null, ev, true)
+		var dd := maxi(1, int(round(float(d.amount) * c.vuln_mult())))
+		ev.append({"t": "dot", "target": c.id, "kind": d.kind, "amount": dd})
+		_apply_damage(c, dd, null, ev, true)
 		d.rounds -= 1
 		if d.rounds > 0:
 			still.append(d)
@@ -509,7 +510,8 @@ func dmg_preview(a: Combatant, sid: String, t: Combatant) -> Array:
 	var m := dmg_mult(a, sid, t)
 	var flat := a.stat("dmg_flat", t)
 	var prot := maxf(0.0, t.stat("prot", a) - a.stat("pierce", t)) / 100.0
-	return [maxi(1, int(round(maxf(0.0, r[0] * m + flat) * (1.0 - prot)))), maxi(1, int(round(maxf(0.0, r[1] * m + flat) * (1.0 - prot))))]
+	var vm := t.vuln_mult() if t != null else 1.0
+	return [maxi(1, int(round(maxf(0.0, r[0] * m + flat) * (1.0 - prot) * vm))), maxi(1, int(round(maxf(0.0, r[1] * m + flat) * (1.0 - prot) * vm)))]
 
 
 ## Base damage for a move. A move may set "dmg_range": [lo, hi], its damage as written at
@@ -527,6 +529,10 @@ func skill_dmg_range(a: Combatant, sid: String) -> Array:
 func effect_chance(a: Combatant, sid: String, e: Dictionary, t: Combatant) -> int:
 	var kind: String = e.get("type", "")
 	var base := float(e.get("chance", 100))
+	# "chance_vs": {tag: chance} replaces the base chance against targets with that tag.
+	for tag in e.get("chance_vs", {}):
+		if tag in t.tags:
+			base = float(e.chance_vs[tag])
 	if a.is_hero():
 		base += DB.cfg("skill_level_effect", 6) * (a.skill_level(sid) - 1)
 	else:
@@ -647,9 +653,13 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 		if crit:
 			dmg *= DB.cfg("crit_mult", 1.5)
 		dmg *= 1.0 - maxf(0.0, t.stat("prot", a) - a.stat("pierce", t)) / 100.0
+		dmg *= t.vuln_mult()
 		var amount := maxi(1, int(round(dmg)))
 		ev.append({"t": "hit", "actor": a.id, "target": t.id, "amount": amount, "crit": crit, "note": gamble_text})
 		_apply_damage(t, amount, a, ev, false)
+		# Transfusion: the damage dealt heals the attacker's most wounded ally (by HP share).
+		if sk.has("transfuse_pct"):
+			_transfuse(a, sid, amount * float(sk.transfuse_pct) / 100.0, ev)
 		if crit and t.is_hero() and not t.dead:
 			ev.append_array(Fatigue.add(t.hero, DB.cfg("crit_taken_fatigue", 8), rng, {"tags": a.tags}))
 	else:
@@ -664,6 +674,9 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 				_apply_self_effect(a, sid, e, ev)
 		return crit
 	for e in sk.get("effects", []):
+		# "if_tag": the effect only lands on targets with that tag (mythic bonuses).
+		if e.has("if_tag") and not str(e.if_tag) in t.tags:
+			continue
 		_apply_effect(a, sid, e, t, ev, crit)
 	return crit
 
@@ -705,6 +718,10 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 			ev.append({"t": "status", "target": t.id, "status": "mark"})
 		"debuff":
 			if _roll_effect(a, sid, e, t, ev):
+				# "refresh": a recast replaces this move's earlier debuff instead of stacking.
+				if e.get("refresh", false):
+					var sname: String = DB.skill(sid).get("name", "")
+					t.buffs = t.buffs.filter(func(b): return not (b.get("name", "") == sname and b.stat == e.stat))
 				t.buffs.append({"stat": e.stat, "value": e.value, "rounds": e.get("rounds", 3), "name": DB.skill(sid).get("name", ""), "fresh": t == a})
 				ev.append({"t": "debuff", "target": t.id, "stat": e.stat, "value": e.value})
 		"buff":
@@ -765,7 +782,7 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 			if "stun" in kinds:
 				t.stunned = false
 			if "debuff" in kinds:
-				t.buffs = t.buffs.filter(func(b): return float(b.value) >= 0.0)
+				t.buffs = t.buffs.filter(func(b): return Stats.mod_is_good({"stat": b.stat, "value": b.value}))
 			ev.append({"t": "cure", "target": t.id})
 		"clear_shaken":
 			if t.hero != null and t.hero.shaken:
@@ -773,6 +790,12 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 				ev.append({"t": "cure", "target": t.id})
 		"clear_mark":
 			t.mark = 0
+		"dispel":
+			# Washes away every boon on the target (buffs that help it, from any source).
+			var had := t.buffs.size()
+			t.buffs = t.buffs.filter(func(b): return not Stats.mod_is_good({"stat": b.stat, "value": b.value}))
+			if t.buffs.size() < had:
+				ev.append({"t": "status", "target": t.id, "status": "dispel"})
 		"extend":
 			# Existing poisons, bleeds and debuffs on the target last longer.
 			var n := int(e.get("rounds", 1))
@@ -781,11 +804,28 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 				d.rounds = int(d.rounds) + n
 				any = true
 			for b in t.buffs:
-				if float(b.value) < 0.0 and int(b.rounds) < 99:
+				if not Stats.mod_is_good({"stat": b.stat, "value": b.value}) and int(b.rounds) < 99:
 					b.rounds = int(b.rounds) + n
 					any = true
 			if any:
 				ev.append({"t": "status", "target": t.id, "status": "worse"})
+
+
+## Transfusion: heal the attacker's most wounded living ally (lowest HP share, the attacker
+## included) by `amount`, scaled like any heal (heal_mult, move level).
+func _transfuse(a: Combatant, sid: String, amount: float, ev: Array) -> void:
+	var best: Combatant = null
+	for o in side_of(a):
+		if o.dead:
+			continue
+		if best == null or o.hp_ratio() < best.hp_ratio():
+			best = o
+	if best == null:
+		return
+	var amt := amount * float(DB.cfg("heal_mult", 1.0))
+	if a.is_hero():
+		amt *= 1.0 + DB.cfg("skill_level_heal_pct", 15) / 100.0 * (a.skill_level(sid) - 1)
+	_heal(a, best, maxi(1, int(round(amt))), false, ev)
 
 
 func _roll_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: Array) -> bool:

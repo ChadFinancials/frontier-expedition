@@ -412,7 +412,7 @@ func _buff_line(c: Combatant) -> void:
 	var parts: Array = []
 	for b in c.buffs:
 		var dur := "this fight" if int(b.rounds) >= 99 else "%d turn%s" % [int(b.rounds), "" if int(b.rounds) == 1 else "s"]
-		var col := "#9fd07a" if float(b.value) >= 0 else "#f0a080"
+		var col := "#9fd07a" if Stats.mod_is_good({"stat": b.stat, "value": b.value}) else "#f0a080"
 		parts.append("[color=%s]%s[/color] (%s)" % [col, Stats.mod_text({"stat": b.stat, "value": b.value}), dur])
 	hero_info.add_child(UI.rich(", ".join(parts), 15, false, 420))
 
@@ -747,11 +747,14 @@ func _result(e: Dictionary) -> void:
 				_log("%s heals %d." % [t3.display_name, e.amount])
 		"status":
 			var t4 := engine.unit(e.target)
-			var names := {"bleed": "Bleeding", "poison": "Poisoned", "stun": "Stunned", "mark": "Marked", "guard": "Guarded", "taunt": "Taunting", "worse": "Lingering"}
+			var names := {"bleed": "Bleeding", "poison": "Poisoned", "stun": "Stunned", "mark": "Marked", "guard": "Guarded", "taunt": "Taunting", "worse": "Lingering", "dispel": "Boons washed away"}
 			_sync_status(t4)
 			if t4 != null:
 				_popup(t4, names.get(e.status, e.status), Color("#f0a080") if e.status in ["bleed", "poison", "stun", "mark"] else Color("#9fd07a"), 22, 40)
-				_log("%s is %s." % [t4.display_name, names.get(e.status, e.status).to_lower()])
+				if e.status == "dispel":
+					_log("%s's boons wash away." % t4.display_name)
+				else:
+					_log("%s is %s." % [t4.display_name, names.get(e.status, e.status).to_lower()])
 		"resist":
 			var t5 := engine.unit(e.target)
 			if t5 != null:

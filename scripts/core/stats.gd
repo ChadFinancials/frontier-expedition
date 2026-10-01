@@ -13,12 +13,13 @@ const STAT_NAMES := {
 	"debuff_res": "Debuff Resist", "deathblow": "Deathblow Resist", "fatigue_pct": "Fatigue Taken",
 	"heal_pct": "Healing Received", "resolve": "Second Wind Chance", "scout": "Scouting",
 	"surprise": "Surprise Chance", "food_pct": "Food Eaten", "loot_pct": "Loot Found",
+	"vulnerable": "Vulnerable",
 }
 const PERCENT_STATS := ["max_hp_pct", "prot", "pierce", "dmg_pct", "crit", "stun_res", "bleed_res",
 	"poison_res", "move_res", "debuff_res", "deathblow", "fatigue_pct", "heal_pct", "resolve",
-	"scout", "surprise", "food_pct", "loot_pct"]
+	"scout", "surprise", "food_pct", "loot_pct", "vulnerable"]
 ## For these stats a positive number is bad for the hero.
-const INVERTED_STATS := ["fatigue_pct", "food_pct"]
+const INVERTED_STATS := ["fatigue_pct", "food_pct", "vulnerable"]
 
 
 static func cond_ok(cond: String, ctx: Dictionary) -> bool:
@@ -81,7 +82,7 @@ const STAT_SHORT := {
 	"max_hp_pct": "HP", "acc": "ACC", "dodge": "DODGE", "prot": "PROT", "speed": "SPD",
 	"crit": "CRIT", "dmg_pct": "DMG", "dmg_flat": "DMG", "pierce": "PIERCE", "stun_res": "STUN RES",
 	"bleed_res": "BLEED RES", "poison_res": "POISON RES", "move_res": "MOVE RES",
-	"debuff_res": "DEBUFF RES", "deathblow": "DEATHBLOW", "heal_pct": "HEALING",
+	"debuff_res": "DEBUFF RES", "deathblow": "DEATHBLOW", "heal_pct": "HEALING", "vulnerable": "VULN",
 }
 
 

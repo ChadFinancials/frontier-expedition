@@ -106,6 +106,7 @@ In `data/skills.json` (hero and enemy moves share the file; enemy ids start with
 | `gamble` | Double-or-nothing damage |
 | `on_kill` | Effects when it kills: `{"type": "money", "amount": 50}` pays a bounty; others apply to the user |
 | `once_per_fight` | Usable once per battle |
+| `transfuse_pct` | Heals the user's most wounded ally (lowest HP share, the user included) for this % of the damage dealt (Transfusion: 150) |
 | `anim` | melee, shoot, throw, cast, buff, heal, dog |
 | `sfx` | A clip name in `assets/audio/` without extension (`gunshot` plays `gunshot.wav` or a random `gunshot_N.ogg`) |
 
@@ -119,6 +120,10 @@ In `data/skills.json` (hero and enemy moves share the file; enemy ids start with
 - `guard {rounds}`, `taunt {rounds}`
 - `cure {kinds: ["bleed", "poison", "stun", "debuff"]}`, `clear_shaken`
 - `extend {rounds}`: the target's poisons, bleeds and debuffs last longer
+- `dispel`: washes away every boon (helpful buff) on the target
+- Any effect: `if_tag` (only lands on targets with that tag, e.g. `"mythic"`), `chance_vs`
+  (`{tag: chance}` replaces the base chance against those targets). Debuffs: `refresh: true`
+  makes a recast replace that move's earlier debuff instead of stacking.
 - Self-only: `move {amount}` (+ forward, − back), `summon {enemy, count}`, `light {amount}`,
   `heal_self {amount}`, `heal_self_pct {value}`, `self_damage {amount}` (a blood price, never
   below 1 HP), `buff_kin {mods: [{stat, value}], rounds, stack}` (buffs living allies of the
@@ -126,7 +131,9 @@ In `data/skills.json` (hero and enemy moves share the file; enemy ids start with
 
 **Stats** usable in buffs, debuffs and all modifiers: `acc`, `dodge`, `prot`, `speed`, `crit`,
 `dmg_pct`, `dmg_flat` (per hit), `pierce` (ignores that much protection), `max_hp_pct`,
-`stun_res`, `bleed_res`, `poison_res`, `move_res`, `debuff_res`, `deathblow`.
+`stun_res`, `bleed_res`, `poison_res`, `move_res`, `debuff_res`, `deathblow`, `vulnerable`
+(+% damage taken from every source, damage over time included; apply it with `debuff` and a
+positive value, e.g. `{"type": "debuff", "stat": "vulnerable", "value": 10, "rounds": 3}`).
 
 ## Add an enemy
 

@@ -372,9 +372,15 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 		if sk.get("once_per_fight", false):
 			parts.append("once per fight")
 		lines.append(", ".join(parts))
+	if sk.has("transfuse_pct"):
+		lines.append("• Heals your most wounded ally for %d%% of the damage dealt" % int(sk.transfuse_pct))
 	for e in sk.get("effects", []):
 		var t := effect_text(e, level)
 		if t != "":
+			if e.has("if_tag"):
+				t = "vs %s: %s" % [str(e.if_tag), t]
+			for tag in e.get("chance_vs", {}):
+				t += " (%d%% vs %s)" % [int(e.chance_vs[tag]), tag]
 			lines.append("• " + t)
 	for e in sk.get("self_effects", []):
 		var t2 := effect_text(e, level)
@@ -453,6 +459,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "Cures %s" % ", ".join(names)
 		"clear_shaken":
 			return "Cures Shaken"
+		"dispel":
+			return "Washes away every boon on the target"
 		"extend":
 			return "Poisons, bleeds and debuffs already on the target last %d more round%s" % [int(e.get("rounds", 1)), "" if int(e.get("rounds", 1)) == 1 else "s"]
 		"light":
