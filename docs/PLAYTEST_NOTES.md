@@ -90,6 +90,10 @@ decided, and what shipped. Update both at the end of every round.
   - Tuning pass (owner): Vulnerable came off the marking moves (Warrant, Quarrel, Joker) so
     no move both marks and amps; Peck at the Eyes bleed is 2 rounds; Hellfire is -5 Accuracy
     and -10% Damage; Scalpel Toss hits ranks 1-3 with +2% crit.
+  - Depth pass (owner's picks): Vulnerable 10% for 2 rounds on Pickaxe, Righteous Smite,
+    Point Blank and Sledge Toss, and for 1 round on Axe Cleave. Marked payoffs on Iron Justice
+    (+40%), Money Shot (+40%, bounty stays 50), Hammerfell (+30%) and Book of Judgment (+40%),
+    so every marking hero can cash in their own mark. Move tooltips now show "+N% vs Marked".
 - **New moves** (owner's picks): Preacher **Hellfire Sermon** and **Baptism in the River**
   (dispels boons, Soaked, stuns mythic foes); Frontier Doctor **Transfusion** (heals the most
   wounded ally for 150% of damage dealt) and **Scalpel Toss** (in place of Adrenaline Shot, to

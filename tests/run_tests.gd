@@ -973,6 +973,18 @@ func test_vulnerable_and_new_moves() -> void:
 		e._apply_effect(by["Marshal"], "wr_hogtie", DB.skill("wr_hogtie").effects.back(), brawler, [], false)
 	var vul := brawler.buffs.filter(func(b): return b.stat == "vulnerable").size()
 	check(vul == 1, "Hogtie's Vulnerable lands, and refreshes instead of stacking (got %d)" % vul)
+	# Owner's picks: Vulnerable on five plain attacks, and a Marked payoff for each marker.
+	for sid in ["pr_pickaxe", "pc_smite", "gs_point_blank", "rd_sledge_toss", "mm_axe_cleave"]:
+		check(DB.skill(sid).effects.any(func(ef): return ef.get("stat", "") == "vulnerable"), "%s applies Vulnerable" % sid)
+	brawler.buffs.clear()
+	for sid in ["marshal_iron_justice", "gb_money_shot", "rd_hammer_blow", "pc_judgment"]:
+		check(float(DB.skill(sid).get("vs_marked", 0)) > 0 and not DB.skill(sid).get("effects", []).any(func(ef): return ef.get("stat", "") == "vulnerable"), "%s pays off on Marked, without Vulnerable" % sid)
+	brawler.mark = 0
+	var unmarked: Array = e.dmg_preview(by["Marshal"], "marshal_iron_justice", brawler)
+	brawler.mark = 2
+	var marked: Array = e.dmg_preview(by["Marshal"], "marshal_iron_justice", brawler)
+	check(marked[1] > unmarked[1], "Iron Justice hits harder on a Marked target (%s -> %s)" % [unmarked, marked])
+	brawler.mark = 0
 	# Marking moves don't also apply Vulnerable (owner: no double dip).
 	for sid in ["marshal_warrant", "rd_quarrel", "gb_joker"]:
 		check(not DB.skill(sid).effects.any(func(ef): return ef.get("stat", "") == "vulnerable"), "%s marks without Vulnerable" % sid)

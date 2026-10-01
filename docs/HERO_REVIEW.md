@@ -16,7 +16,7 @@ Resists: stun 50, bleed 35, poison 30, move 50, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| ★ **Iron Justice**: A point-blank revolver shot, delivered with the full weight of the law. | 123 | one of 12 | 92 | 5-10, +2% crit | - |
+| ★ **Iron Justice**: A point-blank revolver shot, delivered with the full weight of the law. Bonus against Marked targets. | 123 | one of 12 | 92 | 5-10, +2% crit, +40% vs marked | - |
 | ★ **Pistol-Whip**: Cracks a revolver butt across a skull. Stuns. | 12 | one of 12 | 92 | 2-3 | stun |
 | **Deputize**: Steps in to shield an ally: attacks aimed at them hit the Marshal instead. The Marshal gains Protection. | 123 | one ally in 1234 | - | - | guards the ally for 3 rounds; self: prot +15 for 3 rounds |
 | **Serve a Warrant**: Names the target a wanted outlaw: Marked, and easier to hit. | 123 | one of 1234 | 102 | - | mark 3 rounds; dodge -10 for 3 rounds |
@@ -36,7 +36,7 @@ Resists: stun 35, bleed 40, poison 50, move 40, debuff 50, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| ★ **Axe Cleave**: A wide swing of a felling axe that catches both front ranks. | 12 | ALL of 12 | 87 | 3-7 each | - |
+| ★ **Axe Cleave**: A wide swing of a felling axe that catches both front ranks and splits their guard. Vulnerable for a round. | 12 | ALL of 12 | 87 | 3-7 each | vulnerable +10 for 1 rounds |
 | ★ **Grizzly Chop**: An overhead chop. Much stronger when the Mystic is below half health. | 12 | one of 12 | 97 | 6-12, +4% crit, +50% when below half HP | - |
 | **Gnarl at the Flesh**: Bites into their own arm and melts back into the trees: moves back 2, bleeds, and is hard to hit for a round. | 12 | self | - | - | bleed 2 x3 rounds; dodge +30 for 1 rounds; self: user moves back 2 |
 | **Bear Trap**: Kicks a sprung trap into the brush; it snaps shut on whoever steps there. Bleed and Slow. | 34 | 1 random in 234 | 92 | 3-5 x1 hits | bleed 2 x3 rounds; speed -3 for 2 rounds |
@@ -56,12 +56,12 @@ Resists: stun 45, bleed 35, poison 35, move 60, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| ★ **Hammerfell**: The whole nine pounds, straight down. Knocks the target back. | 12 | one of 1 | 94 | 7-12 | knockback 1 |
+| ★ **Hammerfell**: The whole nine pounds, straight down. Knocks the target back. Bonus against Marked targets. | 12 | one of 1 | 94 | 7-12, +30% vs marked | knockback 1 |
 | ★ **Rain of Nails**: Swings a keg of railroad spikes into the second line. Slows. | 12 | ALL of 23 | 92 | 3-5 each | speed -3 for 2 rounds (90%) |
 | **Hammered Rhythm**: Finds the work song's beat. Gains Damage and Speed. | 123 | self | - | - | dmg_pct +20 for 3 rounds; speed +2 for 3 rounds |
 | **Line Breaker**: A sweeping swing that shoves the front two enemies back. | 1 | ALL of 12 | 87 | 3-5 each | knockback 1 (90%) |
 | **Brace Yourselves!**: Sets their feet and bellows for the enemy to come at them. Gains Protection, heals a little, and Marks themself as the target. | 12 | self | - | - | prot +20 for 2 rounds; heals 2-4 HP; mark 2 rounds |
-| **Sledge Toss**: Hurls a spare sledge blind into the enemy line, then steps forward. | 23 | 1 random in 234 | 87 | 8-12 x1 hits | self: user moves forward 1 |
+| **Sledge Toss**: Hurls a spare sledge blind into the enemy line, then steps forward. Rings their bell: Vulnerable. | 23 | 1 random in 234 | 87 | 8-12 x1 hits | vulnerable +10 for 2 rounds; self: user moves forward 1 |
 | **Hammer Frenzy**: Three wild swings at whatever's closest. Leaves them off balance, and the Rail Driver winded (stuns self). | 12 | 3 random in 1234 | 87 | 6-8 x3 hits | dodge -5 for 2 rounds; self: stun |
 | **Quarrel**: "You want some of this?" Marks the target and cracks its guard. | 123 | one of 12 | 92 | - | mark 3 rounds; prot -15 for 3 rounds |
 
@@ -79,7 +79,7 @@ Resists: stun 30, bleed 30, poison 30, move 30, debuff 30, deathblow 67
 | ★ **Quick Draw**: Clears leather before anyone else can blink. Reaches any rank. | 234 | one of 1234 | 94 | 5-8, +5% crit | - |
 | ★ **Fan the Hammer**: Three rapid shots at random enemies. | 23 | 3 random in 1234 | 84 | 3-5 x3 hits | - |
 | **Twin Shots**: Both pistols at once, two hits on one target. | 12 | one of 234 | 90 | 3-6 x2 hits | - |
-| **Point Blank**: Jams the barrel into the enemy's gut, fires, then steps back. | 1 | one of 1 | 100 | 7-12, +6% crit | self: user moves back 1 |
+| **Point Blank**: Jams the barrel into the enemy's gut, fires, then steps back. Leaves them doubled over: Vulnerable. | 1 | one of 1 | 100 | 7-12, +6% crit | vulnerable +10 for 2 rounds; self: user moves back 1 |
 | **Duck and Weave**: Rolls forward into cover. Gains Dodge. | 234 | self | - | - | dodge +20 for 2 rounds; self: user moves forward 1 |
 | **Called Shot**: Takes careful aim. Huge bonus damage against Marked targets. | 23 | one of 1234 | 92 | 4-7, +8% crit, +60% vs marked | - |
 | **Armor-Piercing Rounds**: Loads steel-cored rounds. Attacks ignore 15% of the target's Protection. | 23 | self | - | - | pierce +15 for 3 rounds |
@@ -121,7 +121,7 @@ Resists: stun 30, bleed 30, poison 30, move 30, debuff 40, deathblow 67
 | **Deal 'Em**: Deals a hand of razor-edged cards to the whole table. Bleed. | 234 | ALL of 1234 | 85 | 2-4 each | bleed 1 x3 rounds |
 | **Stacked Deck**: Deals every ally a card: each gets a random boon. | 1234 | whole party | - | - | random boon for 3 rounds |
 | **Poker Face**: Gives nothing away. Gains Dodge and Speed. | 234 | self | - | - | dodge +10 for 3 rounds; speed +2 for 3 rounds |
-| **Money Shot**: A shot with a bounty on it. If it kills, the Gambler pockets 50 chips and breathes easier. | 23 | one of 234 | 90 | 2-12 | on kill: +50 chips; on kill: -5 fatigue (relief) |
+| **Money Shot**: A shot with a bounty on it; hits harder on a Marked target. If it kills, the Gambler pockets 50 chips and breathes easier. | 23 | one of 234 | 90 | 2-12, +40% vs marked | on kill: +50 chips; on kill: -5 fatigue (relief) |
 | **Assign the Joker**: Flicks the Joker at a back-liner: Marked, and off their game. | 234 | one of 34 | 90 | - | mark 3 rounds; dodge -12 for 3 rounds; acc -10 for 3 rounds |
 | **Lotto Ticket**: A one-in-a-hundred shot from the very back. Nearly always misses; when it hits, it's a jackpot. Stack Accuracy to make it pay. | 4 | one of 1234 | 22 | 24-48 | - |
 
@@ -137,7 +137,7 @@ Resists: stun 35, bleed 35, poison 45, move 35, debuff 30, deathblow 67
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | ★ **Dynamite Toss**: A lit stick lobbed into the enemy's back lines. | 34 | ALL of 234 | 87 | 2-4 each | stun (50%) |
-| ★ **Pickaxe**: Swings the old pick like they're chasing a vein of gold. | 12 | one of 12 | 92 | 5-11, +3% crit | - |
+| ★ **Pickaxe**: Swings the old pick like they're chasing a vein of gold, and chips a hole in their armour. Vulnerable. | 12 | one of 12 | 92 | 5-11, +3% crit | vulnerable +10 for 2 rounds |
 | **Blasting Charge**: A charge with a short fuse, planted on one enemy. May Stun. | 234 | one of 123 | 92 | 4-6 | stun (85%) |
 | **Flash Powder**: A blinding puff of magnesium over the front pair or the back pair. Lowers Accuracy. | 234 | ALL of 12 or 34 | 87 | - | acc -12 for 2 rounds |
 | **Raise the Lamp**: Holds the miner's lamp high. The party gains Dodge and Accuracy; in caves, restores Lamplight. | 23 | whole party | - | - | dodge +3 for 2 rounds; acc +3 for 2 rounds; self: lamplight +20 |
@@ -197,8 +197,8 @@ Resists: stun 40, bleed 30, poison 30, move 35, debuff 45, deathblow 67
 | ★ **Revival Meeting**: Leads the company in a hymn. Heals everyone a little. | 34 | whole party | - | - | heals 1-4 HP |
 | **Sermon on the Trail**: Words of comfort for weary souls. Party sheds Fatigue and gains Accuracy. | 234 | whole party | - | - | -3 fatigue (relief); acc +3 for 2 rounds |
 | **Fire and Brimstone**: Lifts the brass lantern and blazes holy light. May Stun. | 34 | one of 123 | 87 | 1-2 | stun |
-| **Righteous Smite**: Brings the good book down hard. Extra damage against mythic creatures. | 12 | one of 12 | 87 | 4-7, +50% vs mythic | - |
-| **Book of Judgment**: Reads a verse of judgment aloud. Lowers the target's Damage; extra damage against mythic creatures. | 34 | one of 1234 | 92 | 3-5, +60% vs mythic | dmg_pct -15 for 2 rounds |
+| **Righteous Smite**: Brings the good book down hard: laid bare before the Lord. Vulnerable; extra damage against mythic creatures. | 12 | one of 12 | 87 | 4-7, +50% vs mythic | vulnerable +10 for 2 rounds |
+| **Book of Judgment**: Reads a verse of judgment aloud over the named sinner. Lowers the target's Damage; extra damage against Marked targets and mythic creatures. | 34 | one of 1234 | 92 | 3-5, +40% vs marked, +60% vs mythic | dmg_pct -15 for 2 rounds |
 | **Hellfire Sermon**: Thunders about the fire to come. Every enemy loses Accuracy and Damage, and the unnatural can't shut it out. Costs the Preacher some Fatigue. | 34 | ALL of 1234 | 95 | - | acc -5 for 2 rounds (75%) (100% vs mythic); dmg_pct -10 for 2 rounds (75%) (100% vs mythic); self: +4 fatigue |
 | **Baptism in the River**: Plunges the wicked under. Washes away every boon on the target and leaves it Soaked: slower and easier to hit. Mythic creatures may be stunned outright. | 234 | one of 123 | 95 | - | washes away all boons; speed -2 for 2 rounds; dodge -10 for 2 rounds; vs mythic: stun (80%) |
 

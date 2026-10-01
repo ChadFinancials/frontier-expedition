@@ -363,6 +363,8 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 			parts.append("Damage %s%d%%" % ["+" if dm >= 0 else "", dm])
 		if int(sk.get("crit", 0)) != 0:
 			parts.append("Crit +%d%%" % int(sk.crit))
+		if float(sk.get("vs_marked", 0)) > 0:
+			parts.append("+%d%% vs Marked" % int(round(float(sk.vs_marked) * 100)))
 		if sk.get("hits", 1) > 1:
 			parts.append("%d hits" % int(sk.hits))
 		if sk.get("random_hits", 0) > 0:
