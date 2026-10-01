@@ -34,23 +34,10 @@ decided, and what shipped. Update both at the end of every round.
       level adds the same accuracy, damage, effect and healing bonuses).
 - [ ] Stacked Deck "probably needs tuning" (round 8; owner: save for a later balancing pass). A second deal stacks on the first (two
       Jacks of Clubs = +24 Dodge). Proposed: a new deal replaces that hero's previous card.
-- [ ] **Hero balance proposals** (round 8 review, not applied; for the balancing pass).
-      Model: `python3 tools/hero_power.py` (each move vs the average tier-1 enemy: 14.5 HP,
-      12 dodge, 4% prot; stun res 33, bleed 30, poison 44; enemies hit for ~3.8 at ~88 acc).
-      Ranking 1-10: Gambler 9, Bayou Poisoner 8, Rail Driver 7, Mountain Mystic 7,
-      Gunslinger 7, Prospector 6, Wrangler 6, Marshal 6, Frontier Doctor 5, Preacher 4.
-      - Gambler: Deal 'Em is the outlier, ~23 expected damage per cast (2.3 direct + 3.3 bleed
-        per enemy on all 4 ranks; its 2-4 range skips the 0.9 hero multiplier; bleeds stack on
-        recast). Hit a pair instead (`aoe_groups` [[1,2],[3,4]]): ~11. Stacked Deck: a new deal replaces that hero's card, no stacking.
-      - Bayou Poisoner: Bola Shot stuns two targets, 0.70 expected stuns per cast (best in
-        the game). Stun chance 80 -> 60: 0.41, level with Dynamite (0.38) and Blasting
-        Charge (0.41).
-      - Preacher: offense ~3/turn, speed 1, heals 5.6 (single) / 8 (party) a turn against
-        ~12 incoming. Laying On of Hands 5-9 -> 7-11 (5.6 -> 7.2), Revival Meeting 1-4 ->
-        2-4 (8.0 -> 9.6 party), speed 1 -> 3.
-      - Frontier Doctor: lowest EHP (20.6). Battlefield Surgery's stun costs the patient a
-        turn (~6 of value), so its 10 HP nets ~4. Drop the stun, heal 10-15 -> 8-12 (8.0
-        net, cures and +25 prot kept); HP 16 -> 18 (EHP 23.2).
+- [ ] Hero balance: round 8 changes applied (see History); re-rank with
+      `python3 tools/hero_power.py` after the next playtest. Pre-change ranking: Gambler 9,
+      Bayou Poisoner 8, Rail Driver 7, Mountain Mystic 7, Gunslinger 7, Prospector 6,
+      Wrangler 6, Marshal 6, Frontier Doctor 5, Preacher 4.
 - [ ] Watch: Ruby Blackwing is hard and the crow summon strong; probably right (round 7).
 - [ ] Second region onward (Red Canyons, Thunder Peaks, Redwater Ford) waits until the first
       region is crisp.
@@ -84,6 +71,14 @@ decided, and what shipped. Update both at the end of every round.
 - Crash logs showed no backtrace (a driver kill under OpenGL). `play_vulkan.bat` tested the
   Vulkan renderer; the owner found it much smoother, so **Vulkan is now the default**, with
   OpenGL as the automatic fallback and `play_opengl.bat` to force it.
+- **Balance** (owner's picks from the hero ranking; heal ranges are as shown in game, after
+  the 0.8 heal multiplier). Expected value per cast vs the average tier-1 enemy, before -> after:
+  - Deal 'Em: bleed 2 -> 1 a round (3 rounds), accuracy 87 -> 85: ~22.8 -> ~15.7 damage.
+  - Bola Shot: stun chance 80 -> 70%: 0.70 -> 0.55 expected stuns.
+  - Preacher: Laying On of Hands 4-7 -> 6-10 (5.6 -> 8.0); Revival Meeting 1-3 -> 1-4 (it was
+    stored 1-4 but the multiplier rounded the top to 3; 8.0 -> 9.6 for the party); speed 1 -> 2.
+  - Frontier Doctor: Battlefield Surgery no longer stuns the patient and leaves them at -5
+    Protection for 2 rounds (the +25 Protection is gone); its heal stays 8-12 as shown. HP 16 -> 18.
 - Under Vulkan, dying enemies showed a grey box: the figure's paper group (a CanvasGroup)
   faded through its parent. Units now leave the paper group before a death, a summon's
   fade-in or a scripted retreat (`UnitView.unpaper` / `repaper`). Owner confirmed fixed.

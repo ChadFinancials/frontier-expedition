@@ -118,7 +118,7 @@ Resists: stun 30, bleed 30, poison 30, move 30, debuff 40, deathblow 67
 |---|---|---|---|---|---|
 | ★ **Ace up the Sleeve**: A pocket pistol from the sleeve, and a steadier hand after. | 12 | one of 123 | 92 | 2-8 | self: acc +5 for 3 rounds |
 | ★ **ALL IN**: Pushes every chip to the middle of the table. Big Damage, Accuracy and Speed, but everyone's watching (Marks self). | 234 | self | - | - | mark 3 rounds; dmg_pct +25 for 3 rounds; acc +10 for 3 rounds; speed +2 for 3 rounds |
-| **Deal 'Em**: Deals a hand of razor-edged cards to the whole table. Bleed. | 234 | ALL of 1234 | 87 | 2-4 each | bleed 2 x3 rounds |
+| **Deal 'Em**: Deals a hand of razor-edged cards to the whole table. Bleed. | 234 | ALL of 1234 | 85 | 2-4 each | bleed 1 x3 rounds |
 | **Stacked Deck**: Deals every ally a card: each gets a random boon. | 1234 | whole party | - | - | random boon for 3 rounds |
 | **Poker Face**: Gives nothing away. Gains Dodge and Speed. | 234 | self | - | - | dodge +10 for 3 rounds; speed +2 for 3 rounds |
 | **Money Shot**: A shot with a bounty on it. If it kills, the Gambler pockets 50 chips and breathes easier. | 23 | one of 234 | 90 | 2-12 | on kill: +50 chips; on kill: -5 fatigue (relief) |
@@ -156,7 +156,7 @@ Resists: stun 30, bleed 30, poison 30, move 35, debuff 30, deathblow 67
 |---|---|---|---|---|---|
 | ★ **Poison Darts**: Two blowgun darts into the enemy line. Weakens their resistances and Poisons (worse if the user is poisoned too). | 34 | 2 random in 234 | 92 | 2-4 x2 hits | debuff_res -10 for 2 rounds; poison_res -10 for 2 rounds; poison 2 x2 rounds (4 if user poisoned) |
 | ★ **Gas Cloud**: A gourd of swamp gas bursts over the enemy. Lowers Debuff and Poison Resist, and whatever ails them lingers a round longer. | 34 | 2 random in 1234 | 97 | - | existing poison/bleed/debuffs +1 round; debuff_res -10 for 2 rounds; poison_res -10 for 2 rounds |
-| **Bola Shot**: Weighted cords whirl into the middle of the line and tangle both. Stuns. | 234 | ALL of 23 | 87 | 2-3 each | stun (80%) |
+| **Bola Shot**: Weighted cords whirl into the middle of the line and tangle both. Stuns. | 234 | ALL of 23 | 87 | 2-3 each | stun (70%) |
 | **Suppressing Fire**: A spray of darts across the front of the line. Slows. | 34 | ALL of 123 | 92 | 2-3 each | speed -2 for 2 rounds |
 | **Blighted Sacrament**: A thorn dipped in the worst of the bayou. Heavy Poison; hits much harder if the user is poisoned. | 23 | 1 random in 123 | 92 | 4-6 x1 hits, +80% while user is poisoned | poison 5 x3 rounds |
 | **Questionable Mushroom**: Eats something off a log. It's fine. Mostly. Poisons self a little and sheds Fatigue. | 234 | self | - | - | poison 1 x3 rounds; -6 fatigue (relief) |
@@ -168,14 +168,14 @@ Notes:
 
 Studied medicine back east, practices it out west, and has opinions about which tinctures go in patients and which go in outlaws.
 
-`frontier_doctor` | HP **16** | dodge 10 | prot 0 | speed 4 | acc +0 | crit 3% | dmg 3-6 | prefers ranks 34
+`frontier_doctor` | HP **18** | dodge 10 | prot 0 | speed 4 | acc +0 | crit 3% | dmg 3-6 | prefers ranks 34
 Resists: stun 30, bleed 40, poison 60, move 30, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | ★ **Flask of Vileness**: A flask of something vile, uncorked in the back line. Strong Poison. | 34 | one of 234 | 92 | 1-3 | poison 4 x3 rounds |
 | ★ **Experimental Tonic**: Untested, but promising. Heals a little, may ease or add Fatigue, and gives a Damage boost. | 34 | one ally in 1234 | - | - | heals 2-4 HP; -5 to +3 fatigue; dmg_pct +10 for 3 rounds |
-| **Battlefield Surgery**: Quick, bloody, effective, and the patient goes under for it. A big heal, cures Bleed and Poison, and they're braced but stunned. | 34 | one ally in 1234 | - | - | heals 8-12 HP; cures bleed/poison; stun; prot +25 for 1 rounds |
+| **Battlefield Surgery**: Quick, bloody, effective, and it takes it out of the patient. A big heal and cures Bleed and Poison, but they're left weak for a while (less Protection). | 34 | one ally in 1234 | - | - | heals 8-12 HP; cures bleed/poison; prot -5 for 2 rounds |
 | **Smelling Salts**: Snaps an ally back to their senses. Cures Stun, Bleed and Poison, and gains Speed. | 234 | one ally in 1234 | - | - | cures bleed/poison/stun; speed +3 for 2 rounds |
 | **Chloroform Rag**: A soaked rag over the mouth. Stuns. | 34 | one of 1 | 92 | 1-2 | stun |
 | **Laudanum**: A few drops take the edge off. Big Fatigue relief, but the patient is slow and sluggish. | 234 | one ally in 1234 | - | - | -12 fatigue (relief); speed -2 for 2 rounds; dodge -5 for 2 rounds |
@@ -186,13 +186,13 @@ Notes:
 
 Carries a battered Bible, a brass lantern, and more faith than the rest of the company combined. Mends bodies and spirits alike.
 
-`preacher` | HP **20** | dodge 3 | prot 5 | speed 1 | acc +0 | crit 2% | dmg 4-7 | prefers ranks 34
+`preacher` | HP **20** | dodge 3 | prot 5 | speed 2 | acc +0 | crit 2% | dmg 4-7 | prefers ranks 34
 Resists: stun 40, bleed 30, poison 30, move 35, debuff 45, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| ★ **Laying On of Hands**: A prayer and a firm hand. A strong single heal. | 234 | one ally in 1234 | - | - | heals 4-7 HP |
-| ★ **Revival Meeting**: Leads the company in a hymn. Heals everyone a little. | 34 | whole party | - | - | heals 1-3 HP |
+| ★ **Laying On of Hands**: A prayer and a firm hand. A strong single heal. | 234 | one ally in 1234 | - | - | heals 6-10 HP |
+| ★ **Revival Meeting**: Leads the company in a hymn. Heals everyone a little. | 34 | whole party | - | - | heals 1-4 HP |
 | **Sermon on the Trail**: Words of comfort for weary souls. Party sheds Fatigue and gains Accuracy. | 234 | whole party | - | - | -3 fatigue (relief); acc +3 for 2 rounds |
 | **Fire and Brimstone**: Lifts the brass lantern and blazes holy light. May Stun. | 34 | one of 123 | 87 | 1-2 | stun |
 | **Righteous Smite**: Brings the good book down hard. Extra damage against mythic creatures. | 12 | one of 12 | 87 | 4-7, +50% vs mythic | - |

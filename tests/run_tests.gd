@@ -49,6 +49,8 @@ func _ready() -> void:
 	test_settlement_services()
 	print("> test_quest_boss()")
 	test_quest_boss()
+	print("> test_round8_balance()")
+	test_round8_balance()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -878,3 +880,39 @@ func full_campaign(runs: int, weeks: int) -> void:
 			"avg_level": lv / maxf(1, co.heroes.size()), "money": co.money, "settlements": co.settlements.size(), "statuses": statuses})
 	for r in results:
 		print("CAMPAIGN ", r)
+
+
+
+## Round 8 balance: Battlefield Surgery heals and weakens the patient instead of stunning
+## them; heals land in the ranges the owner set (after heal_mult 0.8).
+func test_round8_balance() -> void:
+	var co := Company.new()
+	co.new_game(31)
+	var doc := co.make_hero("frontier_doctor", 1)
+	var pal := co.make_hero("marshal", 1)
+	check(doc.max_hp() >= 18, "Frontier Doctor has 18 HP (got %d)" % doc.max_hp())
+	check(int(DB.classes.preacher.speed) == 2, "Preacher speed 2")
+	var e := CombatEngine.new()
+	# Surgery is used from ranks 3-4, so the Doctor stands third.
+	e.setup([pal, co.make_hero("gunslinger", 1), doc], ["outlaw_brawler"], {})
+	var pc: Combatant = null
+	var dc: Combatant = null
+	for hc in e.heroes:
+		if hc.hero == pal:
+			pc = hc
+		elif hc.hero == doc:
+			dc = hc
+	pc.hp = 3
+	e.use_skill(dc, "dr_surgery", pc.id)
+	check(not pc.stunned, "Surgery no longer stuns the patient")
+	check(pc.buffs.any(func(b): return b.stat == "prot" and float(b.value) == -5.0), "Surgery leaves the patient at -5 Protection")
+	check(pc.hp >= 3 + 8, "Surgery heals at least 8 (got %d)" % (pc.hp - 3))
+	var hm: float = DB.cfg("heal_mult", 1.0)
+	for pair in [["pc_hands", 6, 10], ["pc_revival", 1, 4], ["dr_surgery", 8, 12]]:
+		var h: Dictionary = DB.skill(pair[0]).effects[0]
+		var lo := int(round(int(h.min) * hm))
+		var hi := int(round(int(h.max) * hm))
+		check(lo == pair[1] and hi == pair[2], "%s heals %d-%d in game (got %d-%d)" % [pair[0], pair[1], pair[2], lo, hi])
+	var deal: Dictionary = DB.skill("gb_card_toss")
+	check(int(deal.acc) == 85 and int(deal.effects[0].amount) == 1, "Deal 'Em: acc 85, bleed 1")
+	check(int(DB.skill("ss_kill_shot").effects[0].chance) == 70, "Bola Shot stun 70%")
