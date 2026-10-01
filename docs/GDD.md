@@ -183,6 +183,10 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
   moves (crows, gila monster, the Cyclops' sweep). Marked payoffs (`vs_marked`): Called Shot
   +60%, Sic 'Em and Lightspeed Whip +50%, Iron Justice, Money Shot and Book of Judgment +40%,
   Hammerfell +30%. Markers: Serve a Warrant, Quarrel, Assign the Joker, Lasso.
+- **Bones**: a fallen enemy leaves its bones (2 HP) in its rank, so the enemies behind don't
+  step up. Bones can be targeted and are hit by area and random moves; destroy them and the
+  line slides forward. They never act and ignore every effect. The last enemy standing
+  leaves none: the fight ends.
 - **Statuses**: bleed and poison (damage per round), stun (skip a turn, then +50% stun
   resist for a round), mark, guard, taunt, buffs and debuffs (accuracy, dodge, protection,
   damage, crit, speed, resistances), knockback and pull, summons. Durations show on units.

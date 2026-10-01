@@ -53,6 +53,8 @@ func _ready() -> void:
 	test_round8_balance()
 	print("> test_vulnerable_and_new_moves()")
 	test_vulnerable_and_new_moves()
+	print("> test_bones()")
+	test_bones()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -922,6 +924,62 @@ func test_round8_balance() -> void:
 
 ## Vulnerable (+% damage taken, all sources), dispel, tag-conditioned effects, refresh and
 ## Transfusion (owner's round 8 picks).
+## Owner's DD rule: a fallen enemy leaves 2-HP bones in its rank; the line only slides up
+## once they're destroyed.
+func test_bones() -> void:
+	var co := Company.new()
+	co.rng.seed = 21
+	var party := _party(co, ["marshal", "gunslinger", "frontier_doctor", "preacher"])
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 8
+	var e := CombatEngine.new()
+	e.setup(party, ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], {"rng": rng})
+	var mar: Combatant = e.heroes[0]
+	var gunhand: Combatant = e.enemies[1]
+	var ev: Array = []
+	e._apply_damage(e.enemies[0], 999, mar, ev, false)
+	e._cleanup(ev)
+	var bones: Combatant = e.enemies[0]
+	check(e.enemies.size() == 3 and bones.corpse and bones.hp == 2 and bones.rank == 1, "a fallen enemy leaves 2-HP bones in its rank")
+	check(gunhand.rank == 2, "the enemy behind the bones doesn't step up (rank %d)" % gunhand.rank)
+	check(ev.any(func(x): return x.t == "bones" and x.unit == bones.id), "bones event for the screen")
+	check(e.killed.count("outlaw_brawler") == 1 and e.state == "running", "the kill counts once; the fight goes on")
+	check(bones.id in e.valid_targets(mar, "marshal_iron_justice"), "bones can be targeted")
+	check(not e._turn_order().has(bones), "bones never take a turn")
+	# Bones shrug off effects: a Warrant never marks them.
+	for k in 8:
+		e._resolve_attack(mar, "marshal_warrant", DB.skill("marshal_warrant"), bones, [])
+	check(bones.mark == 0 and bones.buffs.is_empty(), "bones take no effects")
+	# Smash them: now the line slides forward, and it isn't a kill.
+	ev = []
+	e._apply_damage(bones, 3, mar, ev, false)
+	e._cleanup(ev)
+	check(e.enemies.size() == 2 and gunhand.rank == 1, "destroyed bones let the line slide up")
+	check(e.killed.size() == 1 and ev.any(func(x): return x.t == "death" and x.get("bones", false)), "smashed bones aren't a kill")
+	# The last foe standing leaves no bones: victory, even with bones still on the field.
+	ev = []
+	e._apply_damage(gunhand, 999, mar, ev, false)
+	e._cleanup(ev)
+	check(e.enemies[0].corpse and e.state == "running", "bones where the gunhand fell")
+	ev = []
+	e._apply_damage(e.enemies[1], 999, mar, ev, false)
+	e._cleanup(ev)
+	check(e.state == "victory" and not ev.any(func(x): return x.t == "bones"), "the last kill wins, bones or not")
+	# A summoner on a full line kicks aside bones to make room.
+	var sb := CombatEngine.new()
+	sb.setup(party, ["silas_crane", "outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], {"rng": rng, "boss": true})
+	ev = []
+	sb._apply_damage(sb.enemies[1], 999, sb.heroes[0], ev, false)
+	sb._cleanup(ev)
+	check(sb.enemies[1].corpse and "e_crane_storm" in sb.usable_skills(sb.enemies[0]), "Crowstorm has room: bones can be swept aside")
+	sb.use_skill(sb.enemies[0], "e_crane_storm", sb.heroes[0].id)
+	check(sb.enemies.size() == 4 and not sb.enemies.any(func(x): return x.corpse) and sb.enemies[1].enemy_id == "murder_of_crows", "a crow takes the bones' rank")
+	# A whole bot fight still ends.
+	var bot := Bot.new(4)
+	var e2 := bot.fight(_party(co, ["rail_driver", "wrangler", "prospector", "frontier_doctor"]), ["prairie_wolf", "coyote", "carrion_crows", "prairie_wolf"], {"rng": rng})
+	check(e2.is_over(), "bot fight with bones finishes (%s)" % e2.state)
+
+
 func test_vulnerable_and_new_moves() -> void:
 	var co := Company.new()
 	co.new_game(41)
@@ -944,7 +1002,7 @@ func test_vulnerable_and_new_moves() -> void:
 	brawler.dots = [{"kind": "bleed", "amount": 4, "rounds": 1}]
 	var hp0 := brawler.hp
 	e._start_turn(brawler)
-	check(hp0 - brawler.hp == 6, "Vulnerable 50% makes a 4 bleed tick hit for 6 (got %d)" % (hp0 - brawler.hp))
+	check(hp0 - brawler.hp == 6, "Vulnerable 50%% makes a 4 bleed tick hit for 6 (got %d)" % (hp0 - brawler.hp))
 	check(not Stats.mod_is_good({"stat": "vulnerable", "value": 10}), "Vulnerable counts as a debuff")
 	# A debuff cure clears it.
 	e._apply_effect(by["Marshal"], "marshal_flash_badge", {"type": "cure", "kinds": ["debuff"]}, brawler, [], false)

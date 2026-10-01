@@ -23,6 +23,7 @@ var guarding: int = -1           # id of the ally this unit shields
 var guarded_by: int = -1
 var taunt: int = 0
 var dead: bool = false
+var corpse: bool = false         # an enemy's bones: holds its rank until destroyed
 var initiative: int = 0          # round-1 surprise bonus (+100 for the side that got the jump)
 var actions_left: int = 0        # turns still to take this round (heroes 1; some bosses more)
 var actions_used: int = 0        # turns taken this round
@@ -32,6 +33,8 @@ var speed_roll: int = 0          # this round's small initiative roll, added to 
 
 ## Turns per round: 1, or the enemy's "actions" field (bosses can act more than once).
 func actions_per_round() -> int:
+	if corpse:
+		return 0
 	return 1 if hero != null else maxi(1, int(data.get("actions", 1)))
 var tier: int = 1
 var boss: bool = false
@@ -74,6 +77,23 @@ static func from_enemy(eid: String, uid: int, t: int, cave: bool) -> Combatant:
 	c.hp = c.max_hp
 	c.tags = d.get("tags", []).duplicate()
 	c.skills = d.get("skills", []).duplicate()
+	return c
+
+
+## What a fallen enemy leaves in its rank: bones that block the line (the units behind
+## don't step up) until they're destroyed. They never act and shrug off every effect.
+static func bones(of: Combatant, uid: int) -> Combatant:
+	var c := Combatant.new()
+	c.id = uid
+	c.side = "enemy"
+	c.corpse = true
+	c.data = {"id": "bones", "name": "Bones", "title": "What's left of the %s. Clear them to reach whoever's behind." % of.display_name,
+		"look": {"body": "bones", "big": of.data.get("look", {}).get("body", "human") in ["giant", "bull", "bear"]}}
+	c.display_name = "Bones"
+	c.max_hp = maxi(1, int(DB.cfg("bones_hp", 2)))
+	c.hp = c.max_hp
+	c.tags = ["remains"]
+	c.rank = of.rank
 	return c
 
 

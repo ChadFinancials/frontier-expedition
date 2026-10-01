@@ -80,7 +80,7 @@ $GODOT --headless --path . res://tests/test_runner.tscn -- sim=2   # rules/data 
 tools/shot.sh <scenario> /tmp/x.png [args]                    # look at it (xvfb)
 # scenarios: menu settlement embark trail combat camp cave event curio results hero building
 #   tutorial silas lineup faces outfits (see scripts/debug/shots.gd)
-# args: full (party of 4), region=<id>, far (end of map), enemies=a,b, ehp=N, act,
+# args: full (party of 4), region=<id>, far (end of map), enemies=a,b, ehp=N, bones=N, act,
 #   statuses (load everyone with effects), with=<class> skill=<id> (watch a move),
 #   soak=N (idle N seconds printing memory/object/draw counts, for leak and crash hunts),
 #   settlement hover=N (plot N highlighted)

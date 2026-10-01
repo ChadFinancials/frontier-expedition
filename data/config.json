@@ -28,6 +28,7 @@
   "starting_moves": 4,
   "stock_moves": 2,
   "initiative_roll": 3,
+  "bones_hp": 2,
   "learn_cost": 300,
 
   "skill_level_acc": 4,

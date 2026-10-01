@@ -835,8 +835,12 @@ func _result(e: Dictionary) -> void:
 				tw.tween_property(v, "position:y", v.position.y + 20, 0.7 / speed)
 				views.erase(t11.id)
 				tw.chain().tween_callback(v.queue_free)
-				Audio.play("death_hero" if t11.is_hero() else "death")
-				_log("[b]%s %s.[/b]" % [t11.display_name, "has died" if t11.is_hero() else "is defeated"])
+				if e.get("bones", false):
+					Audio.play("knock")
+					_log("The bones are scattered.")
+				else:
+					Audio.play("death_hero" if t11.is_hero() else "death")
+					_log("[b]%s %s.[/b]" % [t11.display_name, "has died" if t11.is_hero() else "is defeated"])
 		"moved":
 			pass
 		"positions":
@@ -854,6 +858,19 @@ func _result(e: Dictionary) -> void:
 				twn.tween_callback(func(): if is_instance_valid(nv): nv.repaper())
 				_log("%s joins the fight!" % nc.display_name)
 				_layout()
+		"bones":
+			# A fallen enemy's bones settle into its rank and block the line until destroyed.
+			var bc := engine.unit(e.unit)
+			if bc != null:
+				_add_view(bc)
+				var bv: UnitView = views[bc.id]
+				bv.position = _rank_pos(bc)
+				bv.unpaper()
+				bv.modulate.a = 0
+				var twb := create_tween()
+				twb.tween_interval(0.35 / speed)
+				twb.tween_property(bv, "modulate:a", 1.0, 0.4 / speed)
+				twb.tween_callback(func(): if is_instance_valid(bv): bv.repaper())
 		"light":
 			backdrop.light = e.light / 100.0
 			_log("The lamp flares brighter.")

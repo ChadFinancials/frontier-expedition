@@ -481,6 +481,16 @@ static func run(main: Main, args: Dictionary) -> void:
 							for m in [["acc", 10], ["dodge", -8], ["dmg_pct", 15], ["speed", -2], ["prot", 10]]:
 								u.buffs.append({"stat": m[0], "value": m[1], "rounds": 3, "name": "Test"})
 							u.mark = 2
+					# bones=N: the first N enemies fall and leave their bones (DD-style corpses).
+					if args.has("bones"):
+						var eb: CombatEngine = main.screen.engine
+						for k in int(args.bones):
+							var bev: Array = []
+							var live := eb.enemies.filter(func(x): return not x.corpse)
+							eb._apply_damage(live[0], 999, eb.heroes[0], bev, false)
+							eb._cleanup(bev)
+							await main.screen._play(bev)
+						await main.get_tree().create_timer(1.5).timeout
 					if args.has("act"):
 						await _act(main, args)
 				"camp":

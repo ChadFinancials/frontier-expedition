@@ -144,6 +144,12 @@ while not engine.is_over():
   `effect_chance` in the engine, fed by `Combatant.stat` (class stats, level, gear, quirks,
   trinkets, buffs) and constants in `config.json`. Class matchups (`vs_tags` on a class, e.g.
   the Mountain Mystic against beasts) go through `_class_vs`.
+- **Bones** (Darkest Dungeon's corpses): `_cleanup` swaps a fallen enemy for a
+  `Combatant.bones()` unit (`corpse = true`, `bones_hp` HP, 0 turns it off) in the same rank,
+  so the line behind doesn't step up until the bones are destroyed. Bones never act, take
+  no effects, aren't kills (no `killed` entry, no on-kill payoffs) and don't count for
+  victory; area, random and targeted hits all land on them. A summoner on a full line
+  sweeps the rearmost bones aside. Events: `bones` (new unit) and `death` with `bones: true`.
 - **Enemy AI** picks a move by the skill's `ai.weight` and a target by `ai.pref`
   (`random, lowest_hp, marked, back, front, deaths_door`), honouring taunt and guard.
 - **Layout**: units stand on `GROUND` (745); the HUD panel starts at 835. Each unit's HUD
@@ -244,7 +250,7 @@ while not engine.is_over():
 | `... test_runner.tscn -- balance=40 weeks=6` | Balance report over many simulated campaigns (`tests/bot.gd` plays them) |
 | `... test_runner.tscn -- simtut=50` | Plays the tutorial many times and reports win rate and health left |
 | `$G --headless --path . -- shot=autoplay expeditions=3` | UI smoke test: `tests/autopilot.gd` clicks through the real screens |
-| `tools/shot.sh <scenario> out.png [args]` | Screenshot under xvfb. Scenarios in `scripts/debug/shots.gd`: `menu, settlement, embark, trail, combat, camp, cave, event, curio, results, hero, building, tutorial, silas, lineup, faces, outfits`, plus A/B comparisons. Useful args: `full` (party of 4), `region=<id>`, `far` (end of map), `enemies=a,b`, `ehp=N`, `act`, `statuses`, `with=<class> skill=<id>`, `soak=N` (idle and print memory, objects and draw calls) |
+| `tools/shot.sh <scenario> out.png [args]` | Screenshot under xvfb. Scenarios in `scripts/debug/shots.gd`: `menu, settlement, embark, trail, combat, camp, cave, event, curio, results, hero, building, tutorial, silas, lineup, faces, outfits`, plus A/B comparisons. Useful args: `full` (party of 4), `region=<id>`, `far` (end of map), `enemies=a,b`, `ehp=N`, `bones=N` (first N enemies fall, leaving bones), `act`, `statuses`, `with=<class> skill=<id>`, `soak=N` (idle and print memory, objects and draw calls) |
 | `python3 tools/hero_sheet.py` | Regenerates `docs/HERO_REVIEW.md` from the data |
 | `python3 tools/enemy_sheet.py` | Regenerates `docs/ENEMY_REVIEW.md` |
 | `python3 tools/hero_power.py` | Rough power model: every hero move scored against the average tier-1 enemy (balance aid) |

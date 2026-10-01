@@ -94,6 +94,10 @@ decided, and what shipped. Update both at the end of every round.
     Point Blank and Sledge Toss, and for 1 round on Axe Cleave. Marked payoffs on Iron Justice
     (+40%), Money Shot (+40%, bounty stays 50), Hammerfell (+30%) and Book of Judgment (+40%),
     so every marking hero can cash in their own mark. Move tooltips now show "+N% vs Marked".
+- **Bones** (owner, Darkest Dungeon's corpses): a fallen enemy leaves 2-HP bones in its rank;
+  the line only slides up once they're destroyed. Back-liners stay harder to reach, AoE and
+  random hits can clear them, they never act or take effects, smashing them isn't a kill,
+  and summoners sweep them aside on a full line. `bones_hp` in config (0 turns it off).
 - **New moves** (owner's picks): Preacher **Hellfire Sermon** and **Baptism in the River**
   (dispels boons, Soaked, stuns mythic foes); Frontier Doctor **Transfusion** (heals the most
   wounded ally for 150% of damage dealt) and **Scalpel Toss** (in place of Adrenaline Shot, to

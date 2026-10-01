@@ -173,7 +173,7 @@ func _start_round() -> Array:
 func _turn_order() -> Array:
 	var slots: Array = []
 	for c in heroes + enemies:
-		if c.dead:
+		if c.dead or c.corpse:
 			continue
 		for k in c.actions_left:
 			slots.append({"c": c, "n": c.actions_used + k})
@@ -413,7 +413,7 @@ func valid_targets(c: Combatant, sid: String) -> Array:
 		"ally":
 			var ranks: Array = sk.get("target_ranks", [1, 2, 3, 4])
 			for x in side_of(c):
-				if x.dead or not (x.rank in ranks):
+				if x.dead or x.corpse or not (x.rank in ranks):
 					continue
 				if sk.get("no_self", false) and x == c:
 					continue
@@ -422,9 +422,14 @@ func valid_targets(c: Combatant, sid: String) -> Array:
 			out.append(c.id)
 	# Summons need room.
 	for e in sk.get("self_effects", []):
-		if e.get("type", "") == "summon" and side_of(c).size() >= 4:
+		if e.get("type", "") == "summon" and not _has_room(side_of(c)):
 			return []
 	return out
+
+
+## A line has room for a newcomer if it's short of 4, or if bones can be swept aside.
+func _has_room(line: Array) -> bool:
+	return line.size() < 4 or line.any(func(x): return x.corpse)
 
 
 func usable_skills(c: Combatant) -> Array:
@@ -568,7 +573,7 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 	var targets: Array = []
 	var tkind: String = sk.get("target", "enemy")
 	if tkind == "party":
-		targets = side_of(a).filter(func(x): return not x.dead)
+		targets = side_of(a).filter(func(x): return not x.dead and not x.corpse)
 	elif sk.get("aoe", false):
 		# "aoe_groups": [[1, 2], [3, 4]] hits only the clicked target's group.
 		var groups: Array = sk.get("aoe_groups", [])
@@ -658,12 +663,15 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 		ev.append({"t": "hit", "actor": a.id, "target": t.id, "amount": amount, "crit": crit, "note": gamble_text})
 		_apply_damage(t, amount, a, ev, false)
 		# Transfusion: the damage dealt heals the attacker's most wounded ally (by HP share).
-		if sk.has("transfuse_pct"):
+		if sk.has("transfuse_pct") and not t.corpse:
 			_transfuse(a, sid, amount * float(sk.transfuse_pct) / 100.0, ev)
 		if crit and t.is_hero() and not t.dead:
 			ev.append_array(Fatigue.add(t.hero, DB.cfg("crit_taken_fatigue", 8), rng, {"tags": a.tags}))
 	else:
 		ev.append({"t": "hit", "actor": a.id, "target": t.id, "amount": 0, "crit": false, "note": ""})
+	# Bones only take damage: no effects, and smashing them isn't a kill.
+	if t.corpse:
+		return crit
 	if t.dead:
 		# Some moves pay off on a kill (Money Shot).
 		for e in sk.get("on_kill", []):
@@ -816,7 +824,7 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 func _transfuse(a: Combatant, sid: String, amount: float, ev: Array) -> void:
 	var best: Combatant = null
 	for o in side_of(a):
-		if o.dead:
+		if o.dead or o.corpse:
 			continue
 		if best == null or o.hp_ratio() < best.hp_ratio():
 			best = o
@@ -855,10 +863,21 @@ func _apply_self_effect(a: Combatant, sid: String, e: Dictionary, ev: Array) -> 
 					ev.append({"t": "buff", "target": o.id, "stat": m.stat, "value": m.value})
 		"summon":
 			for i in int(e.get("count", 1)):
-				if side_of(a).size() >= 4:
+				if not _has_room(side_of(a)):
 					break
 				var c := Combatant.from_enemy(e.enemy, _new_id(), a.tier if not a.boss else tier, in_cave)
-				enemies.append(c)
+				if enemies.size() >= 4:
+					# A full line: the newcomer kicks aside the rearmost bones and takes that rank.
+					var bi := -1
+					for k in enemies.size():
+						if enemies[k].corpse:
+							bi = k
+					var old: Combatant = enemies[bi]
+					old.dead = true
+					ev.append({"t": "death", "target": old.id, "bones": true})
+					enemies[bi] = c
+				else:
+					enemies.append(c)
 				units[c.id] = c
 				_reindex()
 				ev.append({"t": "summon", "actor": a.id, "unit": c.id})
@@ -903,8 +922,11 @@ func _apply_damage(t: Combatant, amount: int, source: Combatant, ev: Array, is_d
 		t.set_hp(t.hp - amount)
 		if t.hp <= 0:
 			t.dead = true
-			killed.append(t.data.get("id", ""))
-			ev.append({"t": "death", "target": t.id})
+			if t.corpse:
+				ev.append({"t": "death", "target": t.id, "bones": true})
+			else:
+				killed.append(t.data.get("id", ""))
+				ev.append({"t": "death", "target": t.id})
 		return
 	# Heroes: Death's Door. The hit that knocks a hero onto it never kills, and neither do
 	# the rest of that same move's hits (a multi-shot volley): the next move rolls Deathblow.
@@ -971,7 +993,20 @@ func _cleanup(ev: Array) -> void:
 		fallen.append(h.hero.uid)
 		for o in heroes:
 			ev.append_array(Fatigue.add(o.hero, DB.cfg("ally_death_fatigue", 15), rng))
-	enemies = enemies.filter(func(x): return not x.dead)
+	# A fallen enemy leaves its bones in its rank (config "bones_hp"; 0 turns them off), so
+	# the line behind doesn't step up until they're destroyed. Destroyed bones are removed.
+	# The last foe standing leaves none: the fight is over.
+	var line: Array = []
+	var living := enemies.any(func(x): return not x.dead and not x.corpse)
+	for x in enemies:
+		if not x.dead:
+			line.append(x)
+		elif not x.corpse and living and int(DB.cfg("bones_hp", 2)) > 0:
+			var b := Combatant.bones(x, _new_id())
+			units[b.id] = b
+			line.append(b)
+			ev.append({"t": "bones", "unit": b.id, "from": x.id})
+	enemies = line
 	if changed:
 		for c in heroes + enemies:
 			if c.guarding >= 0 and (unit(c.guarding) == null or unit(c.guarding).dead):
@@ -989,7 +1024,7 @@ func _cleanup(ev: Array) -> void:
 	if heroes.is_empty():
 		state = "defeat"
 		ev.append({"t": "end", "result": "defeat"})
-	elif enemies.is_empty():
+	elif enemies.all(func(x): return x.corpse):
 		state = "victory"
 		ev.append({"t": "end", "result": "victory"})
 	else:

@@ -132,6 +132,8 @@ func top_y() -> float:
 			return -210.0
 		"swirl":
 			return -230.0
+		"bones":
+			return -95.0
 	return -220.0
 
 
@@ -482,6 +484,8 @@ func _build() -> void:
 			_build_crawler()
 		"giant":
 			_build_giant()
+		"bones":
+			_build_bones()
 		_:
 			_build_human()
 
@@ -1153,6 +1157,34 @@ func _build_crawler() -> void:
 	_line([Vector2(10, -56), Vector2(24, -26), Vector2(20, 0)], 8.0, c)
 	_poly(ellipse(Vector2(56 + lunge, -74), 20, 16, 12), c)
 	_poly([Vector2(60 + lunge, -68), Vector2(80 + lunge, -64), Vector2(66 + lunge, -58)], Color("#3a1414"))
+
+
+## A fallen enemy's bones: a bleached skull, a ribcage and a couple of long bones in a heap.
+func _build_bones() -> void:
+	var bone := Color("#e6dcc2")
+	var dark := Color("#2a2420")
+	var s := 1.4 if look.get("big", false) else 1.0
+	var p := func(x: float, y: float) -> Vector2: return Vector2(x, y) * s
+	# Dust the heap sits in.
+	_poly(ellipse(p.call(0, -6), 70 * s, 12 * s, 20), Color(0.43, 0.35, 0.27, 0.55), {"no_edge": true})
+	# Long bones, crossed.
+	for ends in [[p.call(-62, -10), p.call(40, -30)], [p.call(-30, -34), p.call(58, -8)]]:
+		_line(ends, 9.0 * s, bone.darkened(0.08))
+		for q in ends:
+			_circle(q, 7.0 * s, bone)
+	# Ribs.
+	for i in 4:
+		var x := -40.0 + i * 11.0
+		_line([p.call(x, -12), p.call(x - 6, -34 - (3 - absf(i - 1.5)) * 4), p.call(x + 4, -48)], 4.5 * s, bone.darkened(0.04))
+	_line([p.call(-44, -14), p.call(-2, -14)], 5.0 * s, bone.darkened(0.12))
+	# The skull.
+	_poly(ellipse(p.call(26, -40), 24 * s, 21 * s, 20), bone)
+	_poly([p.call(12, -26), p.call(40, -26), p.call(38, -12), p.call(14, -12)], bone.darkened(0.06))
+	_circle(p.call(18, -42), 6.5 * s, dark, {"no_edge": true})
+	_circle(p.call(34, -42), 6.5 * s, dark, {"no_edge": true})
+	_poly([p.call(26, -34), p.call(23, -28), p.call(29, -28)], dark, {"no_edge": true})
+	for i in 4:
+		_line([p.call(17 + i * 6, -22), p.call(17 + i * 6, -14)], 1.6 * s, dark, {"no_edge": true})
 
 
 func _build_giant() -> void:
