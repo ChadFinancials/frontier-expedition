@@ -70,7 +70,9 @@ echo Preparing game files (the first run after cloning takes up to a minute)...
 echo Launching Frontier Expedition from:
 echo   %REPO%
 echo.
-"%GODOT%" --path "%REPO%"
+rem FE_RENDER is set by play_vulkan.bat to try the Vulkan renderer (empty = the project
+rem default, OpenGL). If Vulkan fails to start, Godot falls back to OpenGL by itself.
+"%GODOT%" --path "%REPO%" %FE_RENDER%
 
 rem Only pause when something went wrong, so a normal close does not hold the window.
 if errorlevel 1 (

@@ -14,8 +14,14 @@ decided, and what shipped. Update both at the end of every round.
       quest test wins and saves, and a 5-minute idle soak (`shot=combat soak=300`) shows flat
       memory, objects and draw calls with no errors. Points to the graphics driver. Hardened:
       every polyline goes through `Figure.clean_line`; idle figures and HUDs no longer redraw
-      every frame. **Needs the crash text**: the `play.bat` console window, or the newest
-      `godot*.log` in `%APPDATA%\Godot\app_userdata\Frontier Expedition\logs\`.
+      every frame. The owner's PC runs Godot's OpenGL renderer (Compatibility) on an RTX 4070
+      Ti Super, NVIDIA driver 581.57. Test: `play_vulkan.bat` launches with the Vulkan
+      renderer (Forward+; falls back to OpenGL if Vulkan fails). Still wanted: the log of a
+      crashed session (the timestamped `godot*.log` from before the crash, in
+      `%APPDATA%\Godot\app_userdata\Frontier Expedition\logs\`); one that just stops with
+      no backtrace means the driver killed the game.
+- [ ] 2D MSAA (smooth edges) is set in the project but unsupported by the OpenGL renderer
+      (the startup warning); it would work under Vulkan. Ties in with the jagged-edges item.
 - [ ] Jagged edges on circles and cut-outs (aliasing). Later.
 
 ### Gameplay
@@ -32,7 +38,7 @@ decided, and what shipped. Update both at the end of every round.
       the Preacher's full kit, the Bayou Poisoner's 8th.
 - [ ] Decide whether utility moves need their own per-level upgrade paths (today every move
       level adds the same accuracy, damage, effect and healing bonuses).
-- [ ] Stacked Deck "probably needs tuning" (round 8). A second deal stacks on the first (two
+- [ ] Stacked Deck "probably needs tuning" (round 8; owner: save for a later balancing pass). A second deal stacks on the first (two
       Jacks of Clubs = +24 Dodge). Proposed: a new deal replaces that hero's previous card.
 - [ ] Watch: Ruby Blackwing is hard and the crow summon strong; probably right (round 7).
 - [ ] Second region onward (Red Canyons, Thunder Peaks, Redwater Ford) waits until the first

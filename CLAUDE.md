@@ -44,7 +44,8 @@ These notes are for any agent (or person) picking up work on it.
 ## Workflow (owner's rules)
 
 - The owner plays from source with `play.bat` (Godot 4.7.2 installed on their PC), after
-  pulling `main`. Commit and push source changes to `main`; that is how they reach the game.
+  pulling `main`. `play_vulkan.bat` is the same with the Vulkan renderer (a crash test; the
+  project default is OpenGL Compatibility, which the cloud container also renders with). Commit and push source changes to `main`; that is how they reach the game.
 - Do **not** rebuild or commit `download/FrontierExpedition-windows.zip` for routine
   changes. Only refresh it for a major version, when the owner asks.
 - More than one agent pushes to `main`: pull (`git pull --ff-only origin main`) before
