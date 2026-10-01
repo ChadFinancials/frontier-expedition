@@ -970,9 +970,12 @@ func test_vulnerable_and_new_moves() -> void:
 	# refresh: a recast doesn't stack the same move's debuff.
 	brawler.buffs.clear()
 	for k in 12:
-		e._apply_effect(by["Marshal"], "marshal_warrant", DB.skill("marshal_warrant").effects.back(), brawler, [], false)
+		e._apply_effect(by["Marshal"], "wr_hogtie", DB.skill("wr_hogtie").effects.back(), brawler, [], false)
 	var vul := brawler.buffs.filter(func(b): return b.stat == "vulnerable").size()
-	check(vul == 1, "Serve a Warrant's Vulnerable lands, and refreshes instead of stacking (got %d)" % vul)
+	check(vul == 1, "Hogtie's Vulnerable lands, and refreshes instead of stacking (got %d)" % vul)
+	# Marking moves don't also apply Vulnerable (owner: no double dip).
+	for sid in ["marshal_warrant", "rd_quarrel", "gb_joker"]:
+		check(not DB.skill(sid).effects.any(func(ef): return ef.get("stat", "") == "vulnerable"), "%s marks without Vulnerable" % sid)
 	# Transfusion heals the most wounded ally.
 	var gsc: Combatant = by["Gunslinger"]
 	gsc.set_hp(3)

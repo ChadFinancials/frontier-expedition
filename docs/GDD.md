@@ -178,8 +178,8 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
 - **Vulnerable** (`vulnerable` stat): the unit takes +X% damage from everything, damage over
   time included. **Mark** is different: enemies focus the marked hero, and some moves deal
   big bonus damage to marked targets. Vulnerable is the small across-the-board amp, Mark the
-  big single-target one. At 10% on Serve a Warrant, Quarrel, Hogtie, Assign the Joker and a
-  few enemy moves (crows, gila monster, the Cyclops' sweep).
+  big single-target one. A move doesn't do both (no double dip). At 10% on Hogtie and a few
+  enemy moves (crows, gila monster, the Cyclops' sweep).
 - **Statuses**: bleed and poison (damage per round), stun (skip a turn, then +50% stun
   resist for a round), mark, guard, taunt, buffs and debuffs (accuracy, dodge, protection,
   damage, crit, speed, resistances), knockback and pull, summons. Durations show on units.

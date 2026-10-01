@@ -91,7 +91,7 @@ Found in: The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Peck at the Eyes**: A flurry of beaks. | 1234 | one of 1234 | 88 | 2-4 | bleed 1 x3 rounds; vulnerable +10 for 2 rounds | 2 |
+| **Peck at the Eyes**: A flurry of beaks. | 1234 | one of 1234 | 88 | 2-4 | bleed 1 x2 rounds; vulnerable +10 for 2 rounds | 2 |
 | **Circle the Drain**: The flock wheels overhead, waiting. Hard to aim with that going on. | 1234 | one of 234 | 85 | - | acc -20 for 2 rounds | 1 |
 
 Notes: 
@@ -104,7 +104,7 @@ Found in: The Crow's Nest, The Tallgrass Sea, Quests, summoned by Crow Lieutenan
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Peck at the Eyes**: A flurry of beaks. | 1234 | one of 1234 | 88 | 1-3 | bleed 1 x3 rounds; vulnerable +10 for 2 rounds | 2 |
+| **Peck at the Eyes**: A flurry of beaks. | 1234 | one of 1234 | 88 | 1-3 | bleed 1 x2 rounds; vulnerable +10 for 2 rounds | 2 |
 | **Carrion Dive**: The flock dives at the weakest face in the line. | 1234 | one of 1234 | 88 | 1-2 | bleed 1 x3 rounds (90%) | 2 (lowest_hp) |
 | **Circle the Drain**: The flock wheels overhead, waiting. Hard to aim with that going on. | 1234 | one of 234 | 85 | - | acc -20 for 2 rounds | 1 |
 | **Carrion Chorus**: They know something you don't. | 1234 | one of 1234 | 95 | - | +12 fatigue | 2 |

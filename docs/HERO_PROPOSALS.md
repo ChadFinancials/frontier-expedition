@@ -76,8 +76,9 @@ From 2-4 → one enemy in 1-3, acc 95, no damage.
 
 ### Preacher: Hellfire Sermon (tuned)
 From 3-4 → all enemies in 1-4.
-- -10 Accuracy and -10% Damage for 2 rounds, base chance 75%. About 47% sticks after the
-  average 28% debuff resist.
+- **Shipped (owner's tune):** -5 Accuracy and -8 Dodge for 2 rounds, base chance 75%.
+  About 47% sticks after the average 28% debuff resist. (First draft: -10 Accuracy, -10%
+  Damage.)
 - Mythic targets: base 100%, so about 72% sticks.
 - Costs the Preacher 4 Fatigue.
 - **Expected value:** about 1.9 enemies affected, preventing roughly 3 HP of damage over the
@@ -185,7 +186,8 @@ Vulnerable (+X% damage taken from all sources) is different from **Mark** (enemi
 the marked hero, and some moves deal bonus damage to marked targets). Keep both.
 
 **Hero moves whose flavour already says "exposed"** (swap their current debuff for, or add,
-Vulnerable 10-15%):
+Vulnerable 10-15%). *Owner's call after shipping: the three marking moves (Quarrel, Joker,
+Warrant) dropped it again, as marking plus Vulnerable double-dips. Hogtie keeps it.*
 - Rail Driver **Quarrel** ("cracks its guard": -15 Prot today).
 - Wrangler **Hogtie** (tied up, can't brace).
 - Gambler **Assign the Joker** (off their game).
