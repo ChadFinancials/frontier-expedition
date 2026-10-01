@@ -180,6 +180,35 @@ tooltip.
 **Art:** a new character look (a drifter in a long coat and flat cap, a bindle, coal-smudged),
 three outfits, and a steam-gold palette for the gauge.
 
+### The Train Hopper: revision 4 (owner's kit, single-target burster)
+
+**Identity:** a drifter who rides the rails. She builds Momentum by moving and spends it on
+one huge single-target hit. The rhythm is forward from the back, back from the front, then
+**End of the Line**. She can Mark for the party (Chart the Hills) and add Vulnerable
+(Railspike Toss). Runaway Train (all enemies) is dropped.
+
+**Momentum:** every move lists its own gain (below). Passive: moved by someone else +10;
+stunned -25; ending a turn without moving -10. Reset to 0 each fight. **Full Steam** at 50+:
++3 Speed, +5 Dodge.
+
+**End of the Line (mega, extra button at 100):** any rank → one of 1-4, **10-18** damage,
++50% vs Marked, ignores half the target's Protection. She lands in rank 1 and the gauge
+empties; **if it kills, she keeps 50**. Against a Marked and Vulnerable target: about 23.
+
+| Move | From → hits | Damage | Effect | Momentum |
+|---|---|---|---|---|
+| ★ **Boxcar Leap** | 3-4 → one of 1-2 | 4-8 | moves forward 1, then strikes | +30 |
+| ★ **Stowaway** | 1-2 → self | - | moves back 1; heals 2-3; cures Bleed | +30 |
+| ★ **Chart the Hills** | 1-4 → one of 1-4 | - | Marks the target for 3 rounds; she moves forward 1 | +20 |
+| **Railspike Toss** | 2-4 → one of 2-4 | 3-5 | Vulnerable 10% for 2 rounds; she moves forward 1 | +20 |
+| **Emergency Brake** | 1-2 → self | - | moves back 2; +10 Dodge for 2 rounds; clears all debuffs | +30 (proposed) |
+| **The Dancing Man** | 3-4 → self | - | Marks herself for 2 rounds (draws fire); +12 Dodge for 2 rounds; moves forward 1 | +20 (proposed) |
+| *proposed* **Ride the Rods** | 1-2 → one of 2-3 | 4-8, +8% crit | dives under the front line to strike behind it, then moves back 1 | +30 |
+| *proposed* **Catch Out** | 1-4 → any ally | - | swaps with any ally (not just a neighbour); both +2 Speed for 2 rounds | +20 per rank she travels |
+
+**Engine work:** per-combatant Momentum and its triggers, a per-move `momentum` field, the
+HUD gauge, the mega button, a kill refund, swap-with-any-ally (Catch Out), and a self-Mark.
+
 ### Vulnerable: where else it fits
 Vulnerable (+X% damage taken from all sources) is different from **Mark** (enemies target
 the marked hero, and some moves deal bonus damage to marked targets). Keep both.
