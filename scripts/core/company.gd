@@ -1166,7 +1166,7 @@ func finish_run(status: String) -> Dictionary:
 	for h in survivors:
 		var entry := {"uid": h.uid, "name": h.hero_name, "class": h.class_name_text(), "level_before": h.level,
 			"xp": xp_gain, "quirks": []}
-		h.add_xp(xp_gain)
+		h.add_xp(int(round(xp_gain * (1.0 + h.stat("xp_pct") / 100.0))))
 		entry["level_after"] = h.level
 		h.expeditions += 1
 		h.deaths_door = false
@@ -1188,8 +1188,19 @@ func finish_run(status: String) -> Dictionary:
 		var site := site_for_region(r.region_id)
 		if site >= 0 and not founded(site):
 			summary.found_site = site
+	# Drinker: some come home and don't leave the saloon for another week.
+	var drunk: Array = []
+	for h in survivors:
+		for q in h.quirks:
+			var bar := int(DB.quirks.get(q, {}).get("bar_lock", 0))
+			if bar > 0 and h.alive and rng.randf() * 100.0 < bar:
+				h.busy_weeks = maxi(h.busy_weeks, 0) + 2
+				h.busy_reason = "Drinking at the saloon"
+				drunk.append(h.hero_name)
 	run = null
 	summary.week_msgs = advance_week()
+	for n in drunk:
+		summary.week_msgs.append("%s heads straight for the saloon and won't come out for a week." % n)
 	return summary
 
 

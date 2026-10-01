@@ -156,6 +156,7 @@ func step() -> Array:
 func _start_round() -> Array:
 	round_num += 1
 	for c in heroes + enemies:
+		c.round_num = round_num
 		c.actions_left = 0 if c.dead else c.actions_per_round()
 		c.actions_used = 0
 		c.tiebreak = rng.randf()

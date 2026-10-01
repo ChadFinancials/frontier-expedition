@@ -25,6 +25,7 @@ var taunt: int = 0
 var dead: bool = false
 var corpse: bool = false         # an enemy's bones: holds its rank until destroyed
 var momentum: int = 0            # Train Hopper gauge, 0-100; resets every fight
+var round_num: int = 0           # the fight's current round (quirks that fire in round 1)
 var turn_rank: int = 0           # rank at the start of this unit's turn (-1: turn lost to a stun)
 var spent_mega: bool = false     # used its mega move this turn
 var initiative: int = 0          # round-1 surprise bonus (+100 for the side that got the jump)
@@ -141,7 +142,9 @@ func deaths_door() -> bool:
 
 func ctx(vs: Combatant = null) -> Dictionary:
 	return {"in_cave": in_cave, "rank": rank, "hp_ratio": hp_ratio(),
-		"tags": vs.tags if vs != null else []}
+		"tags": vs.tags if vs != null else [], "marked": mark > 0, "deaths_door": deaths_door(),
+		"round": round_num, "vs_marked": vs != null and vs.mark > 0,
+		"vs_vulnerable": vs != null and vs.buff_total("vulnerable") > 0}
 
 
 ## Damage taken multiplier from Vulnerable (+% damage taken, all sources, damage over time

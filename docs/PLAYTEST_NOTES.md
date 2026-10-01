@@ -58,6 +58,9 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Quirk pass** (owner's edits, see QUIRK_PROPOSALS.md): 50 quirks (26 good, 24 bad). New
+  conditions `marked`, `vs_marked`, `vs_vulnerable`, `deaths_door`, `round1`; stat `xp_pct`;
+  quirk fields `bar_lock`, `after_battle_fatigue`, compulsion `steals`.
 - Owner playtest (Mad Dog, all level 1: Doctor 4, Preacher 3, Prospector 2, Mountain Mystic
   1): healing very strong, damage decent, back-line access short until the bones in ranks 1-2
   were cleared; not too hard.

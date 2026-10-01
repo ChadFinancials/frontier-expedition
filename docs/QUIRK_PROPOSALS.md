@@ -1,7 +1,16 @@
-# Quirk proposals (round 9)
+# Quirk proposals (round 9) — ✅ shipped with the owner's edits
 
-All 40 current quirks with a proposed edit, then 10 new ones. ✅ = data only; 🛠 = needs a
-small engine hook (listed at the end). Awaiting the owner's picks and tweaks.
+**Shipped (owner's numbers):** Quick Feet +1 Speed; Eagle Eye +4 Acc, +2% Crit back;
+Tough as Nails +10% HP; Night Owl +5/+5 in caves; Trailwise 15 Scouting; Lucky +2% Crit only;
+Thick-Skinned +5 Prot; Hard to Rattle (was Trail-Hardened); Spooked by Critters -10% Dmg vs
+beasts; Drinker also 40% to spend a week at the saloon after an expedition; Gold Fever pockets
+money and valuables from treasure curios; Homebody +10% Fatigue; Overweight (was Clumsy);
+Hothead Vulnerable 10%; Homesick (was Nearsighted) +1 Fatigue after every fight; Maternal
+Instinct (was Yellow Streak) -5% Dmg, +2 Prot; new Manhunter, Opportunist +6% Crit, Final
+Gambit (+50% Dmg, +8 Dodge on Death's Door), Early Riser (+4 Spd, +4 Acc), Lightning Rod
+(+10/+10), Quick Study +10% XP, Glass Jaw, Fainthearted, Slow Starter (-4/-4) and Simple
+(-10% XP). Price on Their Head cut. Ids are unchanged, so saved heroes keep their quirks.
+The tables below are the original proposal.
 
 ## Positive (20)
 

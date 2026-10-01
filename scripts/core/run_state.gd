@@ -486,6 +486,13 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		driven_back = true
 		xp += int(DB.cfg("xp_boss", 6) / 2.0)
 		return res
+	# Quirks that cost something after every fight (Homesick).
+	if engine.state in ["victory", "fled"]:
+		for h in party_heroes():
+			for q in h.quirks:
+				var af := int(DB.quirks.get(q, {}).get("after_battle_fatigue", 0))
+				if af != 0:
+					Fatigue.add(h, af, company.rng)
 	if engine.state != "victory":
 		return res
 	# Loot.
@@ -625,6 +632,18 @@ func use_item(item_id: String, h: Hero) -> Array:
 
 # --- Curios ---------------------------------------------------------------------------
 
+## Loot a Gold Fever hero keeps for themself.
+const STOLEN := ["money", "money_pct", "keepsake", "timber", "iron", "charters"]
+
+
+func _steals(h: Hero, cu: Dictionary) -> bool:
+	for q in h.quirks:
+		var comp: Dictionary = DB.quirks.get(q, {}).get("compulsion", {})
+		if comp.get("steals", false) and comp.get("tag", "") in cu.get("tags", []):
+			return true
+	return false
+
+
 ## A hero whose quirk forces them to grab this curio, or null.
 func compulsion_for(curio_id: String) -> Dictionary:
 	var tags: Array = DB.curios.get(curio_id, {}).get("tags", [])
@@ -657,7 +676,14 @@ func interact_curio(curio_id: String, h: Hero, item_id: String = "") -> Dictiona
 	else:
 		outcome = Stats.pick_weighted(company.rng, cu.get("hand", []))
 	out.text = str(outcome.get("text", "")).replace("{hero}", h.hero_name)
-	var res := Effects.apply(outcome.get("effects", []), self, h)
+	var effects: Array = outcome.get("effects", [])
+	# Gold Fever: a hero who handles treasure by hand pockets the valuables.
+	if item_id == "" and _steals(h, cu):
+		var kept := effects.filter(func(e): return not str(e.get("type", "")) in STOLEN)
+		if kept.size() < effects.size():
+			out.text += "\n\n%s pockets the valuables before anyone sees. (Gold Fever)" % h.hero_name
+		effects = kept
+	var res := Effects.apply(effects, self, h)
 	out.msgs = res.msgs
 	out.fight = res.fight
 	add_log([out.text] + out.msgs)

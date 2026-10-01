@@ -556,11 +556,25 @@ static func hero_tooltip(h: Hero) -> String:
 static func quirk_tooltip(q: String) -> String:
 	var d: Dictionary = DB.quirks.get(q, {})
 	var lines := [d.get("name", q) + (" (good)" if d.get("positive", false) else " (bad)"), d.get("desc", "")]
-	for m in d.get("mods", []):
-		lines.append(Stats.mod_text(m))
-	if d.has("compulsion"):
-		lines.append("Compelled to handle %s things." % d.compulsion.tag)
+	lines.append_array(quirk_effects(q))
 	return "\n".join(lines)
+
+
+## Everything a quirk does, one line each: its stat changes and any behaviour.
+static func quirk_effects(q: String) -> Array:
+	var d: Dictionary = DB.quirks.get(q, {})
+	var out: Array = []
+	for m in d.get("mods", []):
+		out.append(Stats.mod_text(m))
+	if d.has("compulsion"):
+		var c: Dictionary = d.compulsion
+		out.append("%d%% chance to grab %s curios by hand%s" % [int(c.get("chance", 0)), str(c.get("tag", "")),
+			", and pockets any money or valuables found" if c.get("steals", false) else ""])
+	if int(d.get("after_battle_fatigue", 0)) != 0:
+		out.append("%+d Fatigue after every fight" % int(d.after_battle_fatigue))
+	if int(d.get("bar_lock", 0)) > 0:
+		out.append("%d%% chance to spend an extra week at the saloon after an expedition" % int(d.bar_lock))
+	return out
 
 
 static func keepsake_tooltip(k: String) -> String:

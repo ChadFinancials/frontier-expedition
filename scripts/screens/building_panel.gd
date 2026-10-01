@@ -140,11 +140,7 @@ func _activities(body: VBoxContainer) -> void:
 			if se.get("type", "") == "quirk" and DB.quirks.has(se.quirk):
 				# Spell out what the quirk actually does, not just its flavor line.
 				var q: Dictionary = DB.quirks[se.quirk]
-				var fx: Array = []
-				for m in q.get("mods", []):
-					fx.append(Stats.mod_text(m))
-				if q.has("compulsion"):
-					fx.append("may compulsively grab %s on the trail" % str(q.compulsion.get("tag", "things")))
+				var fx: Array = UI.quirk_effects(se.quirk)
 				what = "the hero picks up the %s%s quirk (%s)" % ["" if q.get("positive", false) else "bad ", q.name, ", ".join(fx)]
 			side.append("%d%% chance each visit: %s." % [int(se.chance), what.trim_suffix(".")])
 		if not side.is_empty():

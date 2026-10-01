@@ -57,6 +57,8 @@ func _ready() -> void:
 	test_bones()
 	print("> test_train_hopper()")
 	test_train_hopper()
+	print("> test_quirk_pass()")
+	test_quirk_pass()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -343,6 +345,9 @@ func test_turn_order() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 9
 	var party := [co.make_hero("gunslinger"), co.make_hero("marshal")]
+	# No quirks: some (Early Riser, Slow Starter) change Speed in round 1 only.
+	for h in party:
+		h.quirks.clear()
 	var e := CombatEngine.new()
 	e.setup(party, ["outlaw_brawler", "prairie_wolf"], {"rng": rng})
 	e._start_round()
@@ -935,6 +940,93 @@ func test_round8_balance() -> void:
 
 ## Vulnerable (+% damage taken, all sources), dispel, tag-conditioned effects, refresh and
 ## Transfusion (owner's round 8 picks).
+## Round 9 quirk pass (owner's numbers): conditional quirks and the behaviour ones.
+func test_quirk_pass() -> void:
+	var co := Company.new()
+	co.new_game(17)
+	check(DB.quirks.size() - (1 if DB.quirks.has("_comment") else 0) == 50, "50 quirks")
+	check(DB.quirks.values().filter(func(q): return q is Dictionary and q.get("positive", false)).size() == 26, "26 positive quirks")
+	check(DB.quirks.quick_hands.name == "Quick Feet" and DB.quirks.nearsighted.name == "Homesick", "renames keep their ids")
+	var gs := co.make_hero("gunslinger", 1)
+	var mar := co.make_hero("marshal", 1)
+	for h in [gs, mar]:
+		h.quirks.clear()
+	var e := CombatEngine.new()
+	e.setup([mar, gs], ["outlaw_brawler", "outlaw_gunhand"], {})
+	var g: Combatant = e.heroes[1]
+	var m: Combatant = e.heroes[0]
+	var foe: Combatant = e.enemies[0]
+	# Manhunter: more damage and accuracy against a Marked target.
+	gs.quirks = ["manhunter"]
+	var d0 := e.dmg_mult(g, "gs_quick_draw", foe)
+	var a0 := e.hit_chance(g, "gs_quick_draw", foe)
+	foe.mark = 2
+	check(is_equal_approx(e.dmg_mult(g, "gs_quick_draw", foe) - d0, 0.15) and e.hit_chance(g, "gs_quick_draw", foe) > a0, "Manhunter: +15% damage, +5 acc vs Marked")
+	foe.mark = 0
+	# Opportunist: crit vs a Vulnerable target.
+	gs.quirks = ["opportunist"]
+	var c0 := e.crit_chance(g, "gs_quick_draw", foe)
+	foe.buffs.append({"stat": "vulnerable", "value": 10, "rounds": 2, "name": "t"})
+	check(e.crit_chance(g, "gs_quick_draw", foe) == c0 + 6, "Opportunist: +6% crit vs Vulnerable")
+	foe.buffs.clear()
+	# Final Gambit: +50% damage, +8 dodge on Death's Door.
+	gs.quirks = ["final_gambit"]
+	var dd0 := e.dmg_mult(g, "gs_quick_draw", foe)
+	var dg0 := g.stat("dodge", foe)
+	gs.deaths_door = true
+	check(is_equal_approx(e.dmg_mult(g, "gs_quick_draw", foe) - dd0, 0.5) and g.stat("dodge", foe) == dg0 + 8, "Final Gambit on Death's Door")
+	gs.deaths_door = false
+	# Early Riser / Slow Starter: round 1 only.
+	gs.quirks = ["early_riser"]
+	g.round_num = 1
+	var s1 := g.stat("speed")
+	g.round_num = 2
+	check(s1 == g.stat("speed") + 4, "Early Riser: +4 Speed in round 1 only")
+	gs.quirks = ["slow_starter"]
+	g.round_num = 1
+	s1 = g.stat("speed")
+	g.round_num = 2
+	check(s1 == g.stat("speed") - 4, "Slow Starter: -4 Speed in round 1 only")
+	# Lightning Rod: while Marked.
+	mar.quirks = ["lightning_rod"]
+	var p0 := m.stat("prot")
+	m.mark = 2
+	check(m.stat("prot") == minf(80.0, p0 + 10), "Lightning Rod: +10 Prot while Marked")
+	m.mark = 0
+	# Glass Jaw and Hothead: Vulnerable.
+	gs.quirks = ["glass_jaw"]
+	check(is_equal_approx(g.vuln_mult(), 1.1), "Glass Jaw: Vulnerable 10%")
+	# Quick Study / Simple: XP.
+	gs.quirks = ["quick_study"]
+	check(gs.stat("xp_pct") == 10, "Quick Study: +10% XP")
+	gs.quirks = ["simple"]
+	check(gs.stat("xp_pct") == -10, "Simple: -10% XP")
+	# Homesick: Fatigue after every fight.
+	co.heroes = [gs, mar]
+	gs.quirks = ["nearsighted"]
+	var run := RunState.create(co, "tallgrass", 0, [gs.uid, mar.uid], {})
+	co.run = run
+	var f0 := gs.fatigue
+	var won := CombatEngine.new()
+	won.setup([gs, mar], ["outlaw_brawler"], {})
+	won.state = "victory"
+	run.after_combat(won, "fight")
+	check(gs.fatigue == f0 + 1, "Homesick: +1 Fatigue after a fight (%d -> %d)" % [f0, gs.fatigue])
+	# Gold Fever: pockets the money from a treasure curio searched by hand.
+	gs.quirks = ["gold_fever"]
+	var cash0 := int(run.loot.money)
+	for k in 12:
+		run.interact_curio("strongbox", gs)
+	check(int(run.loot.money) == cash0, "Gold Fever keeps the strongbox money (loot %d -> %d)" % [cash0, int(run.loot.money)])
+	# Drinker: forced to 100% here, they spend the week after the expedition at the saloon.
+	var saved := int(DB.quirks.drinker.bar_lock)
+	DB.quirks.drinker.bar_lock = 100
+	mar.quirks = ["drinker"]
+	var sm := co.finish_run("victory")
+	DB.quirks.drinker.bar_lock = saved
+	check(mar.busy_weeks == 1 and mar.busy_reason.contains("saloon") and sm.week_msgs.any(func(x): return str(x).contains(mar.hero_name)), "Drinker stays at the saloon a week (busy %d)" % mar.busy_weeks)
+
+
 ## The Train Hopper: a Momentum gauge filled by moving, spent on End of the Line.
 func test_train_hopper() -> void:
 	var co := Company.new()

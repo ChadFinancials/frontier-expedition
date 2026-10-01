@@ -4,7 +4,8 @@ extends RefCounted
 ## camp buffs and combat buffs:  {"stat": "acc", "value": 5, "cond": "vs:beast"}
 ##
 ## Conditions: always (default), in_cave, on_trail, front (ranks 1-2), back (ranks 3-4),
-## low_hp (below 50%), vs:<tag> (the opponent has the tag).
+## low_hp (below 50%), vs:<tag> (the opponent has the tag), marked (this unit is Marked),
+## vs_marked / vs_vulnerable (the opponent is), deaths_door, round1 (first round of a fight).
 
 const STAT_NAMES := {
 	"max_hp_pct": "Max HP", "acc": "Accuracy", "dodge": "Dodge", "prot": "Protection",
@@ -13,11 +14,11 @@ const STAT_NAMES := {
 	"debuff_res": "Debuff Resist", "deathblow": "Deathblow Resist", "fatigue_pct": "Fatigue Taken",
 	"heal_pct": "Healing Received", "resolve": "Second Wind Chance", "scout": "Scouting",
 	"surprise": "Surprise Chance", "food_pct": "Food Eaten", "loot_pct": "Loot Found",
-	"vulnerable": "Vulnerable",
+	"vulnerable": "Vulnerable", "xp_pct": "XP Gained",
 }
 const PERCENT_STATS := ["max_hp_pct", "prot", "pierce", "dmg_pct", "crit", "stun_res", "bleed_res",
 	"poison_res", "move_res", "debuff_res", "deathblow", "fatigue_pct", "heal_pct", "resolve",
-	"scout", "surprise", "food_pct", "loot_pct", "vulnerable"]
+	"scout", "surprise", "food_pct", "loot_pct", "vulnerable", "xp_pct"]
 ## For these stats a positive number is bad for the hero.
 const INVERTED_STATS := ["fatigue_pct", "food_pct", "vulnerable"]
 
@@ -35,6 +36,16 @@ static func cond_ok(cond: String, ctx: Dictionary) -> bool:
 		return ctx.get("rank", 0) in [3, 4]
 	if cond == "low_hp":
 		return ctx.get("hp_ratio", 1.0) < 0.5
+	if cond == "marked":
+		return ctx.get("marked", false)
+	if cond == "vs_marked":
+		return ctx.get("vs_marked", false)
+	if cond == "vs_vulnerable":
+		return ctx.get("vs_vulnerable", false)
+	if cond == "deaths_door":
+		return ctx.get("deaths_door", false)
+	if cond == "round1":
+		return ctx.get("round", 0) == 1
 	if cond.begins_with("vs:"):
 		return cond.substr(3) in ctx.get("tags", [])
 	return false
@@ -62,6 +73,16 @@ static func cond_text(cond: String) -> String:
 			return " in ranks 3-4"
 		"low_hp":
 			return " below half HP"
+		"marked":
+			return " while Marked"
+		"vs_marked":
+			return " vs Marked targets"
+		"vs_vulnerable":
+			return " vs Vulnerable targets"
+		"deaths_door":
+			return " on Death's Door"
+		"round1":
+			return " in the first round"
 	if cond.begins_with("vs:"):
 		return " vs %s" % cond.substr(3).capitalize()
 	return ""
