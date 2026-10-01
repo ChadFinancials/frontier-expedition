@@ -1,6 +1,8 @@
 # Hero proposals (round 8)
 
-Options for the owner to pick from. Nothing here is in the game yet.
+Options for the owner to pick from. Nothing here is in the game yet. **Revision 2** (the
+owner's picks and revised specs) comes first; the original option lists follow for
+reference.
 
 - **Part 1:** moves to round out the four classes with fewer than 8.
 - **Part 2:** two new hero designs in lanes no class covers yet.
@@ -12,6 +14,145 @@ attack expects about 6-7 damage per turn and a good stun about 0.4-0.5 expected 
 **Engine support.**
 - ✅ means the engine already supports the move; it is data only.
 - 🛠 means the move needs a new mechanic. Each 🛠 lists the work it needs.
+
+---
+
+## Revision 2: the owner's picks and revised specs
+
+**Decisions.**
+- **Prospector:** none of the options; hold for now.
+- **Frontier Doctor:** Bloodletting, renamed **Transfusion**, and **Adrenaline Shot**, with
+  a heal that scales with how hurt the ally is.
+- **Preacher:** **Baptism in the River**, reworked to target an enemy with a small extra
+  effect; **Hellfire Sermon**, tuned so its all-enemies effect isn't overpowered.
+- **Bayou Poisoner:** a fever move in the style of his random targeting.
+- **New heroes:** both approved. The Shotgun Guard gets two stances plus the counter-attack.
+  The Pony Express Rider becomes the **Train Hopper**, with a Momentum gauge that charges a
+  mega attack.
+- **Vulnerable** should appear in more places (see the end of this section).
+
+### Bayou Poisoner: Mosquito Swarm (Swamp Fever)
+From 3-4 → **3 random hits across ranks 1-4**, acc 90, 1-2 damage each.
+- Each hit applies Poison 1 for 3 rounds.
+- A hit on an **already poisoned** target applies Poison 2 instead: the fever spreads
+  where it has taken hold.
+- Expected: about 3.6 poison damage on a fresh line, about 6 once Darts and Sacrament have
+  poisoned it. The payoff for his existing kit, rather than a new trick.
+- 🛠 small: an `amount_if_target_poisoned` field, the mirror of the existing
+  `amount_if_self_poisoned`.
+- Alternative (closer to the first Swamp Fever): 2 random targets; each poisoned one also
+  passes a copy of its poison to a random other enemy. 🛠 poison spreading.
+
+### Frontier Doctor: Transfusion
+From 3-4 → one enemy in 1-3, acc 90, 3-5 damage.
+- The **most wounded ally** (by HP %, the Doctor included) is healed for **150% of the
+  damage dealt**. A miss heals nothing; a crit heals more.
+- Expected per cast: about 3.1 damage plus 4.7 healing, about 7.8 total value. That's level
+  with a good single move, below Laying On of Hands' 8 healing, but it also damages.
+- The heal scales with move level, like other heals.
+- 🛠: a heal-from-damage effect that targets the most wounded ally.
+
+### Frontier Doctor: Adrenaline Shot
+From 3-4 → one ally. +3 Speed for 2 rounds. The heal grows the worse off the ally is:
+
+| Ally's HP | Heal |
+|---|---|
+| above 50% | 2-4 |
+| 25-50% | 4-7 |
+| under 25% | 6-10 |
+| on Death's Door | 10-14, and clears Shaken |
+
+- Always worth casting, and a big save if you manage to land it at the brink.
+- 🛠 small: `heal_tiers` on a heal (HP-percentage bands).
+
+### Preacher: Baptism in the River (enemy)
+From 2-4 → one enemy in 1-3, acc 95, no damage.
+- **Washes away every boon on the target** (a dispel: pack buffs, Silas's crows, boss
+  buffs).
+- Leaves it **Soaked** for 2 rounds: -2 Speed and -10 Dodge.
+- Against mythic creatures, also a 40% stun.
+- Nobody can dispel today, so it's a strong answer to buffed bosses without raw damage.
+- 🛠: a dispel effect.
+
+### Preacher: Hellfire Sermon (tuned)
+From 3-4 → all enemies in 1-4.
+- -10 Accuracy and -10% Damage for 2 rounds, base chance 75%. About 47% sticks after the
+  average 28% debuff resist.
+- Mythic targets: base 100%, so about 72% sticks.
+- Costs the Preacher 4 Fatigue.
+- **Expected value:** about 1.9 enemies affected, preventing roughly 3 HP of damage over the
+  2 rounds. That's on par with Bellow, below a heal, and worth it mainly against mythic
+  packs. It can't snowball: debuffs from it don't stack, a recast refreshes them.
+- ✅ data only (the mythic bonus can use a second effect entry).
+
+### The Shotgun Guard: two stances
+A **stance** is a lasting state that holds until he switches. Switching uses his turn, and
+each stance has its own moves that hit harder in it.
+
+| | **Ride Shotgun** (offence) | **Hold the Strongbox** (defence) |
+|---|---|---|
+| Passive | **Counter-attack**: any enemy that hits him is fired on for 50% damage | +20 Protection, +40 Stun and Move Resist |
+| Also | +10% damage, -5 Protection | The ally behind him gets +10 Protection |
+| Shines with | Both Barrels (+25% in this stance), Buckshot Spread | Rock Salt (debuff +50% longer), Dig In (heals 20% instead of 15%) |
+
+- **Starting stance:** Strongbox. His stock moves are the two stance switches plus Both
+  Barrels.
+- **Counter-attack** uses his weapon damage at 50%, once per hit taken, and can't crit. He
+  doesn't counter a counter.
+- 🛠: stances (a lasting state, stance-dependent move bonuses) and the counter-attack.
+
+### The Train Hopper (was the Pony Express Rider): Momentum gauge
+A rail-riding drifter who leaps between moving cars.
+- **The Momentum gauge** is a bar under her HUD, 0-100. It gains:
+  - +25 whenever she moves (her own moves all move her);
+  - +15 when she swaps with an ally;
+  - +10 when she lands a hit from a rank she wasn't in last turn.
+- **At 100** her mega attack unlocks: **Runaway Train**. She charges through the whole enemy
+  line:
+  - 6-10 damage to every rank;
+  - shoves rank 1 to the back (the line reshuffles);
+  - Vulnerable on everyone for 2 rounds;
+  - the gauge empties.
+- About 3-4 turns to charge.
+- Her other moves follow the earlier design: Saddle Shot, Ride Through, Change of Cars
+  (swap with any ally), Express Delivery (swap two enemies), Coal Dust (Mail Bag reflavoured),
+  Neither Rain nor Snow.
+- 🛠: the gauge (stored per combatant, drawn on the HUD), the mega attack's unlock, enemy
+  swap, swap with any ally, Vulnerable.
+
+### Vulnerable: where else it fits
+Vulnerable (+X% damage taken from all sources) is different from **Mark** (enemies target
+the marked hero, and some moves deal bonus damage to marked targets). Keep both.
+
+**Hero moves whose flavour already says "exposed"** (swap their current debuff for, or add,
+Vulnerable 10-15%):
+- Rail Driver **Quarrel** ("cracks its guard": -15 Prot today).
+- Wrangler **Hogtie** (tied up, can't brace).
+- Gambler **Assign the Joker** (off their game).
+- Marshal **Serve a Warrant** (the whole posse piles on).
+
+**System rules** (small, game-wide):
+- **Stunned → Vulnerable 10% for the stun's turn** ("caught flat-footed"). Makes every stun
+  in the game worth a little more.
+- **Surprise rounds:** the side caught off guard is Vulnerable 15% in round 1.
+
+**Fatigue:**
+- The **Reckless** Breaking Point adds Vulnerable 10% (charging in without cover).
+- The **Fired Up** Second Wind could ignore it.
+
+**Quirks and trinkets:**
+- Negative quirk **Glass Jaw**: Vulnerable 10% always.
+- Positive quirk **Thick-Skinned**: -10% damage taken.
+- High-risk trinkets: e.g. **Gambler's Last Coat**, +15% damage but Vulnerable 10%.
+
+**Enemies:**
+- Crows' **Peck the Eyes**.
+- The Cyclops' **Ground Shake** (the whole party Vulnerable 1 round).
+- Gila monster venom.
+- Bosses with a "rage" phase that are themselves Vulnerable (a window to burst them down).
+
+**Caves:** in Pitch Black, heroes are Vulnerable 10% (in place of part of the current
+enemy-damage bonus).
 
 ---
 
