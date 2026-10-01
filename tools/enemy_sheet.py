@@ -3,10 +3,15 @@
 Usage: python3 tools/enemy_sheet.py
 Damage shown is at tier 1 (bosses are not scaled): base dmg x (1 + move dmg) x enemy_dmg_mult.
 """
-import json, os
+import json, math, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
+
+def gr(x):
+    """Godot's round(): halves go away from zero (Python's round() sends 4.5 to 4)."""
+    return int(math.floor(abs(x) + 0.5)) * (1 if x >= 0 else -1)
 
 def load(name):
 	with open(os.path.join(ROOT, "data", name + ".json"), encoding="utf-8") as f:
@@ -97,7 +102,7 @@ def effect_text(fx):
 		return "%s %d%s" % (t, fx.get("amount", 1), chance)
 	if t == "heal":
 		m = float(cfg.get("heal_mult", 1.0))
-		return "heals %d-%d HP" % (round(fx.get("min", 3) * m), round(fx.get("max", 6) * m))
+		return "heals %d-%d HP" % (gr(fx.get("min", 3) * m), gr(fx.get("max", 6) * m))
 	if t == "heal_pct":
 		return "heals %d%% max HP" % fx.get("value", 10)
 	if t == "guard":
@@ -153,10 +158,12 @@ def main():
 				dmg = "-"
 			else:
 				m = 1.0 + float(s.get("dmg", 0.0))
-				lo, hi = e["dmg"][0] * m * mult, e["dmg"][1] * m * mult
+				# As the game does it: the weapon range is rounded after enemy_dmg_mult, then the
+				# move modifier applies to each roll. A move's own range skips enemy_dmg_mult.
+				lo, hi = max(1, gr(e["dmg"][0] * mult)) * m, max(1, gr(e["dmg"][1] * mult)) * m
 				if s.get("dmg_range"):
 					lo, hi = s["dmg_range"]
-				dmg = "%d-%d" % (max(1, round(lo)), max(1, round(hi)))
+				dmg = "%d-%d" % (max(1, gr(lo)), max(1, gr(hi)))
 				if s.get("aoe"):
 					dmg += " each"
 				if s.get("random_hits"):

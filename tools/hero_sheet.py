@@ -5,7 +5,7 @@ Numbers are at level 1 with starting gear and skill level 1: damage is class dmg
 hero_dmg_mult x (1 + move modifier); heals include heal_mult.
 """
 import os
-from enemy_sheet import ROOT, load, effect_text, ranks
+from enemy_sheet import ROOT, gr, load, effect_text, ranks
 
 classes = load("classes")
 skills = load("skills")
@@ -46,7 +46,7 @@ def main():
 		out.append("")
 		out.append(c.get("desc", ""))
 		out.append("")
-		lo, hi = round(c["dmg"][0] * mult), round(c["dmg"][1] * mult)
+		lo, hi = max(1, gr(c["dmg"][0] * mult)), max(1, gr(c["dmg"][1] * mult))
 		out.append("`%s` | HP **%d** | dodge %d | prot %d | speed %d | acc %+d | crit %d%% | dmg %d-%d | prefers ranks %s" % (
 			cid, c["hp"], c.get("dodge", 0), c.get("prot", 0), c.get("speed", 0), c.get("acc", 0), c.get("crit", 0), lo, hi, ranks(c.get("ranks"))))
 		out.append("Resists: " + ", ".join("%s %d" % (k, v) for k, v in c.get("res", {}).items()))
@@ -61,10 +61,11 @@ def main():
 				dmg = "-"
 			else:
 				m = 1.0 + float(s.get("dmg", 0.0))
+				# As the game does it: the (rounded) range rolls, then the move modifier applies.
 				if s.get("dmg_range"):
-					dmg = "%d-%d" % tuple(s["dmg_range"])
+					dmg = "%d-%d" % (max(1, gr(s["dmg_range"][0] * mult)), max(1, gr(s["dmg_range"][1] * mult)))
 				else:
-					dmg = "%d-%d" % (max(1, round(c["dmg"][0] * mult * m)), max(1, round(c["dmg"][1] * mult * m)))
+					dmg = "%d-%d" % (max(1, gr(lo * m)), max(1, gr(hi * m)))
 				if s.get("aoe"):
 					dmg += " each"
 				if s.get("random_hits"):

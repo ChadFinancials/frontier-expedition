@@ -299,6 +299,9 @@ track level) and `costs`. Code reads a track with `Company.track_value(i, bid, t
 `GDD.md`): starting resources and heroes, levelling, damage multipliers, Fatigue, food and
 camp, surprise and caves (`light_levels`), quirk odds, loot, settlement tiers, costs, mishaps.
 Switches: `hero_ambush` (enemies can surprise the party; off for now), `quest_backdrop`.
+Tuning dials (see `_dials` there): `hero_dmg_mult` (all hero damage), `heal_mult` (heals with a
+min-max range), `enemy_dmg_mult` (enemy weapon damage). Hero numbers in the data are the
+numbers that play, so their dials sit at 1.0; turn a dial to scale a whole group at once.
 
 ## Art and sound
 

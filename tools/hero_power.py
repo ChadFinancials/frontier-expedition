@@ -65,8 +65,7 @@ for cid,c in C.items():
         if tgt=='enemy':
             p=hitp(sk.get('acc',85)+c.get('acc',0))
             lo,hi=sk.get('dmg_range',c['dmg']); m=1+sk.get('dmg',0)
-            # A move's own dmg_range is used as written; hero_dmg_mult only scales the weapon range.
-            per=0 if sk.get('no_damage') else (lo+hi)/2*m*(1.0 if 'dmg_range' in sk else HM)*(1-EP/100)*(1+0.5*(c['crit']+sk.get('crit',0))/100)
+            per=0 if sk.get('no_damage') else (lo+hi)/2*m*HM*(1-EP/100)*(1+0.5*(c['crit']+sk.get('crit',0))/100)
             n=1
             if sk.get('aoe'):
                 tr=sk.get('target_ranks',[]); g=sk.get('aoe_groups')

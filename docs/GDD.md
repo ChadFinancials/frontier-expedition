@@ -168,9 +168,11 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
 - **Crit chance** = attacker crit + move crit. Crits deal ×1.5 `[crit_mult]` and relieve the
   crit-er's Fatigue (below).
 - **Damage** = roll(weapon range, or the move's own range) × (1 + move modifier + buffs +
-  matchups) × (crit) × (1 − protection), minimum 1; then ×0.9 for heroes and for enemies
-  `[hero_dmg_mult, enemy_dmg_mult]`. Healing ×0.8 `[heal_mult]`. Bleed and poison ignore
-  protection. Armor Piercing ignores some protection.
+  matchups) × (crit) × (1 − protection), minimum 1. Bleed and poison ignore protection.
+  Armor Piercing ignores some protection.
+- **Tuning dials** (config): `hero_dmg_mult` scales all hero damage, `heal_mult` all
+  ranged heals, `enemy_dmg_mult` enemy weapon damage. Hero damage and heals are written in the
+  data exactly as they play, so those two dials sit at 1.0; enemies' sits at 0.9.
 - **Effect chance** = effect base + move level bonus − target resistance, clamped 0-95%.
   A failed effect shows "Resisted Stun" (or whichever).
 - **Statuses**: bleed and poison (damage per round), stun (skip a turn, then +50% stun

@@ -519,7 +519,8 @@ func skill_dmg_range(a: Combatant, sid: String) -> Array:
 	var d: Array = DB.skill(sid).get("dmg_range", [])
 	if d.size() < 2:
 		return a.dmg_range()
-	var mult: float = 1.0 if a.boss or a.is_hero() else 1.0 + DB.cfg("tier_dmg_pct", 30) / 100.0 * (a.tier - 1)
+	# Heroes: the hero_dmg_mult dial covers a move's own range too, as it does the weapon's.
+	var mult: float = float(DB.cfg("hero_dmg_mult", 1.0)) if a.is_hero() else (1.0 if a.boss else 1.0 + DB.cfg("tier_dmg_pct", 30) / 100.0 * (a.tier - 1))
 	return [maxi(1, int(round(d[0] * mult))), maxi(1, int(round(d[1] * mult)))]
 
 

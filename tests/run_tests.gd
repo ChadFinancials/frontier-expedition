@@ -884,7 +884,7 @@ func full_campaign(runs: int, weeks: int) -> void:
 
 
 ## Round 8 balance: Battlefield Surgery heals and weakens the patient instead of stunning
-## them; heals land in the ranges the owner set (after heal_mult 0.8).
+## them; heals land in the ranges the owner set (heal_mult multiplies on top; 1.0 now).
 func test_round8_balance() -> void:
 	var co := Company.new()
 	co.new_game(31)

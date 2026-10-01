@@ -26,7 +26,7 @@ Found in: Dry Gulch Mine, The Crow's Nest, The Tallgrass Sea, The Red Canyons, Q
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
 | **Double Tap**: Two quick pistol shots at whoever is closest to hand. | 1234 | 2 random in 1234 | 85 | 3-6 x2 hits | - | 3 |
-| **Pinning Fire**: Shots that keep your head down. | 234 | one of 12 | 85 | 2-4 | dodge -5 for 2 rounds; acc -5 for 2 rounds | 1 |
+| **Pinning Fire**: Shots that keep your head down. | 234 | one of 12 | 85 | 2-3 | dodge -5 for 2 rounds; acc -5 for 2 rounds | 1 |
 
 Notes: 
 
@@ -39,7 +39,7 @@ Found in: The Crow's Nest, The Tallgrass Sea, The Red Canyons, The Thunder Peaks
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
 | **Snipe**: A careful rifle shot at the back line. | 34 | one of 34 | 90 | 4-7, +5% crit | - | 3 (back) |
-| **Skeet Shot**: Rapid rifle fire sprayed down the whole line. | 34 | ALL of 1234 | 80 | 1-3 each | - | 1 |
+| **Skeet Shot**: Rapid rifle fire sprayed down the whole line. | 34 | ALL of 1234 | 80 | 2-2 each | - | 1 |
 | **Haymaker**: Caught up close, a rifleman still has fists. | 12 | one of 12 | 85 | 4-6 | stun (40%) | 1 |
 
 Notes: 
@@ -52,7 +52,7 @@ Found in: The Crow's Nest, The Tallgrass Sea, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Cutthroat Slash**: A quick knife across the arm, then pressing in. | 123 | one of 12 | 90 | 2-4 | bleed 2 x2 rounds; user moves forward 1 | 3 |
+| **Cutthroat Slash**: A quick knife across the arm, then pressing in. | 123 | one of 12 | 90 | 3-5 | bleed 2 x2 rounds; user moves forward 1 | 3 |
 | **Rusty Shank**: A rusty blade for whoever is bleeding worst. | 12 | one of 123 | 85 | 4-6 | - | 2 (lowest_hp, always) |
 
 Notes: 
@@ -159,7 +159,7 @@ Found in: The Tallgrass Sea, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Stampede**: A ton of angry buffalo. | 1 | one of 1 | 85 | 7-11 | knockback 1; stun (60%) | 2 |
+| **Stampede**: A ton of angry buffalo. | 1 | one of 1 | 85 | 6-11 | knockback 1; stun (60%) | 2 |
 | **Trample**: Hooves the size of skillets. | 12 | ALL of 12 | 85 | 4-6 each | - | 2 |
 
 Notes: 
@@ -186,7 +186,7 @@ Found in: Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Ham-Fist Haymaker**: A fist like a ham hock. It rings bells. | 12 | one of 12 | 90 | 4-7 | stun (80%) | 3 |
+| **Ham-Fist Haymaker**: A fist like a ham hock. It rings bells. | 12 | one of 12 | 90 | 5-7 | stun (80%) | 3 |
 | **Busted Bottle**: The jagged end of a whiskey bottle. | 123 | one of 123 | 85 | 3-6 | bleed 2 x3 rounds (90%) | 2 |
 | **Where's My Boys?**: Mulligan hollers for another brawler. | 1234 | self | - | - | summons Outlaw Brawler | 1 |
 
@@ -227,7 +227,7 @@ Found in: Dry Gulch Mine, The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Lit Fuse**: A stick of dynamite tossed with a grin. | 234 | ALL of 1234 | 82 | 1-3 each | - | 2 |
+| **Lit Fuse**: A stick of dynamite tossed with a grin. | 234 | ALL of 1234 | 82 | 2-3 each | - | 2 |
 | **Pocket Pistol**: When the dynamite runs out. | 1234 | one of 234 | 85 | 3-5 | - | 2 (back) |
 
 Notes: 
@@ -254,8 +254,8 @@ Found in: The Red Canyons
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Sandblast**: The whirlwind scours your eyes. | 1234 | ALL of 1234 | 90 | 1-1 each | acc -10 for 2 rounds | 2 |
-| **Scour**: Grit that flays skin. | 123 | one of 123 | 88 | 2-4 | bleed 2 x3 rounds | 2 |
+| **Sandblast**: The whirlwind scours your eyes. | 1234 | ALL of 1234 | 90 | 1-2 each | acc -10 for 2 rounds | 2 |
+| **Scour**: Grit that flays skin. | 123 | one of 123 | 88 | 2-5 | bleed 2 x3 rounds | 2 |
 
 Notes: 
 
@@ -267,7 +267,7 @@ Found in: The Red Canyons, Quests
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Locking Bite**: Bites down and won't let go. | 12 | one of 12 | 88 | 2-5 | poison 4 x3 rounds; speed -2 for 2 rounds | 3 |
+| **Locking Bite**: Bites down and won't let go. | 12 | one of 12 | 88 | 3-5 | poison 4 x3 rounds; speed -2 for 2 rounds | 3 |
 | **Tail Lash**: A heavy, beaded tail. | 123 | one of 12 | 85 | 3-5 | - | 1 |
 
 Notes: 
@@ -292,7 +292,7 @@ Found in: The Red Canyons
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Professional Courtesy**: Aimed, fired, done. | 1234 | one of 1234 | 92 | 5-10, +8% crit | - | 3 (lowest_hp) |
+| **Professional Courtesy**: Aimed, fired, done. | 1234 | one of 1234 | 92 | 6-10, +8% crit | - | 3 (lowest_hp) |
 | **Paid in Advance**: Picks a target and lets everyone know. | 1234 | one of 1234 | 100 | - | mark 3 rounds; +6 fatigue | 1 |
 
 Notes: 
@@ -306,7 +306,7 @@ Found in: The Red Canyons
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
 | **Tree-Trunk Club**: The Cyclops sweeps a whole pine tree through the line. | 123 | ALL of 123 | 85 | 6-9 each | - | 3 |
-| **Hurled Boulder**: A boulder the size of a wagon, thrown at the back line. | 123 | one of 34 | 85 | 10-17 | stun (60%) | 2 |
+| **Hurled Boulder**: A boulder the size of a wagon, thrown at the back line. | 123 | one of 34 | 85 | 10-16 | stun (60%) | 2 |
 | **The Great Eye**: A single eye the size of a wagon wheel turns toward you. | 1234 | ALL of 1234 | 92 | - | +12 fatigue | 1 |
 | **Call the Flock**: The shepherd whistles for his stone rams. | 1234 | self | - | - | summons Stone Ram | 2 |
 
@@ -359,7 +359,7 @@ Found in: The Thunder Peaks
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Frostbite**: Ice creeps up from the fingertips. | 123 | one of 123 | 88 | 2-5 | speed -3 for 2 rounds; dmg_pct -10 for 2 rounds | 2 |
+| **Frostbite**: Ice creeps up from the fingertips. | 123 | one of 123 | 88 | 3-5 | speed -3 for 2 rounds; dmg_pct -10 for 2 rounds | 2 |
 | **Snowblind Whisper**: It tells you to lie down in the snow and rest. | 1234 | one of 1234 | 92 | - | +13 fatigue | 2 (back) |
 
 Notes: 
@@ -372,8 +372,8 @@ Found in: The Thunder Peaks
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Rock Throw**: A young stone giant hurls a chunk of mountain. | 123 | one of 1234 | 85 | 5-9 | - | 2 |
-| **Earthshaker**: The ground bucks like a wild horse. | 12 | ALL of 12 | 85 | 3-6 each | stun (50%) | 2 |
+| **Rock Throw**: A young stone giant hurls a chunk of mountain. | 123 | one of 1234 | 85 | 6-9 | - | 2 |
+| **Earthshaker**: The ground bucks like a wild horse. | 12 | ALL of 12 | 85 | 4-6 each | stun (50%) | 2 |
 
 Notes: 
 
@@ -386,10 +386,10 @@ Found in: The Thunder Peaks
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
 | **Mountain's Arm**: An arm of granite sweeps the pass clean. | 1234 | ALL of 123 | 85 | 7-11 each | knockback 1 (60%) | 3 |
-| **Quake**: The Titan stamps, and the mountain answers. | 1234 | ALL of 1234 | 85 | 4-7 each | stun (55%) | 2 |
+| **Quake**: The Titan stamps, and the mountain answers. | 1234 | ALL of 1234 | 85 | 5-7 each | stun (55%) | 2 |
 | **Voice of the Mountain**: It speaks, and it is older than anything you know. | 1234 | ALL of 1234 | 95 | - | +14 fatigue | 1 |
 | **Call the Storm**: Thunderheads gather and storm hawks pour out of them. | 1234 | self | - | - | summons Storm Hawk | 2 |
-| **Crushing Grip**: Picks up one of you. Squeezes. | 1234 | one of 12 | 88 | 14-22 | - | 2 (lowest_hp) |
+| **Crushing Grip**: Picks up one of you. Squeezes. | 1234 | one of 12 | 88 | 15-22 | - | 2 (lowest_hp) |
 
 Notes: 
 
@@ -401,7 +401,7 @@ Found in: The Old Mill Road, Dry Gulch Mine, The Crow's Nest, The Tallgrass Sea,
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Bat Bite**: Leathery wings and needle teeth. | 1234 | one of 1234 | 90 | 2-3 | bleed 1 x3 rounds | 3 |
+| **Bat Bite**: Leathery wings and needle teeth. | 1234 | one of 1234 | 90 | 2-4 | bleed 1 x3 rounds | 3 |
 | **Screech**: A sound too high to hear but not too high to feel. | 1234 | 2 random in 234 | 90 | - | +6 fatigue | 1 |
 
 Notes: 

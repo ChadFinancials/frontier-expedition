@@ -79,6 +79,11 @@ decided, and what shipped. Update both at the end of every round.
     stored 1-4 but the multiplier rounded the top to 3; 8.0 -> 9.6 for the party); speed 1 -> 2.
   - Frontier Doctor: Battlefield Surgery no longer stuns the patient and leaves them at -5
     Protection for 2 rounds (the +25 Protection is gone); its heal stays 8-12 as shown. HP 16 -> 18.
+- **Dials**: `hero_dmg_mult` (0.9) and `heal_mult` (0.8), added in batch 1 to turn early
+  damage and healing down, were folded into the data and set to 1.0, so hero weapon ranges
+  and heal ranges read in the data exactly as they play (gameplay unchanged). The hero dial
+  now also covers moves with their own damage range. `enemy_dmg_mult` stays 0.9. The review
+  sheets now round like Godot (halves up), fixing a few ranges they had shown one too low.
 - Under Vulkan, dying enemies showed a grey box: the figure's paper group (a CanvasGroup)
   faded through its parent. Units now leave the paper group before a death, a summon's
   fade-in or a scripted retreat (`UnitView.unpaper` / `repaper`). Owner confirmed fixed.
