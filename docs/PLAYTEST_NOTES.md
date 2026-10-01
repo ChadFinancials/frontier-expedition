@@ -27,9 +27,10 @@ decided, and what shipped. Update both at the end of every round.
 - [ ] Money supply may be too high (round 1 note; recheck with the current economy).
 - [ ] Gunslinger bullet system: 6 rounds in the cylinder shown overhead, moves spend bullets,
       a Reload move.
-- [ ] Class workshop, second half: Prospector 7th/8th move (forced guard plus strapped
-      dynamite that goes off when the guarded unit is attacked?), Frontier Doctor 7th/8th,
-      the Preacher's full kit, the Bayou Poisoner's 8th.
+- [ ] Class workshop, second half: options for the Prospector, Frontier Doctor and
+      Preacher (2 moves each) and the Bayou Poisoner (1), plus two new hero designs (the
+      Shotgun Guard tank, the Pony Express Rider), in `docs/HERO_PROPOSALS.md`. Waiting on
+      the owner's picks.
 - [ ] Decide whether utility moves need their own per-level upgrade paths (today every move
       level adds the same accuracy, damage, effect and healing bonuses).
 - [ ] Stacked Deck "probably needs tuning" (round 8; owner: save for a later balancing pass). A second deal stacks on the first (two

@@ -9,6 +9,7 @@
 | [`PLAYTEST_NOTES.md`](PLAYTEST_NOTES.md) | The open backlog, then each playtest round's notes and what shipped | Every round |
 | [`ART_PIPELINE.md`](ART_PIPELINE.md) | The approved look (drawn and painted), style rules, what works and what doesn't | Owner art decisions |
 | [`COMFYUI_GUIDE.md`](COMFYUI_GUIDE.md) | The owner's hands-on ComfyUI guide, and the path from an image to the game (icons, backdrops) | With the art workflow |
+| [`HERO_PROPOSALS.md`](HERO_PROPOSALS.md) | Options awaiting the owner's picks: new moves for the classes under 8, and two new hero designs | Until picked and built |
 | [`HERO_REVIEW.md`](HERO_REVIEW.md) | Every class and move with real numbers. **Generated**: `python3 tools/hero_sheet.py` | Regenerate after hero changes |
 | [`ENEMY_REVIEW.md`](ENEMY_REVIEW.md) | Every enemy and move with real numbers. **Generated**: `python3 tools/enemy_sheet.py` | Regenerate after enemy changes |
 | [`RESEARCH.md`](RESEARCH.md) | How Darkest Dungeon 1 and 2 work, and what this game takes from them | Reference, rarely changes |

@@ -1,0 +1,167 @@
+# Hero proposals (round 8)
+
+Options for the owner to pick from. Nothing here is in the game yet.
+
+- **Part 1:** moves to round out the four classes with fewer than 8.
+- **Part 2:** two new hero designs in lanes no class covers yet.
+
+**Numbers.** Damage and odds are level-1 values, judged against the average tier-1 enemy
+(`tools/hero_power.py`: 14.5 HP, 12 dodge, 33% stun resist). For scale, a good single-target
+attack expects about 6-7 damage per turn and a good stun about 0.4-0.5 expected stuns.
+
+**Engine support.**
+- ✅ means the engine already supports the move; it is data only.
+- 🛠 means the move needs a new mechanic. Each 🛠 lists the work it needs.
+
+---
+
+## Part 1: filling out movepools
+
+### Prospector (6 moves, needs 2): demolitions, caves, the lamp
+
+| # | Move | From → hits | Effect | Why | Engine |
+|---|---|---|---|---|---|
+| P1 | **Strapped Charge** | 2-4 → one of 1-3 | Straps a lit bundle to the target. At the end of its next turn (or when it is next hit) it blows: 6-9 damage to it and 3-4 to each neighbour, 40% stun. | Your backlog idea: a delayed bomb you set up, then let the party trigger. Nobody else has delayed damage. | 🛠 a fused charge that detonates on a trigger |
+| P2 | **Shore Up the Tunnel** | 2-3 → whole party | Party +8 Protection for 2 rounds. In a cave, also +10 Lamplight and -3 Fatigue. | A miner's defensive call that makes him wanted in caves. Protects the party without guarding or taunting (the Marshal's tools). | ✅ |
+| P3 | **Canary in a Cage** | 2-4 → whole party | Cures Poison on everyone; party +20 Poison Resist for 3 rounds. In a cave, the party can't be surprised in the next room. | Old miner's lore. A direct answer to snakes, gila monsters and poison-heavy fights. | ✅ in combat; 🛠 the cave no-surprise part |
+| P4 | **Controlled Cave-In** | 3-4 → 2 random enemies in 1-4 | 5-8 damage to each, 35% stun. Costs the Prospector 2 HP (falling rock). | Uses Old Jeb's random-target mechanic. A riskier, harder-hitting option than Dynamite Toss. | ✅ (random_targets, self_damage) |
+| P5 | **Gold Strike** | 1-2 → one of 1-2 | Pickaxe swing for 5-9. On a kill: +30 chips and -5 Fatigue. | The forty-niner's dream. Gives the front-rank Pickaxe build a payoff. | ✅ (on_kill) |
+
+**Suggested pick: P1 + P2.** That gives the Prospector a signature trick and a cave-support role.
+
+### Bayou Poisoner (7 moves, needs 1): poison stacking, resist shred, self-poison synergy
+
+| # | Move | From → hits | Effect | Why | Engine |
+|---|---|---|---|---|---|
+| B1 | **Swamp Fever** | 3-4 → one of 1-4 | The target's Poison spreads: each neighbour gets a copy of its current Poison. 2-3 damage. | A payoff for stacking poison on one target. Unique: nobody spreads status. | 🛠 spread existing damage-over-time to neighbours |
+| B2 | **Gator Bait** | 2-3 → one of 3-4 | Hauls a back-liner forward 1 into the gator's jaws: 3-5 damage, Bleed 2 for 3 rounds. | Bleed and poison on the same target, plus the class's only movement. | ✅ (pull, bleed) |
+| B3 | **Spanish Moss** | 2-4 → self | Dodge +20 and moves back 1. If poisoned: also +10% damage for 2 rounds. | A self-defence turn that fits the class's self-poison style. | ✅ (self_poisoned_bonus is a damage field; the buff version is 🛠 small) |
+| B4 | **Snakeroot Tonic** | 2-4 → self | Ends the Poisoner's own Poison and heals 2 per poison point removed (about 4-8). | Turns Questionable Mushroom's cost into sustain. | 🛠 heal per cured stack |
+
+**Suggested pick: B1.** It's the most distinctive; B2 if you want data-only.
+
+### Frontier Doctor (6 moves, needs 2): medicine with a cost, poison, stuns
+
+| # | Move | From → hits | Effect | Why | Engine |
+|---|---|---|---|---|---|
+| D1 | **Bloodletting** | 3-4 → one of 1-3 | Lances an enemy for 3-5 and heals the most wounded ally for the damage dealt. | Turns attacks into healing, so the Doctor isn't stuck choosing between damage and heals. | 🛠 heal-from-damage to an ally |
+| D2 | **Inoculation** | 3-4 → one ally | +30 Bleed and Poison Resist for 3 rounds, and immune to Shaken this fight. | Prevention instead of cure; the doctor who saw it coming. | ✅ resists; 🛠 the Shaken immunity (or drop it) |
+| D3 | **Adrenaline Shot** | 3-4 → one ally | Heals 3-5, or 8-12 if the ally is on Death's Door. Speed +3 for 2 rounds. | A clutch save that only shines in emergencies. Distinct from the Preacher's steady heals. | 🛠 heal bonus on Death's Door |
+| D4 | **Bone Saw** | 2-3 → one of 1-2 | 3-6 damage, Bleed 3 for 3 rounds; 20% chance the Doctor gains +5 Fatigue (grim work). | Gives the Doctor a front-ish attack, and pairs with the poison flask. | ✅ |
+| D5 | **Quarantine** | 3-4 → one of 1-4 | Marks the target; it takes +25% from Poison and Bleed and heals 50% less, for 3 rounds. | An anti-healer debuff (useful against haints and bosses that mend). | 🛠 damage-over-time amplifier and healing-received debuff on enemies |
+
+**Suggested pick: D1 + D3.** That makes the Doctor the risky-but-clutch medic, beside the Preacher's steady one.
+
+### Preacher (6 moves, needs 2): healing, party spirit, scourge of the unnatural
+
+| # | Move | From → hits | Effect | Why | Engine |
+|---|---|---|---|---|---|
+| R1 | **Baptism in the River** | 2-4 → one ally | Cures every debuff, Bleed, Poison and Stun; heals 2-4; clears Shaken. | A full cleanse. The Marshal's badge clears debuffs and stun, but not damage-over-time or Shaken. | ✅ (cure kinds, clear_shaken) |
+| R2 | **Last Rites** | 3-4 → one ally | +20 Deathblow Resist and +10 Protection for 3 rounds. | Protects someone about to fall; matters with permadeath. | 🛠 small: the Death's Door check reads the hero's base stats, so it must also count combat buffs |
+| R3 | **Pass the Plate** | 3-4 → one of 1-4 | Strips all the target's boons. 1-3 damage. | The first answer to buffed bosses and pack buffs (wolves, Silas). | 🛠 remove enemy buffs |
+| R4 | **Hellfire Sermon** | 3-4 → all of 1-4 | Enemies -8 Accuracy and -2 Speed for 2 rounds; +6 against mythic creatures. Costs the Preacher 4 Fatigue. | An area defence-by-fear move, and a reason to bring the Preacher to the mythic regions. | ✅ |
+| R5 | **Hymn of the Trail** | 2-4 → whole party | Party +2 Speed for 2 rounds and -2 Fatigue. | A tempo hymn; small but stacks with Sermon on the Trail. | ✅ |
+
+**Suggested pick: R1 + R3.** Cleanse and dispel are the two jobs no one does.
+
+---
+
+## Part 2: new heroes
+
+The existing lanes, so the new heroes stay out of them:
+- **Marshal:** guard/redirect, taunt, cleanse.
+- **Mountain Mystic:** blood price.
+- **Rail Driver:** knockback and self-rhythm.
+- **Gunslinger:** fast multi-hit.
+- **Wrangler:** pull plus mark, party buffs.
+- **Gambler:** chance and random party boons.
+- **Prospector:** area blasts and stuns.
+- **Bayou Poisoner:** poison stacking.
+- **Frontier Doctor:** cost-heals.
+- **Preacher:** heals and fatigue relief.
+
+Nobody yet does any of these:
+- **counter-attacks** (punishing attackers);
+- **damage sharing or soaking for neighbours**;
+- **reordering the enemy line** (only straight knockback and pull exist);
+- **a damage-taken amplifier** ("Vulnerable");
+- **momentum** (getting stronger by moving).
+
+### A. The Shotgun Guard: tank, retaliation and holding the line (ranks 1-2)
+
+> Rode shotgun on the Overland Stage for nine years and never lost a strongbox. Doesn't
+> shield anyone: makes attacking the coach a very bad idea.
+
+HP 28 · Prot 15 · Dodge 0 · Speed 1 · Crit 3% · damage 5-9 · stun resist 55, move resist 70.
+
+**The lane:** where the Marshal *redirects* hits, the Guard *punishes* them. Enemies that
+attack the Guard or the ally beside him get shot back, so they either waste turns on the
+toughest hero or pay for every swing. He hardens the front line instead of taunting. He's
+also the obvious candidate to defend the **wagon** if it becomes a fifth combatant.
+
+| Move | From → hits | Effect | Engine |
+|---|---|---|---|
+| ★ **Ride Shotgun** | 1-2 → self | **Riposte** for 3 rounds: every enemy that hits him takes a 50% buckshot counter. +10 Protection. | 🛠 riposte |
+| ★ **Both Barrels** | 1-2 → one of 1-2 | 7-11 damage, then he must spend a turn to **Reload** before using it again. | 🛠 reload lock (or once per fight to keep it data-only) |
+| **Buckshot Spread** | 1-2 → all of 1-2 | 3-5 each; -10 Dodge for 2 rounds. | ✅ |
+| **Slug Round** | 1-2 → one of 1-3 | 5-8 damage that ignores 40% of Protection (an armour breaker for brutes and bosses). | ✅ as a pierce self-buff for a few rounds; 🛠 small for a per-shot version |
+| **Shoulder to Shoulder** | 1-2 → self and the ally behind | Both gain +15 Protection for 2 rounds; Riposte extends to cover that ally. | 🛠 adjacent-ally targeting, riposte for an ally |
+| **Hold the Strongbox** | 1-2 → self | +25 Protection and +40 Stun/Move Resist for 2 rounds; can't be moved. | ✅ (the "can't be moved" part is very high move resist) |
+| **Rock Salt** | 1-2 → one of 1-3 | 2-4 damage, the target is Rattled: -15% damage and -5 Accuracy for 2 rounds. | ✅ |
+| **Dig In** | 1-2 → self | Heals 15% of max HP and clears his own debuffs; if below half HP, also Riposte 2 rounds. | ✅ heal and cure; 🛠 the conditional riposte |
+
+**Power check:** effective HP about 39, the highest in the game. Single-target damage about
+6, on par with the Marshal. His value is counter-damage: with Riposte up and two enemies
+swinging at him at about 80% to hit, that's roughly 2 × 0.8 × 3.5 ≈ 5.6 extra damage a
+round, at no cost to his turn.
+
+**New engine work:** riposte (counter on being hit, optionally for an ally), a reload lock,
+and adjacent-ally targeting. Riposte is the core; the other two can be faked with data at
+first.
+
+### B. The Pony Express Rider: hit-and-run, enemy reordering and Vulnerable (ranks 1-4)
+
+> Seventy-five miles a day, a fresh horse every ten, and the mail always gets through. In a
+> fight she never stops moving, and she rides straight through whoever's in the way.
+
+HP 18 · Prot 0 · Dodge 14 · Speed 7 (the fastest hero) · Crit 7% · damage 4-8 ·
+move resist 60.
+
+**The lane:**
+- **Every attack moves her.** The party's formation shifts every turn, which pairs with
+  heroes who like the ranks she leaves.
+- **Momentum.** Each move she makes grants a stack: +6% damage, up to 4. Her finisher spends
+  them all.
+- **She rearranges the enemy line.** She doesn't push it straight back or pull it straight
+  forward: she swaps enemies, dragging a back-line sniper forward or shoving a tank back.
+- **She brings Vulnerable,** a new debuff: the target takes +20% damage from everyone. That
+  makes her a force multiplier rather than a pure damage dealer.
+
+| Move | From → hits | Effect | Engine |
+|---|---|---|---|
+| ★ **Saddle Shot** | 2-4 → one of 1-4 | 4-7 damage, then moves back 1. | ✅ |
+| ★ **Ride Through** | 3-4 → one of 1-2 | 5-8 damage, moves forward 2, the target is **Vulnerable** (+20% damage taken) for 2 rounds. | 🛠 Vulnerable |
+| **Change of Horses** | 1-4 → any ally | Swaps places with any ally, not just a neighbour; both gain +2 Speed for 2 rounds. | 🛠 swap with any rank |
+| **Express Delivery** | 1-3 → one of 1-4 | 2-4 damage; the target **swaps with the enemy behind it** (or in front, if it's last). | 🛠 enemy swap |
+| **Mail Bag** | 2-4 → all of 3-4 | 1-3 each; -3 Speed and -6 Accuracy for 2 rounds (blinded by flying letters). | ✅ |
+| **Spur Hard** | 1-4 → self | +2 Momentum and +3 Speed for 2 rounds; moves forward 1. | 🛠 momentum |
+| **Last Leg** | 1-2 → one of 1-2 | 5-8 damage, +25% per Momentum spent (up to 4: 2× damage); ends Momentum. | 🛠 momentum |
+| **Neither Rain nor Snow** | 1-4 → self | Clears her stun and debuffs; +30 Stun Resist for 2 rounds; moves back 1. | ✅ |
+
+**Power check:** Saddle Shot expects about 4.7; Last Leg at 4 Momentum about 10-11. The
+real value is Vulnerable: +20% on everything the party lands on that target for 2 rounds,
+roughly +2.5 damage per party attack, about 8-10 a round with three attackers. She's fragile
+(effective HP about 23, Gambler territory), but speed 7 means she usually acts first.
+
+**New engine work:** the Vulnerable stat (a damage-taken multiplier), Momentum (stacks
+gained on moving, spent by a finisher), swapping two enemies, and swapping with any ally.
+Vulnerable is also useful beyond her, for enemy designs and trinkets.
+
+### Alternates (one line each, if neither lands)
+
+- **Tank: the Blacksmith (Farrier).** Hardens allies with Protection, sunders enemy armour,
+  and reforges broken gear mid-fight. A "Protection economy" tank. Less new tech, less
+  distinct.
+- **Damage: the Wildcatter.** Spills oil that makes enemies slip (move resist down) and then
+  ignites it as a new **Burn** status. Very combo-heavy, close to the Prospector's
+  explosives.
