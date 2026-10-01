@@ -76,9 +76,8 @@ From 2-4 → one enemy in 1-3, acc 95, no damage.
 
 ### Preacher: Hellfire Sermon (tuned)
 From 3-4 → all enemies in 1-4.
-- **Shipped (owner's tune):** -5 Accuracy and -8 Dodge for 2 rounds, base chance 75%.
-  About 47% sticks after the average 28% debuff resist. (First draft: -10 Accuracy, -10%
-  Damage.)
+- **Shipped (owner's tune):** -5 Accuracy and -10% Damage for 2 rounds, base chance 75%.
+  About 47% sticks after the average 28% debuff resist. (First draft: -10 Accuracy.)
 - Mythic targets: base 100%, so about 72% sticks.
 - Costs the Preacher 4 Fatigue.
 - **Expected value:** about 1.9 enemies affected, preventing roughly 3 HP of damage over the

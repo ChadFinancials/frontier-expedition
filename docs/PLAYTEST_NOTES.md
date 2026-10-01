@@ -89,7 +89,7 @@ decided, and what shipped. Update both at the end of every round.
   and Tree-Trunk Club. Recasts refresh rather than stack. Cures remove it.
   - Tuning pass (owner): Vulnerable came off the marking moves (Warrant, Quarrel, Joker) so
     no move both marks and amps; Peck at the Eyes bleed is 2 rounds; Hellfire is -5 Accuracy
-    and -8 Dodge; Scalpel Toss hits ranks 1-3 with +2% crit.
+    and -10% Damage; Scalpel Toss hits ranks 1-3 with +2% crit.
 - **New moves** (owner's picks): Preacher **Hellfire Sermon** and **Baptism in the River**
   (dispels boons, Soaked, stuns mythic foes); Frontier Doctor **Transfusion** (heals the most
   wounded ally for 150% of damage dealt) and **Scalpel Toss** (in place of Adrenaline Shot, to

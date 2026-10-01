@@ -199,7 +199,7 @@ Resists: stun 40, bleed 30, poison 30, move 35, debuff 45, deathblow 67
 | **Fire and Brimstone**: Lifts the brass lantern and blazes holy light. May Stun. | 34 | one of 123 | 87 | 1-2 | stun |
 | **Righteous Smite**: Brings the good book down hard. Extra damage against mythic creatures. | 12 | one of 12 | 87 | 4-7, +50% vs mythic | - |
 | **Book of Judgment**: Reads a verse of judgment aloud. Lowers the target's Damage; extra damage against mythic creatures. | 34 | one of 1234 | 92 | 3-5, +60% vs mythic | dmg_pct -15 for 2 rounds |
-| **Hellfire Sermon**: Thunders about the fire to come. Every enemy loses Accuracy and Dodge, and the unnatural can't shut it out. Costs the Preacher some Fatigue. | 34 | ALL of 1234 | 95 | - | acc -5 for 2 rounds (75%) (100% vs mythic); dodge -8 for 2 rounds (75%) (100% vs mythic); self: +4 fatigue |
+| **Hellfire Sermon**: Thunders about the fire to come. Every enemy loses Accuracy and Damage, and the unnatural can't shut it out. Costs the Preacher some Fatigue. | 34 | ALL of 1234 | 95 | - | acc -5 for 2 rounds (75%) (100% vs mythic); dmg_pct -10 for 2 rounds (75%) (100% vs mythic); self: +4 fatigue |
 | **Baptism in the River**: Plunges the wicked under. Washes away every boon on the target and leaves it Soaked: slower and easier to hit. Mythic creatures may be stunned outright. | 234 | one of 123 | 95 | - | washes away all boons; speed -2 for 2 rounds; dodge -10 for 2 rounds; vs mythic: stun (80%) |
 
 Notes: 
