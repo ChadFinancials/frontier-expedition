@@ -123,8 +123,10 @@ saving: add an **Upscale Image (using Model)** box with `RealESRGAN_x4plus` (in
 `models/upscale_models`), then **Upscale Image By** 0.5, for 2688 x 1536. Save as **PNG**.
 The game draws the scenery about 2070 px wide on a 1080p screen and about 2760 px on 1440p, so
 a 1344-wide image gets blown up 1.5-2x and looks soft and blocky; the upscaled one doesn't.
-Claude stores them at 2560 wide. If the chat shrinks or converts an image (Claude checks the
-pixel size on arrival), commit the PNG to `art-src/backdrops/` with GitHub Desktop instead.
+The chat delivers large images shrunk to about 1872 x 1056 and converted to WebP. That is
+already a clear step up and fine for now; for full quality, commit the PNG to
+`art-src/backdrops/` with GitHub Desktop and tell Claude its name. Replaced originals move to
+`art-src/backdrops/alt/`.
 
 Composition that works (16:9): sky and range in the top third, rolling
 ground below, and the **lower middle kept open**, since eight figures stand across it from
