@@ -949,7 +949,7 @@ func _make_quest(tid: String, west: String, tier_l: int) -> Dictionary:
 	var reward := {
 		"money": int(rng.randi_range(80, 150) * mult),
 		"timber": rng.randi_range(1, 3) + tl,
-		"iron": rng.randi_range(0, 2) + tl,
+		"iron": rng.randi_range(1, 3) + tl,
 		"trinket": "",
 		"recruit": 0,
 	}

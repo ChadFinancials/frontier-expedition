@@ -58,6 +58,15 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Iron** (owner: 23 timber but under 8 iron after 2 expeditions, so no Smithy): Tallgrass's
+  trail curios almost never gave iron, and every recurring source paid less iron than timber.
+  Smithy level 1 is now 10 timber + 5 iron (was 8 + 8); elites always give 1-2 iron (was 0-2);
+  side-quest rewards 1-3 iron (+tier; was 0-2); the Miner's Prospect 2 + 1 per rank (was 1 +
+  1); the Railroad Supply Crate (iron) can turn up in Tallgrass and Crow's Nest. Probe:
+  `res://tests/test_runner.tscn -- econ=N` (bot expeditions, materials per run; the bot loses
+  often, so read it as relative).
+- **End of the Line**: whistle, run-up, charge with speed streaks, heavy impact; a kill gives
+  back 20 Momentum (was 50).
 - **Quirk pass** (owner's edits, see QUIRK_PROPOSALS.md): 50 quirks (26 good, 24 bad). New
   conditions `marked`, `vs_marked`, `vs_vulnerable`, `deaths_door`, `round1`; stat `xp_pct`;
   quirk fields `bar_lock`, `after_battle_fatigue`, compulsion `steals`.

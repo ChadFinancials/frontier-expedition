@@ -21,6 +21,10 @@ func _ready() -> void:
 		sim_tutorial(int(args.simtut))
 		get_tree().quit(0)
 		return
+	if args.has("econ"):
+		econ_probe(int(args.econ))
+		get_tree().quit(0)
+		return
 	if args.has("balance"):
 		balance(int(args.balance), int(args.get("weeks", "6")))
 		get_tree().quit(0)
@@ -1271,3 +1275,41 @@ func test_vulnerable_and_new_moves() -> void:
 		healed = healed or gsc.hp > gs_hp
 	check(healed, "Transfusion heals the most wounded ally")
 	check(DB.classes.preacher.skills.size() == 8 and DB.classes.frontier_doctor.skills.size() == 8, "Preacher and Doctor have 8 moves")
+
+
+## Economy probe (econ=N): N fresh companies each run 3 expeditions from Fort Providence
+## (the tutorial done), and the average timber and iron each expedition brings home.
+func econ_probe(n: int) -> void:
+	var tim := 0
+	var irn := 0
+	var runs := 0
+	var by_region := {}
+	for s in n:
+		var co := Company.new()
+		co.new_game(100 + s)
+		var bot := Bot.new(100 + s)
+		bot.cautious = true
+		co.complete_tutorial()
+		for k in 3:
+			while co.heroes_at(0).filter(func(x): return x.available()).size() < 4 and not co.settlement(0).recruits.is_empty():
+				if co.hire(0, 0) == null:
+					break
+			var t0 := co.timber
+			var i0 := co.iron
+			var reg := ""
+			var r: Dictionary = bot.play_expedition(co, 0)
+			reg = str(r.get("region", ""))
+			if r.get("status", "") in ["no_run"]:
+				continue
+			runs += 1
+			tim += co.timber - t0
+			irn += co.iron - i0
+			if not by_region.has(reg):
+				by_region[reg] = [0, 0, 0]
+			by_region[reg][0] += 1
+			by_region[reg][1] += co.timber - t0
+			by_region[reg][2] += co.iron - i0
+	print("ECON %d expeditions: timber %.1f, iron %.1f per expedition" % [runs, tim / maxf(1, runs), irn / maxf(1, runs)])
+	for reg in by_region:
+		var v: Array = by_region[reg]
+		print("  %s: %d runs, timber %.1f, iron %.1f" % [reg, v[0], v[1] / maxf(1, v[0]), v[2] / maxf(1, v[0])])

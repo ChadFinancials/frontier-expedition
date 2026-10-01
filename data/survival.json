@@ -58,7 +58,7 @@
     ]},
   "miner": {"name": "Miner", "desc": "Can smell ore through six feet of rock.", "passive": {"type": "iron_bonus", "base": 1, "per_rank": 1, "text": "Find extra Iron"},
     "actions": [
-      {"id": "prospect", "name": "Prospect", "hours": 4, "target": "self", "desc": "Digs for Iron, sometimes finds a little gold.", "effects": [{"type": "iron", "base": 1, "per_rank": 1}, {"type": "money", "base": 20, "per_rank": 20, "chance": 35}], "unlock": 1},
+      {"id": "prospect", "name": "Prospect", "hours": 4, "target": "self", "desc": "Digs for Iron, sometimes finds a little gold.", "effects": [{"type": "iron", "base": 2, "per_rank": 1}, {"type": "money", "base": 20, "per_rank": 20, "chance": 35}], "unlock": 1},
       {"id": "dig_in", "name": "Dig In", "hours": 2, "target": "party", "desc": "Dig foxholes and breastworks. Party gains Protection for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "prot", "base": 8, "per_rank": 4}], "unlock": 2}
     ]}
 }

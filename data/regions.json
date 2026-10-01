@@ -97,7 +97,7 @@
     "crossing": {"name": "The Stockade", "enemies": ["outlaw_knifeman", "ruby_blackwing", "murder_of_crows"]},
     "events": ["stranger_on_road", "outlaw_ambush_warning", "outlaw_toll", "wolf_tracks", "abandoned_homestead", "peddler", "trinket_peddler", "hunting_grounds", "fork_in_trail", "torn_canvas"],
     "homestead_events": ["homestead_family", "homestead_widow"],
-    "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "scarecrow", "berry_bushes", "dead_horse"],
+    "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "scarecrow", "berry_bushes", "dead_horse", "railroad_crate"],
     "cave_curios": ["miners_cache", "bone_pile", "strongbox"]
   },
 
@@ -142,7 +142,7 @@
     "crossing": {"name": "Crane's Last Crows", "enemies": ["crane_lieutenant", "outlaw_knifeman", "murder_of_crows", "outlaw_rifleman"]},
     "events": ["river_crossing", "broken_axle", "prairie_fire", "stranger_on_road", "buffalo_herd", "sick_traveler", "rattler_in_bedroll", "thunderstorm", "lost_trail", "wolf_tracks", "abandoned_homestead", "haint_lights", "peddler", "wagon_stuck", "gravesite", "hunting_grounds", "outlaw_ambush_warning", "fork_in_trail", "swollen_creek", "fever_camp", "outlaw_toll", "torn_canvas", "trinket_peddler"],
     "homestead_events": ["homestead_family", "homestead_widow", "homestead_drifter"],
-    "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "prairie_well", "scarecrow", "berry_bushes", "cattle_skull", "dead_horse", "standing_stone"],
+    "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "prairie_well", "scarecrow", "berry_bushes", "cattle_skull", "dead_horse", "standing_stone", "railroad_crate"],
     "cave_curios": ["miners_cache", "whiskey_barrel", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox"]
   },
 
