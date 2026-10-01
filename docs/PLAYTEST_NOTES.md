@@ -39,9 +39,9 @@ decided, and what shipped. Update both at the end of every round.
       12 dodge, 4% prot; stun res 33, bleed 30, poison 44; enemies hit for ~3.8 at ~88 acc).
       Ranking 1-10: Gambler 9, Bayou Poisoner 8, Rail Driver 7, Mountain Mystic 7,
       Gunslinger 7, Prospector 6, Wrangler 6, Marshal 6, Frontier Doctor 5, Preacher 4.
-      - Gambler: Deal 'Em is the outlier, ~22 expected damage per cast (2.6 direct + 3.4 bleed
-        on all 4 ranks; bleeds stack on recast). Hit a pair instead (`aoe_groups`
-        [[1,2],[3,4]]): ~11. Stacked Deck: a new deal replaces that hero's card, no stacking.
+      - Gambler: Deal 'Em is the outlier, ~23 expected damage per cast (2.3 direct + 3.3 bleed
+        per enemy on all 4 ranks; its 2-4 range skips the 0.9 hero multiplier; bleeds stack on
+        recast). Hit a pair instead (`aoe_groups` [[1,2],[3,4]]): ~11. Stacked Deck: a new deal replaces that hero's card, no stacking.
       - Bayou Poisoner: Bola Shot stuns two targets, 0.70 expected stuns per cast (best in
         the game). Stun chance 80 -> 60: 0.41, level with Dynamite (0.38) and Blasting
         Charge (0.41).
@@ -86,7 +86,7 @@ decided, and what shipped. Update both at the end of every round.
   OpenGL as the automatic fallback and `play_opengl.bat` to force it.
 - Under Vulkan, dying enemies showed a grey box: the figure's paper group (a CanvasGroup)
   faded through its parent. Units now leave the paper group before a death, a summon's
-  fade-in or a scripted retreat (`UnitView.unpaper` / `repaper`).
+  fade-in or a scripted retreat (`UnitView.unpaper` / `repaper`). Owner confirmed fixed.
 
 ### Round 7 (continuing the owner's save from here on)
 - Owner: text on the wood is hard to read; the map looks much better; ambushed in the first
