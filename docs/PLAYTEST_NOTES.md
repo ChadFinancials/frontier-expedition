@@ -57,6 +57,16 @@ decided, and what shipped. Update both at the end of every round.
 
 ## History
 
+### Round 9
+- Owner playtest (Mad Dog, all level 1: Doctor 4, Preacher 3, Prospector 2, Mountain Mystic
+  1): healing very strong, damage decent, back-line access short until the bones in ranks 1-2
+  were cleared; not too hard.
+- Shipped: Battlefield Surgery stuns the patient again (95%, the cap) on top of -5 Protection,
+  so it's no longer strictly better than Laying On of Hands. The owner's wagon art is the
+  trail, menu and camp wagon (`assets/art/props/wagon.png`, cut out with `prep_icons.py
+  --prop`), oxen still drawn in code. The Fort Providence painting runs under the roster
+  panel's edge (no strip of screen between them).
+
 ### Round 8
 - Owner: painted backdrops look stretched and pixelated; top-bar numbers float away from their
   icons; Stacked Deck shows all cards at once; more than two rows of buffs and debuffs vanish

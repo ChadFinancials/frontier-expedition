@@ -43,7 +43,8 @@ func setup(params: Dictionary) -> void:
 	var ta: Dictionary = site.get("town_art", {})
 	var art_path := "res://assets/art/town/%s.png" % str(ta.get("image", ""))
 	if not ta.is_empty() and ResourceLoader.exists(art_path):
-		town.size = Vector2(1340, 740)
+		# Runs under the roster panel's edge, so no strip of screen shows between them.
+		town.size = Vector2(1356, 740)
 		town.set_art(load(art_path), ta.get("spots", []), ta.get("prefer", {}))
 		add_child(town)
 	elif PaperFX.enabled:

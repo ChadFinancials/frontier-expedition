@@ -128,3 +128,11 @@ code-drawn fallback, so the game runs with any fraction of the art done.
 | `tools/art/generate.py`, `prompts.py`, `*.json` workflows | Scripted ComfyUI generation (on the owner's PC; optional) |
 | `tools/art/cutout.py`, `inpaint.py` | Earlier experiments: rembg cut-outs and pose inpainting |
 | `tools/shot.sh` | Screenshots in the real game, for checking any art change |
+
+### Props
+- `assets/art/props/`: painted scene props. `python3 tools/art/prep_icons.py --prop <src>
+  <key> <width>` cuts one out at full resolution, keeps its aspect ratio and clears enclosed
+  background only in the bottom third (wheel spokes), so off-white parts like a wagon's
+  canvas survive. The wagon (`wagon.png`, from `art-src/icons/wagon.webp`) is drawn by
+  `WagonArt` flipped to face west, with a soft shadow and a roll bob; the code-drawn wagon is
+  the fallback if the file is missing.

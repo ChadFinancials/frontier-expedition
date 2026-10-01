@@ -4,6 +4,13 @@ extends Node2D
 ## Origin: ground level under the wagon's center. Faces right (west).
 
 const PAPER := Color("#f3e9d2")
+## The owner's painted wagon (tools/art/prep_icons.py --prop). Drawn when present, flipped
+## to face right, with the code-drawn oxen hitched to its tongue; the old drawn wagon is the
+## fallback.
+const ART := "res://assets/art/props/wagon.png"
+const ART_W := 340.0     # drawn width, local units (the drawn wagon is about as wide)
+static var _art: Texture2D = null
+static var _art_tried := false
 var wheel_angle := 0.0
 var step := 0.0
 var damaged := false
@@ -56,7 +63,18 @@ func _ox(at: Vector2, phase: float) -> void:
 	draw_line(at + Vector2(-60, -60), at + Vector2(-70, -38), fur, 4.0)
 
 
+static func art() -> Texture2D:
+	if not _art_tried:
+		_art_tried = true
+		if ResourceLoader.exists(ART):
+			_art = load(ART)
+	return _art
+
+
 func _draw() -> void:
+	if art() != null:
+		_draw_art()
+		return
 	# Team of oxen ahead of the wagon.
 	if show_team:
 		_ox(Vector2(330, 0), 0.0)
@@ -85,3 +103,28 @@ func _draw() -> void:
 		draw_line(Vector2(40, -210), Vector2(70, -160), Color("#8a6a45"), 3.0)
 	_wheel(Vector2(100, -36), 36)
 	draw_line(Vector2(150, -80), Vector2(230, -60), Color("#5a3a22"), 6.0)
+
+
+func _draw_art() -> void:
+	var tex := art()
+	var sc := ART_W / float(tex.get_width())
+	var sz := Vector2(ART_W, tex.get_height() * sc)
+	# The art's tongue pokes out low on its front (left) side; flipped, it's on the right.
+	var tongue := Vector2(ART_W / 2 - 6, -sz.y * 0.25)
+	if show_team:
+		_ox(Vector2(tongue.x + 150, 0), 0.0)
+		_ox(Vector2(tongue.x + 55, 0), 1.7)
+		draw_line(tongue, Vector2(tongue.x + 120, -50), Color("#5a3e26"), 5.0)
+	# Rolling: a gentle bob and rock, since the painted wheels can't turn.
+	var bob := absf(sin(step * 0.9)) * -2.5
+	var tilt := sin(step * 0.45) * 0.006
+	var tint := Color(1, 1, 1) if not damaged else Color(0.86, 0.8, 0.72)
+	draw_set_transform(Vector2(0, bob), tilt, Vector2(-1, 1))
+	var rect := Rect2(Vector2(-ART_W / 2, -sz.y), sz)
+	draw_texture_rect(tex, Rect2(rect.position + Vector2(-5, 6), sz), false, Color(0, 0, 0, 0.28))
+	draw_texture_rect(tex, rect, false, tint)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if damaged:
+		# Torn canvas.
+		draw_line(Vector2(-60, -sz.y * 0.85), Vector2(-25, -sz.y * 0.62), Color("#8a6a45"), 3.0)
+		draw_line(Vector2(50, -sz.y * 0.9), Vector2(78, -sz.y * 0.68), Color("#8a6a45"), 3.0)

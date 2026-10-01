@@ -54,11 +54,14 @@ def _flood(ok: np.ndarray, seeds) -> np.ndarray:
     return seen
 
 
-def prep(src: str, key: str, pockets: bool | None = None) -> str:
+def prep(src: str, key: str, pockets: bool | None = None, prop: int = 0) -> str:
+    """prop > 0: a scene prop instead of an icon: worked at full size, trimmed, kept at its
+    own aspect ratio, saved prop px wide to assets/art/props/."""
     if pockets is None:
         pockets = key in POCKET_KEYS
     img = Image.open(src).convert("RGBA")
-    img.thumbnail((WORK, WORK), Image.LANCZOS)
+    work = WORK if not prop else 1024
+    img.thumbnail((work, work), Image.LANCZOS)
     a = np.asarray(img).astype(np.float32)
     rgb = a[:, :, :3]
     h, w = rgb.shape[:2]
@@ -78,13 +81,18 @@ def prep(src: str, key: str, pockets: bool | None = None) -> str:
     is_bg = _flood((dist < LOOSE) | shadow, seeds)
     # Enclosed pockets of plain background.
     near = ((dist < TIGHT) & ~is_bg) if pockets else np.zeros_like(is_bg)
+    if prop and pockets:
+        # Props: only clear pockets low down (between wheel spokes), where nothing else is
+        # off-white. A wagon's canvas bonnet is nearly the background colour.
+        near = ((dist < 60) | shadow) & ~is_bg
+        near[: int(h * 0.68)] = False
     done = np.zeros_like(near)
     for y in range(h):
         for x in range(w):
             if near[y, x] and not done[y, x]:
                 comp = _flood(near & ~done, [(y, x)])
                 done |= comp
-                if comp.sum() >= POCKET:
+                if comp.sum() >= POCKET * (work / WORK) ** 2:
                     is_bg |= comp
     alpha = np.where(is_bg, 0.0, 255.0)
     # Soften the rim: object pixels next to the background fade with their likeness to it.
@@ -97,6 +105,13 @@ def prep(src: str, key: str, pockets: bool | None = None) -> str:
     if box is None:
         raise SystemExit(f"{src}: nothing left after removing the background")
     icon = icon.crop(box)
+    if prop:
+        icon = icon.resize((prop, int(round(icon.size[1] * prop / icon.size[0]))), Image.LANCZOS)
+        pdir = os.path.join(ROOT, "assets", "art", "props")
+        os.makedirs(pdir, exist_ok=True)
+        dest = os.path.join(pdir, key + ".png")
+        icon.save(dest)
+        return dest
     side = int(max(icon.size) * (1.0 + 2 * MARGIN))
     canvas = Image.new("RGBA", (side, side), (0, 0, 0, 0))
     canvas.paste(icon, ((side - icon.size[0]) // 2, (side - icon.size[1]) // 2))
@@ -110,6 +125,10 @@ def prep(src: str, key: str, pockets: bool | None = None) -> str:
 def main() -> None:
     args = sys.argv[1:]
     pairs = []
+    if args[:1] == ["--prop"]:
+        # --prop <src> <key> <width>: a scene prop (the trail wagon), enclosed pockets removed.
+        print("wrote", prep(args[1], args[2], True, int(args[3])))
+        return
     if args[:1] == ["--dir"]:
         d = args[1]
         for f in sorted(os.listdir(d)):

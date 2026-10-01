@@ -175,7 +175,7 @@ Resists: stun 30, bleed 40, poison 60, move 30, debuff 35, deathblow 67
 |---|---|---|---|---|---|
 | ★ **Flask of Vileness**: A flask of something vile, uncorked in the back line. Strong Poison. | 34 | one of 234 | 92 | 1-2 | poison 4 x3 rounds |
 | ★ **Experimental Tonic**: Untested, but promising. Heals a little, may ease or add Fatigue, and gives a Damage boost. | 34 | one ally in 1234 | - | - | heals 2-4 HP; -5 to +3 fatigue; dmg_pct +10 for 3 rounds |
-| **Battlefield Surgery**: Quick, bloody, effective, and it takes it out of the patient. A big heal and cures Bleed and Poison, but they're left weak for a while (less Protection). | 34 | one ally in 1234 | - | - | heals 8-12 HP; cures bleed/poison; prot -5 for 2 rounds |
+| **Battlefield Surgery**: Quick, bloody, effective, and the patient goes under for it. A big heal and cures Bleed and Poison, but they're Stunned and left weak for a while (less Protection). | 34 | one ally in 1234 | - | - | heals 8-12 HP; cures bleed/poison; stun; prot -5 for 2 rounds |
 | **Smelling Salts**: Snaps an ally back to their senses. Cures Stun, Bleed and Poison, and gains Speed. | 234 | one ally in 1234 | - | - | cures bleed/poison/stun; speed +3 for 2 rounds |
 | **Chloroform Rag**: A soaked rag over the mouth. Stuns. | 34 | one of 1 | 92 | 1-2 | stun |
 | **Laudanum**: A few drops take the edge off. Big Fatigue relief, but the patient is slow and sluggish. | 234 | one ally in 1234 | - | - | -12 fatigue (relief); speed -2 for 2 rounds; dodge -5 for 2 rounds |

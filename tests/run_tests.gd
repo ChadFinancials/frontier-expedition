@@ -889,8 +889,8 @@ func full_campaign(runs: int, weeks: int) -> void:
 
 
 
-## Round 8 balance: Battlefield Surgery heals and weakens the patient instead of stunning
-## them; heals land in the ranges the owner set (heal_mult multiplies on top; 1.0 now).
+## Round 8 balance: Battlefield Surgery heals, then stuns and weakens the patient (round 9:
+## the stun is back, owner); heals land in the ranges the owner set (heal_mult multiplies on top; 1.0 now).
 func test_round8_balance() -> void:
 	var co := Company.new()
 	co.new_game(31)
@@ -910,7 +910,16 @@ func test_round8_balance() -> void:
 			dc = hc
 	pc.hp = 3
 	e.use_skill(dc, "dr_surgery", pc.id)
-	check(not pc.stunned, "Surgery no longer stuns the patient")
+	var stuns := 0
+	for k in 10:
+		pc.stunned = false
+		pc.stun_guard = 0
+		e.use_skill(dc, "dr_surgery", pc.id)
+		stuns += 1 if pc.stunned else 0
+	check(stuns >= 7, "Surgery stuns the patient almost every time (%d of 10)" % stuns)
+	pc.hp = 3
+	pc.buffs.clear()
+	e.use_skill(dc, "dr_surgery", pc.id)
 	check(pc.buffs.any(func(b): return b.stat == "prot" and float(b.value) == -5.0), "Surgery leaves the patient at -5 Protection")
 	check(pc.hp >= 3 + 8, "Surgery heals at least 8 (got %d)" % (pc.hp - 3))
 	var hm: float = DB.cfg("heal_mult", 1.0)
