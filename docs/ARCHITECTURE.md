@@ -146,10 +146,17 @@ while not engine.is_over():
   the Mountain Mystic against beasts) go through `_class_vs`.
 - **Enemy AI** picks a move by the skill's `ai.weight` and a target by `ai.pref`
   (`random, lowest_hp, marked, back, front, deaths_door`), honouring taunt and guard.
+- **Layout**: units stand on `GROUND` (745); the HUD panel starts at 835. Each unit's HUD
+  (`UnitView._Hud`) draws HP, Fatigue, action diamonds and up to three rows of short status
+  chips (`Stats.mod_short`), folding any overflow into a "+N" chip; the hover tooltip lists
+  everything in full.
 - **Presentation** (`combat_screen.gd`): the engine resolves a whole action instantly, so the
   screen freezes each unit's HUD (`UnitView.shown`, `_freeze`) and moves it only as each hit
   lands (`shift_hp`, `shift_fatigue`, `sync_status`). Popups stack per unit (`_popup_stack`);
-  multi-hit moves play a sound per hit; area and party moves show all results at once.
+  multi-hit moves play a sound per hit; area and party moves show all results at once,
+  except dealt cards (Stacked Deck), which come one at a time.
+- **Redraw cost**: figures breathe through their node scale and redraw only when their shapes
+  change (pose, flash, animated creatures); HUDs redraw only when what they show changes.
 
 ## Screens and UI
 
@@ -234,7 +241,7 @@ while not engine.is_over():
 | `... test_runner.tscn -- balance=40 weeks=6` | Balance report over many simulated campaigns (`tests/bot.gd` plays them) |
 | `... test_runner.tscn -- simtut=50` | Plays the tutorial many times and reports win rate and health left |
 | `$G --headless --path . -- shot=autoplay expeditions=3` | UI smoke test: `tests/autopilot.gd` clicks through the real screens |
-| `tools/shot.sh <scenario> out.png [args]` | Screenshot under xvfb. Scenarios in `scripts/debug/shots.gd`: `menu, settlement, embark, trail, combat, camp, cave, event, curio, results, hero, building, tutorial, silas, lineup, faces, outfits`, plus A/B comparisons. Useful args: `full` (party of 4), `region=<id>`, `far` (end of map), `enemies=a,b`, `ehp=N`, `act` |
+| `tools/shot.sh <scenario> out.png [args]` | Screenshot under xvfb. Scenarios in `scripts/debug/shots.gd`: `menu, settlement, embark, trail, combat, camp, cave, event, curio, results, hero, building, tutorial, silas, lineup, faces, outfits`, plus A/B comparisons. Useful args: `full` (party of 4), `region=<id>`, `far` (end of map), `enemies=a,b`, `ehp=N`, `act`, `statuses`, `with=<class> skill=<id>`, `soak=N` (idle and print memory, objects and draw calls) |
 | `python3 tools/hero_sheet.py` | Regenerates `docs/HERO_REVIEW.md` from the data |
 | `python3 tools/enemy_sheet.py` | Regenerates `docs/ENEMY_REVIEW.md` |
 | `python3 tools/gen_audio.py [name]` | Regenerates generated sounds and music |

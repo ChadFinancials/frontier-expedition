@@ -184,6 +184,21 @@ static func lbl(text: String, size: int = 22, variation: String = "", color: Var
 	return l
 
 
+## A resource readout: an icon with its value right beside it, both centred vertically.
+## Used by the top bar and the trail's strip, which space items widely apart.
+static func res_item(icon: String, text: String, tip: String, icon_px: float = 32, font: int = 24) -> HBoxContainer:
+	var h := hb(3)
+	var ic := ResIcon.make(icon, icon_px)
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(ic)
+	var l := lbl(text, font, "Bold")
+	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(l)
+	h.tooltip_text = tip
+	h.mouse_filter = Control.MOUSE_FILTER_STOP
+	return h
+
+
 static func hdr(text: String, size: int = 40, ink: bool = false) -> Label:
 	return lbl(text, size, "InkHeader" if ink else "Header")
 

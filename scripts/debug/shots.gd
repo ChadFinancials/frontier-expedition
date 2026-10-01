@@ -429,6 +429,15 @@ static func run(main: Main, args: Dictionary) -> void:
 				for cid in ["mountain_man", "preacher"]:
 					if co.heroes.size() < 4:
 						co.heroes.append(co.make_hero(cid, 1))
+			# with=<class>: a hero of that class takes the last party seat, knowing skill=<id>
+			# when that's one of its moves (to watch a particular move play out).
+			if args.has("with"):
+				var wh: Hero = co.make_hero(str(args.with), 1)
+				var ws := str(args.get("skill", ""))
+				if ws in DB.classes[str(args.with)].skills and not ws in wh.equipped:
+					wh.known.append(ws)
+					wh.equipped[0] = ws
+				co.heroes.insert(mini(3, co.heroes.size()), wh)
 			var uids: Array = []
 			for h in co.heroes.slice(0, 4):
 				uids.append(h.uid)
@@ -459,6 +468,15 @@ static func run(main: Main, args: Dictionary) -> void:
 					if args.has("ehp"):
 						for ec in main.screen.engine.enemies:
 							ec.hp = int(args.ehp)
+					# statuses: pile buffs, debuffs and damage over time on everyone (chip layout).
+					if args.has("statuses"):
+						var eng: CombatEngine = main.screen.engine
+						for u in eng.heroes + eng.enemies:
+							u.dots.append({"kind": "bleed", "amount": 2, "rounds": 3})
+							u.dots.append({"kind": "poison", "amount": 3, "rounds": 3})
+							for m in [["acc", 10], ["dodge", -8], ["dmg_pct", 15], ["speed", -2], ["prot", 10]]:
+								u.buffs.append({"stat": m[0], "value": m[1], "rounds": 3, "name": "Test"})
+							u.mark = 2
 					if args.has("act"):
 						await _act(main, args)
 				"camp":
@@ -499,6 +517,23 @@ static func run(main: Main, args: Dictionary) -> void:
 			main.screen.open_building(args.get("id", "saloon"))
 	for i in wait:
 		await tree.process_frame
+	# soak=N: sit idle for N seconds, printing what grows (leak and crash hunting).
+	if args.has("soak"):
+		var secs := int(args.soak)
+		var t0 := Time.get_ticks_msec()
+		var next := 0
+		while Time.get_ticks_msec() - t0 < secs * 1000:
+			await tree.process_frame
+			var el: int = (Time.get_ticks_msec() - t0) / 1000
+			if el >= next:
+				next += 10
+				print("SOAK t=%ds fps=%d objects=%d nodes=%d orphans=%d mem=%.1fMB vmem=%.1fMB canvas_items=%d draws=%d" % [el,
+					Performance.get_monitor(Performance.TIME_FPS), Performance.get_monitor(Performance.OBJECT_COUNT),
+					Performance.get_monitor(Performance.OBJECT_NODE_COUNT), Performance.get_monitor(Performance.OBJECT_ORPHAN_NODE_COUNT),
+					Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0,
+					Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0,
+					Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),
+					Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)])
 	var img := main.get_viewport().get_texture().get_image()
 	img.save_png(out)
 	print("saved ", out)

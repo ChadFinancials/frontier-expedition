@@ -20,7 +20,7 @@ func _init() -> void:
 	tv.add_child(sub_label)
 	tv.custom_minimum_size.x = 560
 	row.add_child(tv)
-	res_row = UI.hb(22)
+	res_row = UI.hb(40)
 	res_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	res_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_child(res_row)
@@ -50,10 +50,4 @@ func refresh(extra: Dictionary = {}) -> void:
 
 
 func _item(icon: String, text: String, tip: String) -> void:
-	var h := UI.hb(6)
-	h.add_child(ResIcon.make(icon, 28))
-	var l := UI.lbl(text, 24, "Bold")
-	h.add_child(l)
-	h.tooltip_text = tip
-	h.mouse_filter = Control.MOUSE_FILTER_STOP
-	res_row.add_child(h)
+	res_row.add_child(UI.res_item(icon, text, tip))

@@ -48,7 +48,7 @@ func setup(_params: Dictionary) -> void:
 	var hp := UI.panel("DarkRopeBottom")
 	hp.custom_minimum_size = Vector2(1920, 64)
 	add_child(hp)
-	hud_row = UI.hb(22)
+	hud_row = UI.hb(30)
 	hp.add_child(hud_row)
 	# Map.
 	# The map sheet is nailed to a board (MapView draws the parchment, legend and signpost).
@@ -141,12 +141,7 @@ func refresh() -> void:
 	if not run.loot.keepsakes.is_empty():
 		items.append(["xp", "%d trinket%s" % [run.loot.keepsakes.size(), "s" if run.loot.keepsakes.size() > 1 else ""], ", ".join(run.loot.keepsakes.map(func(k): return DB.keepsakes[k].name))])
 	for it in items:
-		var h := UI.hb(6)
-		h.add_child(ResIcon.make(it[0], 26))
-		h.add_child(UI.lbl(it[1], 22, "Bold"))
-		h.tooltip_text = it[2]
-		h.mouse_filter = Control.MOUSE_FILTER_STOP
-		hud_row.add_child(h)
+		hud_row.add_child(UI.res_item(it[0], it[1], it[2], 30, 22))
 	UI.party_cards(party_row, run, 0, _open_hero, func():
 		Game.save_game()
 		_make_walkers()

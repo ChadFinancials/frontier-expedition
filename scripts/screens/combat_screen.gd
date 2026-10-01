@@ -6,7 +6,7 @@ signal chosen(kind: String, a: Variant, b: Variant)
 
 const HERO_X := [790.0, 610.0, 430.0, 250.0]
 const ENEMY_X := [1130.0, 1310.0, 1490.0, 1670.0]
-const GROUND := 770.0
+const GROUND := 745.0
 
 var run: RunState
 var engine: CombatEngine
@@ -52,7 +52,8 @@ func setup(p: Dictionary) -> void:
 		backdrop.mode = "cave"
 		backdrop.light = float(run.cave.light) / 100.0
 	backdrop.setup(run.region_id if run != null else "tallgrass", backdrop.mode, 77)
-	# Heroes stand at GROUND 770 and the HUD starts at 835, so keep the horizon high.
+	# Heroes stand at GROUND 745 (room for three rows of status chips above the HUD at 835),
+	# so keep the horizon high.
 	backdrop.set_bg_horizon(430.0)
 	if run != null and not run.in_cave():
 		backdrop.set_progress(run.map_progress())
@@ -957,12 +958,21 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 	_popup_stack = {}
 	var multi: bool = int(sk.get("hits", 1)) > 1 or int(sk.get("random_hits", 0)) > 0
 	var at_once: bool = not multi and (sk.get("aoe", false) or sk.get("target", "") == "party")
+	# Dealt cards (Stacked Deck) are the exception: one card at a time, each held long
+	# enough to read before the next is dealt.
+	var dealt: bool = group.any(func(g): return str(g.get("card", "")) != "")
+	var cards_seen := 0
 	var hits_seen := 0
 	var shown_any := false
 	for g in group:
 		var pops: bool = g.t in POPPING
 		var is_hit: bool = g.t in ["hit", "miss"]
-		if pops and shown_any and not at_once:
+		if dealt and str(g.get("card", "")) != "":
+			if cards_seen > 0:
+				Audio.play(e.get("sfx", ""))
+				await _wait(0.9)
+			cards_seen += 1
+		elif pops and shown_any and not at_once:
 			await _wait(0.3 if is_hit else 0.16)
 		if is_hit:
 			if multi and hits_seen > 0:
@@ -975,9 +985,9 @@ func _animate_action(e: Dictionary, group: Array) -> void:
 		shown_any = shown_any or pops
 	_move_has_sfx = false
 	await _wait(1.0)
-	# Give dealt cards (Stacked Deck) time to be read.
-	if group.any(func(g): return str(g.get("card", "")) != ""):
-		await _wait(1.2)
+	# Give the last dealt card (Stacked Deck) time to be read.
+	if dealt:
+		await _wait(0.8)
 	# Step back.
 	av.figure.set_pose("idle")
 	for v in targets:

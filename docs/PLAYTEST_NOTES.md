@@ -9,11 +9,13 @@ decided, and what shipped. Update both at the end of every round.
 ## Open backlog
 
 ### Bugs
-- [ ] **Crash on the killing blow against "Mad Dog" Mulligan** (Mad Dog's Hideout, round 7
-      save). Not reproduced headless (`test_quest_boss` wins the fight, settles the run and
-      saves). Suspected native GPU crash from degenerate antialiased polylines; every polyline
-      now goes through `Figure.clean_line`. Waiting on the owner's retry from the stop before
-      the boss, and the log from `%APPDATA%\Godot\app_userdata\Frontier Expedition\logs\`.
+- [ ] **Crashes in combat**: on the killing blow against "Mad Dog" Mulligan (round 7) and
+      mid-battle while idle, deciding on a move (round 8). Not reproduced here: the headless
+      quest test wins and saves, and a 5-minute idle soak (`shot=combat soak=300`) shows flat
+      memory, objects and draw calls with no errors. Points to the graphics driver. Hardened:
+      every polyline goes through `Figure.clean_line`; idle figures and HUDs no longer redraw
+      every frame. **Needs the crash text**: the `play.bat` console window, or the newest
+      `godot*.log` in `%APPDATA%\Godot\app_userdata\Frontier Expedition\logs\`.
 - [ ] Jagged edges on circles and cut-outs (aliasing). Later.
 
 ### Gameplay
@@ -30,6 +32,8 @@ decided, and what shipped. Update both at the end of every round.
       the Preacher's full kit, the Bayou Poisoner's 8th.
 - [ ] Decide whether utility moves need their own per-level upgrade paths (today every move
       level adds the same accuracy, damage, effect and healing bonuses).
+- [ ] Stacked Deck "probably needs tuning" (round 8). A second deal stacks on the first (two
+      Jacks of Clubs = +24 Dodge). Proposed: a new deal replaces that hero's previous card.
 - [ ] Watch: Ruby Blackwing is hard and the crow summon strong; probably right (round 7).
 - [ ] Second region onward (Red Canyons, Thunder Peaks, Redwater Ford) waits until the first
       region is crisp.
@@ -48,6 +52,17 @@ decided, and what shipped. Update both at the end of every round.
 ---
 
 ## History
+
+### Round 8
+- Owner: painted backdrops look stretched and pixelated; top-bar numbers float away from their
+  icons; Stacked Deck shows all cards at once; more than two rows of buffs and debuffs vanish
+  under the HUD; a crash mid-battle while idle.
+- Shipped: numbers sit right beside their icons (shared `UI.res_item`, top bar and trail);
+  Stacked Deck deals one card at a time; status chips are short tags ("ACC +10"), the
+  fighters stand 25 px higher so three rows fit, overflow folds into "+N"; idle figures and
+  HUDs stop redrawing every frame. Backdrops: not stretched (the aspect is kept), just a
+  1344-wide image blown up 1.5-2x; the owner is regenerating them at 1344 x 768 plus a 2x
+  model upscale (`COMFYUI_GUIDE.md` §7). New screenshot args: `statuses`, `with=`, `soak=`.
 
 ### Round 7 (continuing the owner's save from here on)
 - Owner: text on the wood is hard to read; the map looks much better; ambushed in the first

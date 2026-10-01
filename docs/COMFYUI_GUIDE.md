@@ -117,7 +117,16 @@ shows outdoors only (trail and fights): caves and the night camp keep their own 
 the whole sky and range stay in view and the figures stand on the ground. New images get a
 measured guess; check it in-game and hand-set it if the view looks zoomed into the ground.
 
-Composition that works (16:9, e.g. 1344 x 768): sky and range in the top third, rolling
+**Size.** Generate at **1344 x 768** (SDXL's native 16:9 size; asking SDXL for 1920 or more
+straight away gives muddled compositions), then **upscale 2x with a model upscaler** before
+saving: add an **Upscale Image (using Model)** box with `RealESRGAN_x4plus` (in
+`models/upscale_models`), then **Upscale Image By** 0.5, for 2688 x 1536. Save as **PNG**.
+The game draws the scenery about 2070 px wide on a 1080p screen and about 2760 px on 1440p, so
+a 1344-wide image gets blown up 1.5-2x and looks soft and blocky; the upscaled one doesn't.
+Claude stores them at 2560 wide. If the chat shrinks or converts an image (Claude checks the
+pixel size on arrival), commit the PNG to `art-src/backdrops/` with GitHub Desktop instead.
+
+Composition that works (16:9): sky and range in the top third, rolling
 ground below, and the **lower middle kept open**, since eight figures stand across it from
 about 10% to 90% of the width. A landmark (cabin, windmill, rocks) belongs small in the
 middle distance or at the far left or right edge, not low in the frame, or it ends up behind

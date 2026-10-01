@@ -171,7 +171,7 @@ func status_chips() -> Array:
 	if poison > 0:
 		chips.append({"text": "Poison %d" % poison, "kind": "bad"})
 	if stunned:
-		chips.append({"text": "Stunned", "kind": "bad"})
+		chips.append({"text": "Stun", "kind": "bad"})
 	if mark > 0:
 		chips.append({"text": "Marked", "kind": "bad"})
 	if guarded_by >= 0:
@@ -179,14 +179,13 @@ func status_chips() -> Array:
 	if guarding >= 0:
 		chips.append({"text": "Guarding", "kind": "good"})
 	if taunt > 0:
-		chips.append({"text": "Taunting", "kind": "good"})
-	if deaths_door():
-		chips.append({"text": "Death's Door", "kind": "bad"})
+		chips.append({"text": "Taunt", "kind": "good"})
+	# Death's Door has no chip: the HP bar already reads DEATH'S DOOR.
 	var totals := {}
 	for b in buffs:
 		totals[b.stat] = totals.get(b.stat, 0.0) + float(b.value)
 	for s in totals:
 		if totals[s] != 0:
 			var m := {"stat": s, "value": totals[s]}
-			chips.append({"text": Stats.mod_text(m), "kind": "good" if Stats.mod_is_good(m) else "bad"})
+			chips.append({"text": Stats.mod_short(m), "kind": "good" if Stats.mod_is_good(m) else "bad"})
 	return chips

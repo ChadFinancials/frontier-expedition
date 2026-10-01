@@ -75,6 +75,24 @@ static func mod_text(m: Dictionary) -> String:
 		STAT_NAMES.get(stat, stat), cond_text(str(m.get("cond", "")))]
 
 
+## Short labels for the status chips under a unit ("ACC +10"); the unit tooltip has the
+## full wording.
+const STAT_SHORT := {
+	"max_hp_pct": "HP", "acc": "ACC", "dodge": "DODGE", "prot": "PROT", "speed": "SPD",
+	"crit": "CRIT", "dmg_pct": "DMG", "dmg_flat": "DMG", "pierce": "PIERCE", "stun_res": "STUN RES",
+	"bleed_res": "BLEED RES", "poison_res": "POISON RES", "move_res": "MOVE RES",
+	"debuff_res": "DEBUFF RES", "deathblow": "DEATHBLOW", "heal_pct": "HEALING",
+}
+
+
+static func mod_short(m: Dictionary) -> String:
+	var stat: String = m.get("stat", "")
+	var v: float = float(m.get("value", 0))
+	var num := str(int(v)) if is_equal_approx(v, round(v)) else str(v)
+	return "%s %s%s%s" % [STAT_SHORT.get(stat, STAT_NAMES.get(stat, stat)), "+" if v >= 0 else "", num,
+		"%" if stat in PERCENT_STATS else ""]
+
+
 ## True when the modifier is good for the one who carries it.
 static func mod_is_good(m: Dictionary) -> bool:
 	var v: float = float(m.get("value", 0))

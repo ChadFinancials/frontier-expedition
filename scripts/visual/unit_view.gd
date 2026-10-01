@@ -15,6 +15,7 @@ var _t := 0.0
 ## sync); otherwise it follows the unit every frame.
 var shown: Dictionary = {}
 var frozen := false
+var _hud_key := ""
 
 
 func setup(c: Combatant, paper: bool = false) -> void:
@@ -83,7 +84,11 @@ func _process(delta: float) -> void:
 		paper_group.material.set_shader_parameter("grain_offset", get_global_transform_with_canvas().origin)
 	if glow != "":
 		queue_redraw()
-	hud.queue_redraw()
+	# The HUD redraws only when what it shows changes.
+	var key := str(shown) + str(unit.dead if unit != null else true)
+	if key != _hud_key:
+		_hud_key = key
+		hud.queue_redraw()
 
 
 func top_local() -> float:
@@ -112,6 +117,9 @@ func _draw() -> void:
 
 
 class _Hud extends Node2D:
+	## How far below the feet the HUD may draw before the combat panel covers it
+	## (panel top 835 minus the ground line 745).
+	const CHIP_FLOOR := 88.0
 	var view: UnitView
 
 	func _draw() -> void:
@@ -146,19 +154,33 @@ class _Hud extends Node2D:
 			var c := Vector2(w / 2 + 14, 22 + k * 20)
 			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -10), c + Vector2(8, 0), c + Vector2(0, 10), c + Vector2(-8, 0)]), Color(0, 0, 0, 0.8))
 			draw_colored_polygon(PackedVector2Array([c + Vector2(0, -7), c + Vector2(5.5, 0), c + Vector2(0, 7), c + Vector2(-5.5, 0)]), Color("#e0bd4f"))
-		# Status chips.
+		# Status chips: short tags ("ACC +10") in rows under the bars. The combat screen keeps
+		# the ground line high enough for three rows above the HUD panel; the unit's tooltip
+		# lists each one in full with its duration.
+		# Rows use the gap between neighbours (units stand 180 apart); anything that would
+		# drop behind the HUD panel folds into a "+N" chip.
 		var chips: Array = sh.chips
-		var x := -w / 2
-		for ch in chips:
+		var left := -w / 2 - 16.0
+		var right := w / 2 + 34.0
+		var x := left
+		for i in chips.size():
+			var ch: Dictionary = chips[i]
 			var t: String = ch.text
-			var tw := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 8
-			if x + tw > w / 2 + 40:
-				x = -w / 2
-				y += 17
+			var tw := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 7
+			if x + tw > right and x > left:
+				x = left
+				y += 15
+			if y + 16 > CHIP_FLOOR - 15 and i < chips.size() - 1 and x + tw + 30 > right:
+				# Last row, and more to come than fits: say how many are hidden.
+				var more := "+%d" % (chips.size() - i)
+				var mw := font.get_string_size(more, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 7
+				draw_rect(Rect2(x, y + 2, mw, 14), Color(0.15, 0.1, 0.07, 0.9))
+				draw_string(font, Vector2(x + 3.5, y + 13), more, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
+				break
 			var col := Color("#5f8a3a") if ch.kind == "good" else Color("#a8392e")
-			draw_rect(Rect2(x, y + 2, tw, 15), col)
-			draw_string(font, Vector2(x + 4, y + 14), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
-			x += tw + 3
+			draw_rect(Rect2(x, y + 2, tw, 14), col)
+			draw_string(font, Vector2(x + 3.5, y + 13), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
+			x += tw + 2
 
 	func _text(font: Font, pos: Vector2, t: String, size: int, c: Color) -> void:
 		var tw := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x

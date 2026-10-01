@@ -62,6 +62,8 @@ var _skin: Color
 var _hair: Color
 var _colors: Dictionary = {}
 var _dirty := true
+var _breath := 1.0              # breathing factor currently applied to scale.y
+var _fx_was := false            # a flash or muzzle flash was showing last frame
 var _muzzle_pos := Vector2.ZERO
 
 
@@ -138,9 +140,20 @@ func _process(delta: float) -> void:
 		return
 	_t += delta
 	var body: String = look.get("body", "human")
-	if body in ["ghost", "swirl", "bird", "bat", "flock", "harpy"] or flash > 0.0 or muzzle > 0.0:
+	var fx := flash > 0.0 or muzzle > 0.0
+	if body in ["ghost", "swirl", "bird", "bat", "flock", "harpy"] or fx:
 		_dirty = true
-	queue_redraw()
+	# Breathing is a gentle vertical scale on the node itself, so a figure at rest costs
+	# nothing to draw. Last frame's factor is divided out first, which keeps any scale set
+	# from outside (figure.scale *= ...) intact.
+	var br := 1.0 + 0.012 * sin(_t * 2.2 + look_seed % 7) if pose != "dead" else 1.0
+	scale.y = scale.y / _breath * br
+	_breath = br
+	# Redraw only when something changed: new shapes, or a flash or muzzle fading out
+	# (one more frame after it ends, to clear it).
+	if _dirty or fx or _fx_was:
+		queue_redraw()
+	_fx_was = fx
 
 
 func _draw() -> void:
@@ -160,8 +173,6 @@ func _draw() -> void:
 	if body_style >= 3:
 		_draw_layered()
 		return
-	var breathe := 1.0 + 0.012 * sin(_t * 2.2 + look_seed % 7) if idle_anim and pose != "dead" else 1.0
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, breathe))
 	# Shadow pass.
 	for s in _shapes:
 		if s.get("glow", false):
@@ -1450,8 +1461,6 @@ func _add_light_bands() -> void:
 ## Styles 3-5 draw piece by piece (edge, shadow and fill per piece) instead of pass by pass,
 ## so every piece shows its own outline and casts onto the pieces behind it.
 func _draw_layered() -> void:
-	var breathe := 1.0 + 0.012 * sin(_t * 2.2 + look_seed % 7) if idle_anim and pose != "dead" else 1.0
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1.0, breathe))
 	if body_style == 5:
 		# One soft ground shadow for the whole figure, then the paper silhouette edge.
 		for s in _shapes:
