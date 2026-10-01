@@ -10,6 +10,7 @@
 | [`ART_PIPELINE.md`](ART_PIPELINE.md) | The approved look (drawn and painted), style rules, what works and what doesn't | Owner art decisions |
 | [`COMFYUI_GUIDE.md`](COMFYUI_GUIDE.md) | The owner's hands-on ComfyUI guide, and the path from an image to the game (icons, backdrops) | With the art workflow |
 | [`CONTENT_AUDIT.md`](CONTENT_AUDIT.md) | Which systems have had real passes and which are still first-draft (quirks, trinkets, curios, events...), with a recommended order | Before a content pass |
+| [`QUIRK_PROPOSALS.md`](QUIRK_PROPOSALS.md) | Every quirk with a proposed edit, plus 10 new ones, awaiting the owner's picks | Until picked and built |
 | [`HERO_PROPOSALS.md`](HERO_PROPOSALS.md) | Options awaiting the owner's picks: new moves for the classes under 8, and two new hero designs | Until picked and built |
 | [`HERO_REVIEW.md`](HERO_REVIEW.md) | Every class and move with real numbers. **Generated**: `python3 tools/hero_sheet.py` | Regenerate after hero changes |
 | [`ENEMY_REVIEW.md`](ENEMY_REVIEW.md) | Every enemy and move with real numbers. **Generated**: `python3 tools/enemy_sheet.py` | Regenerate after enemy changes |
