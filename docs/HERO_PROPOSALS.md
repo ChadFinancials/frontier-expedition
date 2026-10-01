@@ -120,6 +120,66 @@ A rail-riding drifter who leaps between moving cars.
 - 🛠: the gauge (stored per combatant, drawn on the HUD), the mega attack's unlock, enemy
   swap, swap with any ally, Vulnerable.
 
+### The Train Hopper: workshop (revision 3)
+
+A rail-riding drifter who leaps between moving cars. She wants to move every turn, and her
+Momentum gauge rewards it.
+
+**Stats:** HP 18 · Dodge 14 · Speed 7 · Crit 7% · damage 4-8 · ranks 1-4 (prefers 2-3) ·
+move resist 30. Low on purpose: being shoved around feeds her gauge.
+
+**The Momentum gauge** (0-100): a steam-gold bar under her HP and Fatigue bars, with a
+tooltip.
+
+| Source | Momentum |
+|---|---|
+| Each rank she moves, by her own move or a swap she starts | +20 |
+| Being moved by anyone else (an ally's swap, an enemy's knockback) | +10 (she rolls with it) |
+| Landing a hit on the turn she moved | +10 ("hopping on") |
+| Ending her turn **without moving** | -15 ("losing steam") |
+| Being stunned | -25 |
+
+**Thresholds:**
+- **50+ "Full Steam":** +3 Speed and +5 Dodge while the gauge stays above half.
+- **100: Runaway Train unlocks** as an extra button. It doesn't take one of her 4 move slots.
+- The gauge resets to 0 each fight, so a fight is about building to the mega attack.
+
+**Runaway Train (mega):** usable from any rank at 100.
+- She charges through the whole enemy line: 5-9 damage to all 4 ranks, the front enemy is
+  thrown to the back, and every enemy hit is Vulnerable 15% for 2 rounds.
+- She ends in rank 1 and the gauge empties.
+- Expected: about 22 damage plus the Vulnerable window, once every 3-4 turns. That's about
+  9 a turn averaged, a carry's output, paid for with her fragility.
+
+**Moves (8)**, every one of which moves her or the line:
+
+| Move | From → hits | Damage | Effect | Momentum |
+|---|---|---|---|---|
+| ★ **Hop the Car** | 2-4 → one of 1-3 | 3-6 | Hits, then moves back 1 | +20, +10 for the hit |
+| ★ **Boxcar Leap** | 3-4 → one of 1-2 | 4-7, +10% crit | Moves forward 2, then strikes | +40, +10 |
+| **Coupling Pin** | 1-2 → one of 1-2 | 3-5 | Uncouples it: the target swaps with the enemy behind it | +10 if she moved this turn |
+| **Coal Dust** | 2-4 → all of 3-4 | - | -8 Acc and -2 Speed for 2 rounds, then she moves back 1 | +20 |
+| **Switch Tracks** | 1-4 → any ally | - | Swaps with any ally (not just a neighbour); both +2 Speed for 2 rounds | +15 |
+| **Railspike Toss** | 3-4 → 2 random of 1-4 | 2-4 each | Vulnerable 10% for 2 rounds; she plants her feet (no move) | none (a setup turn) |
+| **Stoke the Boiler** | 1-4 → self | - | +2 Speed for 2 rounds; she doesn't move but loses no steam this turn | +25 |
+| **Duck the Tunnel** | 1-4 → self | - | +20 Dodge for 1 round, moves back 1 | +20 |
+
+**Synergies:**
+- She's fed by the Rail Driver's knockbacks and anyone who swaps with her.
+- The Wrangler's speed buffs help her act first.
+- Vulnerable from her Railspikes and the Runaway Train amplifies the whole party.
+- Coupling Pin can drag a back-line sniper into the Shotgun Guard's reach.
+
+**Engine work:**
+- a per-combatant Momentum value, with the triggers above;
+- the HUD gauge and its tooltip;
+- an extra mega button gated on a full gauge;
+- the enemy swap (Coupling Pin) and swap-with-any-ally (Switch Tracks);
+- Vulnerable is already done.
+
+**Art:** a new character look (a drifter in a long coat and flat cap, a bindle, coal-smudged),
+three outfits, and a steam-gold palette for the gauge.
+
 ### Vulnerable: where else it fits
 Vulnerable (+X% damage taken from all sources) is different from **Mark** (enemies target
 the marked hero, and some moves deal bonus damage to marked targets). Keep both.
