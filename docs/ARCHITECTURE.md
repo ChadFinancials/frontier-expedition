@@ -155,6 +155,8 @@ while not engine.is_over():
   lands (`shift_hp`, `shift_fatigue`, `sync_status`). Popups stack per unit (`_popup_stack`);
   multi-hit moves play a sound per hit; area and party moves show all results at once,
   except dealt cards (Stacked Deck), which come one at a time.
+- **Fading a unit**: call `UnitView.unpaper()` first. Its figure sits in a paper
+  CanvasGroup, which draws as a grey box under Vulkan when faded through a parent's modulate.
 - **Redraw cost**: figures breathe through their node scale and redraw only when their shapes
   change (pose, flash, animated creatures); HUDs redraw only when what they show changes.
 

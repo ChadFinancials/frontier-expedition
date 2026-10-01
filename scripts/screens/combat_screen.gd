@@ -825,6 +825,7 @@ func _result(e: Dictionary) -> void:
 			var t11 := engine.unit(e.target)
 			if t11 != null and views.has(t11.id):
 				var v: UnitView = views[t11.id]
+				v.unpaper()
 				var tw := create_tween().set_parallel(true)
 				tw.tween_property(v, "modulate:a", 0.0, 0.7 / speed)
 				tw.tween_property(v, "rotation", -0.9 if t11.is_hero() else 0.9, 0.7 / speed)
@@ -842,8 +843,12 @@ func _result(e: Dictionary) -> void:
 			if nc != null:
 				_add_view(nc)
 				views[nc.id].position = _rank_pos(nc) + Vector2(200, 0)
-				views[nc.id].modulate.a = 0
-				create_tween().tween_property(views[nc.id], "modulate:a", 1.0, 0.4)
+				var nv: UnitView = views[nc.id]
+				nv.unpaper()
+				nv.modulate.a = 0
+				var twn := create_tween()
+				twn.tween_property(nv, "modulate:a", 1.0, 0.4)
+				twn.tween_callback(func(): if is_instance_valid(nv): nv.repaper())
 				_log("%s joins the fight!" % nc.display_name)
 				_layout()
 		"light":
@@ -1227,6 +1232,7 @@ func _scripted_cutscene(sc: Dictionary) -> void:
 	var tw2 := create_tween().set_parallel(true)
 	for c in engine.enemies:
 		var v: UnitView = views[c.id]
+		v.unpaper()
 		tw2.tween_property(v, "position:x", v.position.x + 520, 1.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		tw2.tween_property(v, "modulate:a", 0.0, 1.4)
 	await tw2.finished

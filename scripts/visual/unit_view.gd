@@ -27,15 +27,38 @@ func setup(c: Combatant, paper: bool = false) -> void:
 	figure.scale *= base_scale
 	if paper:
 		figure.crafted = true
-		paper_group = PaperFX.group({"shadow_offset": Vector2(10, 7), "shadow_alpha": 0.3, "shadow_blur": 2.5,
-			"bevel_strength": 1.1, "bevel_radius": 3.0}, 30.0)
-		paper_group.add_child(figure)
-		add_child(paper_group)
+		add_child(figure)
+		repaper()
 	else:
 		add_child(figure)
 	hud = _Hud.new()
 	hud.view = self
 	add_child(hud)
+
+
+## Wrap the figure in its paper group (the paper-theater material).
+func repaper() -> void:
+	if paper_group != null or figure == null:
+		return
+	paper_group = PaperFX.group({"shadow_offset": Vector2(10, 7), "shadow_alpha": 0.3, "shadow_blur": 2.5,
+		"bevel_strength": 1.1, "bevel_radius": 3.0}, 30.0)
+	remove_child(figure)
+	paper_group.add_child(figure)
+	add_child(paper_group)
+	move_child(paper_group, 0)
+
+
+## Take the figure out of its paper group before fading or spinning the whole unit (death,
+## a summon's fade-in). A CanvasGroup faded through its parent's modulate drew as a grey box
+## under Vulkan; a plain figure fades cleanly. repaper() puts the group back.
+func unpaper() -> void:
+	if paper_group == null:
+		return
+	paper_group.remove_child(figure)
+	add_child(figure)
+	move_child(figure, 0)
+	paper_group.queue_free()
+	paper_group = null
 
 
 func set_glow(g: String) -> void:

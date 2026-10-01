@@ -67,6 +67,9 @@ decided, and what shipped. Update both at the end of every round.
 - Crash logs showed no backtrace (a driver kill under OpenGL). `play_vulkan.bat` tested the
   Vulkan renderer; the owner found it much smoother, so **Vulkan is now the default**, with
   OpenGL as the automatic fallback and `play_opengl.bat` to force it.
+- Under Vulkan, dying enemies showed a grey box: the figure's paper group (a CanvasGroup)
+  faded through its parent. Units now leave the paper group before a death, a summon's
+  fade-in or a scripted retreat (`UnitView.unpaper` / `repaper`).
 
 ### Round 7 (continuing the owner's save from here on)
 - Owner: text on the wood is hard to read; the map looks much better; ambushed in the first
