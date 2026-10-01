@@ -392,6 +392,10 @@ static func run(main: Main, args: Dictionary) -> void:
 						root.add_child(l)
 		"settlement":
 			await main.goto("settlement", {"index": 0}, true)
+			# hover=N: show plot N highlighted, as under the mouse.
+			if args.has("hover"):
+				main.screen.town.hover = int(args.hover)
+				main.screen.town.queue_redraw()
 		"silas":
 			# Silas's gambit, triggered at once (in-memory tweak for the screenshot only).
 			Game.company.complete_tutorial()

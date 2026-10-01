@@ -208,6 +208,7 @@ while not engine.is_over():
 |---|---|---|---|
 | Icons | `assets/art/icons/<key>.png` (256 px, transparent) | `ResIcon.art(key, px)`: cached, shrunk once per size | The drawn icon for that key |
 | Backdrops | `assets/art/backdrops/<key>.png` or a numbered set `<key>_1.png`, `_2.png`... | `Backdrop._load_backdrop_image` | Drawn scenery |
+| Town painting | `assets/art/town/<image>.png`, plus `town_art` spots in `settlements.json` | `TownView.set_art`: painted buildings become the plots, marked with name, CLOSED and VACANT boards | The drawn street |
 
 - Icon keys are an item's `icon` field in `items.json` or a resource kind in `res_icon.gd`
   (`money, timber, iron, charter, week, wagon, xp, eye, skull...`).

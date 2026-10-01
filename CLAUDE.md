@@ -82,7 +82,8 @@ tools/shot.sh <scenario> /tmp/x.png [args]                    # look at it (xvfb
 #   tutorial silas lineup faces outfits (see scripts/debug/shots.gd)
 # args: full (party of 4), region=<id>, far (end of map), enemies=a,b, ehp=N, act,
 #   statuses (load everyone with effects), with=<class> skill=<id> (watch a move),
-#   soak=N (idle N seconds printing memory/object/draw counts, for leak and crash hunts)
+#   soak=N (idle N seconds printing memory/object/draw counts, for leak and crash hunts),
+#   settlement hover=N (plot N highlighted)
 $GODOT --headless --path . -- shot=autoplay expeditions=3     # UI smoke test (only when asked)
 ```
 In the cloud dev container: `GODOT=/home/user/tools/godot/Godot_v4.7.2-stable_linux.x86_64`.

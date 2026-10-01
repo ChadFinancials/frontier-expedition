@@ -1,7 +1,9 @@
 class_name TownView
 extends Control
-## The painted settlement street: one clickable building per plot, drawn paper-cutout
-## style over the region backdrop. Emits building_clicked(id) ("" = empty plot).
+## The settlement street: one clickable building per plot. Emits building_clicked(id)
+## ("" = empty plot). Two looks: a town painting (set_art) whose painted buildings serve as
+## the plots, marked with wooden signs; or, without one, buildings drawn paper-cutout style
+## over the region backdrop.
 
 signal building_clicked(bid: String)
 
@@ -13,6 +15,32 @@ var hover := -1
 var street_y := 700.0
 var paper := false         # paper-theater street: two staggered depths, props, palisade
 var _t := 0.0
+# Town painting: settlements.json "town_art". Its painted buildings are the plots.
+var art: Texture2D = null
+var art_spots: Array = []      # Rect2 per painted building, in image pixels, most prominent first
+var art_prefer: Dictionary = {} # building id -> spot index that suits it
+var _art_scale := 1.0
+var _art_off := Vector2.ZERO
+var _boards: Dictionary = {}   # cached signboard styles
+
+
+## Use a town painting. spots: [x, y, w, h] per painted building (image pixels).
+func set_art(tex: Texture2D, spots: Array, prefer: Dictionary = {}) -> void:
+	art = tex
+	art_spots.clear()
+	for s in spots:
+		art_spots.append(Rect2(float(s[0]), float(s[1]), float(s[2]), float(s[3])))
+	art_prefer = prefer
+	_boards = {
+		"name": StyleBoxWood.sign_board(Color("#4a3220"), 8),
+		"name_hover": StyleBoxWood.sign_board(Color("#4a3220"), 8, Color(0, 0, 0, 0), Color("#e0bd4f")),
+		"closed": StyleBoxWood.sign_board(Color("#4a3220"), 8, Color("#8a2c22")),
+		"closed_hover": StyleBoxWood.sign_board(Color("#4a3220"), 8, Color("#8a2c22"), Color("#e0bd4f")),
+		"vacant": StyleBoxWood.sign_board(Color("#6b5236"), 8),
+		"vacant_hover": StyleBoxWood.sign_board(Color("#6b5236"), 8, Color(0, 0, 0, 0), Color("#e0bd4f")),
+	}
+	_layout()
+	queue_redraw()
 
 
 func set_buildings(buildings: Dictionary, slots: int, ruins: Array = []) -> void:
@@ -27,6 +55,9 @@ func set_buildings(buildings: Dictionary, slots: int, ruins: Array = []) -> void
 
 
 func _layout() -> void:
+	if art != null:
+		_layout_art()
+		return
 	if paper:
 		_layout_paper()
 		return
@@ -58,6 +89,36 @@ func _layout_paper() -> void:
 		plots[i].rect = Rect2(x - 110 * s, base_y - 235 * s, 220 * s, 235 * s)
 
 
+## The painting covers the view, anchored at the bottom (any crop comes off the sky). Each
+## building takes the spot that suits it (art_prefer), then empty lots take the most
+## prominent free spots.
+func _layout_art() -> void:
+	var tw := float(art.get_width())
+	var th := float(art.get_height())
+	_art_scale = maxf(size.x / tw, size.y / th)
+	_art_off = Vector2((size.x - tw * _art_scale) / 2.0, size.y - th * _art_scale)
+	var used := {}
+	var spot_of := {}
+	for i in plots.size():
+		var bid: String = plots[i].id
+		if bid != "" and art_prefer.has(bid):
+			var k := int(art_prefer[bid])
+			if k < art_spots.size() and not used.has(k):
+				spot_of[i] = k
+				used[k] = true
+	for i in plots.size():
+		if spot_of.has(i):
+			continue
+		for k in art_spots.size():
+			if not used.has(k):
+				spot_of[i] = k
+				used[k] = true
+				break
+	for i in plots.size():
+		var r: Rect2 = art_spots[int(spot_of[i])] if spot_of.has(i) else Rect2()
+		plots[i].rect = Rect2(_art_off + r.position * _art_scale, r.size * _art_scale)
+
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_layout()
@@ -65,7 +126,8 @@ func _notification(what: int) -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
-	queue_redraw()
+	if art == null:
+		queue_redraw()
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -79,10 +141,12 @@ func _gui_input(event: InputEvent) -> void:
 				if bid == "":
 					tip = "Empty plot: click to build"
 				elif plots[h].ruin:
-					tip = "Burned %s: click to rebuild at a discount" % DB.buildings[bid].name
+					tip = "%s %s: click to rebuild it" % ["Closed" if art != null else "Burned", DB.buildings[bid].name]
 				else:
 					tip = "%s (level %d)\n%s" % [DB.buildings[bid].name, plots[h].level, DB.buildings[bid].desc]
 			tooltip_text = tip
+			if art != null:
+				queue_redraw()
 			mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if h >= 0 else Control.CURSOR_ARROW
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var h2 := _plot_at(event.position)
@@ -91,11 +155,14 @@ func _gui_input(event: InputEvent) -> void:
 			building_clicked.emit(plots[h2].id)
 
 
+## The plot under p. Where painted buildings overlap, the nearer one (lower on screen) wins.
 func _plot_at(p: Vector2) -> int:
+	var best := -1
 	for i in plots.size():
-		if plots[i].rect.has_point(p):
-			return i
-	return -1
+		var r: Rect2 = plots[i].rect
+		if r.has_point(p) and (best < 0 or r.end.y > plots[best].rect.end.y):
+			best = i
+	return best
 
 
 # --- Drawing --------------------------------------------------------------------------
@@ -136,6 +203,9 @@ func _window(p: Vector2, lit: bool = true) -> void:
 
 
 func _draw() -> void:
+	if art != null:
+		_draw_art()
+		return
 	if paper:
 		_draw_paper()
 		return
@@ -390,3 +460,90 @@ func _draw_building(art: String, b: Vector2, level: int, bname: String) -> void:
 	# Level stars.
 	for k in level:
 		draw_colored_polygon(PackedVector2Array(Figure.star_pts(b + Vector2(-(level - 1) * 12 + k * 24, 22), 9, 4, 5)), Color("#e0bd4f"))
+
+
+# --- Town painting ---------------------------------------------------------------------
+
+func _draw_art() -> void:
+	draw_texture_rect(art, Rect2(_art_off, Vector2(art.get_width(), art.get_height()) * _art_scale), false)
+	# Back to front, so a nearer building's signs sit over a farther one's.
+	var order: Array = range(plots.size())
+	order.sort_custom(func(a, b): return plots[a].rect.end.y < plots[b].rect.end.y)
+	for i in order:
+		_draw_art_plot(i)
+
+
+## A plot on the painting: built buildings get a name board on the roofline; a closed one
+## (a ruin to rebuild) its name plus a red CLOSED board on a post out front; an empty lot a
+## VACANT board on the roofline. Hovering lights the ground under the building and gilds
+## its signs.
+func _draw_art_plot(i: int) -> void:
+	var pl: Dictionary = plots[i]
+	var r: Rect2 = pl.rect
+	if r.size.x <= 0.0:
+		return
+	var hov := i == hover
+	var bid: String = pl.id
+	var front := Vector2(r.position.x + r.size.x * 0.5, r.end.y)
+	if hov:
+		for k in 3:
+			var pts := PackedVector2Array(Figure.ellipse(front + Vector2(0, -4), r.size.x * (0.5 + k * 0.06), 12.0 + k * 5.0, 28))
+			draw_colored_polygon(pts, Color(1.0, 0.86, 0.45, 0.22 - k * 0.06))
+	# The roofline: a little below the top of the building's box (chimneys and false fronts
+	# poke above it), so the board reads as belonging to this building, not the one behind.
+	var top := Vector2(r.position.x + r.size.x * 0.5, r.position.y + r.size.y * 0.16)
+	if bid == "":
+		_name_board(top, "VACANT", "+ Build here", hov, false, "vacant")
+	elif pl.get("ruin", false):
+		var nb := _name_board(top, DB.buildings[bid].name, "", hov, true)
+		_post_board(front, "CLOSED", "Rebuild", "closed", hov, nb.end.y + 4.0)
+	else:
+		_name_board(top, DB.buildings[bid].name, "Level %d" % int(pl.level), hov, false)
+
+
+func _board_text_w(title: String, fs: int, sub: String, sfs: int) -> float:
+	var w := UI.font_head.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	if sub != "":
+		w = maxf(w, UI.font_bold.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, sfs).x)
+	return w
+
+
+## A board centred on the roofline.
+func _name_board(top: Vector2, title: String, sub: String, hov: bool, dim: bool, kind: String = "name") -> Rect2:
+	var fs := 21
+	var sfs := 14
+	var w := _board_text_w(title, fs, sub, sfs) + 30.0
+	var h := 34.0 + (16.0 if sub != "" else 0.0)
+	var x := clampf(top.x - w / 2, 4.0, size.x - w - 4.0)
+	var y := maxf(4.0, top.y - h * 0.5)
+	var rect := Rect2(x, y, w, h)
+	_boards[kind + ("_hover" if hov else "")].draw(get_canvas_item(), rect)
+	var gold := Color("#f1d38a") if not dim else Color("#b9a98a")
+	_text_c(UI.font_head, Vector2(rect.get_center().x, y + 25), title, fs, gold)
+	if sub != "":
+		_text_c(UI.font_bold, Vector2(rect.get_center().x, y + 42), sub, sfs, Color("#e9dcc0"))
+	return rect
+
+
+## A board on a post planted in front of the building. On a short building it steps
+## forward (down the screen) so it never covers the name board above (min_top).
+func _post_board(front: Vector2, title: String, sub: String, kind: String, hov: bool, min_top: float = 0.0) -> void:
+	var fs := 18
+	var sfs := 13
+	var w := _board_text_w(title, fs, sub, sfs) + 26.0
+	var h := 46.0
+	var post_h := 22.0
+	var gx := clampf(front.x, w / 2 + 4.0, size.x - w / 2 - 4.0)
+	var gy := minf(maxf(front.y + 6.0, min_top + h + post_h), size.y - 4.0)
+	draw_rect(Rect2(gx - 3.0, gy - post_h - 4.0, 6.0, post_h + 4.0), Color("#3a2618"))
+	draw_colored_polygon(PackedVector2Array(Figure.ellipse(Vector2(gx + 3, gy), 14.0, 4.0, 16)), Color(0, 0, 0, 0.25))
+	var rect := Rect2(gx - w / 2, gy - post_h - h, w, h)
+	_boards[kind + ("_hover" if hov else "")].draw(get_canvas_item(), rect)
+	_text_c(UI.font_head, Vector2(gx, rect.position.y + 22), title, fs, Color("#f6ead0"))
+	_text_c(UI.font_bold, Vector2(gx, rect.position.y + 38), sub, sfs, Color("#f1d38a"))
+
+
+func _text_c(font: Font, at: Vector2, t: String, fs: int, c: Color) -> void:
+	var tw := font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	draw_string_outline(font, Vector2(at.x - tw / 2, at.y), t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 3, Color(0, 0, 0, 0.6))
+	draw_string(font, Vector2(at.x - tw / 2, at.y), t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, c)

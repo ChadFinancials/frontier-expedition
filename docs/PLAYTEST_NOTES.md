@@ -84,6 +84,12 @@ decided, and what shipped. Update both at the end of every round.
   and heal ranges read in the data exactly as they play (gameplay unchanged). The hero dial
   now also covers moves with their own damage range. `enemy_dmg_mult` stays 0.9. The review
   sheets now round like Godot (halves up), fixing a few ranges they had shown one too low.
+- **Town painting** for Fort Providence (owner's): its painted buildings are the plots.
+  Each building has a spot that suits it (the two-storey yellow one is the Saloon, the big
+  barn the Smithy, the front house with a porch the Hiring Board...); empty lots take the most
+  prominent free spots; spots beyond the town's plot count stay scenery. Wooden boards mark
+  them: the name on the roofline, a red CLOSED board on a post for buildings to rebuild (the
+  owner's idea, instead of burned ruins), VACANT for empty lots. Hover glows the ground.
 - Under Vulkan, dying enemies showed a grey box: the figure's paper group (a CanvasGroup)
   faded through its parent. Units now leave the paper group before a death, a summon's
   fade-in or a scripted retreat (`UnitView.unpaper` / `repaper`). Owner confirmed fixed.

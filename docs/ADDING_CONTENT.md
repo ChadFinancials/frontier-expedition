@@ -262,7 +262,11 @@ Optional:
 
 `data/settlements.json`: `index` (position on the chain, east to west), `name`, `desc`,
 `founded_at` (the region whose boss unlocks it), `region_west`, and optionally `side_regions`
-and `victory` (the end-of-trail text). The start town also takes `start_tier`,
+and `victory` (the end-of-trail text). `town_art` gives the settlement a town painting whose
+painted buildings serve as its plots: `image` (a file in `assets/art/town/`, no extension),
+`spots` (one `[x, y, w, h]` box per painted building, in the image's pixels, most prominent
+first; empty lots take the first free ones) and `prefer` (`{building id: spot index}` for the
+spot that suits each building). Without it, or until the image exists, the town is drawn. The start town also takes `start_tier`,
 `start_buildings`, `start_ruins` (burned buildings to rebuild), `tutorial` (region of the first
 expedition) and `tutorial_rebuilds` (the ruin that winning it restores).
 

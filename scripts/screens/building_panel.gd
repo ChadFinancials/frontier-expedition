@@ -441,7 +441,7 @@ func _ruin(v: VBoxContainer) -> void:
 	var b: Dictionary = DB.buildings[bid]
 	var head := UI.hb(12)
 	v.add_child(head)
-	head.add_child(UI.hdr("Burned %s" % b.name, 34, true))
+	head.add_child(UI.hdr("Closed %s" % b.name, 34, true))
 	head.add_child(UI.spacer(0, 0, true))
 	head.add_child(UI.btn("Close", func(): Main.inst.close_modal(wrap), "Small"))
 	v.add_child(UI.wrap(UI.lbl("Silas Crane's gang put this to the torch. It still holds its plot, but lumber and iron are scarce out here: side adventures and the trail are where you'll find them.", 19, "Ink"), 1180))

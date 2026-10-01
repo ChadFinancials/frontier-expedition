@@ -13,7 +13,7 @@ exploration that led here (SDXL runs, rankings, failed routes) is archived in
 | Heroes, enemies, creatures | **Drawn in code** from each `look` in the data | `scripts/visual/figure.gd` |
 | UI panels, buttons, bars | **Drawn in code**: wood planks, rope, signboards | `scripts/ui/wood_style.gd`, `ui.gd` |
 | Expedition map | **Drawn in code**: parchment, inked trails, wooden discs | `scripts/visual/map_view.gd` |
-| Town street and buildings | **Drawn in code** | `scripts/visual/town_view.gd` |
+| Town street and buildings | **Painted** for Fort Providence (its painted buildings are the plots, with wooden signs); **drawn** elsewhere | `assets/art/town/`, `town_view.gd` |
 | Wagon, campfire, event and curio art | **Drawn in code** | `wagon_art.gd`, `campfire.gd`, `event_art.gd`, `curio_art.gd` |
 | Scenery | **Painted** where a set exists, otherwise **drawn** layered paper scenery | `assets/art/backdrops/`, `backdrop.gd` |
 | Item and resource icons | **Painted by the owner**, drawn fallback | `assets/art/icons/`, `res_icon.gd` |

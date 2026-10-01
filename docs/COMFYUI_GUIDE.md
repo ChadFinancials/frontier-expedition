@@ -117,6 +117,11 @@ shows outdoors only (trail and fights): caves and the night camp keep their own 
 the whole sky and range stay in view and the figures stand on the ground. New images get a
 measured guess; check it in-game and hand-set it if the view looks zoomed into the ground.
 
+**Town paintings** go in the same folder (`town_<settlement>.png`). The painted buildings
+become the building plots, so the picture needs about 9 clearly separate buildings at
+different depths (a city's 9 plots), none hiding another; Claude marks a box on each in
+`settlements.json` and hangs the signs.
+
 **The owner's prompt for area 1 backdrops** (Fort Providence, the Tallgrass Sea, the tutorial
 and rumors; verbatim, as used):
 

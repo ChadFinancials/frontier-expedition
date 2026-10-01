@@ -39,7 +39,14 @@ func setup(params: Dictionary) -> void:
 	town.street_y = 680
 	town.paper = PaperFX.enabled
 	town.building_clicked.connect(_on_building)
-	if PaperFX.enabled:
+	# A town painting, when the settlement has one: its painted buildings are the plots.
+	var ta: Dictionary = site.get("town_art", {})
+	var art_path := "res://assets/art/town/%s.png" % str(ta.get("image", ""))
+	if not ta.is_empty() and ResourceLoader.exists(art_path):
+		town.size = Vector2(1340, 740)
+		town.set_art(load(art_path), ta.get("spots", []), ta.get("prefer", {}))
+		add_child(town)
+	elif PaperFX.enabled:
 		var tg := PaperFX.group({"shadow_offset": Vector2(8, 9), "shadow_alpha": 0.3, "bevel_strength": 0.9}, 30.0)
 		tg.add_child(town)
 		add_child(tg)
@@ -242,7 +249,7 @@ func _company_news() -> String:
 
 
 func _home_tips() -> String:
-	return "[i]Tips: Click a building to use it. Burned buildings can be rebuilt once you have the Timber and Iron. Click a hero to see their skills, quirks and gear. When you're ready, [b]Plan Expedition[/b]. Esc opens the menu and How to Play.[/i]"
+	return "[i]Tips: Click a building to use it. Closed buildings (Crane's gang burned them out) can be rebuilt once you have the Timber and Iron. Click a hero to see their skills, quirks and gear. When you're ready, [b]Plan Expedition[/b]. Esc opens the menu and How to Play.[/i]"
 
 
 func open_hero(h: Hero) -> void:
