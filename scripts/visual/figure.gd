@@ -583,6 +583,10 @@ func _build_human() -> void:
 		"hurt":
 			hand_f = shoulder_f + Vector2(10 + reach * 0.5, 30)
 			weapon_ang = 1.5
+	# Turned three-quarter, a long gun keeps both hands on it in every pose: the far hand
+	# grips further along the barrel.
+	if tq and long_gun and pose in ["windup", "strike", "cast", "hurt"]:
+		hand_b = hand_f + Vector2.RIGHT.rotated(weapon_ang) * 24
 
 	var parts_start := _shapes.size()
 	# Lantern at the hip (behind).

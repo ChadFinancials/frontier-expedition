@@ -97,7 +97,7 @@ decided, and what shipped. Update both at the end of every round.
 - **Three-quarter bodies** (owner, from a Darkest Dungeon screenshot): heroes and human
   enemies now turn toward their facing side: chest open forward, weapon arm from the back
   shoulder across the body, far arm steadying the weapon, weapons held low and ready.
-  `Figure.three_quarter` (false: the old side-on build); shot arg `side` for before/after.
+  `Figure.three_quarter` (false: the old side-on build); shot arg `side` for before/after; `shot=faces poses small classes=a,b,c,d` checks every pose.
 - **Train Hopper** (new class, owner's kit; design in HERO_PROPOSALS revision 4): a
   single-target burster. Momentum gauge (moves +20/+30, moved by others +10, idle turn -10,
   stunned -25; Full Steam at 50: +3 Speed, +5 Dodge) and the mega **End of the Line** at 100

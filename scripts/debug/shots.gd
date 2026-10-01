@@ -240,6 +240,9 @@ static func run(main: Main, args: Dictionary) -> void:
 					bgd3.setup("tallgrass", "trail", 3)
 					froot.add_child(bgd3)
 				var classes: Array = ["marshal", "gunslinger", "mountain_man", "preacher"] if small else [args.get("cls", "marshal"), args.get("cls", "marshal")]
+				# classes=a,b,c,d: which four (hero classes or enemy ids) the small grid shows.
+				if small and args.has("classes"):
+					classes = str(args.classes).split(",")
 				for r in classes.size():
 					for i in pl.size():
 						var cellp := Control.new()
@@ -254,7 +257,8 @@ static func run(main: Main, args: Dictionary) -> void:
 							cellp.add_child(cb)
 						var fp := Figure.new()
 						fp.face_look = 6 if (small or r == 1) else 1
-						fp.setup(DB.classes[classes[r]].look, 7 + r if small else 7, 1)
+						var plook: Dictionary = DB.classes[classes[r]].look if DB.classes.has(classes[r]) else DB.enemy(classes[r]).get("look", {})
+						fp.setup(plook, 7 + r if small else 7, 1)
 						fp.set_pose(pl[i])
 						var pz := float(args.get("zoom", "2.6"))
 						# Centre the head: the body leans about (0, -10) per pose (see Figure._build_human).
