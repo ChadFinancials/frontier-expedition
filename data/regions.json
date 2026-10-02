@@ -8,7 +8,7 @@
     "palette": {"sky_top": "#4a6f8f", "sky_bottom": "#f2c57c", "sun": "#fff4d6", "far": "#8f8a6a", "mid": "#9aa05a", "near": "#6e8a3a", "ground": "#55692e", "accent": "#d9a441"},
     "props": ["fence", "tree", "grass", "rock"],
     "cave_name": "Root Cellar",
-    "boss_rewards": {"money": 120, "charters": 0, "timber": 3, "iron": 1},
+    "boss_rewards": {"money": 240, "charters": 0, "timber": 3, "iron": 1},
     "fixed_map": [
       [{"type": "start", "title": "The Old Mill Road",
         "story": "Your company has ridden a month from back east, chasing the same rumor as everyone else: past the last mountain stands [b]the Great Casino[/b], a paradise city where a fortune waits on every table. Its chips are the only coin anyone trusts out here.\n\nTwo of you are bringing the wagon; the other two rode ahead to Fort Providence, the last real town, two days west. But there's smoke on the western horizon, and nobody has passed you coming east.\n\n[i]Tip: This is the trail map. Your wagon is on the left. Click a stop you can reach (it glows) to travel there. Stops marked ? haven't been scouted yet. Each leg of travel eats Food and wears the wagon.[/i]"}],
@@ -43,7 +43,7 @@
     "props": ["mesa", "rock", "skull", "cactus"],
     "cave_name": "Mine Shaft",
     "node_weights": {"fight": 34, "event": 18, "curio": 18, "cave": 18, "elite": 8, "homestead": 0, "trading_post": 4}, "max_caves": 2,
-    "boss_rewards": {"money": 150, "charters": 0, "timber": 2, "iron": 6},
+    "boss_rewards": {"money": 300, "charters": 0, "timber": 2, "iron": 6},
     "side_reward": {"rescue": true, "iron": 6, "text": "Tied up behind Old Jeb's throne of ore carts is {name}: alive, filthy and absolutely furious. The knockers had been keeping them as a pet."},
     "fights": [
       {"enemies": ["tommyknocker", "tommyknocker", "giant_bat"], "weight": 3},
@@ -78,7 +78,7 @@
     "props": ["tree", "grass", "fence", "rock"],
     "cave_name": "Root Cellar",
     "node_weights": {"fight": 46, "elite": 12, "event": 18, "curio": 12, "cave": 4, "homestead": 4, "trading_post": 4},
-    "boss_rewards": {"money": 220, "charters": 0, "timber": 6, "iron": 2},
+    "boss_rewards": {"money": 440, "charters": 0, "timber": 6, "iron": 2},
     "side_reward": {"timber": 6},
     "fights": [
       {"enemies": ["outlaw_brawler", "outlaw_gunhand", "carrion_crows"], "weight": 3},

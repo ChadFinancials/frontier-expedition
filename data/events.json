@@ -51,7 +51,7 @@
       {"text": "Share a bottle and ask questions.", "requires": {"item": "whiskey"}, "consume": {"item": 1}, "outcomes": [
         {"weight": 1, "good": true, "text": "The whiskey loosens their tongue. They sketch you a map of the region.", "effects": [{"type": "reveal", "amount": 4}, {"type": "fatigue", "amount": -4, "target": "party"}]}]},
       {"text": "Recognize a wanted face.", "requires": {"class": "marshal"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} recognizes a wanted horse thief and brings them in. There's a bounty.", "effects": [{"type": "money", "min": 60, "max": 100}, {"type": "fatigue", "amount": -6, "target": "actor"}]}]},
+        {"weight": 1, "good": true, "text": "{hero} recognizes a wanted horse thief and brings them in. There's a bounty.", "effects": [{"type": "money", "min": 120, "max": 200}, {"type": "fatigue", "amount": -6, "target": "actor"}]}]},
       {"text": "Keep your hand on your iron and ride on.", "outcomes": [
         {"weight": 1, "text": "You pass without a word. The stranger watches you go.", "effects": []}]}
     ]},
@@ -121,7 +121,7 @@
     "text": "Big paw prints circle the camp. They were here last night, watching.",
     "options": [
       {"text": "Set a trap line.", "requires": {"skill": "trapper"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero}'s traps catch two wolves. The pelts will fetch a price.", "effects": [{"type": "money", "min": 40, "max": 70}]}]},
+        {"weight": 1, "good": true, "text": "{hero}'s traps catch two wolves. The pelts will fetch a price.", "effects": [{"type": "money", "min": 80, "max": 140}]}]},
       {"text": "Hunt them down before they hunt you.", "outcomes": [
         {"weight": 1, "text": "You find them. Or they find you.", "effects": [{"type": "fight", "enemies": ["prairie_wolf", "prairie_wolf", "coyote"], "surprise": "enemies"}]}]},
       {"text": "Keep a big fire going and move on.", "outcomes": [
@@ -145,7 +145,7 @@
     "text": "Pale green lights bob in the tall grass after sundown, drifting closer, then away. Almost like they want to be followed.",
     "options": [
       {"text": "Follow the lights.", "outcomes": [
-        {"weight": 2, "good": true, "text": "They lead to a hidden cache: someone's buried savings.", "effects": [{"type": "money", "min": 60, "max": 120}]},
+        {"weight": 2, "good": true, "text": "They lead to a hidden cache: someone's buried savings.", "effects": [{"type": "money", "min": 120, "max": 240}]},
         {"weight": 2, "text": "They lead you in circles until dawn, and then they turn and come for you.", "effects": [{"type": "fatigue", "amount": 10, "target": "party"}, {"type": "fight", "enemies": ["prairie_haint", "prairie_haint"]}]}]},
       {"text": "Ring the camp with salt.", "requires": {"item": "salt"}, "consume": {"item": 1}, "outcomes": [
         {"weight": 1, "good": true, "text": "The lights circle all night but never cross the salt. By morning they've gone.", "effects": [{"type": "fatigue", "amount": -4, "target": "party"}]}]},
@@ -162,7 +162,7 @@
       {"text": "Buy supplies (70 chips).", "requires": {"money": 70}, "consume": {"money": 70}, "outcomes": [
         {"weight": 1, "good": true, "text": "Bandages and a bottle of something.", "effects": [{"type": "item", "item": "bandages", "amount": 2}, {"type": "item", "item": "whiskey", "amount": 1}]}]},
       {"text": "Out-hustle the hustler.", "requires": {"class": "gambler"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} wins the peddler's stock in a hand of poker.", "effects": [{"type": "item", "item": "bandages", "amount": 2}, {"type": "item", "item": "salt", "amount": 1}, {"type": "money", "min": 20, "max": 50}]}]},
+        {"weight": 1, "good": true, "text": "{hero} wins the peddler's stock in a hand of poker.", "effects": [{"type": "item", "item": "bandages", "amount": 2}, {"type": "item", "item": "salt", "amount": 1}, {"type": "money", "min": 40, "max": 100}]}]},
       {"text": "No thank you.", "outcomes": [{"weight": 1, "text": "The peddler shrugs and rattles on.", "effects": []}]}
     ]},
 
@@ -219,7 +219,7 @@
       {"text": "Ride hard and hit them first.", "outcomes": [
         {"weight": 1, "text": "You catch them off guard!", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "surprise": "enemies"}]}]},
       {"text": "Circle around them.", "requires": {"skill": "tracker"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} leads you on a deer trail around the ambush. You even spot their stash.", "effects": [{"type": "money", "min": 30, "max": 60}]}]},
+        {"weight": 1, "good": true, "text": "{hero} leads you on a deer trail around the ambush. You even spot their stash.", "effects": [{"type": "money", "min": 60, "max": 120}]}]},
       {"text": "Take the long way round.", "outcomes": [
         {"weight": 1, "text": "Safe, but it costs you a day.", "effects": [{"type": "food", "amount": -4}, {"type": "fatigue", "amount": 4, "target": "party"}]}]}
     ]},
@@ -262,7 +262,7 @@
         {"weight": 2, "good": true, "text": "The song fades behind you.", "effects": [{"type": "fatigue", "amount": 5, "target": "party"}]},
         {"weight": 1, "text": "{hero} pulls the wax out and runs toward the voice. You chase them down.", "effects": [{"type": "fight", "enemies": ["canyon_siren", "canyon_siren"]}]}]},
       {"text": "Tie everyone to the wagon, like the old story.", "requires": {"item": "rope"}, "consume": {"item": 1}, "outcomes": [
-        {"weight": 1, "good": true, "text": "Everyone struggles and weeps, but the ropes hold. At dawn, a nest of treasure lies abandoned on the ledge.", "effects": [{"type": "money", "min": 60, "max": 120}, {"type": "fatigue", "amount": 8, "target": "party"}]}]},
+        {"weight": 1, "good": true, "text": "Everyone struggles and weeps, but the ropes hold. At dawn, a nest of treasure lies abandoned on the ledge.", "effects": [{"type": "money", "min": 120, "max": 240}, {"type": "fatigue", "amount": 8, "target": "party"}]}]},
       {"text": "Answer the song with a louder one.", "requires": {"skill": "storyteller"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} bellows every trail song they know. The siren goes quiet, offended.", "effects": [{"type": "fatigue", "amount": -5, "target": "party"}]}]}
     ]},
@@ -281,7 +281,7 @@
     "text": "Two prospectors are shouting over a stake, guns half drawn. \"Tell him! This here's MY claim!\"",
     "options": [
       {"text": "Settle it fairly.", "requires": {"class": "marshal"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} reads the claim papers and settles it. Both pay a finder's fee to keep it official.", "effects": [{"type": "money", "min": 50, "max": 90}]}]},
+        {"weight": 1, "good": true, "text": "{hero} reads the claim papers and settles it. Both pay a finder's fee to keep it official.", "effects": [{"type": "money", "min": 100, "max": 180}]}]},
       {"text": "Assess the ore yourself.", "requires": {"skill": "miner"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} points out the real vein is twenty yards over. Both are grateful.", "effects": [{"type": "iron", "amount": 3}, {"type": "fatigue", "amount": -4, "target": "party"}]}]},
       {"text": "Stay out of it.", "outcomes": [
@@ -316,7 +316,7 @@
         {"weight": 2, "good": true, "text": "They thaw out, grateful, and offer to join the company.", "effects": [{"type": "recruit", "class": "random"}, {"type": "food", "amount": -2}]},
         {"weight": 1, "text": "They don't make it through the night.", "effects": [{"type": "fatigue", "amount": 10, "target": "party"}]}]},
       {"text": "Take their supplies.", "outcomes": [
-        {"weight": 1, "text": "Some food and a coin purse. Nobody feels good about it.", "effects": [{"type": "food", "amount": 3}, {"type": "money", "min": 20, "max": 40}, {"type": "fatigue", "amount": 10, "target": "party"}]}]}
+        {"weight": 1, "text": "Some food and a coin purse. Nobody feels good about it.", "effects": [{"type": "food", "amount": 3}, {"type": "money", "min": 40, "max": 80}, {"type": "fatigue", "amount": 10, "target": "party"}]}]}
     ]},
 
   "giant_footprints": {"title": "Giant Footprints", "art": "tracks",
@@ -324,7 +324,7 @@
     "options": [
       {"text": "Follow them.", "outcomes": [
         {"weight": 1, "text": "They lead to a young stone giant, and it's not happy.", "effects": [{"type": "fight", "enemies": ["stone_giant_youth", "storm_hawk"]}]},
-        {"weight": 1, "good": true, "text": "They lead to a giant's cache of shiny things.", "effects": [{"type": "money", "min": 80, "max": 150}, {"type": "iron", "amount": 3}]}]},
+        {"weight": 1, "good": true, "text": "They lead to a giant's cache of shiny things.", "effects": [{"type": "money", "min": 160, "max": 300}, {"type": "iron", "amount": 3}]}]},
       {"text": "Study them.", "requires": {"skill": "tracker"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} works out where the giants walk, and how to avoid them.", "effects": [{"type": "reveal", "amount": 3}, {"type": "buff", "stat": "dmg_pct", "value": 10, "target": "party"}]}]},
       {"text": "Go the other way. Quickly.", "outcomes": [{"weight": 1, "text": "A sensible choice.", "effects": [{"type": "fatigue", "amount": 5, "target": "party"}]}]}
@@ -345,7 +345,7 @@
     "text": "A widow works a claim alone with a shotgun across her knees. \"Wolves took my husband. I aim to see them pay.\"",
     "options": [
       {"text": "Help her clear the wolf den.", "outcomes": [
-        {"weight": 1, "text": "The den is nearby, and occupied.", "effects": [{"type": "fight", "enemies": ["prairie_wolf", "prairie_wolf", "prairie_wolf"], "reward": {"money": 150, "keepsake": true}}]}]},
+        {"weight": 1, "text": "The den is nearby, and occupied.", "effects": [{"type": "fight", "enemies": ["prairie_wolf", "prairie_wolf", "prairie_wolf"], "reward": {"money": 300, "keepsake": true}}]}]},
       {"text": "Rest and trade stories.", "outcomes": [
         {"weight": 1, "good": true, "text": "She's good company. Everyone rests.", "effects": [{"type": "fatigue", "amount": -5, "target": "party"}, {"type": "heal_pct", "value": 5, "target": "party"}]}]},
       {"text": "Offer her a place in the company.", "outcomes": [

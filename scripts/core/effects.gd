@@ -50,7 +50,7 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 				if e.has("min"):
 					m = rng.randi_range(int(e.min), int(e.max))
 				if m >= 0:
-					m = int(round(m * (1.0 + run.party_loot_pct() / 100.0)))
+					m = int(round(m * (1.0 + run.party_loot_pct() / 100.0) * float(DB.cfg("chips_mult", 1.0))))
 				run.loot.money = maxi(0, int(run.loot.money) + m)
 				out.msgs.append("%s%d chips." % ["+" if m >= 0 else "-", absi(m)])
 			"money_pct":

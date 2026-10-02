@@ -502,7 +502,7 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 	var money := engine.bounty
 	for eid in engine.killed:
 		money += rng.randi_range(int(em[0]), int(em[1])) * tier()
-	money = int(round(money * mult))
+	money = int(round(money * mult * float(DB.cfg("chips_mult", 1.0))))
 	if kind == "elite":
 		xp += DB.cfg("xp_elite", 2)
 		var et: Array = DB.cfg("elite_timber", [2, 5])
@@ -538,7 +538,7 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 	elif kind == "boss":
 		xp += DB.cfg("xp_boss", 6)
 		var br: Dictionary = region().get("boss_rewards", {})
-		money += int(br.get("money", DB.cfg("boss_money", 400) * tier()))
+		money += int(br.get("money", DB.cfg("boss_money", 400) * tier()) * float(DB.cfg("chips_mult", 1.0)))
 		var first := not region_id in company.beaten
 		res.charters = int(br.get("charters", 2 if first else 1))
 		res.timber += int(br.get("timber", 0))
@@ -571,12 +571,12 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 				res.iron += int(sr.get("iron", 0))
 	if kind == "crossing" and not quest:
 		xp += DB.cfg("xp_elite", 2) + 2
-		money += int(DB.cfg("boss_money", 400) * tier() / 3.0)
+		money += int(DB.cfg("boss_money", 400) * tier() / 3.0 * float(DB.cfg("chips_mult", 1.0)))
 		res.charters = 1
 		res.keepsakes.append(company.random_keepsake(["uncommon", "rare"]))
 		boss_won = true
 	if reward.has("money"):
-		money += int(reward.money)
+		money += int(int(reward.money) * float(DB.cfg("chips_mult", 1.0)))
 	if reward.get("keepsake", false):
 		res.keepsakes.append(company.random_keepsake())
 	res.money = money

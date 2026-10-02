@@ -337,8 +337,10 @@ retired in round 7; the Shovel took its curios.)
 
 - Currency: **chips**. Materials: **Timber** and **Iron** (gate building and gear), and
   **Charters** (from region bosses, needed to found and grow settlements).
-- Fights pay 5-12 chips per enemy × region tier `[enemy_money]`. Elites add 1-3 Timber and
-  0-2 Iron. Region bosses pay 250 chips × tier `[boss_money]`, a Charter and a trinket.
+- Fights pay 10-24 chips per enemy × region tier `[enemy_money]`. Elites add 1-3 Timber and
+  1-2 Iron. Region bosses pay 500 chips × tier `[boss_money]`, a Charter and a trinket. Side
+  quests pay 160-300 chips (more in harder tiers). Every chip earned passes through the
+  `chips_mult` dial (1.0).
   Rumors pay a set reward (chips, Timber, Iron, maybe a trinket or recruit).
 - Buildings cost roughly 300-450 / 800-1100 / 1800-2400 chips per level plus Timber and Iron
   (`buildings.json`). Gear, move training and treatment costs are in config.

@@ -1410,6 +1410,9 @@ func test_vulnerable_and_new_moves() -> void:
 func econ_probe(n: int) -> void:
 	var tim := 0
 	var irn := 0
+	var chips := 0
+	var won := 0
+	var by_status := {}
 	var runs := 0
 	var by_region := {}
 	for s in n:
@@ -1424,12 +1427,17 @@ func econ_probe(n: int) -> void:
 					break
 			var t0 := co.timber
 			var i0 := co.iron
+			var m0 := co.money - co.supply_cost(0, {})
 			var reg := ""
 			var r: Dictionary = bot.play_expedition(co, 0)
 			reg = str(r.get("region", ""))
 			if r.get("status", "") in ["no_run"]:
 				continue
 			runs += 1
+			by_status[r.get("status", "")] = by_status.get(r.get("status", ""), 0) + 1
+			if r.get("status", "") != "defeat":
+				won += 1
+				chips += int(r.get("loot", {}).get("money", 0))
 			tim += co.timber - t0
 			irn += co.iron - i0
 			if not by_region.has(reg):
@@ -1437,7 +1445,7 @@ func econ_probe(n: int) -> void:
 			by_region[reg][0] += 1
 			by_region[reg][1] += co.timber - t0
 			by_region[reg][2] += co.iron - i0
-	print("ECON %d expeditions: timber %.1f, iron %.1f per expedition" % [runs, tim / maxf(1, runs), irn / maxf(1, runs)])
+	print("ECON %d expeditions: timber %.1f, iron %.1f per expedition; %d came home, %.0f chips each; %s" % [runs, tim / maxf(1, runs), irn / maxf(1, runs), won, chips / maxf(1, won), by_status])
 	for reg in by_region:
 		var v: Array = by_region[reg]
 		print("  %s: %d runs, timber %.1f, iron %.1f" % [reg, v[0], v[1] / maxf(1, v[0]), v[2] / maxf(1, v[0])])

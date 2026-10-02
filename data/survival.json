@@ -44,7 +44,7 @@
   "trapper": {"name": "Trapper", "desc": "Runs a trap line and knows what a good pelt is worth.", "passive": {"type": "loot_pct", "base": 8, "per_rank": 6, "text": "More money from fights"},
     "actions": [
       {"id": "set_snares", "name": "Set Snares", "hours": 3, "target": "self", "desc": "Catches food overnight.", "effects": [{"type": "food", "base": 3, "per_rank": 1}], "unlock": 1},
-      {"id": "pelt_trade", "name": "Tan Pelts", "hours": 3, "target": "self", "desc": "Prepares pelts to sell.", "effects": [{"type": "money", "base": 25, "per_rank": 20}], "unlock": 2}
+      {"id": "pelt_trade", "name": "Tan Pelts", "hours": 3, "target": "self", "desc": "Prepares pelts to sell.", "effects": [{"type": "money", "base": 50, "per_rank": 40}], "unlock": 2}
     ]},
   "angler": {"name": "Angler", "desc": "Can find a fish in a mud puddle.", "passive": {"type": "river_bonus", "base": 1, "per_rank": 1, "text": "Knows the fords: river crossings go better"},
     "actions": [
@@ -58,7 +58,7 @@
     ]},
   "miner": {"name": "Miner", "desc": "Can smell ore through six feet of rock.", "passive": {"type": "iron_bonus", "base": 1, "per_rank": 1, "text": "Find extra Iron"},
     "actions": [
-      {"id": "prospect", "name": "Prospect", "hours": 4, "target": "self", "desc": "Digs for Iron, sometimes finds a little gold.", "effects": [{"type": "iron", "base": 2, "per_rank": 1}, {"type": "money", "base": 20, "per_rank": 20, "chance": 35}], "unlock": 1},
+      {"id": "prospect", "name": "Prospect", "hours": 4, "target": "self", "desc": "Digs for Iron, sometimes finds a little gold.", "effects": [{"type": "iron", "base": 2, "per_rank": 1}, {"type": "money", "base": 40, "per_rank": 40, "chance": 35}], "unlock": 1},
       {"id": "dig_in", "name": "Dig In", "hours": 2, "target": "party", "desc": "Dig foxholes and breastworks. Party gains Protection for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "prot", "base": 8, "per_rank": 4}], "unlock": 2}
     ]}
 }

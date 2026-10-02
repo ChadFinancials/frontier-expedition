@@ -24,7 +24,9 @@ decided, and what shipped. Update both at the end of every round.
       config `hero_ambush: false`, including night-camp ambushes).
 - [ ] Find more places for the wagon and resources to matter (materials already take wagon
       space; mishaps and events drain supplies).
-- [ ] Money supply may be too high (round 1 note; recheck with the current economy).
+- [ ] Money: round 9 doubled every chip source (owner was running short: one quest paid about
+      200, one bar visit and one move). Recheck after a few weeks of play; `chips_mult` in
+      config scales all of it at once.
 - [ ] Gunslinger bullet system: 6 rounds in the cylinder shown overhead, moves spend bullets,
       a Reload move.
 - [ ] Class workshop, second half (`docs/HERO_PROPOSALS.md`): Preacher and Doctor done.
@@ -65,6 +67,11 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Chips doubled** (owner: running low; a saloon quest paid about 200, barely one bar visit
+  and one new move): enemies 10-24 per kill (was 5-12), bosses 500 × tier (was 250), region
+  boss rewards ×2, side quests 160-300 (was 80-150), curio and event chips ×2, Trapper and
+  Miner camp chips ×2. New dial `chips_mult` (1.0) scales every chip earned. The `econ=N`
+  probe now reports chips per run home (bot: ~315; it usually turns back early).
 - **Trinket pass** (owner's picks, TRINKET_PROPOSALS.md): 22 class trinkets (2 per class,
   class-locked, dropping at their rarity like any trinket; the owner turned down a roster bias), 4 general trinkets
   reworked off their quirk copies, 5 new general ones; 49 in all. Hooks: `class`,
