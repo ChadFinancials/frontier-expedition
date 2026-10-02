@@ -449,11 +449,13 @@ func _show_followup(event_id: String) -> void:
 
 func show_curios(curios: Array, title: String = "Curiosities") -> void:
 	var p := UI.panel()
-	p.custom_minimum_size = Vector2(1300, 0)
+	# As wide as the curios on offer (usually one), so it sits small in the middle.
+	var open := maxi(1, curios.filter(func(x): return not x.done).size())
+	var width := 414.0 * open + 14.0 * (open - 1)
 	var v := UI.vb(12)
 	p.add_child(v)
 	v.add_child(UI.hdr(title, 36, true))
-	v.add_child(UI.lbl("Investigate by hand for a random result, or use a supply for a sure one. Known uses are marked ✓.", 19, "Ink"))
+	v.add_child(UI.wrap(UI.lbl("Investigate by hand for a random result, or use a supply for a sure one. Known uses are marked ✓.", 18, "Ink"), width))
 	var holder := {"wrap": null}
 	var row := UI.hb(14)
 	v.add_child(row)

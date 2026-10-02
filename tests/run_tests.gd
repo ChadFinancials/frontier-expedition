@@ -73,6 +73,7 @@ func _ready() -> void:
 	test_curio_experts()
 	test_fatigue_states()
 	test_event_pass()
+	test_starter_quest()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -946,7 +947,7 @@ func test_round8_balance() -> void:
 	check(pc.buffs.any(func(b): return b.stat == "prot" and float(b.value) == -5.0), "Surgery leaves the patient at -5 Protection")
 	check(pc.hp >= 3 + 8, "Surgery heals at least 8 (got %d)" % (pc.hp - 3))
 	var hm: float = DB.cfg("heal_mult", 1.0)
-	for pair in [["pc_hands", 6, 10], ["pc_revival", 1, 4], ["dr_surgery", 8, 12]]:
+	for pair in [["pc_hands", 6, 10], ["pc_revival", 1, 3], ["dr_surgery", 8, 12]]:
 		var h: Dictionary = DB.skill(pair[0]).effects[0]
 		var lo := int(round(int(h.min) * hm))
 		var hi := int(round(int(h.max) * hm))
@@ -1082,8 +1083,8 @@ func test_curio_experts() -> void:
 	check(fight != null and fight.surprise == "enemies", "a Gunslinger strikes first at a curio ambush")
 	# Picker hints.
 	check(run.curio_hint("railroad_crate", mk.call("mountain_man")).begins_with("✗"), "averse heroes show a ✗")
-	check(run.curio_hint("ore_vein", mk.call("prospector")).contains("works as Shovel"), "as-key experts say so")
-	check(run.curio_hint("scarecrow", mk.call("gunslinger")).contains("strikes first"), "quick draw shows at ambush curios")
+	check(run.curio_hint("ore_vein", mk.call("prospector")) == "★ Prospector", "picker marks show the name only (★ Prospector)")
+	check(run.curio_hint("scarecrow", mk.call("gunslinger")).contains("★ Gunslinger"), "quick draw shows at ambush curios")
 	check(run.curio_hint("ore_vein", mk.call("marshal")) == "", "no hint for a hero with nothing to offer")
 	# Quirk interactions: two good, two bad, 15% each.
 	var qs := {}
@@ -1404,6 +1405,30 @@ func _check_event_options(eid: String, options: Array) -> void:
 			if o.has("then"):
 				check(not str(o.then.get("text", "")).is_empty(), "%s: a follow-up has text" % eid)
 				_check_event_options(eid, o.then.get("options", []))
+
+
+func test_starter_quest() -> void:
+	# Skipping the tutorial puts a starter job on the Saloon board straight away, and the
+	# starter job is easy (no story rumor, no boss) until a side quest has been run.
+	for sd in [3, 11, 29]:
+		var co := Company.new()
+		co.new_game(sd)
+		co.complete_tutorial(true)
+		var qs: Array = co.settlement(0).get("quests", [])
+		check(qs.size() == 1, "a starter quest is offered right after the tutorial (seed %d)" % sd)
+		for q in qs:
+			var reg: Dictionary = DB.regions[q]
+			check(reg.final == "crossing" and int(reg.difficulty) <= 2 and reg.template != "mad_dog", "the starter quest is easy (seed %d: %s)" % [sd, reg.template])
+	var co2 := Company.new()
+	co2.new_game(5)
+	co2.complete_tutorial(true)
+	co2.story_flags["quest_run"] = true
+	var mad := false
+	for w in 30:
+		co2.advance_week()
+		for q in co2.settlement(0).get("quests", []):
+			mad = mad or DB.regions[q].template == "mad_dog"
+	check(mad, "after a side quest, Mad Dog's rumor comes back to the board")
 
 
 func test_round9_town() -> void:

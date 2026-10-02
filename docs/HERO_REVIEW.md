@@ -194,7 +194,7 @@ Resists: stun 40, bleed 30, poison 30, move 35, debuff 45, deathblow 67
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | ★ **Laying On of Hands**: A prayer and a firm hand. A strong single heal. | 234 | one ally in 1234 | - | - | heals 6-10 HP |
-| ★ **Revival Meeting**: Leads the company in a hymn. Heals everyone a little. | 34 | whole party | - | - | heals 1-4 HP |
+| ★ **Revival Meeting**: Leads the company in a hymn. Heals everyone a little. | 34 | whole party | - | - | heals 1-3 HP |
 | **Sermon on the Trail**: Words of comfort for weary souls. Party sheds Fatigue and gains Accuracy. | 234 | whole party | - | - | -3 fatigue (relief); acc +3 for 2 rounds |
 | **Fire and Brimstone**: Lifts the brass lantern and blazes holy light. May Stun. | 34 | one of 123 | 87 | 1-2 | stun |
 | **Righteous Smite**: Brings the good book down hard: laid bare before the Lord. Vulnerable; extra damage against mythic creatures. | 12 | one of 12 | 87 | 4-7, +50% vs mythic | vulnerable +10 for 2 rounds |

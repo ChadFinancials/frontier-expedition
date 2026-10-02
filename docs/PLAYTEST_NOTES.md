@@ -77,6 +77,31 @@ decided, and what shipped. Update both at the end of every round.
 
 ## History
 
+### Round 10 (fresh party, weeks 1-2)
+- **Starter Saloon quest:**
+  - Skipping the tutorial never rolled the Saloon's first quest, so week 1 offered only Dry
+    Gulch and the Crow's Nest. Rebuilding the Saloon now rolls its board at once.
+  - Until the company has run a side quest, the board offers easy jobs only: difficulty 2 or
+    less, no boss, and Mad Dog's rumor doesn't jump the queue.
+- **Curio window:** as wide as the curios on offer (one on map stops), so it sits small in the
+  middle.
+- **Curio picker:** names only, like event options ("★ Marshal  ★ Gunslinger").
+- **Revival Meeting:** 1-4 → 1-3 per hero (about 8 across a party of four at level 1, was
+  about 10-12).
+- **Old Jeb's Cave-In:** stun 40 → 60%. Against hero stun resist (30-50) it was 10% at best,
+  and 0% against the Marshal and Preacher. Now about 30% / 20% / 10%.
+- **General Store rebuild:** 300 chips, 10 Timber, 2 Iron → 500 chips, 14 Timber, 4 Iron and
+  2 Hides. The Hides push it past an early hunt.
+- **Answered:**
+  - The Standing Stone's experts are the Mountain Mystic and Storyteller; the Miner's Cache's
+    are the Prospector and Miner. That company had none, hence no marks.
+  - The Dead Horse ambush is 1 in 9: the Marshal turns it into a bounty, and the Gunslinger
+    strikes first.
+  - Old Jeb's first defeat always gives the Miner's Lamp and frees one hero missing since the
+    fort burned. Repeat clears give a random rare or uncommon trinket.
+- **Noted:** a company without area attacks (Marshal, Train Hopper, Gunslinger, Preacher) feels
+  the bosses; two Tommyknocker stuns in round 1 hurt.
+
 ### Round 9
 - **Event pass 2:**
   - 12 new events.

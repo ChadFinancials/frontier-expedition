@@ -701,24 +701,16 @@ func curio_quickdraw(h: Hero) -> String:
 	return ""
 
 
-## One line per hero for the "Who investigates?" picker: ★ for an expert, ✗ for averse.
+## The "Who investigates?" picker's marks for a hero: just what they bring, ★ for an expert,
+## ✗ for averse ("★ Prospector   ✗ Preacher"), as on event options.
 func curio_hint(curio_id: String, h: Hero) -> String:
 	var parts := []
 	for x in curio_experts(curio_id, h):
-		var bits := []
-		if x.e.has("as_key"):
-			bits.append("works as %s" % DB.items[x.e.as_key].name)
-		elif x.odds > 0:
-			bits.append("better odds")
-		elif x.odds < 0:
-			bits.append("worse odds")
-		if x.e.has("hint"):
-			bits.append(str(x.e.hint))
-		parts.append("%s %s: %s" % ["✗" if x.odds < 0 else "★", x.name, ", ".join(bits)])
+		parts.append("%s %s" % ["✗" if x.odds < 0 else "★", DB.survival[x.id].name if DB.survival.has(x.id) else x.name])
 	var qd := curio_quickdraw(h)
-	if qd != "" and _has_ambush(DB.curios.get(curio_id, {})):
-		parts.append("★ %s: strikes first if it's an ambush" % qd)
-	return "\n".join(parts)
+	if qd != "" and _has_ambush(DB.curios.get(curio_id, {})) and not parts.has("★ " + qd):
+		parts.append("★ %s" % qd)
+	return "   ".join(parts)
 
 
 func _has_ambush(cu: Dictionary) -> bool:

@@ -427,7 +427,7 @@ Found in: Dry Gulch Mine
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Cave-In**: Old Jeb knocks twice on the ceiling, and the ceiling answers. | 1234 | one of 1234 | 90 | 2-4 | stun (40%) | 2 |
+| **Cave-In**: Old Jeb knocks twice on the ceiling, and the ceiling answers. | 1234 | one of 1234 | 90 | 2-4 | stun (60%) | 2 |
 | **Oversized Pick**: A full-size miner's pick swung by a very small, very angry miner. It takes a moment to recover. | 123 | one of 123 | 80 | 7-10 | stun; stun | 2 |
 
 Notes: 

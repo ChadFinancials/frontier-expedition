@@ -103,7 +103,9 @@ exist but wait until the start is crisp.
 - **Saloon rumors** (`data/quests.json`): each week the Saloon offers random short quests
   (7 columns) from a template pool: Mad Dog's Hideout (always ends at "Mad Dog" Mulligan, jumps
   the queue until beaten, pays Brass Knuckles), rustlers, a wolf den, a haunted homestead,
-  claim jumpers, a snake gulch, Crane's scouts. Each has a chance of a boss, a trinket and a
+  claim jumpers, a snake gulch, Crane's scouts. Until the company has run one, the board
+  offers an easy starter job (difficulty 2 or less, no boss, no Mad Dog), posted the moment
+  the Saloon reopens. Each has a chance of a boss, a trinket and a
   recruit that rises with Loose Lips (`chances`). They borrow the western region's scenery,
   events and curios, add a few theme events of their own, and scale to its tier. They are the main early source of chips, Timber
   and Iron, and the place to train.
@@ -343,7 +345,7 @@ retired in round 7; the Shovel took its curios.)
   Doctor = Antivenom at a glowing pool, Angler = Rope at a well). A class that hates the thing
   makes bad outcomes 50% more likely (Preacher at a whiskey barrel, Mountain Mystic at a
   railroad crate). The Gunslinger and a Tracker strike first when a curio is an ambush. The
-  picker shows each as a green ★ or a red ✗ line. A few bad outcomes carry a 15% quirk.
+  picker shows each by name only, a green ★ or a red ✗ (★ Prospector, ✗ Preacher). A few bad outcomes carry a 15% quirk.
 - **Events** are Oregon Trail-style text choices. Options can need an item, chips, Hides, a
   class, a survival skill or a quirk; options needing a class, skill or quirk nobody has are
   hidden (secret options). Outcomes are weighted.

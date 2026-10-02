@@ -542,7 +542,11 @@ static func run(main: Main, args: Dictionary) -> void:
 						HeroPicker.pick(co.run.party_heroes(), "Who investigates?", func(_h): pass,
 							func(x: Hero): return co.run.curio_hint(cid, x))
 					else:
-						main.screen.show_curios([{"id": "abandoned_wagon", "done": false}, {"id": "whiskey_barrel", "done": false}, {"id": "standing_stone", "done": false}])
+						# one=<curio id>: a single curio, the usual case on a map.
+						if args.has("one"):
+							main.screen.show_curios([{"id": str(args.one), "done": false}])
+						else:
+							main.screen.show_curios([{"id": "abandoned_wagon", "done": false}, {"id": "whiskey_barrel", "done": false}, {"id": "standing_stone", "done": false}])
 		"results":
 			var co2: Company = Game.company
 			var uids2: Array = []

@@ -939,15 +939,20 @@ func _roll_quests(st: Dictionary) -> void:
 	var count := int(track_value(i, "saloon", "chatter"))
 	var tier_l := int(track_value(i, "saloon", "tips"))
 	var templates: Array = DB.quests.get("templates", {}).keys().filter(func(k): return not story_flags.has(DB.quests.templates[k].get("done_flag", "-")))
+	# Until the company has run a side quest, the board offers an easy starter job (no story
+	# rumor, no boss) so there's a gentle trip before Dry Gulch and the Crow's Nest.
+	var starter := not story_flags.has("quest_run")
+	if starter:
+		templates = templates.filter(func(k): return int(DB.quests.templates[k].get("difficulty", 2)) <= 2)
 	var picks := Stats.shuffled(rng, templates)
 	# Story rumors (like Mulligan's hideout) jump the queue most weeks until they're done.
 	for k in templates:
-		if rng.randf() * 100.0 < float(DB.quests.templates[k].get("priority", 0)):
+		if not starter and rng.randf() * 100.0 < float(DB.quests.templates[k].get("priority", 0)):
 			picks.erase(k)
 			picks.push_front(k)
 	for n in mini(count, picks.size()):
 		var qid := "q_%d_%d_%d" % [i, week, n]
-		var reg := _make_quest(picks[n], west, tier_l)
+		var reg := _make_quest(picks[n], west, tier_l, starter)
 		quest_regions[qid] = reg
 		DB.regions[qid] = reg
 		st.quests.append(qid)
@@ -966,13 +971,13 @@ func _prune_quests() -> void:
 			quest_regions.erase(q)
 
 
-func _make_quest(tid: String, west: String, tier_l: int) -> Dictionary:
+func _make_quest(tid: String, west: String, tier_l: int, starter: bool = false) -> Dictionary:
 	var t: Dictionary = DB.quests.templates[tid]
 	var base: Dictionary = DB.regions[west]
 	var place: String = Stats.pick(rng, DB.quests.get("places", ["the hills"]))
 	var ch: Dictionary = DB.quests.get("chances", {})
 	var tl := clampi(tier_l, 0, 2)
-	var has_boss: bool = t.get("always_boss", false) or rng.randf() * 100.0 < float(ch.get("boss", [25, 40, 55])[tl])
+	var has_boss: bool = t.get("always_boss", false) or (not starter and rng.randf() * 100.0 < float(ch.get("boss", [25, 40, 55])[tl]))
 	var tier := int(base.get("tier", 1))
 	var mult := (1.0 + tl * 0.5) * tier
 	var reward := {
@@ -1108,6 +1113,8 @@ func complete_tutorial(skipped: bool = false) -> String:
 	if bid != "" and building_level(0, bid) == 0:
 		st.get("ruins", []).erase(bid)
 		st.buildings[bid] = 1
+		# The Saloon is open: its first rumor (the starter job) is on the board right away.
+		_roll_quests(st)
 		return "Ma Delaney has the %s standing again by the end of the week: new planks, old piano, same watered whiskey. Heroes can shed Fatigue there now." % DB.buildings[bid].name
 	return ""
 
@@ -1216,6 +1223,8 @@ func finish_run(status: String) -> Dictionary:
 			if q != "":
 				entry.quirks.append(q)
 		summary.heroes.append(entry)
+	if DB.regions.get(r.region_id, {}).get("quest", false):
+		story_flags["quest_run"] = true
 	if r.boss_won and DB.regions.get(r.region_id, {}).get("tutorial", false) and summary.status != "defeat":
 		summary.story = complete_tutorial()
 		summary["tutorial"] = true
