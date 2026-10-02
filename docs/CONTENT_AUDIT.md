@@ -71,12 +71,16 @@ first-draft. "Revisions" counts the commits that changed the data file after it 
 
 ## Recommended order
 
-1. **Quirks + Breaking Points.** Touch every hero, never revised, cheap (mostly data). Tie them
-   to Mark, Vulnerable, bones, Momentum, position and Death's Door; add a few behaviour quirks;
-   stop overlapping trinkets.
-2. **Trinkets.** Give them identity: one per class, triggered effects, a few sets, and rarity
-   that means something. Pairs naturally with the quirk pass.
-3. **Curios.** Spread keys across every supply, add class and quirk interactions, give each
-   region its own signature curios.
-4. **Events.** Class options for all 11 classes, quirk-gated options, more combat hooks.
-5. **Supplies, camp skills, quests.** Smaller passes once the above settle.
+1. ✅ **Quirks** (round 9, QUIRK_PROPOSALS.md): 50 quirks, tied to Mark, Vulnerable, Death's
+   Door, first round; behaviour quirks (Drinker's bar lock, Gold Fever, Homesick).
+   ⬜ **Breaking Points and Second Winds** were part of this step and are still untouched.
+2. ✅ **Trinkets** (round 9, TRINKET_PROPOSALS.md): 22 class trinkets, general edits, 5 new.
+3. 🟨 **Curios** (round 9, CURIO_PROPOSALS.md): class and skill experts, ★/✗ in the picker and
+   quirk chances, done for the Fort Providence area's 16. Still to do: Red Canyons (Painted
+   Canyon Wall) and Thunder Peaks (Stone Cairn, Giant's Bones, Frozen Pack, Hot Spring), and
+   keys for the supplies that open nothing (Bandages, Whiskey, Lamp Oil, Wagon Parts).
+4. ⬜ **Events.** Class options for all 11 classes (only Marshal, Preacher and Gambler have
+   any), quirk-gated options (supported, used 0 times), more combat hooks.
+5. ⬜ **Town buildings and upgrades** (owner, round 9): what each building and level is worth,
+   its costs in chips, Timber, Iron and Hides, the hiring board and bunkhouse tracks.
+6. ⬜ **Supplies, camp skills, side quests.** Smaller passes once the above settle.
