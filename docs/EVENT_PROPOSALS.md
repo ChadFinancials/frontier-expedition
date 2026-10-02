@@ -1,36 +1,476 @@
-# Event proposals (round 9)
+# Event proposals (round 9, take 2)
 
-Status: **awaiting the owner's picks.** Nothing here is built yet.
+Status: **awaiting the owner's picks.** Nothing here is built yet. This replaces the first
+draft. Scope: the first region only (Tallgrass Sea, Dry Gulch Mine, Crow's Nest and the
+Saloon side quests). Red Canyons and the Thunder Peaks come later; their events stay as they
+are for now.
 
-## How events work today
+## 1. Pools
 
-- 36 events. Each region has its own pool; map nodes draw from it without repeats. Homesteads
-  draw from a separate pool.
-- Each option may need an item, chips, a survival skill, a class or a quirk. **An option that
-  needs a skill, class or quirk is hidden** unless someone in the company qualifies. The
-  qualifying hero becomes `{hero}`.
-- Outcomes are weighted. Angler/Wheelwright river passives and Hunter passives add weight to
-  `good` outcomes at the river and hunting events.
-- An outcome can be any shared effect: Fatigue, HP, food, chips, materials, items, a trinket,
-  a quirk, a recruit, a scouting reveal, a buff or debuff for the next fight, or a fight.
-  A fight takes enemies, who strikes first, and a reward.
+**Today:** each region has one hand-written list, and a Saloon side quest borrows the list of
+the region west of its town (Fort Providence → Tallgrass Sea). There's no shared pool.
 
-**What's thin:**
-- **Classes:** only Marshal (4 events), Preacher (2) and Gambler (2) have options. The other
-  8 classes have none.
-- **Quirks:** quirk-gated options are supported but used 0 times. Three events can *give* a
-  quirk.
-- **Combat:** 13 outcomes start a fight, but only "who strikes first" and one reward carry
-  over. Nothing wounds the enemy, Marks it or leaves the company shaky. "Next fight" buffs and
-  debuffs work but are used once.
-- **Skills:** the Cook skill is never used, and Miner and Angler once each.
-- **Supplies:** Lamp Oil is never used; Salt and Antivenom once each.
-- **Dead options:** five options do nothing at all (Stuck in the Mud ×2, Swollen Creek rope,
-  Torn Canvas rope, Fever Medic). Avoiding a bad outcome is the reward, which is fine, but a
-  few could give a small bonus.
-- **Bug:** Prairie Fire's Whiskey option says "Soak blankets with the water barrel".
+**Proposed:** every event stop draws from one of three layers.
 
-## Every event now
+| Layer | What's in it | Weight |
+|---|---|---|
+| **Common** | Trail life that could happen anywhere: wagon trouble, peddlers, weather, sickness, strangers, graves, card games | 45% |
+| **Region** | The region's flavour: open prairie (Tallgrass), mine country (Dry Gulch), outlaw country (Crow's Nest) | 55% |
+| **Quest theme** (side quests only) | 2-3 events that match the quest: Rustlers get the Cattle Drive, the Haint quest gets Haint Lights and the graves | Side quests: theme 40%, region 30%, common 30% |
+
+No repeats within one expedition. When a layer runs dry, the pick falls through to the next.
+The weights live in config, and Red Canyons and the Peaks will only need their region list.
+
+## 2. What makes an event interesting
+
+1. **★ / ✗ experts on ordinary options**, using the same system and dials as the curios.
+   - An option lists who's good or bad at it: a class, a survival skill (rank matters), or now
+     also a **quirk**.
+   - The best expert in the company acts: ★ better odds, a bonus on success, or a different,
+     better outcome. A ✗ hero acting means worse odds or a worse outcome.
+   - The picker shows the lines under each option ("★ Ezra (Tracker 2): better odds"), so it
+     reads like the curio picker.
+   - Odds shift but never guarantee success (cap 75%), as with curios.
+2. **Secret options** stay. These are options only someone with that class, skill or quirk can
+   see, like today's [Marshal] options. They're the signature move: often a safe, clever way
+   through.
+3. **Bad quirks compel.** A hero with Drinker, Gold Fever, Too Curious, Hothead or Spooked by
+   Critters may grab an option before you choose ("{hero} can't help themselves!"). It's a
+   `compel` chance, as at curios.
+4. **Follow-ups.** Some good outcomes open a second choice. For example, the Haint Lights lead
+   to a grave: dig it up, or leave a coin? That's where the best and worst payoffs live.
+5. **Payoffs that last:**
+   - quirks, good and bad, at a low % where thematic
+   - trinkets and recruits
+   - "next fight" buffs and debuffs (wet powder, hungover, charged up)
+   - fights that start in your favour (foes wounded, a lookout already shot, foes Vulnerable)
+     or against you (surprised)
+6. **Every event has a gamble.** At least one option can go clearly well or clearly badly,
+   next to the safe-but-dull option.
+
+Notation below: `5/3/1` are outcome weights. ★ and ✗ are experts on that option. [Bracketed]
+options are secret, or need a supply. **New** marks a new event or option.
+
+## 3. Common pool (15)
+
+**Broken Axle**
+- [Wagon Parts] Swap in the spare. → fixed.
+- **Lash it together and hope.** 2 holds (-15 Wagon) / 2 hot work (-10 Wagon, +8 Fatigue all) /
+  1 fails (-25 Wagon, -2 Food).
+  - ★ Wheelwright (rank odds; +5 Wagon on success)
+  - ★ Rail Driver ("drives a new pin": better odds, +6 Fatigue to the hero)
+  - ✗ Butterfingers ("drops the axle on their foot": worse odds, -10% HP hero)
+
+**Stuck in the Mud**
+- **Everybody push!** 3 free (+8 Fatigue all) / 1 wrenched back (+6 Fatigue all, -10% HP one).
+  - ★ Rail Driver ("gets under it and lifts": the good outcome is -4 Fatigue all instead)
+  - ★ Woodcutter (rank odds: corduroy road)
+  - ★ Wrangler (better odds: settles the oxen)
+  - ✗ Overweight ("sinks to the knees": worse odds)
+- [Rope] Pulley. → free, -2 Fatigue all.
+
+**Torn Canvas**
+- [Rope] Lash it. → +2 Wagon.
+- [Wagon Parts] Rebuild the bows. → +10 Wagon.
+- **New:** [1 Hides] Patch it with a hide. → +6 Wagon. ★ Trapper: no Hides used.
+- Leave it. → -3 Food, -8 Wagon.
+
+**Traveling Peddler**
+- Buy a lucky charm (150). 3 trinket / 1 painted rock.
+  - ★ Gambler, ★ Keen-Eyed ("spots the fakes": no painted rock)
+- Buy supplies (70). → 2 Bandages, 1 Whiskey.
+- [Gambler] Out-hustle the hustler (as now).
+- **New** [Frontier Doctor] "Test his tonics." → 1/2: genuine (+2 Bandages, +1 Antivenom) ·
+  1/2: snake oil, and he pays 60-100 chips to keep you quiet.
+- **New, compel 30%:** [Drinker] buys his whole case of rotgut. → -60 chips, +3 Whiskey; the
+  hero sheds 10 Fatigue now, but is -5 Acc next fight (hungover).
+
+**The Trinket Peddler**
+- Top pocket (90) / inside pocket (260) as now; [Gambler] read her palm.
+  - Inside pocket: ★ Superstitious ("knows real charms": always real) · ✗ Unbeliever (she
+    takes offence and leaves: chips refunded, nothing bought)
+
+**Stranger on the Road**
+- **Welcome them to the fire.** 3 trail tips (reveal 2) / 2 joins / 1 robbed (-15% chips).
+  - ★ Gunslinger, ★ Scout (rank) ("sizes them up": the robbery can't happen)
+  - ✗ Jumpy ("spooks them": no recruit)
+- [Whiskey] Share a bottle. → reveal 4, -4 Fatigue all.
+- [Marshal] Recognise a wanted face (as now).
+- **New** [Bounty Hunter] "There's paper on this one." → fight vs 1 hired gun, we strike
+  first, 150-chip bounty.
+- **New, compel 40%:** [Drinker] drinks with the stranger till dawn. → 1/2: they draw you a
+  map (reveal 4) · 1/2: robbed blind (-25% chips) and hungover.
+
+**Lost the Trail**
+- **Pick a direction and hope.** 2 found it (-2 Food) / 2 wasted day (-4 Food, +8 Fatigue all).
+  - ★ Trailwise
+  - ★ Train Hopper ("follows the telegraph poles")
+  - ✗ Homesick ("keeps steering east": worse odds)
+- [Tracker] Read the land / [Scout] Ride ahead (as now).
+
+**Fever in the Camp**
+- [2 Bandages] Treat them. / [Medic] Take charge. → -4 Fatigue all.
+- **Push on and hope.** 2 slow (-12% HP all, +8 Fatigue all) / 1 worst of it (-20% HP,
+  Sickly quirk).
+  - ★ Frontier Doctor ("quinine and quarantine": always good, no harm)
+  - ★ Cook (rank: broth; better odds)
+  - ★ Iron Stomach (better odds)
+  - ✗ Sickly (that hero takes the bad outcome, at better odds of happening)
+- Good outcome added: "It passes overnight" (+4 Fatigue all).
+
+**Rattler in the Bedroll**
+- **Freeze and let someone deal with it.** 3 fine (+5 Fatigue hero) / 2 bitten (-20% HP, 40%
+  Spooked by Critters).
+  - ★ Trapper (rank)
+  - ★ Bayou Poisoner (swap: "milks the venom": +1 Antivenom, and their next fight's poisons do
+    +2)
+  - ✗ Spooked by Critters (compel 50%: "bolts into the dark", +10 Fatigue, never bitten)
+- [Antivenom] Swat it. ★ Frontier Doctor: no Antivenom used.
+- [Trapper] Grab it behind the head (as now).
+
+**Thunderstorm**
+- **Shelter under the wagon.** 3 soaking (+8 Fatigue all, wet powder -5 Acc next fight) /
+  1 oxen bolt (-15 Wagon).
+  - ★ Wrangler (no bolt)
+  - ★ Good Humor (-4 Fatigue all on any outcome)
+  - ✗ Lightning Rod (**new** outcome, 1 in 6: the hero is struck: -15% HP, but +15% Dmg next
+    fight, "charged up")
+- [Storyteller] Ghost stories / [Whiskey] (as now).
+
+**Row of Graves**
+- **Pay respects.** → +5 Fatigue all, -8 one.
+  - ★ Preacher (-8 all instead)
+  - ✗ Superstitious, ✗ Gloomy (that hero +10)
+- Hurry past (as now).
+- **New, compel 30%:** [Gold Fever] Dig one up. → 1/2: grave goods (trinket) · 1/2: cholera
+  (-20% HP, 30% Sickly) and +10 Fatigue all for the rest.
+
+**Fork in the Trail**
+- **Take the shortcut.** 2 shorter / 2 rough (-15 Wagon).
+  - ★ Train Hopper (hobo sign: always good)
+  - ★ Scout, ★ Tracker (rank)
+- Main trail (as now).
+- **New** [Gambler] "Flip for it." → 3 good / 1 rough.
+
+**Swollen Creek**
+- [Rope] Rope across. / Wait for it to drop. (as now)
+- **Chance it.** 2 cracked wheel / 1 supplies lost / 1 across.
+  - ★ Angler (rank; +3 Food on success)
+  - ★ Bayou Poisoner ("reads the water")
+  - ★ Wrangler
+  - ✗ Overweight
+
+**New: Campfire Card Game.** Three cowhands at a fire wave you over for a hand of faro.
+- **Sit in (50 chips).** 1 win 100 / 1 lose.
+  - ★ Gambler (much better odds; on a win also a trinket off a sore loser)
+  - ★ Lucky
+  - ✗ Hothead (a bad outcome turns into a fight vs 3 outlaws)
+- Just share the fire. → -6 Fatigue all, +5% HP all.
+- Compel 30%: [Drinker] "One more round." → -40 chips, hungover; 1/3 also wins 120.
+
+**New: Medicine Show.** "Doctor Ezekiel's Miracle Elixir: cures fever, gout, heartbreak and
+snakebite!"
+- **Buy a bottle (40).** 1/2 genuinely bracing (-10 Fatigue hero) / 1/2 makes them sick (-10%
+  HP, 20% Sickly).
+  - ★ Frontier Doctor (always good; and exposes the rest as fakes: +60 chips from the crowd)
+  - ★ Unbeliever
+  - ✗ Superstitious
+- [Preacher] Preach against the snake oil. → the crowd's grateful: +80 chips, -6 Fatigue all.
+- Move on.
+
+## 4. Tallgrass Sea (open prairie, 10)
+
+**River Crossing**
+- **Ford it.** 5 across (-8 Wagon) / 3 tips (-20 Wagon, -4 Food, +8 Fatigue, wet powder) /
+  1 swept away (-20% HP).
+  - ★ Wrangler ("swims the oxen across")
+  - ★ Angler, ★ Wheelwright (rank)
+  - ✗ Overweight (the swept outcome is likelier and lands on them)
+- [Wheelwright] Caulk it / [Angler] Find the ford / [40] Ferryman (as now).
+
+**Prairie Fire**
+- **Run for it!** 3 outrun / 2 canvas catches.
+  - ★ Wrangler ("lets the oxen run": better odds)
+  - ★ Scout (rank)
+  - ✗ Slowpoke
+- [Scout] Backfire (as now).
+- [Whiskey] fixed text: "Soak the blankets in whiskey and hunker down."
+- **New** [Prospector] "Blast a firebreak." → safe, -4 Fatigue all.
+
+**Buffalo Herd**
+- Wait (as now).
+- **Push through.** 2 parts / 1 bull fight.
+  - ★ Wrangler (swap: "cuts one out and parts the herd": no bull, +6 Food)
+  - ✗ Hothead (bull every time, and it charges first)
+- [Hunter] Hunt one.
+  - ★ Beast Hunter (+2 Hides)
+  - ★ Cook ("jerks the meat": +4 Food)
+  - **New:** [Salt] "Salt the meat" adds +5 Food
+
+**Sick Traveler**
+- Bandages / Medic / Food / Keep moving (as now).
+  - On Bandages: ★ Frontier Doctor ("and charges for it": +100-160 chips)
+  - ✗ Sickly (on the Medic option: 30% the hero catches it)
+- **New** [Preacher] "Sit with the family." → -8 Fatigue all; 1/3 the father lives (trinket).
+- **New** [Frontier Doctor + 1 Antivenom] "It's snakebite, not fever." → -10 Fatigue all, a
+  trinket, 30% positive quirk.
+
+**Haint Lights** (follow-up)
+- **Follow the lights.** 2 they lead somewhere / 2 circles, then attack (+10 Fatigue, fight
+  2 Haints).
+  - ★ Mountain Mystic ("speaks with them": better odds; the fight drops to 1 Haint)
+  - ★ Unbeliever (better odds; Haints start Vulnerable 15%)
+  - ✗ Superstitious (worse odds, +10 Fatigue hero)
+  - On "lead somewhere", **follow-up:** the lights hover over a lone grave.
+    - Dig. → 1/2: buried savings, 160-300 chips · 1/2: the haint rises: fight 2 Haints.
+    - Leave a coin (10). → -8 Fatigue all, and 25% a good quirk for the hero ("they feel
+      watched over").
+- [Salt] Ring the camp / [Preacher] Pray them away (as now).
+- **New:** [Lamp Oil] "Light your own lamp and follow." The attack drops to 1 in 4.
+- **New, compel 40%:** [Gold Fever] Chase the lights alone. → straight to the grave, without
+  the coin option.
+
+**Wolf Tracks**
+- [Trapper] Trap line (as now).
+- **Hunt them down.**
+  - ★ Beast Hunter (+3 Hides)
+  - ★ Hunter (rank: the pack starts at 80% HP)
+- **Keep a big fire going.** 2 no sleep / 1 attack.
+  - ★ Woodcutter (no attack)
+- **New** [Mountain Mystic] "Go out and meet the pack." → 3 they let you pass (-6 Fatigue,
+  +1 Hides) / 1 a young wolf won't listen (fight 1 wolf, we strike first).
+- **New** [Bayou Poisoner] "Poisoned bait." → +2 Hides, no fight, -1 Food.
+
+**Good Hunting**
+- **Go hunting.** 3 pronghorn / 2 sore feet.
+  - ★ Hunter (rank)
+  - ★ Eagle Eye, ★ Beast Hunter
+  - ★ Cook (+3 Food on success)
+  - ✗ Butterfingers, ✗ Hard of Hearing ("spooks the herd")
+- [Hunter] / [Forager] (as now).
+
+**Abandoned Homestead** (follow-up)
+- **Search the house.** 3 canned goods / 2 squatters (fight; **new:** +40-80 chips) / 1 wrong
+  feeling.
+  - ★ Scout (no ambush)
+  - ★ Keen-Eyed (+loot)
+  - On canned goods, **follow-up:** a cellar door with a fresh padlock.
+    - Force it. → 1/2: a trinket · 1/2: the squatters' stash, and they come back (fight).
+    - Leave it.
+- Tear down the barn (as now).
+- **New** [Prospector] "Blast the root cellar." → 2: 80-160 chips, +2 Iron · 1: squatters
+  come running, already at 70% HP.
+- **New** [Lamp Oil] "Light a lamp and search properly." → +5 Food, 1/3 trinket, no ambush.
+- **New, compel 30%:** [Too Curious] "Opens the door nobody wants to open." → 1/2: trinket ·
+  1/2: fight 2 Haints.
+
+**New: Twister.** A black funnel walks across the prairie, straight for you.
+- **Run for the gully.** 3 safe (+8 Fatigue all) / 1 the wagon is caught (-25 Wagon, -5 Food).
+  - ★ Scout
+  - ★ Wrangler
+  - ★ Mountain Mystic ("reads the sky")
+- [Rope] "Tie down the wagon and lie flat." → -8 Wagon. Afterwards **follow-up:** a farm's
+  strongbox lies in the debris.
+  - Keep it. → 120-200 chips.
+  - Find the owner (★ Tracker). → -8 Fatigue all, and 2/3 they give you a trinket.
+
+**New: Cattle Drive.** A short-handed trail boss with 300 longhorns asks for a hand.
+- **Ride drag for a day.** 3 paid 80-140 chips (+6 Fatigue all) / 1 stampede (-15% HP one,
+  -10 Wagon).
+  - ★ Wrangler (better odds; +60 chips bonus)
+  - ✗ Overweight
+- **Cut out a stray for supper.** → +10 Food; 1/3 the drovers catch you (fight 3 outlaws).
+  - ✗ Marshal ("won't steal": the option is hidden if a Marshal is present)
+- Wave and ride on.
+
+Homestead stops keep their own Tallgrass list (Homestead, Widow's Claim, Drifter's Camp):
+- **Homestead** supper: ★ Cook (+8 Food to take with you).
+- **Widow's Claim** wolf den: ★ Beast Hunter (foes start Vulnerable). New: [Gunslinger]
+  "Teach her to shoot." → she joins for sure.
+- **Drifter's Camp:** new [Train Hopper] "Swap hobo code." → recruit, and reveal 3.
+
+## 5. Dry Gulch Mine (mine country, 6)
+
+**Claim Dispute** (moved from Red Canyons, where it stays as well)
+- [Marshal] Settle it / [Miner] Assess the ore (as now).
+- **New** [Prospector] "Blast a test hole." → +4 Iron, and both pay 40-80 chips.
+- **New** [Gunslinger] "Fire a warning shot." → they both back off: -6 Fatigue all.
+- **Stay out of it.** 2 gunshots behind you / 1 they turn on you (fight 2 Claim Jumpers).
+  - ✗ Hothead (fight every time)
+
+**New: The Powder Shack.** A shack of sweating dynamite crates, the door hanging open.
+- **Carry some out, gently.** 3 got it (+15% Dmg for everyone next fight, "a few sticks to
+  throw") / 1 BOOM (-25% HP hero, +10 Fatigue all, 30% Hard of Hearing).
+  - ★ Prospector (always safe; also +2 Iron from the blasting caps)
+  - ★ Miner (rank)
+  - ✗ Butterfingers, ✗ Jumpy, ✗ Hothead
+- Leave it. Quickly.
+
+**New: Tapping Underground.** Faint tapping from under a collapsed adit. Someone's alive down
+there.
+- **Dig them out.** 2 a miner, grateful (recruit a Prospector, or 100-160 chips) / 1 the roof
+  comes down (-20% HP hero, 30% Claustrophobic).
+  - ★ Miner, ★ Woodcutter (rank: shoring)
+  - ★ Rail Driver ("moves the beam alone")
+  - ✗ Claustrophobic (worse odds, +10 Fatigue hero)
+- Mark the spot and move on. → +8 Fatigue all.
+
+**New: Tommyknockers.** Knocking from the dark mine mouth. The old miners leave the Knockers a
+bite of their supper for luck.
+- **[2 Food] Leave them a pasty.** → the company's luck turns: -6 Fatigue all, +2 Iron
+  "left by the door".
+  - ★ Superstitious (bad quirk, good here: also +10 Light in the next cave)
+  - ★ Mountain Mystic ("speaks their language": also +10 Light, and 1/3 a trinket left by the door)
+- **Mock them.** → 2 nothing / 1 rockfall (-15% HP one) and a fight vs 2 Tommyknockers.
+  - ★ Unbeliever (better odds)
+  - ✗ Superstitious (refuses; the option is hidden if they're present)
+- Walk on. → +4 Fatigue all.
+
+**New: Runaway Burro.** A burro packed with a prospector's kit wanders up to the wagon.
+- **Keep it.** → +1 Wagon Parts, +2 Food; 1/3 its owner turns up angry (fight 2 Claim
+  Jumpers).
+- **Follow its tracks back.** ★ Tracker (rank) / ★ Wrangler.
+  - 2: the owner's dead in a wash: his poke (80-140 chips) and his map (reveal 3).
+  - 1: he's alive, with a broken leg: rescue him (-6 Fatigue all, recruit a Prospector, 30%).
+
+**New: Ore Wagon Wreck.** A company ore wagon on its side, the driver dead in the traces.
+- **Take the ore.** → +4 Iron; 1/3 company guards ride up (fight 2 Railroad Enforcers).
+  - ✗ Marshal (hidden while a Marshal is present)
+- **Bury the driver.** ★ Preacher (-8 Fatigue all). Otherwise -3.
+- [Marshal] "Report it at the next post." → 100-160 chips reward later (paid on return).
+
+The common pool brings Rattler, Fever, the peddlers, Broken Axle, Stuck in the Mud and the
+rest. Gulch's old Haint Lights moves to Tallgrass, with the Tommyknockers as the Gulch's own
+spooky event.
+
+## 6. Crow's Nest (outlaw country, 6)
+
+**Smoke Signals**
+- Ride hard (fight, we strike first) / [Tracker] Circle around / Long way (as now).
+- **New** [Gunslinger] "Pick off the lookout." → fight vs 2 (the rifleman is gone), we strike
+  first.
+- **New** [Prospector] "Dynamite the ridge." → fight, foes at 60% HP, we strike first.
+- **New, compel 50%:** [Hothead] charges in before the plan is made. → fight, *they* strike
+  first.
+
+**Outlaw Toll**
+- Pay (40) / Refuse (fight; **new:** +40 chips if you win) (as now).
+- [Marshal] Flash the badge.
+  - ★ Bounty Hunter (+1/3 to back down)
+- **New** [Gunslinger] "Call out the leader." → 1/2 they ride off (+40-80 chips) · 1/2 fight
+  with the leader at 50% HP, we strike first.
+- **New** [Gambler] "Double or nothing on a hand." → 1/2 free passage (+40 chips) · 1/2 pay 80,
+  or fight if you can't.
+- **New, compel 50%:** [Hothead] "Already drawn." → fight; we strike first, but the hothead is
+  Vulnerable 10% next fight.
+
+**New: Wanted Poster.** A fresh poster on a fencepost: "SNAKE-EYE PIKE. 200 CHIPS. LAST SEEN
+HEREABOUTS."
+- **Go after him.** → fight vs Pike (a hired gun, elite) and 1 outlaw; 200 chips.
+  - ★ Tracker, ★ Scout (rank: we strike first)
+  - ★ Marshal, ★ Bounty Hunter, ★ Manhunter (Pike starts Marked)
+- Not our business.
+- 1 in 10 posters is a lookalike: "Hey... that looks like {hero}." → +6 Fatigue to that hero;
+  ★ Good Humor: -6 for everyone instead.
+
+**New: The Hanging Tree.** Three of Crane's men are about to hang a homesteader.
+- **Cut him down.** → fight (3 outlaws), then he joins (recruit) or pays 100 chips.
+  - ★ Gunslinger ("shoots the rope": they're surprised, we strike first, the first outlaw at
+    50% HP)
+- [Marshal] "This hanging ain't lawful." → 2 they back off, he joins / 1 fight.
+- **Ride on.** → +10 Fatigue all.
+  - ✗ Gloomy, ✗ Maternal Instinct (that hero +10 more)
+
+**New: Stagecoach in Trouble.** Gunfire ahead: a stage is pinned down behind its own horses.
+- **Ride to the rescue.** → fight 3 outlaws; reward 120-200 chips and 1/3 a trinket from a
+  grateful passenger.
+- **Wait, then pick over what's left.** → 80-160 chips, +8 Fatigue all.
+  - ★ Gold Fever (+50% chips)
+  - ✗ Preacher, ✗ Marshal (that hero +12 Fatigue)
+
+**Abandoned Homestead** is shared with Tallgrass (an event can sit in two region pools).
+Crow's Nest's old Wolf Tracks, Good Hunting and Fork move to Tallgrass and the common pool.
+
+## 7. Saloon side-quest themes
+
+| Quest | Theme events (40%) | Notes |
+|---|---|---|
+| Mad Dog's Hideout | Smoke Signals, Outlaw Toll, Hanging Tree | |
+| Rustlers at {place} | Cattle Drive, Buffalo Herd, Wanted Poster | |
+| The Wolves of {place} | Wolf Tracks, Good Hunting, Widow's Claim *(homestead)* | |
+| The Haint at {place} | Haint Lights, Row of Graves, Abandoned Homestead | |
+| Claim Jumpers at {place} | Claim Dispute, Powder Shack, Runaway Burro | |
+| Snakes in {place} | Rattler in the Bedroll, Medicine Show, Sick Traveler | Sick Traveler becomes the snakebite case |
+| Crane's Scouts near {place} | Smoke Signals, Wanted Poster, Stagecoach | |
+
+The rest of a quest's events come from its base region (Tallgrass for Fort Providence) and
+the common pool.
+
+## 8. Tally
+
+- **Events in the first region:** 15 common + 10 Tallgrass + 6 Dry Gulch + 6 Crow's Nest.
+  - 12 of these are new: Card Game, Medicine Show, Twister, Cattle Drive, Powder Shack,
+    Tapping Underground, Tommyknockers, Runaway Burro, Ore Wagon Wreck, Wanted Poster,
+    Hanging Tree, Stagecoach. *(Claim Dispute moves in from Red.)*
+  - A Dry Gulch map now sees 21 possible events instead of 10, and Crow's Nest 21 instead of
+    10.
+- **Every class has a role:**
+
+  | Class | Events where it's an expert or has a secret option |
+  |---|---|
+  | Marshal | 8 |
+  | Preacher | 6 |
+  | Gambler | 5 |
+  | Gunslinger | 6 |
+  | Wrangler | 9 |
+  | Rail Driver | 3 |
+  | Prospector | 5 |
+  | Bayou Poisoner | 3 |
+  | Frontier Doctor | 5 |
+  | Train Hopper | 3 |
+  | Mountain Mystic | 4 |
+
+- **Survival skills:** all 12 appear. Cook now shows up 5 times.
+- **Quirks:** 27 quirks matter somewhere.
+  - Good: Unbeliever, Trailwise, Keen-Eyed, Lucky, Good Humor, Beast Hunter, Bounty Hunter,
+    Manhunter, Eagle Eye, Iron Stomach.
+  - Bad: Drinker, Gold Fever, Too Curious, Hothead, Spooked by Critters, Superstitious,
+    Sickly, Butterfingers, Overweight, Jumpy, Hard of Hearing, Claustrophobic, Gloomy,
+    Homesick, Slowpoke, Maternal Instinct.
+  - Lightning Rod has a funny one.
+- **Quirks given at low %:** Spooked by Critters, Sickly (×3), Hard of Hearing, Claustrophobic,
+  plus a random good quirk (×2).
+
+## 9. Engine work
+
+1. **Pools:** a `common` list in `events.json` (or a pool tag per event), region lists stay,
+   and a quest template `events` list. Weights go in config. The map picks a layer, then an
+   event, without repeats.
+2. **Event experts:** reuse the curio expert code, add quirks as an expert key, and allow ★/✗
+   on any option. The best expert acts, and the event screen lists the lines under each option.
+3. **`compel`** on quirk options.
+4. **Follow-ups:** an outcome with `then: [options]` shows a second choice in the same window.
+5. **Fight setup:** `wounded`, `drop`, `foe_mods`, `foe_marked` on a fight effect.
+6. **Hide an option** when a given class or quirk is present (Marshal won't steal).
+7. Smaller items:
+   - "next fight" debuffs (wet powder, hungover) already work.
+   - `light` for the next cave already exists.
+   - A "paid on return" reward goes into the expedition loot, which already exists.
+8. **Tests:** every requirement is valid, pools never repeat, experts move the odds, compel
+   fires, follow-ups resolve, and fight setup reaches the fight.
+
+## 10. Questions for the owner
+
+1. Are the pool weights right (45 common / 55 region; quests 40 theme / 30 / 30)?
+2. Should the ★/✗ lines show on the event options, as at curios? (Recommended.)
+3. Which new events to keep? All 12, or a shortlist?
+4. Is a 30-50% compel right for the bad quirks?
+5. Build it in two passes? (1) pools, experts, compel, fixes and the existing events;
+   (2) the new events and follow-ups.
+
+---
+
+## Appendix: every event as it is today
 
 Regions: Mill = Old Mill Road, Tall = Tallgrass Sea, Gulch = Dry Gulch Mine, Crow = Crow's
 Nest, Red = Red Canyons, Peaks = Thunder Peaks. **Bold** = class option. "Hero" means the
@@ -74,132 +514,3 @@ hero who acts; "one" means a random hero.
 | Fever in the Camp | Gulch, Tall, Red, Peaks | [2 Bandages] Treat them with bandages and cool water → +3 Fatigue all<br>[Medic] Let the Medic take charge → nothing<br>Push on and hope it passes → 67%: -12% HP all, +8 Fatigue all / 33%: -20% HP hero, quirk sickly |
 | Outlaw Toll | Crow, Tall, Red | [40 chips] Pay the toll (40 chips) → +4 Fatigue all<br>**[Marshal]** Flash the badge → 67%: -4 Fatigue all / 33%: **fight**<br>Refuse → **fight** |
 | Torn Canvas | Gulch, Crow, Tall, Red, Peaks | [1 Rope] Lash it down with rope → nothing<br>[1 Wagon Parts] Rebuild the bows with spare parts → +10 Wagon<br>Leave it → -3 Food, -8 Wagon |
-
-## A. Class options for the 8 classes with none
-
-Each class gets **3 events**. At least 2 of them are in the first region (Tallgrass, Dry
-Gulch, Crow's Nest), so you'll see them early. Like now, an option shows only when that class
-is in the company.
-
-| Class | Event | Option | Outcomes |
-|---|---|---|---|
-| **Mountain Mystic** | Haint Lights | "Speak with them." | 2/3: the lights show the way: reveal 3, -6 Fatigue all · 1/3: "They don't want to talk": fight vs 2 Haints, who start Vulnerable 15% |
-| | Wolf Tracks | "Go out and meet the pack." | 3/4: the wolves sit and let you pass: -6 Fatigue all, +1 Hides (a gift) · 1/4: one young wolf doesn't listen: fight vs 1 wolf, we strike first |
-| | Giant Footprints *(Peaks)* | "Leave an offering of iron." | -1 Iron: the giant leaves a gift (trinket, rare) |
-| **Rail Driver** | Broken Axle | "Drive a new pin with the hammer." | +5 Wagon, +6 Fatigue hero (hard work, but no supplies used) |
-| | Stuck in the Mud | "Get under it and lift." | Out at once: -4 Fatigue all (everyone's impressed), +8 Fatigue hero |
-| | Railroad Surveyors *(Red)* | "Talk to the work gang." | 120-200 chips (they pay you to look the other way) **or** they down tools: -8 Fatigue all |
-| **Gunslinger** | Outlaw Toll | "Call out the leader." | 1/2: the leader backs down: -6 Fatigue all, +40-80 chips (their toll money) · 1/2: draw: fight, we strike first, the leader starts at 50% HP |
-| | Smoke Signals | "Pick off the lookout." | fight vs 2 instead of 3 (rifleman removed), we strike first |
-| | Stranger on the Road | "Size them up." | Spots trouble before it starts: 2/3 recruit, 1/3 reveal 2 (no chance of being robbed) |
-| **Wrangler** | Buffalo Herd | "Cut one out of the herd." | +8 Food, +1 Hides, and the herd parts: no wagon damage |
-| | River Crossing | "Swim the oxen across." | 4/5: across clean, -4 Fatigue all · 1/5: -8 Wagon |
-| | Thunderstorm | "Settle the oxen." | No ditch: +4 Fatigue all only (instead of 8) |
-| **Prospector** | Abandoned Homestead | "Blast open the root cellar." | 2/3: 80-160 chips, +2 Iron · 1/3: the squatters come running: fight, they start at 70% HP (stunned by the blast) |
-| | Smoke Signals | "Dynamite the ridge." | fight where every enemy starts at 60% HP, we strike first |
-| | Claim Dispute *(Red)* | "Blast a test hole." | +4 Iron, both parties pay 40-80 chips for the answer |
-| **Bayou Poisoner** | Rattler in the Bedroll | "Milk the venom." | +1 Antivenom, and the hero's next fight gets +2 Poison per turn on their poisons |
-| | Wolf Tracks | "Leave poisoned bait." | +2 Hides, no fight · -1 Food (the bait) |
-| | Swollen Creek | "Read the water, bayou style." | Across safely and +3 Food (crawfish) |
-| **Frontier Doctor** | Sick Traveler | "Treat him, and charge for it." | 100-160 chips, -6 Fatigue all |
-| | Fever in the Camp | "Quinine and quarantine." | No harm, and -4 Fatigue all (no Bandages used) |
-| | Frozen Traveler *(Peaks)* | "Treat the frostbite properly." | Recruit always lives (no 1/3 death) |
-| **Train Hopper** | Fork in the Trail | "Read the hobo sign on the post." | Always the good shortcut: -5 Fatigue all, +2 Food |
-| | Drifter's Camp | "Swap hobo code." | Recruit **and** reveal 3 (they know the trail) |
-| | Railroad Surveyors *(Red)* | "Hop their supply car." | +2 Bandages, +1 Whiskey, +1 Wagon Parts |
-
-**Marshal** (4), **Preacher** (2) and **Gambler** (2) keep theirs. Two more each, both in the
-first region:
-
-| Class | Event | Option | Outcomes |
-|---|---|---|---|
-| Preacher | Sick Traveler | "Sit with the family." | -8 Fatigue all; 1/3 the father lives (trinket) |
-| | Frozen Traveler *(Peaks)* | "Last rites." | No Fatigue for the death; the company takes heart (-6 Fatigue all) |
-| Gambler | Outlaw Toll | "Double or nothing on a hand of cards." | 1/2: they ride off with nothing: +40 chips · 1/2: pay 80 chips, or fight if short |
-| | Fork in the Trail | "Flip for it." | 3/4 the good shortcut, 1/4 the bad one |
-
-## B. Quirk options
-
-The option shows only if someone has the quirk.
-
-**Good quirks** (a better way through):
-
-| Quirk | Event | Option | Outcomes |
-|---|---|---|---|
-| Unbeliever | Haint Lights | "Walk right through them." | 2/3: the cache, 120-240 chips · 1/3: fight vs 2 Haints who start Vulnerable 15% |
-| Beast Hunter | Wolf Tracks | "Track the pack leader." | fight vs 1 big wolf, we strike first, +3 Hides |
-| Bounty Hunter | Outlaw Toll | "Recognize them: there's paper on all three." | fight, with a 200-chip bounty if you win |
-| Trailwise | Lost the Trail | "Trust your gut." | reveal 3 |
-| Iron Stomach | Fever in the Camp | "Nurse the sick; nothing makes {hero} ill." | No harm to anyone |
-| Hard of Hearing *(bad quirk, good here)* | A Song in the Canyon *(Red)* | "{hero} can't hear a thing." | Walks up and takes the treasure: 120-240 chips |
-
-**Bad quirks** (a temptation). These take a new field, `compel`: when the event opens, a
-hero with the quirk has that % chance to grab the option before you can choose. It works
-like the Drinker and Gold Fever compulsions at curios.
-
-| Quirk | Event | Option | Compel | Outcomes |
-|---|---|---|---|---|
-| Drinker | Stranger on the Road | "{hero} pulls out a bottle." | 40% | 1/2: they share the map: reveal 3 · 1/2: wakes up robbed: -20% chips, next fight -5 Acc for the hero (hungover) |
-| Gold Fever | Haint Lights | "Chase the lights. There's gold out there." | 40% | 1/2: 160-300 chips · 1/2: fight vs 3 Haints, +10 Fatigue hero |
-| Too Curious | Abandoned Homestead | "Open the door nobody wants to open." | 30% | 1/2: trinket · 1/2: fight vs 2 Haints |
-| Hothead | Outlaw Toll | "{hero} has already drawn." | 50% | fight, we strike first, but the hero is Vulnerable 10% next fight |
-| Spooked by Critters | Rattler in the Bedroll | "{hero} bolts." | 50% | Into the night: +10 Fatigue hero, but they're not bitten |
-
-## C. Combat hooks
-
-New fields on a `fight` effect (small engine work):
-- `wounded`: enemies start at a % of their HP (Prospector's dynamite, the Gunslinger's draw).
-- `drop`: remove an enemy by id (the Gunslinger shoots the lookout).
-- `foe_mods`: round-1 modifiers on the enemy (Vulnerable for the Mystic and Unbeliever, Marked).
-
-"Next fight" debuffs already work, with negative values. Proposed uses on existing bad
-outcomes:
-- River Crossing "tips": wet powder, -5 Acc next fight.
-- Heat Wave "push through": -2 Spd next fight.
-- Thunderstorm "shelter" (75%): wet powder, -5 Acc next fight.
-- Blizzard "push through": numb hands, -5% Dmg next fight.
-
-Event fights that pay nothing extra could add a small reward:
-- Abandoned Homestead squatters: 40-80 chips.
-- Claim Dispute claim jumpers: +2 Iron.
-- Outlaw Toll "Refuse": 40 chips (their toll).
-
-## D. Supplies and skills that go unused
-
-| Supply or skill | Event | Option |
-|---|---|---|
-| **Cook** | Buffalo Herd | "Jerk the meat." Needs a Hunter or Cook; +6 Food on top |
-| **Cook** | Homestead | "Cook for the family." +12 Food, -8 Fatigue all |
-| **Lamp Oil** | Abandoned Homestead | "Light a lamp and search properly." The squatter fight can't happen; +5 Food, 1/3 trinket |
-| **Lamp Oil** | Haint Lights | "Light your own lamp and follow." 2/3 the cache; the fight drops to 1/3 |
-| **Salt** | Buffalo Herd (Hunter) | "Salt the meat." +5 Food |
-| **Antivenom** | Sick Traveler | "It's snakebite, not fever." -10 Fatigue all, trinket |
-| Angler | Swollen Creek | "Find the riffle." Across safely, +3 Food |
-| Miner | Abandoned Homestead | "Check the well shaft." +3 Iron |
-
-## E. Fixes and small edits
-
-- **Prairie Fire:** fix the Whiskey option text ("Soak the blankets in whiskey and hunker
-  down").
-- **Do-nothing options:**
-  - Stuck in the Mud (Rope) and (Woodcutter): -2 Fatigue all, "quick work".
-  - Torn Canvas (Rope): +2 Wagon.
-  - Fever (Medic): -4 Fatigue all.
-  - Swollen Creek (Rope) stays as it is: avoiding the risk is the reward.
-- **Old Mill Road** has just Broken Axle and Homestead. It's the tutorial, so leave it.
-
-## Engine work (small)
-
-- `compel` on quirk options; the event screen shows "{hero} can't help themselves!".
-- Fight fields `wounded`, `drop`, `foe_mods`.
-- Tests: every option's requirements are valid, a class option is hidden without the class,
-  compel fires, and wounded, drop and foe_mods reach the fight.
-
-## Questions for the owner
-
-1. All of A, or a subset? That's 28 new class options, covering all 11 classes.
-2. Quirk options: is `compel` for the bad quirks OK, or should they just be optional choices?
-3. Should C's "next fight" debuffs go in? They make the bad outcomes bite a little harder.
-4. New events? The first region's pools are Tallgrass 23, Dry Gulch 10, Crow's Nest 10.
-   Dry Gulch and Crow's Nest could use 2-3 each, e.g. a Cattle Drive, a Medicine Show, a Hobo
-   Jungle or a Dynamite Shack.
