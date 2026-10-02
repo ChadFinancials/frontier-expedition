@@ -67,6 +67,8 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Saloon prices halved** (owner): Belly Up to the Bar 75 chips (was 150), Card Table 50
+  (was 100); Fatigue relief unchanged.
 - **Chips doubled** (owner: running low; a saloon quest paid about 200, barely one bar visit
   and one new move): enemies 10-24 per kill (was 5-12), bosses 500 × tier (was 250), region
   boss rewards ×2, side quests 160-300 (was 80-150), curio and event chips ×2, Trapper and
