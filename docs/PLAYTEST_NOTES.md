@@ -56,6 +56,9 @@ decided, and what shipped. Update both at the end of every round.
       building.
 
 ### Visuals
+- [ ] **Big image pass (owner, later)** with the owner's image generator. It covers curio and
+      event art, trinket icons, more backdrops and the like. Until then, the drawn
+      placeholders are fine; don't spend effort polishing them.
 - [ ] **Backdrops**: about ten more images in the owner's prairie style for stops across side
       quests and expeditions (composition rule: keep the lower middle open, see
       `COMFYUI_GUIDE.md` §7). Also the idea of rebuilding favourite drawn scenes in code from
