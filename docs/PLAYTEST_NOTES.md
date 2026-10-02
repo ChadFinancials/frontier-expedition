@@ -77,6 +77,17 @@ decided, and what shipped. Update both at the end of every round.
 
 ## History
 
+### Round 12 (week 3: Rustlers at Miller's Draw)
+- **Rustlers:**
+  - Every ordinary fight was 3-4 outlaws, and 3 in 8 were the full four, the same group as the
+    final. Now: brawler, gunhand and rifleman (3); a new light pair, brawler and gunhand (2);
+    two gunhands and a coyote (2); the full four (2).
+  - Fewer fight stops: fight 48 → 42, event 16 → 20, curio 12 → 14.
+  - Quests already on the board keep their old groups until they roll over.
+- **Noted:** the Gunhand's Double Tap (2 random hits of 3-6) stands out against two or more
+  gunhands, since their speed lets them open with it. No change for now.
+- The haul (275 chips, 3 Timber, 3 Iron, 3 Hides) paid for the Bunkhouse.
+
 ### Round 11 (weeks 2-3: Mad Dog's hideout)
 - **Iron Justice** (owner): +15% damage vs outlaws, +5% per move level, stacking with +40% vs
   Marked (a Marked outlaw: +55% at level 1).
