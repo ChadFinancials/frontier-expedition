@@ -789,9 +789,13 @@ func _result(e: Dictionary) -> void:
 				_log("%s resists the %s (a status resistance; damage is unaffected)." % [t5.display_name, st_name.to_lower()])
 		"bounty":
 			var tb := engine.unit(e.actor)
-			_popup(tb, "+%d chips" % e.amount, Color("#e0bd4f"), 26, 70)
-			_log("[color=#e0bd4f]%s collects %d chips for that one.[/color]" % [tb.display_name if tb else "?", e.amount])
-			Audio.play("coin")
+			if int(e.amount) >= 0:
+				_popup(tb, "+%d chips" % e.amount, Color("#e0bd4f"), 26, 70)
+				_log("[color=#e0bd4f]%s collects %d chips for that one.[/color]" % [tb.display_name if tb else "?", e.amount])
+				Audio.play("coin")
+			else:
+				_popup(tb, "%d chips" % e.amount, Color("#e05a4a"), 24, 70)
+				_log("[color=#e05a4a]No kill: %s loses the %d-chip stake.[/color]" % [tb.display_name if tb else "?", -int(e.amount)])
 		"buff", "debuff":
 			var t6 := engine.unit(e.target)
 			_sync_status(t6)

@@ -801,14 +801,20 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 	if t.corpse:
 		return crit
 	if t.dead:
-		# Some moves pay off on a kill (Money Shot).
+		# Some moves pay off on a kill (Money Shot: amount + per_level for each level above 1).
 		for e in sk.get("on_kill", []):
 			if e.get("type", "") == "money":
-				bounty += int(e.get("amount", 0))
-				ev.append({"t": "bounty", "actor": a.id, "amount": int(e.get("amount", 0))})
+				var pay := int(e.get("amount", 0)) + int(e.get("per_level", 0)) * (a.skill_level(sid) - 1)
+				bounty += pay
+				ev.append({"t": "bounty", "actor": a.id, "amount": pay})
 			else:
 				_apply_self_effect(a, sid, e, ev)
 		return crit
+	# ...and some cost something when they don't (Money Shot's lost stake).
+	for e in sk.get("on_fail", []):
+		if e.get("type", "") == "money":
+			bounty += int(e.get("amount", 0))
+			ev.append({"t": "bounty", "actor": a.id, "amount": int(e.get("amount", 0))})
 	for e in sk.get("effects", []):
 		# "if_tag": the effect only lands on targets with that tag (mythic bonuses).
 		if e.has("if_tag") and not str(e.if_tag) in t.tags:

@@ -74,6 +74,7 @@ func _ready() -> void:
 	test_fatigue_states()
 	test_event_pass()
 	test_starter_quest()
+	test_money_shot()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -1429,6 +1430,35 @@ func test_starter_quest() -> void:
 		for q in co2.settlement(0).get("quests", []):
 			mad = mad or DB.regions[q].template == "mad_dog"
 	check(mad, "after a side quest, Mad Dog's rumor comes back to the board")
+
+
+func test_money_shot() -> void:
+	# A kill pays 30 (+10 a level); a shot that doesn't kill loses the 10-chip stake.
+	var co := Company.new()
+	co.new_game(31)
+	var g: Hero = co.make_hero("gambler", 1)
+	g.quirks.clear()
+	if not "gb_money_shot" in g.equipped:
+		g.equipped[0] = "gb_money_shot"
+	var e := CombatEngine.new()
+	e.setup([co.make_hero("marshal", 1), g], ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], {})
+	var gc: Combatant = e.heroes[1]
+	var foe: Combatant = e.enemies[1]
+	foe.hp = 999
+	foe.max_hp = 999
+	e.use_skill(gc, "gb_money_shot", foe.id)
+	check(e.bounty == -10, "Money Shot without a kill loses 10 chips (bounty %d)" % e.bounty)
+	foe.hp = 1
+	var kills := 0
+	for i in 20:
+		if foe.dead:
+			break
+		e.bounty = 0
+		e.use_skill(gc, "gb_money_shot", foe.id)
+		if foe.dead:
+			kills += 1
+			check(e.bounty == 30, "a Money Shot kill pays 30 at level 1 (got %d)" % e.bounty)
+	check(kills == 1, "the 1-HP foe falls to a Money Shot")
 
 
 func test_round9_town() -> void:

@@ -988,7 +988,8 @@ func _make_quest(tid: String, west: String, tier_l: int, starter: bool = false) 
 		"trinket": "",
 		"recruit": 0,
 	}
-	if rng.randf() * 100.0 < float(ch.get("trinket", [10, 22, 35])[tl]):
+	# A story boss that pays its own trinket (Mad Dog's Brass Knuckles) doesn't add a random one.
+	if str(t.get("boss_keepsake", "")) == "" and rng.randf() * 100.0 < float(ch.get("trinket", [10, 22, 35])[tl]):
 		reward.trinket = "rare" if tl >= 1 else "uncommon"
 	if rng.randf() * 100.0 < float(ch.get("recruit", [8, 14, 20])[tl]):
 		reward.recruit = 1 + tl

@@ -77,6 +77,22 @@ decided, and what shipped. Update both at the end of every round.
 
 ## History
 
+### Round 11 (weeks 2-3: Mad Dog's hideout)
+- **Money Shot:** a kill pays 30 chips +10 per skill level (was a flat 50). A shot that
+  doesn't kill, misses included, loses a 10-chip stake.
+- **Mad Dog's crew:** he now has a rifleman in rank 3 as well as his gunhand.
+- **Story bosses with their own trinket** (Mad Dog's Brass Knuckles) no longer add a random
+  quest trinket on top.
+- **Answered:**
+  - The Marshal has no built-in bonus against outlaws.
+  - The free kit (16 Food, 1 Bandages, 1 Wagon Parts) covers an 8-column side region, about
+    14 Food for four heroes. The 12-column Tallgrass needs about 22, so the warning steers new
+    companies to side quests first. Owner to decide whether that's wanted.
+- **Noted:**
+  - The quest gave 2 Hides, short of the 3 for the Bunkhouse. Quest Hides are 0-2 plus the
+    tips level, plus template bonuses (Wolves +3, Rustlers +2, Snakes +1).
+  - The chip economy feels fine (1600 at the start of week 3, with some Money Shot farming).
+
 ### Round 10 (fresh party, weeks 1-2)
 - **Starter Saloon quest:**
   - Skipping the tutorial never rolled the Saloon's first quest, so week 1 offered only Dry

@@ -588,8 +588,8 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		money += int(int(reward.money) * float(DB.cfg("chips_mult", 1.0)))
 	if reward.get("keepsake", false):
 		res.keepsakes.append(company.random_keepsake())
-	res.money = money
-	loot.money = int(loot.money) + money
+	res.money = maxi(0, money)
+	loot.money = maxi(0, int(loot.money) + money)
 	for mat in ["timber", "iron", "hides"]:
 		var want := int(res[mat])
 		var got := add_material(mat, want)

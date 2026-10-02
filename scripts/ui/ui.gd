@@ -395,9 +395,12 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 		if t2 != "":
 			lines.append("• Self: " + t2)
 	for e in sk.get("on_kill", []):
-		var t3 := "+%d chips" % int(e.get("amount", 0)) if e.get("type", "") == "money" else effect_text(e, level)
+		var t3 := "+%d chips" % (int(e.get("amount", 0)) + int(e.get("per_level", 0)) * (level - 1)) if e.get("type", "") == "money" else effect_text(e, level)
 		if t3 != "":
 			lines.append("• On a kill: " + t3)
+	for e in sk.get("on_fail", []):
+		if e.get("type", "") == "money":
+			lines.append("• No kill: %d chips" % int(e.get("amount", 0)))
 	return "\n".join(lines)
 
 

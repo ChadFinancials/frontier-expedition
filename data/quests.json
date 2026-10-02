@@ -17,7 +17,7 @@
       "final": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"],
       "boss": {"name": "\"Mad Dog\" Mulligan", "intro": "Mulligan's hideout at {place} is a sod house with a whiskey barrel for a front door. A man the size of a woodstove steps out, cracking his knuckles, a black crow feather stuck in his cap.\n\n\"You're the ones who roughed up Pete. Boys! Company!\"",
         "victory": "Mulligan goes down like a felled oak. When he comes to, he's hog-tied on the back of your wagon, and Ma Delaney has a Wanted poster with a reward on it.",
-        "enemies": ["mad_dog_mulligan", "outlaw_gunhand"]}},
+        "enemies": ["mad_dog_mulligan", "outlaw_gunhand", "outlaw_rifleman"]}},
     "rustlers": {"events": ["cattle_drive", "buffalo_herd", "wanted_poster"], "name": "Rustlers at {place}", "desc": "A rancher says rustlers are holed up at {place} with half his herd.",
       "node_weights": {"fight": 48, "elite": 12, "event": 16, "curio": 12, "cave": 4, "homestead": 4, "trading_post": 0},
       "fights": [

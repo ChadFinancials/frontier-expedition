@@ -86,7 +86,7 @@ def main():
 					dmg += ", %+d%% vs %s" % (round(v * 100), tag)
 				if s.get("gamble"):
 					dmg += ", 50/50: double or quarter"
-			fx = [effect_text(x) for x in s.get("effects", [])] + ["self: " + effect_text(x) for x in s.get("self_effects", [])] + ["on kill: " + effect_text(x) for x in s.get("on_kill", [])]
+			fx = [effect_text(x) for x in s.get("effects", [])] + ["self: " + effect_text(x) for x in s.get("self_effects", [])] + ["on kill: " + effect_text(x) for x in s.get("on_kill", [])] + ["no kill: " + effect_text(x) for x in s.get("on_fail", [])]
 			if "transfuse_pct" in s:
 				fx.insert(0, "heals most wounded ally %d%% of damage dealt" % s["transfuse_pct"])
 			if s.get("momentum"):

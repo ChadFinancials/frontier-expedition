@@ -121,7 +121,7 @@ Resists: stun 30, bleed 30, poison 30, move 30, debuff 40, deathblow 67
 | **Deal 'Em**: Deals a hand of razor-edged cards to the whole table. Bleed. | 234 | ALL of 1234 | 85 | 2-4 each | bleed 1 x3 rounds |
 | **Stacked Deck**: Deals every ally a card: each gets a random boon. | 1234 | whole party | - | - | random boon for 3 rounds |
 | **Poker Face**: Gives nothing away. Gains Dodge and Speed. | 234 | self | - | - | dodge +10 for 3 rounds; speed +2 for 3 rounds |
-| **Money Shot**: A shot with a bounty on it; hits harder on a Marked target. If it kills, the Gambler pockets 50 chips and breathes easier. | 23 | one of 234 | 90 | 2-12, +40% vs marked | on kill: +50 chips; on kill: -5 fatigue (relief) |
+| **Money Shot**: A shot with a bounty on it; hits harder on a Marked target. A kill pays 30 chips (+10 a level) and the Gambler breathes easier; no kill, and the 10-chip stake is lost. | 23 | one of 234 | 90 | 2-12, +40% vs marked | on kill: +30 chips (+10 a level); on kill: -5 fatigue (relief); no kill: -10 chips |
 | **Assign the Joker**: Flicks the Joker at a back-liner: Marked, and off their game. | 234 | one of 34 | 90 | - | mark 3 rounds; dodge -12 for 3 rounds; acc -10 for 3 rounds |
 | **Lotto Ticket**: A one-in-a-hundred shot from the very back. Nearly always misses; when it hits, it's a jackpot. Stack Accuracy to make it pay. | 4 | one of 1234 | 22 | 24-48 | - |
 
