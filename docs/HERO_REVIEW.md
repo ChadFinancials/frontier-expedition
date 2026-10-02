@@ -16,7 +16,7 @@ Resists: stun 50, bleed 35, poison 30, move 50, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| ★ **Iron Justice**: A point-blank revolver shot, delivered with the full weight of the law. Bonus against Marked targets. | 123 | one of 12 | 92 | 5-10, +2% crit, +40% vs marked | - |
+| ★ **Iron Justice**: A point-blank revolver shot, delivered with the full weight of the law. Bonus against outlaws (growing with each level), and more against Marked targets. | 123 | one of 12 | 92 | 5-10, +2% crit, +40% vs marked, +15% vs outlaw (+5% a level) | - |
 | ★ **Pistol-Whip**: Cracks a revolver butt across a skull. Stuns. | 12 | one of 12 | 92 | 2-3 | stun |
 | **Deputize**: Steps in to shield an ally: attacks aimed at them hit the Marshal instead. The Marshal gains Protection. | 123 | one ally in 1234 | - | - | guards the ally for 3 rounds; self: prot +15 for 3 rounds |
 | **Serve a Warrant**: Names the target a wanted outlaw: Marked, and easier to hit. | 123 | one of 1234 | 102 | - | mark 3 rounds; dodge -10 for 3 rounds |

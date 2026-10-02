@@ -102,9 +102,11 @@ In `data/skills.json` (hero and enemy moves share the file; enemy ids start with
 | `crit` | Crit modifier added to the user's crit |
 | `vs_marked` / `low_hp_bonus` | Bonus damage vs Marked targets / when the user is below 50% HP |
 | `vs_tags` | e.g. `{"mythic": 0.5}`: +50% damage vs mythic creatures |
+| `vs_tags_per_level` | e.g. `{"outlaw": 0.05}`: the `vs_tags` bonus grows 5% for each move level above 1 (Iron Justice) |
 | `self_poisoned_bonus` | Extra damage (fraction) while the user is poisoned (Bayou Poisoner) |
 | `gamble` | Double-or-nothing damage |
-| `on_kill` | Effects when it kills: `{"type": "money", "amount": 50}` pays a bounty; others apply to the user |
+| `on_kill` | Effects when it kills: `{"type": "money", "amount": 30, "per_level": 10}` pays a bounty (+10 per move level); others apply to the user |
+| `on_fail` | Effects when it doesn't kill (a miss or a survivor): `{"type": "money", "amount": -10}` loses a stake (Money Shot) |
 | `once_per_fight` | Usable once per battle |
 | `momentum` | Momentum this move adds for a class with `"momentum": true` (Train Hopper) |
 | `mega`, `spend_momentum` | The class's mega move (named by the class's `"mega"` field, not in its `skills`): usable only on a full gauge, which it empties |

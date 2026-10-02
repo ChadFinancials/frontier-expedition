@@ -75,6 +75,7 @@ func _ready() -> void:
 	test_event_pass()
 	test_starter_quest()
 	test_money_shot()
+	test_iron_justice()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -1459,6 +1460,27 @@ func test_money_shot() -> void:
 			kills += 1
 			check(e.bounty == 30, "a Money Shot kill pays 30 at level 1 (got %d)" % e.bounty)
 	check(kills == 1, "the 1-HP foe falls to a Money Shot")
+
+
+func test_iron_justice() -> void:
+	# Iron Justice: +15% against outlaws (+5% a level), stacking with +40% against Marked targets.
+	var co := Company.new()
+	co.new_game(37)
+	var m: Hero = co.make_hero("marshal", 1)
+	m.quirks.clear()
+	var e := CombatEngine.new()
+	e.setup([m], ["outlaw_brawler", "prairie_wolf"], {})
+	var mc: Combatant = e.heroes[0]
+	var outlaw: Combatant = e.enemies[0]
+	var wolf: Combatant = e.enemies[1]
+	var base := e.dmg_mult(mc, "marshal_iron_justice", wolf)
+	check(is_equal_approx(e.dmg_mult(mc, "marshal_iron_justice", outlaw) - base, 0.15), "Iron Justice +15% vs outlaws at level 1")
+	outlaw.mark = 2
+	check(is_equal_approx(e.dmg_mult(mc, "marshal_iron_justice", outlaw) - base, 0.55), "Iron Justice +55% vs a Marked outlaw")
+	outlaw.mark = 0
+	m.skill_levels["marshal_iron_justice"] = 3
+	var base3 := e.dmg_mult(mc, "marshal_iron_justice", wolf)
+	check(is_equal_approx(e.dmg_mult(mc, "marshal_iron_justice", outlaw) - base3, 0.25), "Iron Justice +25% vs outlaws at level 3")
 
 
 func test_round9_town() -> void:

@@ -78,6 +78,8 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 11 (weeks 2-3: Mad Dog's hideout)
+- **Iron Justice** (owner): +15% damage vs outlaws, +5% per move level, stacking with +40% vs
+  Marked (a Marked outlaw: +55% at level 1).
 - **Money Shot:** a kill pays 30 chips +10 per skill level (was a flat 50). A shot that
   doesn't kill, misses included, loses a 10-chip stake.
 - **Mad Dog's crew:** he now has a rifleman in rank 3 as well as his gunhand.

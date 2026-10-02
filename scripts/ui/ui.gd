@@ -365,6 +365,11 @@ static func skill_tooltip(sid: String, level: int = 1) -> String:
 			parts.append("Crit +%d%%" % int(sk.crit))
 		if float(sk.get("vs_marked", 0)) > 0:
 			parts.append("+%d%% vs Marked" % int(round(float(sk.vs_marked) * 100)))
+		var vt: Dictionary = sk.get("vs_tags", {})
+		var vl: Dictionary = sk.get("vs_tags_per_level", {})
+		for tag in vt:
+			var v := float(vt[tag]) + float(vl.get(tag, 0.0)) * (level - 1)
+			parts.append("%+d%% vs %ss" % [int(round(v * 100)), str(tag).capitalize()])
 		if int(sk.get("ignore_prot_pct", 0)) > 0:
 			parts.append("ignores %d%% of Protection" % int(sk.ignore_prot_pct))
 		if sk.get("hits", 1) > 1:

@@ -83,7 +83,8 @@ def main():
 				if s.get("low_hp_bonus"):
 					dmg += ", +%d%% when below half HP" % round(s["low_hp_bonus"] * 100)
 				for tag, v in s.get("vs_tags", {}).items():
-					dmg += ", %+d%% vs %s" % (round(v * 100), tag)
+					per = s.get("vs_tags_per_level", {}).get(tag, 0)
+					dmg += ", %+d%% vs %s%s" % (round(v * 100), tag, " (+%d%% a level)" % round(per * 100) if per else "")
 				if s.get("gamble"):
 					dmg += ", 50/50: double or quarter"
 			fx = [effect_text(x) for x in s.get("effects", [])] + ["self: " + effect_text(x) for x in s.get("self_effects", [])] + ["on kill: " + effect_text(x) for x in s.get("on_kill", [])] + ["no kill: " + effect_text(x) for x in s.get("on_fail", [])]

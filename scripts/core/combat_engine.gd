@@ -604,10 +604,12 @@ func dmg_mult(a: Combatant, sid: String, t: Combatant) -> float:
 	if a.is_poisoned():
 		m += float(sk.get("self_poisoned_bonus", 0.0))
 	if t != null:
+		# vs_tags: an edge against a kind of foe; vs_tags_per_level grows it with the move's level.
 		var vt: Dictionary = sk.get("vs_tags", {})
+		var vl: Dictionary = sk.get("vs_tags_per_level", {})
 		for tag in vt:
 			if tag in t.tags:
-				m += float(vt[tag])
+				m += float(vt[tag]) + float(vl.get(tag, 0.0)) * (a.skill_level(sid) - 1)
 		m += _class_vs(a, t, "dmg")
 	if in_cave and not a.is_hero():
 		m += _light_row().get("enemy_dmg", 0) / 100.0
@@ -768,6 +770,7 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 	var chance := hit_chance(a, sid, t)
 	if rng.randi_range(1, 100) > chance:
 		ev.append({"t": "miss", "actor": a.id, "target": t.id})
+		_on_fail(a, sk, ev)
 		return false
 	var crit := false
 	if not sk.get("no_damage", false):
@@ -810,17 +813,21 @@ func _resolve_attack(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev
 			else:
 				_apply_self_effect(a, sid, e, ev)
 		return crit
-	# ...and some cost something when they don't (Money Shot's lost stake).
-	for e in sk.get("on_fail", []):
-		if e.get("type", "") == "money":
-			bounty += int(e.get("amount", 0))
-			ev.append({"t": "bounty", "actor": a.id, "amount": int(e.get("amount", 0))})
+	_on_fail(a, sk, ev)
 	for e in sk.get("effects", []):
 		# "if_tag": the effect only lands on targets with that tag (mythic bonuses).
 		if e.has("if_tag") and not str(e.if_tag) in t.tags:
 			continue
 		_apply_effect(a, sid, e, t, ev, crit)
 	return crit
+
+
+## A move that didn't kill (a miss or a survivor) may cost something: Money Shot's lost stake.
+func _on_fail(a: Combatant, sk: Dictionary, ev: Array) -> void:
+	for e in sk.get("on_fail", []):
+		if e.get("type", "") == "money":
+			bounty += int(e.get("amount", 0))
+			ev.append({"t": "bounty", "actor": a.id, "amount": int(e.get("amount", 0))})
 
 
 func _resolve_support(a: Combatant, sid: String, sk: Dictionary, t: Combatant, ev: Array) -> void:
