@@ -94,7 +94,7 @@
     "res": {"stun": 80, "bleed": 50, "poison": 50, "move": 95, "debuff": 50}, "skills": ["e_titan_sweep", "e_titan_quake", "e_titan_voice", "e_titan_call", "e_titan_crush"], "boss": true,
     "look": {"body": "giant", "eye": "glow", "crown": true, "scale": 1.6, "colors": {"fur": "#6f7a82", "belly": "#4c555c", "eye": "#9ee6ff", "coat": "#3e464c", "accent": "#b8c6cf"}}},
 
-  "giant_bat": {"name": "Giant Bat", "tags": ["beast", "cave"], "hp": 6, "dodge": 30, "prot": 0, "speed": 8, "acc": 0, "crit": 5, "dmg": [2, 4],
+  "giant_bat": {"name": "Giant Bat", "tags": ["beast", "cave"], "hp": 6, "dodge": 20, "prot": 0, "speed": 8, "acc": 0, "crit": 5, "dmg": [2, 4],
     "res": {"stun": 30, "bleed": 20, "poison": 25, "move": 50, "debuff": 25}, "skills": ["e_bat_bite", "e_bat_screech"],
     "look": {"body": "bat", "colors": {"fur": "#3a2f36", "belly": "#5b4a55", "eye": "#e84a4a"}}},
   "tommyknocker": {"name": "Tommyknocker", "tags": ["mythic", "cave"], "hp": 12, "dodge": 10, "prot": 5, "speed": 2, "acc": 0, "crit": 4, "dmg": [3, 5],

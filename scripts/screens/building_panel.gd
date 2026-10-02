@@ -63,6 +63,7 @@ func _build() -> void:
 			_store(body)
 		"hiring_board":
 			_hiring(body)
+			_activities(body)
 		"stage_line":
 			_stage(body)
 	if bid == "boot_hill":
@@ -120,7 +121,8 @@ func _activities(body: VBoxContainer) -> void:
 			var reg: Dictionary = DB.regions.get(q, {})
 			cv.add_child(UI.rich("[b]%s[/b]: %s  %s" % [reg.get("name", "?"), reg.get("desc", ""), Company.quest_hints(reg)], 17, true, 1100))
 		cv.add_child(UI.lbl("Take these jobs from Plan Expedition. Upgrade Chatter and Loose Lips below for more and better jobs.", 16, "Ink"))
-	body.add_child(UI.lbl("Click an empty slot to send a hero. They shed Fatigue and sit out the next expedition. Visiting also clears a Breaking Point.", 18, "InkBold"))
+	if bid != "hiring_board":
+		body.add_child(UI.lbl("Click an empty slot to send a hero. They shed Fatigue and sit out the next expedition. Visiting also clears a Breaking Point.", 18, "InkBold"))
 	for a in DB.buildings[bid].get("activities", []):
 		var aid: String = a.id
 		var key: String = bid + "/" + aid
@@ -133,7 +135,9 @@ func _activities(body: VBoxContainer) -> void:
 		var head := UI.hb(14)
 		cv.add_child(head)
 		head.add_child(UI.lbl(a.name, 24, "InkBold"))
-		head.add_child(UI.lbl("Sheds up to %d Fatigue  |  %d chips" % [relief, cost], 18, "Ink"))
+		head.add_child(UI.lbl("Sheds up to %d Fatigue  |  %s" % [relief, "%d chips" % cost if cost > 0 else "free"], 18, "Ink"))
+		if a.has("desc"):
+			cv.add_child(UI.wrap(UI.lbl(str(a.desc) + " The hero sits out the next expedition.", 16, "Ink"), 1100))
 		var side: Array = []
 		for se in a.get("side_effects", []):
 			var what := str(se.text).replace("%s ", "").replace("%s", "")
@@ -145,7 +149,7 @@ func _activities(body: VBoxContainer) -> void:
 			side.append("%d%% chance each visit: %s." % [int(se.chance), what.trim_suffix(".")])
 		if not side.is_empty():
 			cv.add_child(UI.wrap(UI.lbl(" ".join(side), 16, "Ink"), 1100))
-		_slot_row(cv, key, co.slot_cap(index, bid), func():
+		_slot_row(cv, key, co.activity_slot_cap(index, bid, aid), func():
 			var elig := co.service_candidates(index).filter(func(h): return (h.fatigue > 0 or h.is_breaking()) and co.can_do_activity(index, bid, aid, h) == "")
 			HeroPicker.pick(elig, "%s: who goes?" % a.name, func(h: Hero):
 				var msgs := co.do_activity(index, bid, aid, h)

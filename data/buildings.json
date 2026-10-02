@@ -50,12 +50,16 @@
   "hiring_board": {"name": "Hiring Board", "art": "board", "order": 7,
     "desc": "A plank wall papered with notices. New hands arrive every week.",
     "costs": [{"money": 250, "timber": 8, "iron": 1}],
+    "activities": [
+      {"id": "porch", "name": "Sit a Spell on the Porch", "cost": [0], "relief": [15], "slots": [1],
+        "desc": "A rocking chair, a long look at the horizon, nobody asking anything. Free, one seat."}
+    ],
     "tracks": {
       "notices": {"name": "More Notices", "desc": "More recruits answer the board each week.", "values": [2, 3, 4],
         "costs": [{"money": 500}, {"money": 1200}]},
       "reputation": {"name": "Word of Mouth", "desc": "Better recruits: a chance of higher levels, and better quirks.", "values": [0, 1, 2],
         "costs": [{"money": 700, "timber": 10, "iron": 6}, {"money": 1600, "timber": 20, "iron": 14}]},
-      "bunks": {"name": "Bunkhouse", "desc": "Bunks out back: room for more heroes in the company.", "values": [0, 2, 4],
+      "bunks": {"name": "Bunkhouse", "desc": "Bunks out back: room for more heroes in the company.", "values": [0, 4, 6],
         "costs": [{"money": 600, "timber": 6}, {"money": 1400, "timber": 14}]}
     }},
   "stage_line": {"name": "Stage Line", "art": "stage", "order": 8,

@@ -461,12 +461,24 @@ func activity(bid: String, act_id: String) -> Dictionary:
 
 func activity_cost(i: int, bid: String, act_id: String) -> int:
 	var lvl := maxi(1, building_level(i, bid))
-	return int(activity(bid, act_id).get("cost", [0])[mini(lvl, 3) - 1])
+	var c: Array = activity(bid, act_id).get("cost", [0])
+	return int(c[mini(lvl, c.size()) - 1])
 
 
 func activity_relief(i: int, bid: String, act_id: String) -> int:
 	var lvl := maxi(1, building_level(i, bid))
-	return int(activity(bid, act_id).get("relief", [0])[mini(lvl, 3) - 1])
+	var r: Array = activity(bid, act_id).get("relief", [0])
+	return int(r[mini(lvl, r.size()) - 1])
+
+
+## Seats for one activity: its own "slots" by level if it has them (the free porch has one),
+## otherwise the building's.
+func activity_slot_cap(i: int, bid: String, act_id: String) -> int:
+	var s: Array = activity(bid, act_id).get("slots", [])
+	if s.is_empty():
+		return slot_cap(i, bid)
+	var lvl := building_level(i, bid)
+	return 0 if lvl <= 0 else int(s[mini(lvl, s.size()) - 1])
 
 
 func can_do_activity(i: int, bid: String, act_id: String, h: Hero) -> String:
@@ -474,7 +486,7 @@ func can_do_activity(i: int, bid: String, act_id: String, h: Hero) -> String:
 		return "No %s here" % DB.buildings[bid].name
 	if h == null or not h.available() or h.location != i:
 		return "Hero not available"
-	if slots_left(i, bid, bid + "/" + act_id) <= 0:
+	if activity_slot_cap(i, bid, act_id) - int(settlement(i).get("used", {}).get(bid + "/" + act_id, 0)) <= 0:
 		return "No room this week"
 	if money < activity_cost(i, bid, act_id):
 		return "Not enough money"

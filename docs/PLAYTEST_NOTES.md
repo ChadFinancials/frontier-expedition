@@ -45,6 +45,10 @@ decided, and what shipped. Update both at the end of every round.
       region is crisp.
 
 ### Quality of life
+- [ ] **Move animation pass** (owner, round 9: "End of the Line's animation is fantastic"):
+      give the moves that matter a proper animation, like End of the Line's (wind-up, travel,
+      impact, flash, shake, own sounds) instead of the shared small arm swing and one sound.
+      Start with each class's signature moves and the bosses' big moves.
 - [ ] **Trinket inventory screen**, like DD's (owner, round 9): a "Trinkets" button in the top
       bar opens an equip menu showing the stash and every hero's two slots side by side, to
       drag or click trinkets on and off. Needs an icon per trinket (49 today: 24 general,
@@ -62,11 +66,24 @@ decided, and what shipped. Update both at the end of every round.
       buildings, foreground and background) without overdoing it.
 - [ ] A world map between settlements, later.
 
+### Economy
+- [ ] **A third town material** beside Timber and Iron (owner, round 9): found on expeditions,
+      carried in the wagon, spent on buildings and upgrades. Options under discussion.
+
 ---
 
 ## History
 
 ### Round 9
+- Owner's Dry Gulch run (all level 2: Marshal, Prospector, Preacher, Train Hopper): the
+  hardest region so far; Marshal on Death's Door, Preacher at 160 Fatigue; caves heavy on
+  Fatigue (bats and tommyknockers); End of the Line animation great; income better; three
+  heroes hit level 3 too fast.
+- Shipped: XP thresholds +25% (19 / 56 / 113 / 188, was 15 / 45 / 90 / 150); Giant Bat Dodge
+  20 (was 30: four bats were near unhittable); Knock, Knock comes up half as often (weight 1,
+  was 2; the Oversized Pick stays 2); **Sit a Spell on the Porch** on the Hiring Board: free,
+  one seat a week, up to 15 Fatigue (activities can now set their own `slots`); Bunkhouse
+  +4 then +6 bunks (was +2 then +4), so the first upgrade takes a town to 10.
 - **Enemy damage dial back to 1.0** (owner; was 0.9): enemy weapon damage up about 11%. That's
   41 of the 61 enemy attacks; the 20 with their own damage range were never dialed.
 - **Saloon prices halved** (owner): Belly Up to the Bar 75 chips (was 150), Card Table 50

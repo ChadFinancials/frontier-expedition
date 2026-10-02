@@ -65,6 +65,8 @@ func _ready() -> void:
 	test_quirk_pass()
 	print("> test_trinket_pass()")
 	test_trinket_pass()
+	print("> test_round9_town()")
+	test_round9_town()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -946,6 +948,25 @@ func test_round8_balance() -> void:
 
 ## Vulnerable (+% damage taken, all sources), dispel, tag-conditioned effects, refresh and
 ## Transfusion (owner's round 8 picks).
+## Round 9 town: the free porch seat on the Hiring Board, the bigger first Bunkhouse.
+func test_round9_town() -> void:
+	var co := Company.new()
+	co.new_game(29)
+	var a: Hero = co.heroes[0]
+	var b: Hero = co.heroes[1]
+	a.fatigue = 60
+	b.fatigue = 60
+	co.money = 0
+	check(co.can_do_activity(0, "hiring_board", "porch", a) == "", "the porch is free (no chips needed)")
+	co.do_activity(0, "hiring_board", "porch", a)
+	check(a.fatigue >= 45 and a.fatigue < 60, "the porch takes off up to 15 Fatigue (now %d)" % a.fatigue)
+	check(co.can_do_activity(0, "hiring_board", "porch", b) != "", "the porch has one seat a week")
+	check(int(DB.cfg("xp_levels", [])[1]) == 19, "XP thresholds +25% (level 2 at 19)")
+	var base := co.roster_cap()
+	co.settlement(0)["tracks"] = {"hiring_board": {"bunks": 1}}
+	check(co.roster_cap() == base + 4, "first Bunkhouse: +4 bunks (%d -> %d)" % [base, co.roster_cap()])
+
+
 ## Round 9 trinket pass: class trinkets (class lock, move bonuses) and the new hooks.
 func test_trinket_pass() -> void:
 	var n_class := 0

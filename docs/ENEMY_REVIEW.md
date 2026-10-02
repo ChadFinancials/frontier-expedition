@@ -395,7 +395,7 @@ Notes:
 
 ## Giant Bat  (Regular)
 
-`giant_bat` | HP **6** | dodge 30 | prot 0 | speed 8 | acc +0 | crit 5% | dmg 2-4 | tags: beast, cave
+`giant_bat` | HP **6** | dodge 20 | prot 0 | speed 8 | acc +0 | crit 5% | dmg 2-4 | tags: beast, cave
 Resists: stun 30, bleed 20, poison 25, move 50, debuff 25
 Found in: The Old Mill Road, Dry Gulch Mine, The Crow's Nest, The Tallgrass Sea, The Red Canyons, The Thunder Peaks, Quests
 
@@ -414,7 +414,7 @@ Found in: Dry Gulch Mine, The Tallgrass Sea, The Red Canyons, The Thunder Peaks,
 
 | Move | From | Hits | Acc | Damage | Effects | AI |
 |---|---|---|---|---|---|---|
-| **Knock, Knock**: Tapping in the walls. Tapping behind you. | 1234 | one of 1234 | 95 | - | +10 fatigue; dmg_flat -2 for 2 rounds | 2 (back) |
+| **Knock, Knock**: Tapping in the walls. Tapping behind you. | 1234 | one of 1234 | 95 | - | +10 fatigue; dmg_flat -2 for 2 rounds | 1 (back) |
 | **Oversized Pick**: A full-size miner's pick swung by a very small, very angry miner. It takes a moment to recover. | 123 | one of 123 | 80 | 7-10 | stun; stun | 2 |
 
 Notes: 

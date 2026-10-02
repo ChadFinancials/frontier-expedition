@@ -21,7 +21,7 @@
   "armor_hp_pct": 8,
   "armor_dodge": 2,
   "weapon_dmg_pct": 12,
-  "xp_levels": [0, 15, 45, 90, 150],
+  "xp_levels": [0, 19, 56, 113, 188],
   "max_level": 5,
   "max_tier": 5,
   "max_skill_level": 5,
