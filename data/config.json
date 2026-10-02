@@ -45,8 +45,8 @@
   "skill_level_dot_pct": 15,
 
   "enemy_hp_mult": 1.0,
-  "_dials": "Tuning dials, applied on top of the numbers in the data. hero_dmg_mult scales all hero damage (weapon ranges and moves' own ranges); heal_mult scales heals with a min-max range; enemy_dmg_mult scales enemy weapon damage (not moves with their own dmg_range); chips_mult scales every chip the company earns (kills, bosses, quests, curios, events, camp). Hero damage and heals are written in the data as they play, so their dials sit at 1.0.",
-  "enemy_dmg_mult": 0.9,
+  "_dials": "Tuning dials, applied on top of the numbers in the data. hero_dmg_mult scales all hero damage (weapon ranges and moves' own ranges); heal_mult scales heals with a min-max range; enemy_dmg_mult scales enemy weapon damage (not moves with their own dmg_range); chips_mult scales every chip the company earns (kills, bosses, quests, curios, events, camp). Hero damage, heals and enemy damage are written in the data as they play, so the dials sit at 1.0.",
+  "enemy_dmg_mult": 1.0,
   "hero_dmg_mult": 1.0,
   "heal_mult": 1.0,
   "chips_mult": 1.0,

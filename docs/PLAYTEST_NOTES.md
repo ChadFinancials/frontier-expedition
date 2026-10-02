@@ -67,6 +67,8 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Enemy damage dial back to 1.0** (owner; was 0.9): enemy weapon damage up about 11%. Moves
+  with their own damage range (most named enemy attacks) were never dialed and are unchanged.
 - **Saloon prices halved** (owner): Belly Up to the Bar 75 chips (was 150), Card Table 50
   (was 100); Fatigue relief unchanged.
 - **Chips doubled** (owner: running low; a saloon quest paid about 200, barely one bar visit

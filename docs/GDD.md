@@ -181,7 +181,8 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
   Armor Piercing ignores some protection.
 - **Tuning dials** (config): `hero_dmg_mult` scales all hero damage, `heal_mult` all
   ranged heals, `enemy_dmg_mult` enemy weapon damage. Hero damage and heals are written in the
-  data exactly as they play, so those two dials sit at 1.0; enemies' sits at 0.9.
+  data exactly as they play, so those two dials sit at 1.0; enemies' is 1.0 too (round 9; was
+  0.9).
 - **Effect chance** = effect base + move level bonus − target resistance, clamped 0-95%.
   A failed effect shows "Resisted Stun" (or whichever).
 - **Vulnerable** (`vulnerable` stat): the unit takes +X% damage from everything, damage over
