@@ -1,4 +1,19 @@
-# Curio proposals (round 9) — awaiting the owner's picks
+# Curio proposals (round 9) — ✅ first region shipped
+
+**Shipped:** the expert system and the 16 curios of the Fort Providence area (Old Mill Road,
+Tallgrass Sea, Dry Gulch Mine, Crow's Nest), as proposed below. Shared curios carry their
+experts into later regions. The ★/✗ lines show in the hero picker (owner: a better chance,
+never a sure thing). New: four 15% quirk chances (two good, two bad):
+
+| Curio | Outcome | Quirk |
+|---|---|---|
+| Abandoned Wagon | snake in the flour barrel | Spooked by Critters (bad) |
+| Collapsed Tunnel | rocks fall | Claustrophobic (bad) |
+| Scarecrow | just straw and coins | Unbeliever (good) |
+| Chokecherry Thicket | wrong berries | Iron Stomach (good) |
+
+**Waiting for their regions:** Painted Canyon Wall (Red Canyons); Stone Cairn, Giant's Bones,
+Frozen Pack, Hot Spring (Thunder Peaks). The optional base tweaks are not applied.
 
 21 curios today. When you investigate one, you pick the hero ("Who investigates?"), but today
 the pick changes nothing except for the three compulsion quirks. This pass makes the pick the

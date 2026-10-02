@@ -313,6 +313,15 @@ retired in round 7; the Shovel took its curios.)
 - **Curios** have a *by hand* outcome table and **key items** that give a guaranteed good
   result; keys are remembered once found. Quirk compulsions can make a hero grab one (a
   Drinker and a whiskey barrel).
+- **Curio experts**: you pick who investigates, and it matters. A hero whose class or survival
+  skill knows the curio makes the bad outcomes less likely (class 50%; skill 20/35/50% by
+  rank; capped at 75%), may add a bonus (+1 Iron, +1 Hide, scouting), may swap a bad outcome
+  (the Marshal collects the Dead Horse rider's bounty), or works as the key (Preacher = Salt
+  at a grave, Prospector = Shovel at an ore vein, Train Hopper = Shovel at a railroad crate,
+  Doctor = Antivenom at a glowing pool, Angler = Rope at a well). A class that hates the thing
+  makes bad outcomes 50% more likely (Preacher at a whiskey barrel, Mountain Mystic at a
+  railroad crate). The Gunslinger and a Tracker strike first when a curio is an ambush. The
+  picker shows each as a green ★ or a red ✗ line. A few bad outcomes carry a 15% quirk.
 - **Events** are Oregon Trail-style text choices. Options can need an item, chips, a class, a
   survival skill or a quirk; a party skill unlocks special options. Outcomes are weighted.
 

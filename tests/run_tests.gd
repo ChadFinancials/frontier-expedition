@@ -69,6 +69,8 @@ func _ready() -> void:
 	test_round9_town()
 	print("> test_hides()")
 	test_hides()
+	print("> test_curio_experts()")
+	test_curio_experts()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -987,6 +989,108 @@ func test_hides() -> void:
 	check(co.hides == carried, "Hides come home (%d)" % co.hides)
 	var co2 := Company.from_dict(DB.normalize(JSON.parse_string(JSON.stringify(co.to_dict()))))
 	check(co2.hides == co.hides, "Hides save and load")
+
+
+## Curio experts: class and survival skill shift the odds, add bonuses, work as keys.
+func test_curio_experts() -> void:
+	# Data: every expert is a class or survival skill, keys and swaps point at real things.
+	for cid in DB.curios:
+		var cu: Dictionary = DB.curios[cid]
+		var ex: Dictionary = cu.get("experts", {})
+		if ex.is_empty():
+			continue
+		check(cu.hand.any(func(o): return o.get("good", false)), "%s has a good outcome" % cid)
+		for id in ex:
+			check(DB.classes.has(id) or DB.survival.has(id), "%s expert %s is a class or skill" % [cid, id])
+			if ex[id].has("as_key"):
+				check(cu.get("keys", {}).has(ex[id].as_key), "%s: %s works as a real key" % [cid, id])
+			for idx in ex[id].get("swap", {}):
+				check(int(idx) < cu.hand.size(), "%s: %s swaps a real outcome" % [cid, id])
+	var co := Company.new()
+	co.new_game(41)
+	var uids: Array = []
+	for h in co.heroes:
+		uids.append(h.uid)
+	var run := RunState.create(co, "tallgrass", 0, uids, {"food": 4, "salt": 1})
+	co.run = run
+	var mk := func(cls: String, skills: Dictionary = {}) -> Hero:
+		var h: Hero = co.make_hero(cls, 1)
+		h.survival = {}
+		for s in skills:
+			h.survival[s] = {"rank": skills[s], "xp": 0}
+		h.quirks = []
+		return h
+	# Odds: bad outcomes rarer for an expert, commoner for an averse class.
+	var bad_rate := func(cid: String, h: Hero, n: int) -> float:
+		var bad := 0
+		for i in n:
+			h.hp = h.max_hp()
+			h.quirks = []
+			var cu: Dictionary = DB.curios[cid]
+			var res := run.interact_curio(cid, h)
+			var good := false
+			for o in cu.hand + cu.get("experts", {}).values().map(func(x): return x.get("swap", {}).values()).reduce(func(a, b): return a + b, []):
+				if o.get("good", false) and res.text.ends_with(str(o.text).replace("{hero}", h.hero_name)):
+					good = true
+			if not good:
+				bad += 1
+		return float(bad) / n
+	var plain: float = bad_rate.call("miners_cache", mk.call("marshal"), 600)
+	var pro: float = bad_rate.call("miners_cache", mk.call("prospector"), 600)
+	check(plain > 0.07 and pro < plain * 0.5, "a Prospector rarely sets off old powder (%.2f vs %.2f)" % [pro, plain])
+	var miner1: float = bad_rate.call("ore_vein", mk.call("marshal", {"miner": 1}), 600)
+	var miner3: float = bad_rate.call("ore_vein", mk.call("marshal", {"miner": 3}), 600)
+	check(miner3 < miner1, "a rank-3 Miner beats a rank-1 Miner (%.2f vs %.2f)" % [miner3, miner1])
+	var base_w: float = bad_rate.call("whiskey_barrel", mk.call("marshal"), 600)
+	var pre_w: float = bad_rate.call("whiskey_barrel", mk.call("preacher"), 600)
+	check(pre_w > base_w, "a Preacher fares worse at the whiskey barrel (%.2f vs %.2f)" % [pre_w, base_w])
+	# A Gambler never picks up Drinker at the barrel.
+	var gam: Hero = mk.call("gambler")
+	var drank := false
+	for i in 200:
+		gam.quirks = []
+		run.interact_curio("whiskey_barrel", gam)
+		drank = drank or "drinker" in gam.quirks
+	check(not drank, "a Gambler holds their liquor")
+	# As key: a Preacher salts the grave without using Salt.
+	var res := run.interact_curio("old_grave", mk.call("preacher"))
+	check(res.key_worked and int(run.supplies.get("salt", 0)) == 1, "a Preacher works as Salt at a grave, no Salt used")
+	# Bonus on a good outcome, labelled.
+	var got_bonus := false
+	var miner: Hero = mk.call("marshal", {"miner": 2})
+	for i in 30:
+		var r := run.interact_curio("ore_vein", miner)
+		got_bonus = got_bonus or r.msgs.any(func(m): return str(m).begins_with("★ Miner 2"))
+	check(got_bonus, "a Miner's bonus shows with a ★")
+	# Swap: the Marshal never meets the rider's friends; collects instead.
+	var mar: Hero = mk.call("marshal")
+	var ambushed := false
+	for i in 200:
+		ambushed = ambushed or run.interact_curio("dead_horse", mar).fight != null
+	check(not ambushed, "the Marshal turns the Dead Horse ambush into a bounty")
+	# Quick draw: a Gunslinger's curio ambush strikes first.
+	var gun: Hero = mk.call("gunslinger")
+	var fight: Variant = null
+	for i in 300:
+		gun.hp = gun.max_hp()
+		var r := run.interact_curio("scarecrow", gun)
+		if r.fight != null:
+			fight = r.fight
+			break
+	check(fight != null and fight.surprise == "enemies", "a Gunslinger strikes first at a curio ambush")
+	# Picker hints.
+	check(run.curio_hint("railroad_crate", mk.call("mountain_man")).begins_with("✗"), "averse heroes show a ✗")
+	check(run.curio_hint("ore_vein", mk.call("prospector")).contains("works as Shovel"), "as-key experts say so")
+	check(run.curio_hint("scarecrow", mk.call("gunslinger")).contains("strikes first"), "quick draw shows at ambush curios")
+	check(run.curio_hint("ore_vein", mk.call("marshal")) == "", "no hint for a hero with nothing to offer")
+	# Quirk interactions: two good, two bad, 15% each.
+	var qs := {}
+	for cid in DB.curios:
+		for o in DB.curios[cid].get("hand", []):
+			for e in o.get("effects", []):
+				if e.get("type", "") == "quirk" and int(e.get("chance", 100)) == 15:
+					qs[e.quirk] = true
+	check(qs.has("afraid_of_snakes") and qs.has("claustrophobic") and qs.has("myth_buster") and qs.has("iron_stomach"), "curio quirk chances are in (%s)" % [qs.keys()])
 
 
 ## Round 9 town: the free porch seat on the Hiring Board, the bigger first Bunkhouse.

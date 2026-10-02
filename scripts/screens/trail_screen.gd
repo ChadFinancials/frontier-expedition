@@ -484,7 +484,7 @@ func _do_curio(cu: Dictionary, item: String, curios: Array, holder: Dictionary) 
 				if curios.all(func(x): return x.done):
 					run.complete_current()
 				Game.save_game()
-				_to_combat(res.fight.enemies, "fight"), "Danger"]])
+				_to_combat(res.fight.enemies, "fight", res.fight.get("surprise", "")), "Danger"]])
 		else:
 			Main.inst.dialog(DB.curios[cu.id].name, body, [["Continue", func():
 				if run.party_heroes().is_empty():
@@ -494,7 +494,8 @@ func _do_curio(cu: Dictionary, item: String, curios: Array, holder: Dictionary) 
 	if h != null:
 		go.call(h)
 	else:
-		HeroPicker.pick(run.party_heroes(), "Who investigates?", go)
+		HeroPicker.pick(run.party_heroes(), "Who investigates?", go,
+			func(x: Hero): return run.curio_hint(cu.id, x) if item == "" else "")
 
 
 # --- Trading post ---------------------------------------------------------------------

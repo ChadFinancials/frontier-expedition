@@ -663,6 +663,71 @@ func compulsion_for(curio_id: String) -> Dictionary:
 	return {}
 
 
+## The curio experts that apply to this hero: their class and any survival skill the curio
+## lists. Each is {"id", "name", "odds", "e"}: odds > 0 makes the bad outcomes that much (%)
+## less likely, odds < 0 (averse) more likely.
+func curio_experts(curio_id: String, h: Hero) -> Array:
+	var out := []
+	var ex: Dictionary = DB.curios.get(curio_id, {}).get("experts", {})
+	for id in ex:
+		var e: Dictionary = ex[id]
+		var odds := 0
+		var label := ""
+		if id == h.class_id:
+			label = DB.classes[id].name
+			odds = int(e.get("odds", DB.cfg("curio_class_odds", 50)))
+		elif h.survival.has(id):
+			var rank := h.survival_rank(id)
+			label = "%s %d" % [DB.survival[id].name, rank]
+			var table: Array = DB.cfg("curio_skill_odds", [20, 35, 50])
+			odds = int(e.get("odds", table[clampi(rank - 1, 0, table.size() - 1)]))
+		else:
+			continue
+		if e.get("averse", false):
+			odds = -int(DB.cfg("curio_averse_odds", 50))
+		out.append({"id": id, "name": label, "odds": odds, "e": e})
+	return out
+
+
+## Quick draw (config curio_quickdraw: classes and survival skills): a curio ambush becomes a
+## fight where the company strikes first. Returns the name of what grants it, or "".
+func curio_quickdraw(h: Hero) -> String:
+	for id in DB.cfg("curio_quickdraw", []):
+		if id == h.class_id:
+			return DB.classes[id].name
+		if h.survival.has(id):
+			return DB.survival[id].name
+	return ""
+
+
+## One line per hero for the "Who investigates?" picker: ★ for an expert, ✗ for averse.
+func curio_hint(curio_id: String, h: Hero) -> String:
+	var parts := []
+	for x in curio_experts(curio_id, h):
+		var bits := []
+		if x.e.has("as_key"):
+			bits.append("works as %s" % DB.items[x.e.as_key].name)
+		elif x.odds > 0:
+			bits.append("better odds")
+		elif x.odds < 0:
+			bits.append("worse odds")
+		if x.e.has("hint"):
+			bits.append(str(x.e.hint))
+		parts.append("%s %s: %s" % ["✗" if x.odds < 0 else "★", x.name, ", ".join(bits)])
+	var qd := curio_quickdraw(h)
+	if qd != "" and _has_ambush(DB.curios.get(curio_id, {})):
+		parts.append("★ %s: strikes first if it's an ambush" % qd)
+	return "\n".join(parts)
+
+
+func _has_ambush(cu: Dictionary) -> bool:
+	for o in cu.get("hand", []):
+		for e in o.get("effects", []):
+			if e.get("type", "") == "fight":
+				return true
+	return false
+
+
 ## item_id "" = by hand. Returns {"text", "msgs", "fight", "key_worked"}.
 func interact_curio(curio_id: String, h: Hero, item_id: String = "") -> Dictionary:
 	var cu: Dictionary = DB.curios.get(curio_id, {})
@@ -681,12 +746,40 @@ func interact_curio(curio_id: String, h: Hero, item_id: String = "") -> Dictiona
 		out.text = "Using %s on the %s does nothing useful." % [DB.items[item_id].name, cu.name]
 		add_log(out.text)
 		return out
-	else:
-		outcome = Stats.pick_weighted(company.rng, cu.get("hand", []))
-	out.text = str(outcome.get("text", "")).replace("{hero}", h.hero_name)
+	var experts := curio_experts(curio_id, h) if item_id == "" else []
+	var intro := ""
+	var bonus := []
+	if item_id == "":
+		# An expert with "as_key" gets the key's result without using the supply.
+		for x in experts:
+			if x.e.has("as_key") and cu.get("keys", {}).has(x.e.as_key):
+				outcome = cu.keys[x.e.as_key]
+				out.key_worked = true
+				intro = "★ %s knows the trick: no %s needed.\n\n" % [x.name, DB.items[x.e.as_key].name]
+				break
+	if item_id == "" and outcome.is_empty():
+		var hand: Array = cu.get("hand", []).duplicate(true)
+		var odds := 0
+		for x in experts:
+			odds += int(x.odds)
+			for idx in x.e.get("swap", {}):
+				hand[int(idx)] = x.e.swap[idx]
+		odds = clampi(odds, -int(DB.cfg("curio_averse_odds", 50)), int(DB.cfg("curio_odds_cap", 75)))
+		if odds != 0:
+			for o in hand:
+				if not o.get("good", false):
+					o.weight = float(o.get("weight", 1)) * (1.0 - odds / 100.0)
+		outcome = Stats.pick_weighted(company.rng, hand)
+		for x in experts:
+			if outcome.get("good", false) and x.odds >= 0 and x.e.has("bonus"):
+				bonus.append(x)
+			elif not outcome.get("good", false) and x.odds < 0:
+				intro = "✗ %s: %s\n\n" % [x.name, x.e.get("hint", "out of their element")]
+	out.text = intro + str(outcome.get("text", "")).replace("{hero}", h.hero_name)
 	var effects: Array = outcome.get("effects", [])
 	# Gold Fever: a hero who handles treasure by hand pockets the valuables.
-	if item_id == "" and _steals(h, cu):
+	var steals := item_id == "" and _steals(h, cu)
+	if steals:
 		var kept := effects.filter(func(e): return not str(e.get("type", "")) in STOLEN)
 		if kept.size() < effects.size():
 			out.text += "\n\n%s pockets the valuables before anyone sees. (Gold Fever)" % h.hero_name
@@ -694,6 +787,17 @@ func interact_curio(curio_id: String, h: Hero, item_id: String = "") -> Dictiona
 	var res := Effects.apply(effects, self, h)
 	out.msgs = res.msgs
 	out.fight = res.fight
+	for x in bonus:
+		var b: Array = x.e.bonus
+		if steals:
+			b = b.filter(func(e): return not str(e.get("type", "")) in STOLEN)
+		var bres := Effects.apply(b, self, h)
+		if not bres.msgs.is_empty():
+			out.msgs.append("★ %s: %s" % [x.name, " ".join(bres.msgs)])
+	var qd := curio_quickdraw(h)
+	if out.fight != null and qd != "" and str(out.fight.get("surprise", "")) == "":
+		out.fight.surprise = "enemies"
+		out.msgs.append("★ %s: %s is ready for them. The company strikes first!" % [qd, h.hero_name])
 	add_log([out.text] + out.msgs)
 	return out
 

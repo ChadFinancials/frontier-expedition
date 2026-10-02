@@ -27,7 +27,9 @@ static func pick(heroes: Array, title: String, cb: Callable, info: Callable = Ca
 		list.add_child(card)
 		if info.is_valid():
 			var t: String = info.call(h)
-			if t != "":
-				list.add_child(UI.lbl("   " + t, 16, "Ink"))
+			# One label per line; ★ lines are green, ✗ lines red (curio experts).
+			for line in t.split("\n", false):
+				var col: Variant = UI.GREEN if line.begins_with("★") else (UI.RED if line.begins_with("✗") else null)
+				list.add_child(UI.lbl("   " + line, 16, "Ink", col))
 	v.add_child(UI.btn("Cancel", func(): Main.inst.close_modal(holder.wrap), "Small"))
 	holder.wrap = Main.inst.modal(p)

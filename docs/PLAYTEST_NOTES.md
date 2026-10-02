@@ -75,6 +75,12 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Curio experts** (owner: make the class and skill pick matter; first region first, ★/✗
+  shown): the 16 curios of the Fort Providence area list experts by class or survival skill
+  (better odds, bonuses, swaps, 5 work-as-key pairs, 2 averse classes); Gunslinger and Tracker
+  quick draw on curio ambushes; the hero picker shows the lines. New 15% quirks: Spooked by
+  Critters (wagon snake), Claustrophobic (tunnel rockfall), Unbeliever (scarecrow straw), Iron
+  Stomach (wrong berries). See CURIO_PROPOSALS.md; later regions' curios still to do.
 - **Hides, a third town material** (owner's pick): the hunting and leather economy beside
   Timber (building) and Iron (metal). They're cargo, come home in the wagon, and show in the
   top bar, trail HUD and results.

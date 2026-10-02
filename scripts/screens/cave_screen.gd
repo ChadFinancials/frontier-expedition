@@ -182,13 +182,15 @@ func _curio_room() -> void:
 			Audio.play("coin" if res.key_worked else "page")
 			var body: String = (comp.text + "\n\n" if not comp.is_empty() else "") + res.text + ("\n\n" + "\n".join(res.msgs) if not res.msgs.is_empty() else "")
 			if res.fight != null:
-				Main.inst.dialog("Ambush!", body, [["Fight!", func(): Main.inst.goto("combat", {"enemies": res.fight.enemies, "kind": "fight", "return": "cave"}), "Danger"]])
+				Main.inst.dialog("Ambush!", body, [["Fight!", func(): Main.inst.goto("combat", {"enemies": res.fight.enemies, "kind": "fight", "return": "cave",
+					"surprise": res.fight.get("surprise", "")}), "Danger"]])
 			else:
 				Main.inst.message(DB.curios[cid].name, body, func(): _refresh())
 		if not comp.is_empty():
 			doit.call(comp.hero)
 		else:
-			HeroPicker.pick(run.party_heroes(), "Who investigates?", doit)
+			HeroPicker.pick(run.party_heroes(), "Who investigates?", doit,
+				func(x: Hero): return run.curio_hint(cid, x) if item == "" else "")
 	var flow := HFlowContainer.new()
 	v.add_child(flow)
 	flow.add_child(UI.btn("Investigate", func(): go.call(""), ""))

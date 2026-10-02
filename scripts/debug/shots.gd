@@ -449,6 +449,11 @@ static func run(main: Main, args: Dictionary) -> void:
 					wh.known.append(ws)
 					wh.equipped[0] = ws
 				co.heroes.insert(mini(3, co.heroes.size()), wh)
+			# party=a,b,c,d: replace the company with heroes of these classes.
+			if args.has("party"):
+				co.heroes = []
+				for cid in str(args.party).split(","):
+					co.heroes.append(co.make_hero(cid, 1))
 			var uids: Array = []
 			for h in co.heroes.slice(0, 4):
 				uids.append(h.uid)
@@ -517,7 +522,13 @@ static func run(main: Main, args: Dictionary) -> void:
 					main.screen.show_event(args.get("id", "river_crossing"))
 				"curio":
 					await main.goto("trail", {}, true)
-					main.screen.show_curios([{"id": "abandoned_wagon", "done": false}, {"id": "whiskey_barrel", "done": false}, {"id": "standing_stone", "done": false}])
+					# pick=<curio id>: open "Who investigates?" on it, to see the ★/✗ expert lines.
+					if args.has("pick"):
+						var cid := str(args.pick)
+						HeroPicker.pick(co.run.party_heroes(), "Who investigates?", func(_h): pass,
+							func(x: Hero): return co.run.curio_hint(cid, x))
+					else:
+						main.screen.show_curios([{"id": "abandoned_wagon", "done": false}, {"id": "whiskey_barrel", "done": false}, {"id": "standing_stone", "done": false}])
 		"results":
 			var co2: Company = Game.company
 			var uids2: Array = []

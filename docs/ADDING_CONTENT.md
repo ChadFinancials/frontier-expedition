@@ -206,6 +206,18 @@ In `data/curios.json`, then add its id to a region's `curios` or `cave_curios`:
 - `hand`: weighted random outcomes when investigated by hand.
 - `keys`: `{item_id: outcome}` gives a guaranteed result when that supply is used.
 - `tags`: `whiskey`, `treasure` or `strange`, which trigger quirk compulsions.
+- `"good": true` on a hand outcome marks it good; the rest count as bad for experts.
+- `experts`: `{"<class id or survival skill id>": {...}}`. The hero who investigates by hand
+  matches by class or by survival skill; the hero picker shows a ★ (or ✗) line for each.
+  - `odds`: % less likely for the bad outcomes. Defaults: class `[curio_class_odds]` 50,
+    skill `[curio_skill_odds]` 20/35/50 by rank; `0` for a bonus-only expert. Matches add up,
+    capped at `[curio_odds_cap]` 75.
+  - `averse: true`: bad outcomes 50% more likely `[curio_averse_odds]`.
+  - `bonus`: effects added to a good outcome. `as_key`: an item id; the expert gets that key's
+    result without using one. `swap`: `{"<hand index>": outcome}` replaces an outcome for them.
+  - `hint`: the short text after the name in the picker ("+1 Iron").
+- Config `curio_quickdraw` (Gunslinger, Tracker): a curio ambush becomes a fight the company
+  opens with surprise.
 - `art`: wagon, barrel, grave, strongbox, well, scarecrow, bush, skull, horse, stone, crate,
   pack, bones, pool, rubble, wall, vein, cairn (drawn by `scripts/visual/curio_art.gd`).
 
