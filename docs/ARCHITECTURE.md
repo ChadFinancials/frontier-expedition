@@ -77,13 +77,13 @@ Three rules hold the codebase together:
 | Class | Holds | Notes |
 |---|---|---|
 | `Company` | The campaign: chips, Timber, Iron, Hides, Charters, heroes, settlements and buildings, the week, story flags, saloon quests, the current `run` | All town services (build, upgrade, treat, train, hire, stage line) are methods here. `start_run` / `finish_run` open and settle an expedition. `advance_week` runs the weekly clock. `to_dict` / `from_dict` is the save format |
-| `RunState` | One expedition: the map (`nodes`, `current`), party, supplies, wagon, loot, log, cave state | Travel, scouting, camp, curios, events, caves and trading posts. `after_combat` settles a fight. `combat_options` builds a fight's modifiers |
+| `RunState` | One expedition: the map (`nodes`, `current`), party, supplies, wagon, loot, log, cave state | Travel, scouting, camp, curios, events (experts, compel, follow-ups in `followup`), caves and trading posts. `after_combat` settles a fight. `combat_options` builds a fight's modifiers |
 | `CombatEngine` | One battle | See "Combat" below |
 | `Combatant` | A unit inside a battle | Wraps a `Hero` or an enemy definition; stats, statuses, buffs |
 | `Hero` | A company member | Class, level and XP, gear tiers, known and equipped skills, survival skills, quirks, trinkets, Fatigue |
 | `Fatigue` | Static helpers | Adding Fatigue, Gut Checks, Breaking Points and True Grit (`second_wind` in code), Collapse. Returns events |
 | `Effects` | Static `apply` | Out-of-combat effects from events, curios and camp actions (format in `ADDING_CONTENT.md`) |
-| `MapGen` | Static `generate` | Builds an expedition's branching map. Every node's contents are rolled up front, so a mid-run save reloads identically. Also node intel (what the player can see) |
+| `MapGen` | Static `generate` | Builds an expedition's branching map. Every node's contents are rolled up front, so a mid-run save reloads identically. Also node intel (what the player can see). `pick_event` draws event stops from the common, region and quest-theme pools |
 | `Inventory` | Static helpers | Wagon slots and stacking over the plain `supplies` dictionary |
 | `Stats` | Static helpers | The shared modifier format `{stat, value, cond}` used by quirks, trinkets, Fatigue states and buffs; weighted picks |
 
@@ -258,6 +258,7 @@ while not engine.is_over():
 | `... test_runner.tscn -- simtut=50` | Plays the tutorial many times and reports win rate and health left |
 | `$G --headless --path . -- shot=autoplay expeditions=3` | UI smoke test: `tests/autopilot.gd` clicks through the real screens |
 | `tools/shot.sh <scenario> out.png [args]` | Screenshot under xvfb. Scenarios in `scripts/debug/shots.gd`: `menu, settlement, embark, trail, combat, camp, cave, event, curio, results, hero, building, tutorial, silas, lineup, faces, outfits`, plus A/B comparisons. Useful args: `full` (party of 4), `region=<id>`, `far` (end of map), `enemies=a,b`, `ehp=N`, `bones=N` (first N enemies fall, leaving bones), `act` (with `frames=N` to save frames while the move plays), `statuses`, `with=<class> skill=<id>`, `soak=N` (idle and print memory, objects and draw calls) |
+| `python3 tools/fmt_events.py` | Re-formats `data/events.json` in its usual layout (one outcome per line, follow-ups indented); import `dump` from it when editing events by script |
 | `python3 tools/hero_sheet.py` | Regenerates `docs/HERO_REVIEW.md` from the data |
 | `python3 tools/enemy_sheet.py` | Regenerates `docs/ENEMY_REVIEW.md` |
 | `python3 tools/hero_power.py` | Rough power model: every hero move scored against the average tier-1 enemy (balance aid) |

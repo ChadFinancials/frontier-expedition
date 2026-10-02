@@ -77,7 +77,7 @@
       {"text": "Wait for them to pass.", "outcomes": [
         {"weight": 1, "text": "It takes most of the day. Everyone is restless and hungry.", "effects": [{"type": "food", "amount": -3}, {"type": "fatigue", "amount": 4, "target": "party"}]}]},
       {"text": "Hunt one for meat.", "requires": {"skill": "hunter"},
-        "experts": {"beast_hunter": {"bonus": [{"type": "hides", "amount": 2}]}, "cook": {"bonus": [{"type": "food", "amount": 4}]}},
+        "experts": {"beast_hunter": {"bonus": [{"type": "hides", "amount": 2}], "odds": 0}, "cook": {"bonus": [{"type": "food", "amount": 4}], "odds": 0}},
         "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} brings down a young cow cleanly. Meat for days, and a hide worth tanning.", "effects": [{"type": "food", "amount": 10}, {"type": "hides", "amount": 2}]}]},
       {"text": "Bring one down and salt the meat.", "requires": {"item": "salt"}, "consume": {"item": 1}, "outcomes": [
@@ -94,7 +94,7 @@
     "text": "A family's wagon sits by the trail. The father is burning with fever. \"Please. Anything you can spare.\"",
     "options": [
       {"text": "Give Bandages and your time.", "requires": {"item": "bandages"}, "consume": {"item": 1},
-        "experts": {"frontier_doctor": {"bonus": [{"type": "money", "min": 100, "max": 160}]}},
+        "experts": {"frontier_doctor": {"bonus": [{"type": "money", "min": 100, "max": 160}], "odds": 0}},
         "outcomes": [
         {"weight": 1, "good": true, "text": "The fever breaks by morning. They press a trinket on you and refuse to take it back.", "effects": [{"type": "keepsake"}, {"type": "fatigue", "amount": -8, "target": "party"}]}]},
       {"text": "Tend them properly.", "requires": {"skill": "medic"},
@@ -185,7 +185,14 @@
       {"text": "Search the house.",
         "experts": {"scout": {}, "keen_eyed": {"bonus": [{"type": "money", "min": 40, "max": 80}]}},
         "outcomes": [
-        {"weight": 3, "good": true, "text": "Canned goods in the root cellar.", "effects": [{"type": "food", "amount": 5}]},
+        {"weight": 3, "good": true, "text": "Canned goods in the root cellar.", "effects": [{"type": "food", "amount": 5}], "then": {"text": "Behind the shelves: a cellar door with a fresh padlock. Somebody's been here, and not long ago.", "options": [
+          {"text": "Force it.",
+            "experts": {"prospector": {}, "keen_eyed": {}},
+            "outcomes": [
+            {"weight": 1, "good": true, "text": "Somebody's stash: a keepsake and a roll of chips.", "effects": [{"type": "keepsake"}, {"type": "money", "min": 30, "max": 60}]},
+            {"weight": 1, "text": "Somebody's stash, and the somebodies come home.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_knifeman"], "reward": {"money": 60}}]}]},
+          {"text": "Leave it.", "outcomes": [
+            {"weight": 1, "text": "Not your business. Probably wise.", "effects": []}]}]}},
         {"weight": 2, "text": "Somebody else has already claimed the place.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_knifeman"], "reward": {"money": 60}}]},
         {"weight": 1, "text": "Something about the place is wrong. Nobody wants to stay.", "effects": [{"type": "fatigue", "amount": 8, "target": "party"}]}]},
       {"text": "Tear down the barn for lumber.", "outcomes": [
@@ -208,7 +215,16 @@
       {"text": "Follow the lights.",
         "experts": {"mountain_man": {"fight": {"enemies": ["prairie_haint"]}}, "myth_buster": {"fight": {"foe_mods": [{"stat": "vulnerable", "value": 15, "rounds": 2}]}}, "superstitious": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}},
         "outcomes": [
-        {"weight": 2, "good": true, "text": "They lead to a hidden cache: someone's buried savings.", "effects": [{"type": "money", "min": 120, "max": 240}]},
+        {"weight": 2, "good": true, "text": "The lights lead you off the trail and stop, hovering, over a lone grave.", "effects": [], "then": {"text": "The lights hang over the grave, waiting. The marker's name has worn away.", "options": [
+          {"text": "Dig.",
+            "experts": {"myth_buster": {}, "superstitious": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}},
+            "outcomes": [
+            {"weight": 1, "good": true, "text": "Under the coffin lid: someone's buried savings, wrapped in oilcloth.", "effects": [{"type": "money", "min": 160, "max": 300}]},
+            {"weight": 1, "text": "The haint rises out of the hole after you.", "effects": [{"type": "fight", "enemies": ["prairie_haint", "prairie_haint"]}]}]},
+          {"text": "Leave a coin on the marker (10 chips).", "requires": {"money": 10}, "consume": {"money": 10}, "outcomes": [
+            {"weight": 1, "good": true, "text": "One by one the lights go out. {hero} feels watched over.", "effects": [{"type": "fatigue", "amount": -8, "target": "party"}, {"type": "quirk", "quirk": "random_positive", "target": "actor", "chance": 25}]}]},
+          {"text": "Walk away.", "outcomes": [
+            {"weight": 1, "text": "The lights don't follow.", "effects": []}]}]}},
         {"weight": 2, "text": "They lead you in circles until dawn, and then they turn and come for you.", "effects": [{"type": "fatigue", "amount": 10, "target": "party"}, {"type": "fight", "enemies": ["prairie_haint", "prairie_haint"]}]}]},
       {"text": "Ring the camp with salt.", "requires": {"item": "salt"}, "consume": {"item": 1}, "outcomes": [
         {"weight": 1, "good": true, "text": "The lights circle all night but never cross the salt. By morning they've gone.", "effects": [{"type": "fatigue", "amount": -4, "target": "party"}]}]},
@@ -277,7 +293,7 @@
     "text": "Six fresh graves beside the trail. Cholera, says the scrawled board. Keep moving.",
     "options": [
       {"text": "Pay respects.",
-        "experts": {"preacher": {"swap": {"0": {"weight": 1, "good": true, "text": "{hero} says a few words over each grave. It helps.", "effects": [{"type": "fatigue", "amount": -8, "target": "party"}]}}}, "superstitious": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}, "gloomy": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}},
+        "experts": {"preacher": {"swap": {"0": {"weight": 1, "good": true, "text": "{hero} says a few words over each grave. It helps.", "effects": [{"type": "fatigue", "amount": -8, "target": "party"}]}}, "odds": 0}, "superstitious": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}, "gloomy": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}},
         "outcomes": [
         {"weight": 1, "text": "A solemn moment. It hits some harder than others.", "effects": [{"type": "fatigue", "amount": 5, "target": "party"}, {"type": "fatigue", "amount": -8, "target": "random"}]}]},
       {"text": "Say a proper service.", "requires": {"class": "preacher"}, "outcomes": [
@@ -446,7 +462,7 @@
     "text": "A sod house with smoke curling from the chimney. A family waves you in. \"We don't get many visitors!\"",
     "options": [
       {"text": "Stay for supper.",
-        "experts": {"cook": {"bonus": [{"type": "food", "amount": 8}]}},
+        "experts": {"cook": {"bonus": [{"type": "food", "amount": 8}], "odds": 0}},
         "outcomes": [
         {"weight": 1, "good": true, "text": "Fresh bread, butter and a real bed. Everyone rests easy.", "effects": [{"type": "heal_pct", "value": 20, "target": "party"}, {"type": "fatigue", "amount": -12, "target": "party"}]}]},
       {"text": "Trade for supplies (30 chips).", "requires": {"money": 30}, "consume": {"money": 30}, "outcomes": [
@@ -560,5 +576,182 @@
         {"weight": 1, "good": true, "text": "{hero} stitches a fresh hide over the tear. Tight as a drum.", "effects": [{"type": "wagon", "amount": 6}]}]},
       {"text": "Leave it.", "outcomes": [
         {"weight": 1, "text": "Grit gets into the food and the gear.", "effects": [{"type": "food", "amount": -3}, {"type": "wagon", "amount": -8}]}]}
+    ]},
+
+  "card_game": {"title": "Campfire Card Game", "art": "campfire",
+    "text": "Three cowhands at a fire wave you over. \"Faro, friend? Penny a point, chips on the side.\"",
+    "options": [
+      {"text": "Sit in for a few hands (50 chips).", "requires": {"money": 50}, "consume": {"money": 50},
+        "experts": {"gambler": {"odds": 60, "bonus": [{"type": "keepsake"}]}, "lucky": {}, "hothead": {"averse": true, "add": [{"weight": 1, "text": "{hero} calls one of them a cheat. Guns come out.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_brawler"]}]}]}},
+        "outcomes": [
+        {"weight": 1, "good": true, "text": "{hero} walks away from the fire a hundred chips heavier.", "effects": [{"type": "money", "min": 100, "max": 100}]},
+        {"weight": 1, "text": "Cleaned out. The cowhands are very friendly about it.", "effects": []}]},
+      {"text": "Just share the fire.", "outcomes": [
+        {"weight": 1, "good": true, "text": "Coffee, beans and tall tales.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}, {"type": "heal_pct", "value": 5, "target": "party"}]}]},
+      {"text": "One more round. Just one.", "requires": {"quirk": "drinker", "money": 40}, "consume": {"money": 40}, "compel": true, "outcomes": [
+        {"weight": 2, "text": "{hero} stays up with the cowhands and the bottle until the stars fade.", "effects": [{"type": "fatigue", "amount": -6, "target": "actor"}, {"type": "buff", "stat": "acc", "value": -5, "target": "actor"}]},
+        {"weight": 1, "good": true, "text": "{hero} stays up all night and wins the pot.", "effects": [{"type": "money", "min": 120, "max": 120}, {"type": "buff", "stat": "acc", "value": -5, "target": "actor"}]}]}
+    ]},
+
+  "medicine_show": {"title": "Medicine Show", "art": "peddler",
+    "text": "A painted wagon, a brass band of one, and a man in a tall hat: \"Doctor Ezekiel's Miracle Elixir! Cures fever, gout, heartbreak and snakebite!\"",
+    "options": [
+      {"text": "Buy a bottle (40 chips).", "requires": {"money": 40}, "consume": {"money": 40},
+        "experts": {"frontier_doctor": {"odds": 75, "bonus": [{"type": "money", "min": 60, "max": 60}]}, "myth_buster": {}, "superstitious": {"averse": true}},
+        "outcomes": [
+        {"weight": 1, "good": true, "text": "Bracing stuff. {hero} feels ten years younger, for an afternoon.", "effects": [{"type": "fatigue", "amount": -10, "target": "actor"}]},
+        {"weight": 1, "text": "{hero} spends the night behind a bush.", "effects": [{"type": "damage_pct", "value": 10, "target": "actor"}, {"type": "quirk", "quirk": "sickly", "target": "actor", "chance": 20}]}]},
+      {"text": "Preach against the snake oil.", "requires": {"class": "preacher"}, "outcomes": [
+        {"weight": 1, "good": true, "text": "{hero} turns the crowd. They pelt the doctor with his own bottles and pass the hat for the preacher.", "effects": [{"type": "money", "min": 80, "max": 80}, {"type": "fatigue", "amount": -6, "target": "party"}]}]},
+      {"text": "Move on.", "outcomes": [
+        {"weight": 1, "text": "The band plays you out of town.", "effects": []}]}
+    ]},
+
+  "twister": {"title": "Twister", "art": "twister",
+    "text": "The sky goes green. A black funnel walks across the prairie, straight for the wagon.",
+    "options": [
+      {"text": "Run for the gully.",
+        "experts": {"scout": {}, "wrangler": {}, "mountain_man": {}},
+        "outcomes": [
+        {"weight": 3, "good": true, "text": "Everyone flat in the gully as the roar goes over.", "effects": [{"type": "fatigue", "amount": 8, "target": "party"}]},
+        {"weight": 1, "text": "The wagon's caught in the edge of it.", "effects": [{"type": "wagon", "amount": -25}, {"type": "food", "amount": -5}]}]},
+      {"text": "Tie down the wagon and lie flat.", "requires": {"item": "rope"}, "consume": {"item": 1}, "outcomes": [
+        {"weight": 1, "good": true, "text": "The ropes sing but they hold.", "effects": [{"type": "wagon", "amount": -8}], "then": {"text": "When the roar passes, a farm's strongbox lies split open in the debris. A family's name is painted on the lid.", "options": [
+          {"text": "Keep it.", "outcomes": [
+            {"weight": 1, "good": true, "text": "Finders keepers. Nobody says much.", "effects": [{"type": "money", "min": 120, "max": 200}]}]},
+          {"text": "Find the owner.",
+            "experts": {"tracker": {}, "scout": {}},
+            "outcomes": [
+            {"weight": 2, "good": true, "text": "{hero} tracks the family to their cellar. They press a keepsake on you, crying.", "effects": [{"type": "fatigue", "amount": -8, "target": "party"}, {"type": "keepsake"}]},
+            {"weight": 1, "text": "You never find them. You leave the box at the next homestead.", "effects": [{"type": "fatigue", "amount": -4, "target": "party"}]}]}]}}]}
+    ]},
+
+  "cattle_drive": {"title": "Cattle Drive", "art": "cattle",
+    "text": "Three hundred longhorns and a trail boss with half the riders he needs. \"Pay's fair, if you'll ride drag for a day.\"",
+    "options": [
+      {"text": "Ride drag for a day.",
+        "experts": {"wrangler": {"bonus": [{"type": "money", "min": 60, "max": 60}]}, "clumsy": {"averse": true}},
+        "outcomes": [
+        {"weight": 3, "good": true, "text": "A long, dusty day. The trail boss pays in cash.", "effects": [{"type": "money", "min": 80, "max": 140}, {"type": "fatigue", "amount": 6, "target": "party"}]},
+        {"weight": 1, "text": "Something spooks the herd. Stampede!", "effects": [{"type": "damage_pct", "value": 15, "target": "random"}, {"type": "wagon", "amount": -10}]}]},
+      {"text": "Cut out a stray for supper.", "hide_if": ["marshal"], "outcomes": [
+        {"weight": 2, "good": true, "text": "One stray, never missed. Steak tonight.", "effects": [{"type": "food", "amount": 10}]},
+        {"weight": 1, "text": "The drovers catch you at it.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_brawler"]}]}]},
+      {"text": "Wave and ride on.", "outcomes": [
+        {"weight": 1, "text": "The herd takes an hour to pass.", "effects": []}]}
+    ]},
+
+  "powder_shack": {"title": "The Powder Shack", "art": "cabin",
+    "text": "A tin-roofed shack by the tailings, door hanging open. Inside, crates of dynamite sweat in the heat.",
+    "options": [
+      {"text": "Carry some out, gently.",
+        "experts": {"prospector": {"odds": 75, "bonus": [{"type": "iron", "amount": 2}]}, "miner": {}, "butterfingers": {"averse": true}, "jumpy": {"averse": true}, "hothead": {"averse": true}},
+        "outcomes": [
+        {"weight": 3, "good": true, "text": "A few sticks to throw. Everyone breathes again.", "effects": [{"type": "buff", "stat": "dmg_pct", "value": 15, "target": "party"}]},
+        {"weight": 1, "text": "BOOM.", "effects": [{"type": "damage_pct", "value": 25, "target": "actor"}, {"type": "fatigue", "amount": 10, "target": "party"}, {"type": "quirk", "quirk": "hard_of_hearing", "target": "actor", "chance": 30}]}]},
+      {"text": "Leave it. Quickly.", "outcomes": [
+        {"weight": 1, "text": "Nobody argues.", "effects": []}]}
+    ]},
+
+  "tapping_underground": {"title": "Tapping Underground", "art": "mine",
+    "text": "Faint tapping from under a collapsed adit: three knocks, a pause, three more. Someone's alive down there.",
+    "options": [
+      {"text": "Dig them out.",
+        "experts": {"miner": {}, "woodcutter": {}, "rail_driver": {}, "claustrophobic": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}},
+        "outcomes": [
+        {"weight": 1, "good": true, "text": "A half-starved miner crawls out into the light. \"I owe you. I'll ride with you, if you'll have me.\"", "effects": [{"type": "recruit", "class": "prospector"}]},
+        {"weight": 1, "good": true, "text": "A miner crawls out, and presses his poke into {hero}'s hands.", "effects": [{"type": "money", "min": 100, "max": 160}]},
+        {"weight": 1, "text": "The roof comes down on {hero}.", "effects": [{"type": "damage_pct", "value": 20, "target": "actor"}, {"type": "quirk", "quirk": "claustrophobic", "target": "actor", "chance": 30}]}]},
+      {"text": "Mark the spot and move on.", "outcomes": [
+        {"weight": 1, "text": "The tapping follows you for a long while.", "effects": [{"type": "fatigue", "amount": 8, "target": "party"}]}]}
+    ]},
+
+  "tommyknockers": {"title": "Tommyknockers", "art": "mine",
+    "text": "Knocking from the dark of the mine mouth. The old Cornish miners always left the Knockers a bite of supper, for luck.",
+    "options": [
+      {"text": "Leave them a pasty.", "requires": {"item": "food"}, "consume": {"item": 2},
+        "experts": {"superstitious": {"odds": 0, "bonus": [{"type": "fatigue", "amount": -6, "target": "actor"}]}, "mountain_man": {"odds": 0, "bonus": [{"type": "keepsake", "chance": 33}]}},
+        "outcomes": [
+        {"weight": 1, "good": true, "text": "By morning the pasty's gone, and two lumps of ore sit on the doorstep.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}, {"type": "iron", "amount": 2}]}]},
+      {"text": "Mock them.", "hide_if": ["superstitious"],
+        "experts": {"myth_buster": {}},
+        "outcomes": [
+        {"weight": 2, "good": true, "text": "Nothing happens. Probably.", "effects": []},
+        {"weight": 1, "text": "A rock falls from nowhere. Then the knocking gets closer.", "effects": [{"type": "damage_pct", "value": 15, "target": "random"}, {"type": "fight", "enemies": ["tommyknocker", "tommyknocker"]}]}]},
+      {"text": "Walk on.", "outcomes": [
+        {"weight": 1, "text": "The knocking stops when you've gone.", "effects": [{"type": "fatigue", "amount": 4, "target": "party"}]}]}
+    ]},
+
+  "runaway_burro": {"title": "Runaway Burro", "art": "tracks",
+    "text": "A burro wanders up to the wagon, packed with a prospector's kit: pick, pan, a coil of fuse. No prospector.",
+    "options": [
+      {"text": "Keep it.", "outcomes": [
+        {"weight": 2, "good": true, "text": "Nobody comes looking. The kit's worth having.", "effects": [{"type": "item", "item": "wagon_parts", "amount": 1}, {"type": "food", "amount": 2}]},
+        {"weight": 1, "text": "Its owner comes looking, with friends.", "effects": [{"type": "item", "item": "wagon_parts", "amount": 1}, {"type": "food", "amount": 2}, {"type": "fight", "enemies": ["claim_jumper", "claim_jumper"]}]}]},
+      {"text": "Follow its tracks back.",
+        "experts": {"tracker": {}, "wrangler": {}},
+        "outcomes": [
+        {"weight": 2, "good": true, "text": "The owner's dead in a wash. His poke and his map are still on him.", "effects": [{"type": "money", "min": 80, "max": 140}, {"type": "reveal", "amount": 3}]},
+        {"weight": 1, "good": true, "text": "He's alive, with a broken leg. You splint it and he swears to repay you.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}, {"type": "recruit", "class": "prospector", "chance": 30}]},
+        {"weight": 2, "text": "The tracks vanish on slickrock. Half a day lost.", "effects": [{"type": "food", "amount": -3}, {"type": "fatigue", "amount": 4, "target": "party"}]}]}
+    ]},
+
+  "ore_wagon_wreck": {"title": "Ore Wagon Wreck", "art": "wagon",
+    "text": "A company ore wagon on its side in the wash, the driver dead in the traces. Nobody's come for the ore yet.",
+    "options": [
+      {"text": "Take the ore.", "hide_if": ["marshal"], "outcomes": [
+        {"weight": 2, "good": true, "text": "Good heavy ore. The company won't miss a sack or two.", "effects": [{"type": "iron", "amount": 4}]},
+        {"weight": 1, "text": "The company's guards ride up as you load the last sack.", "effects": [{"type": "iron", "amount": 4}, {"type": "fight", "enemies": ["railroad_enforcer", "railroad_enforcer"]}]}]},
+      {"text": "Bury the driver.",
+        "experts": {"preacher": {"odds": 0, "swap": {"0": {"weight": 1, "good": true, "text": "{hero} gives the driver a proper service.", "effects": [{"type": "fatigue", "amount": -8, "target": "party"}]}}}},
+        "outcomes": [
+        {"weight": 1, "good": true, "text": "A shallow grave and a wooden cross.", "effects": [{"type": "fatigue", "amount": -3, "target": "party"}]}]},
+      {"text": "Report it at the next post.", "requires": {"class": "marshal"}, "outcomes": [
+        {"weight": 1, "good": true, "text": "{hero} writes it up. The company pays a reward for its ore, and for honest folk.", "effects": [{"type": "money", "min": 100, "max": 160}]}]}
+    ]},
+
+  "wanted_poster": {"title": "Wanted Poster", "art": "poster",
+    "text": "A fresh poster on a fencepost: SNAKE-EYE PIKE, rides with Crane's crew. 200 CHIPS. LAST SEEN HEREABOUTS.",
+    "options": [
+      {"text": "Go after him.",
+        "experts": {"tracker": {"odds": 0, "fight": {"surprise": "enemies"}}, "scout": {"odds": 0, "fight": {"surprise": "enemies"}}, "marshal": {"odds": 0, "fight": {"foe_mark": {"crane_lieutenant": 3}}}, "outlaw_hunter": {"odds": 0, "fight": {"foe_mark": {"crane_lieutenant": 3}}}, "manhunter": {"odds": 0, "fight": {"foe_mark": {"crane_lieutenant": 3}}}},
+        "outcomes": [
+        {"weight": 1, "text": "You find Pike's camp at dusk.", "effects": [{"type": "fight", "enemies": ["crane_lieutenant", "outlaw_gunhand"], "reward": {"money": 200}}]}]},
+      {"text": "Look closer at the face.",
+        "experts": {"good_humor": {"odds": 0, "swap": {"1": {"weight": 1, "good": true, "text": "Hey... that looks a lot like {hero}. {hero} laughs so hard the whole company joins in.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}]}}}},
+        "outcomes": [
+        {"weight": 9, "good": true, "text": "It's Pike, all right. Mean eyes.", "effects": []},
+        {"weight": 1, "text": "Hey... that looks a lot like {hero}. Nobody lets it go for days.", "effects": [{"type": "fatigue", "amount": 6, "target": "actor"}]}]},
+      {"text": "Not our business.", "outcomes": [
+        {"weight": 1, "text": "You ride on.", "effects": []}]}
+    ]},
+
+  "hanging_tree": {"title": "The Hanging Tree", "art": "tree",
+    "text": "Three of Crane's men have a homesteader on a horse under a cottonwood, a rope around his neck. \"Keep riding, strangers.\"",
+    "options": [
+      {"text": "Cut him down.",
+        "experts": {"gunslinger": {"odds": 0, "fight": {"surprise": "enemies", "wounded": {"outlaw_brawler": 50}}}},
+        "outcomes": [
+        {"weight": 1, "text": "No more talking.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "reward": {"money": 100}}]}]},
+      {"text": "This hanging ain't lawful.", "requires": {"class": "marshal"}, "outcomes": [
+        {"weight": 2, "good": true, "text": "{hero} reads them the statute. They don't like it, but they ride off. The homesteader asks to come along.", "effects": [{"type": "recruit", "class": "random"}, {"type": "fatigue", "amount": -6, "target": "party"}]},
+        {"weight": 1, "text": "\"Law's a long way off.\" Guns come out.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "reward": {"money": 100}}]}]},
+      {"text": "Ride on.",
+        "experts": {"gloomy": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}, "coward_streak": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}},
+        "outcomes": [
+        {"weight": 1, "text": "Nobody looks back. Nobody forgets.", "effects": [{"type": "fatigue", "amount": 10, "target": "party"}]}]}
+    ]},
+
+  "stagecoach": {"title": "Stagecoach in Trouble", "art": "stage",
+    "text": "Gunfire ahead. A stagecoach is pinned down behind its own dead horses, and outlaws are working around the flanks.",
+    "options": [
+      {"text": "Ride to the rescue.", "outcomes": [
+        {"weight": 1, "text": "You hit them from behind.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "surprise": "enemies", "reward": {"money": 160}}]}]},
+      {"text": "Wait, then pick over what's left.",
+        "experts": {"gold_fever": {"odds": 0, "bonus": [{"type": "money", "min": 40, "max": 80}]}, "preacher": {"averse": true, "always": true, "bonus": [{"type": "fatigue", "amount": 12, "target": "actor"}]}, "marshal": {"averse": true, "always": true, "bonus": [{"type": "fatigue", "amount": 12, "target": "actor"}]}},
+        "outcomes": [
+        {"weight": 1, "good": true, "text": "By the time you ride down, it's over. The outlaws missed a strongbox under the seat.", "effects": [{"type": "money", "min": 80, "max": 160}, {"type": "fatigue", "amount": 8, "target": "party"}]}]},
+      {"text": "Ride wide around it.", "outcomes": [
+        {"weight": 1, "text": "The shooting fades behind you.", "effects": [{"type": "fatigue", "amount": 4, "target": "party"}]}]}
     ]}
 }

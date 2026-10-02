@@ -13,6 +13,7 @@ var day: int = 1
 var supplies: Dictionary = {}
 var wagon: int = 100
 var loot: Dictionary = {"money": 0, "timber": 0, "iron": 0, "hides": 0, "charters": 0, "keepsakes": []}
+var followup: Dictionary = {}      # a follow-up choice an event outcome opened ("then"): {event, text, options}
 var xp: int = 0
 var kills: int = 0
 var pending_buffs: Array = []    # {stat, value, uid (0 = everyone)}
@@ -863,11 +864,30 @@ func event_experts(opt: Dictionary) -> Array:
 
 ## Options with availability for the UI. "experts" lists the ★/✗ marks the company brings.
 func event_options(event_id: String) -> Array:
-	var ev: Dictionary = DB.events.get(event_id, {})
+	return option_views(DB.events.get(event_id, {}).get("options", []))
+
+
+func followup_options() -> Array:
+	return option_views(followup.get("options", []))
+
+
+func choose_followup(idx: int) -> Dictionary:
+	var f := followup
+	followup = {}
+	return _choose_option(str(f.get("event", "")), f.options[idx])
+
+
+func option_views(options: Array) -> Array:
 	var out: Array = []
 	var i := 0
-	for opt in ev.get("options", []):
+	for opt in options:
 		var req: Dictionary = opt.get("requires", {})
+		# hide_if: classes or quirks in the company that rule the option out (a Marshal won't steal).
+		var ruled_out := false
+		for h in party_heroes():
+			for id in opt.get("hide_if", []):
+				if id == h.class_id or id in h.quirks:
+					ruled_out = true
 		var experts := event_experts(opt)
 		var free := experts.any(func(x): return x.odds >= 0 and x.e.get("free", false))
 		var ok := true
@@ -893,8 +913,8 @@ func event_options(event_id: String) -> Array:
 		var marks := []
 		for x in experts:
 			marks.append({"mark": "✗" if x.odds < 0 else "★", "name": x.name})
-		out.append({"index": i, "text": opt.text, "tag": tag, "available": ok, "experts": marks,
-			"hidden": not ok and (req.has("skill") or req.has("class") or req.has("quirk"))})
+		out.append({"index": i, "text": opt.text, "tag": tag, "available": ok and not ruled_out, "experts": marks,
+			"hidden": ruled_out or (not ok and (req.has("skill") or req.has("class") or req.has("quirk")))})
 		i += 1
 	return out
 
@@ -915,10 +935,14 @@ func event_compel(event_id: String) -> Dictionary:
 	return {}
 
 
-## Returns {"text", "msgs", "fight"}.
+## Returns {"text", "msgs", "fight", "then"}; "then" means a follow-up choice is waiting
+## (followup_options / choose_followup).
 func choose_event_option(event_id: String, idx: int) -> Dictionary:
-	var ev: Dictionary = DB.events.get(event_id, {})
-	var opt: Dictionary = ev.options[idx]
+	followup = {}
+	return _choose_option(event_id, DB.events.get(event_id, {}).options[idx])
+
+
+func _choose_option(event_id: String, opt: Dictionary) -> Dictionary:
 	var req: Dictionary = opt.get("requires", {})
 	var experts := event_experts(opt)
 	# Who acts: the hero who meets the option's requirement, else the best ★ expert.
@@ -1011,7 +1035,11 @@ func choose_event_option(event_id: String, idx: int) -> Dictionary:
 			if not f.is_empty():
 				msgs.append("%s %s" % ["✗" if x.odds < 0 else "★", x.name])
 	add_log([text] + msgs)
-	return {"text": text, "msgs": msgs, "fight": res.fight}
+	var then: Dictionary = picked.get("then", {})
+	if not then.is_empty() and res.fight == null:
+		followup = {"event": event_id, "text": str(then.get("text", "")).replace("{hero}", actor.hero_name if actor != null else "Someone"),
+			"options": then.get("options", [])}
+	return {"text": text, "msgs": msgs, "fight": res.fight, "then": not followup.is_empty()}
 
 
 func event_text(event_id: String) -> String:

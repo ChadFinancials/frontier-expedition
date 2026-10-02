@@ -382,14 +382,21 @@ func show_event(event_id: String) -> void:
 	var compel := run.event_compel(event_id)
 	if not compel.is_empty():
 		v.add_child(UI.rich("[color=#%s][b]✗ %s[/b][/color]" % [UI.RED.to_html(false), compel.text], 21, true, 930))
-	for o in run.event_options(event_id):
-		if o.hidden or (not compel.is_empty() and o.index != compel.index):
+	_option_buttons(v, run.event_options(event_id), holder, int(compel.get("index", -1)),
+		func(idx: int): _event_result(event_id, run.choose_event_option(event_id, idx)))
+	holder.wrap = Main.inst.modal(p, false)
+
+
+## One button per visible option, with the ★/✗ names under it. only >= 0 shows just that one.
+func _option_buttons(v: VBoxContainer, views: Array, holder: Dictionary, only: int, pick: Callable) -> void:
+	for o in views:
+		if o.hidden or (only >= 0 and o.index != only):
 			continue
 		var txt: String = ("%s  " % o.tag if o.tag != "" else "") + o.text
 		var idx: int = o.index
 		var b := UI.btn(txt, func():
 			Main.inst.close_modal(holder.wrap)
-			_event_choice(event_id, idx), "")
+			pick.call(idx), "")
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.disabled = not o.available
 		if not o.available:
@@ -402,11 +409,9 @@ func show_event(event_id: String) -> void:
 				var col: Color = UI.RED if m.mark == "✗" else UI.GREEN
 				marks.append("[color=#%s]%s %s[/color]" % [col.to_html(false), m.mark, m.name])
 			v.add_child(UI.rich("      " + "    ".join(marks), 17, true, 930))
-	holder.wrap = Main.inst.modal(p, false)
 
 
-func _event_choice(event_id: String, idx: int) -> void:
-	var res := run.choose_event_option(event_id, idx)
+func _event_result(event_id: String, res: Dictionary) -> void:
 	var fight = res.fight
 	if fight == null:
 		run.complete_current()
@@ -418,9 +423,26 @@ func _event_choice(event_id: String, idx: int) -> void:
 			run.complete_current()
 			Game.save_game()
 			_to_combat(fight.enemies, "fight", fight.get("surprise", ""), fight.get("reward", {}), fight), "Danger"]])
+	elif res.get("then", false):
+		Audio.play("page")
+		Main.inst.dialog(DB.events[event_id].get("title", ""), body, [["Continue", func(): _show_followup(event_id)]])
 	else:
 		Audio.play("page")
 		Main.inst.dialog(DB.events[event_id].get("title", ""), body, [["Continue", func(): _check_end()]])
+
+
+## The second choice an outcome opened (dig up the grave, or leave a coin?).
+func _show_followup(event_id: String) -> void:
+	var p := UI.panel()
+	p.custom_minimum_size = Vector2(980, 0)
+	var v := UI.vb(12)
+	p.add_child(v)
+	v.add_child(UI.hdr(DB.events.get(event_id, {}).get("title", "Event"), 38, true))
+	v.add_child(UI.rich(str(run.followup.get("text", "")), 23, true, 930))
+	var holder := {"wrap": null}
+	_option_buttons(v, run.followup_options(), holder, -1,
+		func(idx: int): _event_result(event_id, run.choose_followup(idx)))
+	holder.wrap = Main.inst.modal(p, false)
 
 
 # --- Curios ---------------------------------------------------------------------------

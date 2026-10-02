@@ -63,10 +63,10 @@ func _hills(y: float, amp: float, col: Color, seed_value: int) -> void:
 func _draw() -> void:
 	var w := size.x
 	var h := size.y
-	var night := kind in ["lights", "siren", "stranger"]
+	var night := kind in ["lights", "siren", "stranger", "campfire", "mine"]
 	var sky_top := Color("#2b3552") if night else Color("#6f8fb0")
 	var sky_bot := Color("#5b5270") if night else Color("#f0c987")
-	if kind == "storm":
+	if kind in ["storm", "twister"]:
 		sky_top = Color("#3a4150")
 		sky_bot = Color("#7a7d85")
 	if kind == "snow":
@@ -189,5 +189,75 @@ func _draw() -> void:
 				_disc(tp, 9, Color("#4a3a2a"))
 				for j in 3:
 					draw_circle(tp + Vector2(-8 + j * 8, -12), 3, Color("#4a3a2a"))
+		"twister":
+			var sway := sin(_t * 1.4) * 24
+			var left: Array = []
+			var right: Array = []
+			for k in 14:
+				var f := k / 13.0
+				var x := w * 0.62 + sway * f * f + sin(_t * 3.0 + f * 7.0) * 5 * (1.0 - f)
+				var hw := 6 + pow(f, 2.2) * 70
+				var y := ground + 4 - f * (ground - 20)
+				left.append(Vector2(x - hw, y))
+				right.push_front(Vector2(x + hw, y))
+			_poly(left + right, Color("#6b665c"))
+			for k in 3:
+				_cloud(Vector2(w * (0.3 + k * 0.22) + sway * 0.3, 22 + (k % 2) * 10), 5, 30, Color("#4e5058").darkened(0.08 * (k % 2)))
+			for k in 6:
+				var a := _t * 2.2 + k * 1.05
+				var dp := Vector2(w * 0.62 + cos(a) * (30 + k * 8), ground - 8 - fmod(_t * 25 + k * 13, 60))
+				draw_rect(Rect2(dp, Vector2(6, 3)), Color("#3a2a1c"))
+		"cattle":
+			for k in 4:
+				var bx := w * 0.18 + k * 160
+				var bc := Color("#b0703a").darkened(0.12 * (k % 2))
+				for lx in [-34, -18, 16, 30]:
+					draw_line(Vector2(bx + lx, ground - 18), Vector2(bx + lx, ground + 2), bc.darkened(0.3), 5)
+				_poly([Vector2(bx - 46, ground - 16), Vector2(bx - 48, ground - 52), Vector2(bx + 34, ground - 56), Vector2(bx + 40, ground - 18)], bc)
+				_poly([Vector2(bx + 32, ground - 58), Vector2(bx + 56, ground - 56), Vector2(bx + 54, ground - 34), Vector2(bx + 36, ground - 34)], Color("#8a5428"))
+				draw_line(Vector2(bx + 36, ground - 54), Vector2(bx + 6, ground - 62), Color("#efe4c8"), 4, true)
+				draw_line(Vector2(bx + 52, ground - 54), Vector2(bx + 82, ground - 62), Color("#efe4c8"), 4, true)
+		"mine":
+			_poly([c + Vector2(-260, 0), c + Vector2(-130, -160), c + Vector2(140, -170), c + Vector2(270, 0)], Color("#6e5038"))
+			_poly([c + Vector2(-54, 0), c + Vector2(-54, -96), c + Vector2(54, -96), c + Vector2(54, 0)], Color("#140e0c"))
+			_poly([c + Vector2(-70, 0), c + Vector2(-56, 0), c + Vector2(-56, -104), c + Vector2(-70, -104)], Color("#8a6038"))
+			_poly([c + Vector2(56, 0), c + Vector2(70, 0), c + Vector2(70, -104), c + Vector2(56, -104)], Color("#8a6038"))
+			_poly([c + Vector2(-82, -96), c + Vector2(82, -96), c + Vector2(82, -112), c + Vector2(-82, -112)], Color("#7a5232"))
+			draw_line(c + Vector2(-30, 0), c + Vector2(-60, 40), Color("#8a8a8a"), 4, true)
+			draw_line(c + Vector2(30, 0), c + Vector2(60, 40), Color("#8a8a8a"), 4, true)
+			var glow := 0.5 + 0.5 * sin(_t * 2.0)
+			_disc(c + Vector2(-20, -40), 4, Color(1.0, 0.85, 0.4, 0.5 + 0.5 * glow))
+		"campfire":
+			_poly([c + Vector2(-60, 0), c + Vector2(60, -14), c + Vector2(64, -4), c + Vector2(-56, 10)], Color("#5a3a22"))
+			_poly([c + Vector2(-60, -14), c + Vector2(60, 0), c + Vector2(56, 10), c + Vector2(-64, -4)], Color("#6b4426"))
+			var fh2 := 70 + 14 * sin(_t * 5)
+			_poly([c + Vector2(-34, -6), c + Vector2(34, -6), c + Vector2(4, -6 - fh2)], Color("#e07a1f"))
+			_poly([c + Vector2(-16, -6), c + Vector2(16, -6), c + Vector2(2, -6 - fh2 * 0.6)], Color("#f2c14e"))
+			for sx in [c.x - 190, c.x + 190]:
+				_poly([Vector2(sx - 22, ground + 6), Vector2(sx + 22, ground + 6), Vector2(sx + 16, ground - 60), Vector2(sx - 16, ground - 60)], Color("#2e2a30"))
+				_disc(Vector2(sx, ground - 74), 14, Color("#2e2a30"))
+		"poster":
+			draw_line(c + Vector2(0, 0), c + Vector2(0, -150), Color("#6b4426"), 12)
+			_poly([c + Vector2(-56, -146), c + Vector2(56, -146), c + Vector2(56, -20), c + Vector2(-56, -20)], Color("#e8dcc0"))
+			draw_string(UI.font_bold, c + Vector2(-46, -122), "WANTED", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, INK)
+			_disc(c + Vector2(0, -76), 20, Color("#7a6a5a"))
+			draw_string(UI.font_bold, c + Vector2(-26, -34), "$200", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, INK)
+		"tree":
+			_poly([c + Vector2(-20, 0), c + Vector2(16, 0), c + Vector2(10, -150), c + Vector2(-12, -150)], Color("#4a3426"))
+			_poly([c + Vector2(4, -140), c + Vector2(150, -170), c + Vector2(152, -158), c + Vector2(6, -124)], Color("#4a3426"))
+			_poly([c + Vector2(-6, -130), c + Vector2(-110, -190), c + Vector2(-116, -178), c + Vector2(-8, -114)], Color("#4a3426"))
+			var swing := sin(_t * 1.2) * 4
+			draw_line(c + Vector2(120, -162), c + Vector2(120 + swing, -90), Color("#c9b48a"), 3, true)
+			draw_arc(c + Vector2(120 + swing, -80), 10, 0, TAU, 20, Color("#c9b48a"), 3, true)
+		"stage":
+			var bump := sin(_t * 8.0) * 2
+			_poly([c + Vector2(-110, -30 + bump), c + Vector2(80, -30 + bump), c + Vector2(96, -120 + bump), c + Vector2(-96, -120 + bump)], Color("#7a2e2a"))
+			_poly([c + Vector2(-70, -100 + bump), c + Vector2(-20, -100 + bump), c + Vector2(-20, -66 + bump), c + Vector2(-70, -66 + bump)], Color("#f2c46b"))
+			_poly([c + Vector2(10, -100 + bump), c + Vector2(60, -100 + bump), c + Vector2(60, -66 + bump), c + Vector2(10, -66 + bump)], Color("#f2c46b"))
+			_disc(c + Vector2(-80, 0), 26, Color("#3a2618"))
+			_disc(c + Vector2(60, 0), 26, Color("#3a2618"))
+			for k in 4:
+				var ph := fmod(_t * 0.6 + k * 0.25, 1.0)
+				_disc(c + Vector2(-140 - ph * 120, -10 - ph * 40), 10 + ph * 18, Color(0.72, 0.62, 0.5, 1.0))
 		_:
 			_disc(c + Vector2(0, -40), 30, Color("#a8834e"))

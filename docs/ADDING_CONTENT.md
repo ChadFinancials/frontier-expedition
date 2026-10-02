@@ -201,9 +201,15 @@ re-formats the file in its usual layout after a scripted edit.
   used, and the option is open without it), `fight` (merged into a resulting fight:
   `surprise`, `enemies`, `wounded`, `drop`, `foe_mods`, `foe_mark`). The option lists the
   names only: ★ Cook, ✗ Overweight.
+- `hide_if: [class or quirk ids]`: the option is hidden while anyone in the company has one
+  (a Marshal won't steal).
+- An outcome may open a follow-up choice: `"then": {"text": "...", "options": [...]}`. The
+  options use the same format, including experts and requirements.
 - `{hero}` becomes the hero who meets the requirement, else the best ★ expert, else a random
   party member.
-- `art` picks the illustration drawn by `scripts/visual/event_art.gd`.
+- `art` picks the illustration drawn by `scripts/visual/event_art.gd`: wagon, river, fire,
+  smoke, buffalo, cattle, deer, cabin, fork, grave, lights, peddler, siren, snake, snow, storm,
+  twister, stranger, sun, tracks, mine, campfire, poster, tree, stage.
 
 **Effects** (events, curios and camp; applied by `scripts/core/effects.gd`): `fatigue`,
 `heal_pct`, `damage_pct`, `food`, `money` (`amount`, or `min`/`max`), `money_pct`, `timber`,

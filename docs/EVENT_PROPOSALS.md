@@ -1,12 +1,16 @@
 # Event proposals (round 9, take 2)
 
-Status: **pass 1 of 2 built** (owner's picks: ★/✗ show names only, e.g. "★ Cook"; all 12 new
-events; 30% compel for every bad quirk; two passes).
+Status: **✅ built in two passes** (owner's picks: ★/✗ show names only, e.g. "★ Cook"; all 12
+new events; 30% compel for every bad quirk; two passes).
 - **Pass 1, built:** pools, event experts, compel, fight setup, and the existing events
   reworked as in sections 3-6. Claim Dispute moves into Dry Gulch.
-- **Pass 2, to do:** the 12 new events, follow-up choices (the Haint Lights grave, the
-  homestead cellar, the Twister's strongbox), "hidden while a class is present" (the Marshal
-  won't steal), and filling out the quest themes.
+- **Pass 2, built:** the 12 new events, with 7 new illustrations (twister, longhorns, mine
+  mouth, campfire, wanted poster, hanging tree, stagecoach). Follow-up choices: the Haint
+  Lights grave, the homestead cellar, the Twister's strongbox. `hide_if` (a Marshal won't steal,
+  the Superstitious won't mock the Knockers). The quest themes are filled out as in section 7.
+  - Snake-Eye Pike is the Crow Lieutenant, the Crow's Nest elite.
+  - The Tommyknockers' "+10 Light" became Fatigue relief, since Light only matters in caves.
+  - The Stagecoach reward is a flat 160 chips.
 - Small changes in the build:
   - Beast Hunter at Wolf Tracks and the widow's den sets the foes Vulnerable rather than
     adding Hides.

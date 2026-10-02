@@ -358,6 +358,15 @@ retired in round 7; the Shovel took its curios.)
     outcome lands on the ✗ hero. The option shows just the names: ★ Cook, ✗ Overweight.
   - **Compel:** a bad-quirk option (Drinker, Gold Fever, Too Curious, Hothead, Spooked by
     Critters) has a 30% chance `[event_compel_chance]` to be taken before you can choose.
+  - **Follow-ups:** some outcomes open a second choice. The Haint Lights lead to a grave (dig,
+    or leave a coin?), the homestead pantry hides a padlocked cellar, and the Twister leaves a
+    strongbox in the debris.
+  - **Hidden options:** an option can be ruled out by who's present (`hide_if`). A Marshal
+    won't steal a stray or the company's ore, and the Superstitious won't mock the Knockers.
+  - First region: 15 common events, Tallgrass 10, Dry Gulch 6 (mine country: the Powder
+    Shack, Tapping Underground, Tommyknockers, the Runaway Burro, an Ore Wagon Wreck, Claim
+    Dispute) and Crow's Nest 6 (outlaw country: Smoke Signals, Outlaw Toll, the Abandoned
+    Homestead, the Wanted Poster, the Hanging Tree, a Stagecoach in Trouble).
 
 ### Ending an expedition
 - **Victory** (boss, crossing or final fight won): loot, XP, quirk rolls (45%, positive 60%

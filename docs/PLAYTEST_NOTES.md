@@ -75,6 +75,18 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Event pass 2:**
+  - 12 new events.
+    - Common: Campfire Card Game, Medicine Show.
+    - Tallgrass: Twister, Cattle Drive.
+    - Dry Gulch: Powder Shack, Tapping Underground, Tommyknockers, Runaway Burro, Ore Wagon
+      Wreck.
+    - Crow's Nest: Wanted Poster, Hanging Tree, Stagecoach in Trouble.
+  - 7 new illustrations.
+  - Follow-up choices: the haint grave, the padlocked cellar, the twister's strongbox.
+  - `hide_if` for options: a Marshal won't steal.
+  - Side-quest theme lists filled out.
+  - Dry Gulch and Crow's Nest maps now draw from 21 possible events each, up from 10.
 - **Event pass 1** (owner: common + region pools, ★/✗ names only, 30% compel, two passes):
   - Event stops draw from a common pool (13 trail-life events, 45%) or the region's own list
     (55%); side quests add a theme list (40/30/30).

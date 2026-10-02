@@ -524,7 +524,16 @@ static func run(main: Main, args: Dictionary) -> void:
 					await main.goto("cave", {}, true)
 				"event":
 					await main.goto("trail", {}, true)
-					main.screen.show_event(args.get("id", "river_crossing"))
+					# then: open the first follow-up of the event's first option instead (the haint grave).
+					if args.has("then"):
+						var eid := str(args.get("id", "haint_lights"))
+						for oc in DB.events[eid].options[0].outcomes:
+							if oc.has("then"):
+								co.run.followup = {"event": eid, "text": oc.then.text, "options": oc.then.options}
+								break
+						main.screen._show_followup(eid)
+					else:
+						main.screen.show_event(args.get("id", "river_crossing"))
 				"curio":
 					await main.goto("trail", {}, true)
 					# pick=<curio id>: open "Who investigates?" on it, to see the ★/✗ expert lines.

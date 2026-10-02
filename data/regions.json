@@ -65,7 +65,7 @@
       "victory": "Old Jeb crumbles into a heap of pale dust and a tin crown. The knocking fades, one wall at a time, and the mine is only a mine again.",
       "enemies": ["tommyknocker", "tommyknocker", "tommyknocker", "knocker_king"], "keepsake": "miners_lamp"},
     "crossing": {"name": "Deep Drift", "enemies": ["tommyknocker", "knocker_king", "giant_bat"]},
-    "events": ["claim_dispute"],
+    "events": ["claim_dispute", "powder_shack", "tapping_underground", "tommyknockers", "runaway_burro", "ore_wagon_wreck"],
     "homestead_events": ["homestead_drifter"],
     "curios": ["miners_cache", "strongbox", "abandoned_wagon", "dead_horse", "standing_stone", "cattle_skull"],
     "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "ore_vein", "strongbox"]
@@ -95,7 +95,7 @@
       "victory": "Ruby Blackwing goes over the palisade and is gone into the cottonwoods, leaving her feather charm in the mud. The stockade's stores are yours, and Crane's gang will be a little hungrier this winter.",
       "enemies": ["outlaw_knifeman", "ruby_blackwing", "murder_of_crows"], "keepsake": "crow_feather_charm"},
     "crossing": {"name": "The Stockade", "enemies": ["outlaw_knifeman", "ruby_blackwing", "murder_of_crows"]},
-    "events": ["outlaw_ambush_warning", "outlaw_toll", "abandoned_homestead"],
+    "events": ["outlaw_ambush_warning", "outlaw_toll", "abandoned_homestead", "wanted_poster", "hanging_tree", "stagecoach"],
     "homestead_events": ["homestead_family", "homestead_widow"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "scarecrow", "berry_bushes", "dead_horse", "railroad_crate"],
     "cave_curios": ["miners_cache", "bone_pile", "strongbox"]
@@ -140,7 +140,7 @@
         "title": "Crane's Gambit",
         "text": "Silas Crane laughs and fires both revolvers into the air. On the far bank, one of his boys touches a match to a fuse.\n\nThe charge under the near end of the bridge goes up with a roar. Planks and river water rain down, the oxen bolt, and when the smoke clears the gang is across the Redwater and the bridge is burning between you.\n\n\"Toll's gone up, pilgrims!\" Silas calls across the water. \"Come back when you can afford it!\"\n\nThere's no way across tonight. The company gathers what it can and turns for home. But Silas took a bullet in the scramble, and he'll be carrying that wound the next time you meet."}},
     "crossing": {"name": "Crane's Last Crows", "enemies": ["crane_lieutenant", "outlaw_knifeman", "murder_of_crows", "outlaw_rifleman"]},
-    "events": ["river_crossing", "prairie_fire", "buffalo_herd", "sick_traveler", "haint_lights", "wolf_tracks", "hunting_grounds", "abandoned_homestead"],
+    "events": ["river_crossing", "prairie_fire", "buffalo_herd", "sick_traveler", "haint_lights", "wolf_tracks", "hunting_grounds", "abandoned_homestead", "twister", "cattle_drive"],
     "homestead_events": ["homestead_family", "homestead_widow", "homestead_drifter"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "prairie_well", "scarecrow", "berry_bushes", "cattle_skull", "dead_horse", "standing_stone", "railroad_crate"],
     "cave_curios": ["miners_cache", "whiskey_barrel", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox"]

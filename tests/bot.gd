@@ -210,6 +210,9 @@ func resolve_node(r: RunState) -> void:
 			var o: Dictionary = Stats.pick(rng, opts)
 			var compel := r.event_compel(n.data.event)
 			var res := r.choose_event_option(n.data.event, compel.index if not compel.is_empty() else o.index)
+			while res.get("then", false):
+				var fo := r.followup_options().filter(func(x): return x.available)
+				res = r.choose_followup(Stats.pick(rng, fo).index)
 			if res.fight != null:
 				run_fight(r, res.fight.enemies, "fight", res.fight.surprise, res.fight.get("reward", {}), res.fight)
 			r.complete_current()

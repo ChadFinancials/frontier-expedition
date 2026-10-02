@@ -14,18 +14,29 @@ def j(v):
     return json.dumps(v, ensure_ascii=False)
 
 
+def _outcome(o, indent):
+    """One line per outcome; a follow-up ("then") opens its options on the lines below."""
+    if "then" not in o:
+        return indent + j(o)
+    head = {k: v for k, v in o.items() if k != "then"}
+    t = o["then"]
+    s = indent + j(head)[:-1] + ', "then": {"text": %s, "options": [\n' % j(t["text"])
+    s += ",\n".join(_option(x, indent + "  ") for x in t["options"])
+    return s + "]}}"
+
+
 def _outcomes(outs, indent):
-    return ",\n".join(indent + j(o) for o in outs)
+    return ",\n".join(_outcome(o, indent) for o in outs)
 
 
-def _option(o):
+def _option(o, indent="      "):
     head = ", ".join("%s: %s" % (j(k), j(o[k])) for k in OPT_HEAD if k in o)
     rest = [k for k in o if k not in OPT_HEAD and k != "outcomes"]
-    s = "      {" + head
+    s = indent + "{" + head
     for k in rest:
-        s += ",\n        %s: %s" % (j(k), j(o[k]))
-    s += ', "outcomes": [\n' if not rest else ',\n        "outcomes": [\n'
-    s += _outcomes(o["outcomes"], "        ") + "]}"
+        s += ",\n%s  %s: %s" % (indent, j(k), j(o[k]))
+    s += ', "outcomes": [\n' if not rest else ',\n%s  "outcomes": [\n' % indent
+    s += _outcomes(o["outcomes"], indent + "  ") + "]}"
     return s
 
 

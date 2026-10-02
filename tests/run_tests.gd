@@ -1203,34 +1203,7 @@ func test_event_pass() -> void:
 			in_pool[e] = true
 	for eid in DB.events:
 		check(in_pool.has(eid), "event %s is in some pool" % eid)
-		for opt in DB.events[eid].options:
-			var req: Dictionary = opt.get("requires", {})
-			for k in req:
-				check(k in ["item", "money", "hides", "skill", "class", "quirk"], "%s: requirement %s is known" % [eid, k])
-			if req.has("skill"):
-				check(DB.survival.has(req.skill), "%s: skill %s exists" % [eid, req.skill])
-			if req.has("class"):
-				check(DB.classes.has(req["class"]), "%s: class %s exists" % [eid, req["class"]])
-			if req.has("quirk"):
-				check(DB.quirks.has(req.quirk), "%s: quirk %s exists" % [eid, req.quirk])
-			if req.has("item"):
-				check(DB.items.has(req.item), "%s: item %s exists" % [eid, req.item])
-			if opt.get("compel", false):
-				check(req.has("quirk"), "%s: a compel option needs a quirk" % eid)
-			var ex: Dictionary = opt.get("experts", {})
-			for id in ex:
-				check(DB.classes.has(id) or DB.survival.has(id) or DB.quirks.has(id), "%s: expert %s is a class, skill or quirk" % [eid, id])
-				for idx in ex[id].get("swap", {}):
-					check(int(idx) < opt.outcomes.size(), "%s: %s swaps a real outcome" % [eid, id])
-			var shifts := ex.values().any(func(x): return not x.get("averse", false) and int(x.get("odds", 1)) != 0)
-			if shifts:
-				var goods: Array = opt.outcomes.filter(func(o): return o.get("good", false))
-				check(not goods.is_empty() or ex.values().any(func(x): return not x.get("swap", {}).is_empty()), "%s: '%s' has a good outcome for its experts" % [eid, opt.text])
-			for o in opt.outcomes:
-				for ef in o.get("effects", []):
-					if ef.get("type", "") == "fight":
-						for en in ef.enemies:
-							check(DB.enemies.has(en), "%s: enemy %s exists" % [eid, en])
+		_check_event_options(eid, DB.events[eid].options)
 	# Pools: no repeats until every layer is used up; a quest's theme layer is drawn from.
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 12
@@ -1358,6 +1331,79 @@ func test_event_pass() -> void:
 	check(e.enemies.all(func(x): return x.hp == maxi(1, int(round(x.max_hp * 0.6)))), "wounded * puts every foe at 60%")
 	check(e.enemies.all(func(x): return x.stat("vulnerable") == 15), "foe_mods: foes start Vulnerable")
 	check(e.enemies[1].mark == 2 and e.enemies[0].mark == 0, "foe_mark marks the named foe")
+	# Pass 2: the 12 new events sit in the first region's pools.
+	for nid in ["card_game", "medicine_show"]:
+		check(nid in common, "%s is a common event" % nid)
+	for pair in [["tallgrass", ["twister", "cattle_drive"]], ["dry_gulch_mine", ["powder_shack", "tapping_underground", "tommyknockers", "runaway_burro", "ore_wagon_wreck"]],
+			["crows_nest", ["wanted_poster", "hanging_tree", "stagecoach"]]]:
+		for nid in pair[1]:
+			check(nid in DB.regions[pair[0]].events, "%s is in %s's pool" % [nid, pair[0]])
+	# hide_if: a Marshal won't steal.
+	set_party.call([plain])
+	var steal: Dictionary = run.event_options("cattle_drive").filter(func(o): return o.text.begins_with("Cut out"))[0]
+	check(steal.hidden and not steal.available, "a Marshal in the company hides 'Cut out a stray'")
+	set_party.call([gs])
+	steal = run.event_options("cattle_drive").filter(func(o): return o.text.begins_with("Cut out"))[0]
+	check(not steal.hidden and steal.available, "without a Marshal the stray can be cut out")
+	# Follow-ups: the haint lights lead to a grave, and the grave's choice resolves.
+	set_party.call([gs])
+	var reached := false
+	for i in 80:
+		gs.fatigue = 0
+		gs.hp = gs.max_hp()
+		var r6 := run.choose_event_option("haint_lights", 0)
+		if r6.get("then", false):
+			reached = true
+			check(not run.followup.is_empty() and run.followup_options().size() == 3, "the grave offers three choices")
+			run.company.money = 50
+			var coin: int = run.followup_options().filter(func(o): return o.text.begins_with("Leave a coin"))[0].index
+			var r7 := run.choose_followup(coin)
+			check(r7.text.begins_with("One by one") and run.followup.is_empty() and run.company.money + int(run.loot.money) <= 50, "leaving a coin resolves the follow-up and costs 10")
+			break
+		run.followup = {}
+	check(reached, "Follow the lights can lead to the grave")
+	check(run.choose_event_option("wolf_tracks", 0).get("then", false) == false and run.followup.is_empty(), "an outcome without 'then' leaves no follow-up")
+
+
+## Event data checks, recursing into follow-up choices ("then").
+func _check_event_options(eid: String, options: Array) -> void:
+	for opt in options:
+		var req: Dictionary = opt.get("requires", {})
+		for k in req:
+			check(k in ["item", "money", "hides", "skill", "class", "quirk"], "%s: requirement %s is known" % [eid, k])
+		if req.has("skill"):
+			check(DB.survival.has(req.skill), "%s: skill %s exists" % [eid, req.skill])
+		if req.has("class"):
+			check(DB.classes.has(req["class"]), "%s: class %s exists" % [eid, req["class"]])
+		if req.has("quirk"):
+			check(DB.quirks.has(req.quirk), "%s: quirk %s exists" % [eid, req.quirk])
+		if req.has("item"):
+			check(DB.items.has(req.item), "%s: item %s exists" % [eid, req.item])
+		if opt.get("compel", false):
+			check(req.has("quirk"), "%s: a compel option needs a quirk" % eid)
+		for id in opt.get("hide_if", []):
+			check(DB.classes.has(id) or DB.quirks.has(id), "%s: hide_if %s is a class or quirk" % [eid, id])
+		var ex: Dictionary = opt.get("experts", {})
+		for id in ex:
+			check(DB.classes.has(id) or DB.survival.has(id) or DB.quirks.has(id), "%s: expert %s is a class, skill or quirk" % [eid, id])
+			for idx in ex[id].get("swap", {}):
+				check(int(idx) < opt.outcomes.size(), "%s: %s swaps a real outcome" % [eid, id])
+		var shifts := ex.values().any(func(x): return not x.get("averse", false) and int(x.get("odds", 1)) != 0)
+		if shifts:
+			var goods: Array = opt.outcomes.filter(func(o): return o.get("good", false))
+			var swaps := ex.values().any(func(x): return not x.get("swap", {}).is_empty())
+			check(swaps or (not goods.is_empty() and goods.size() < opt.outcomes.size()), "%s: '%s' has good and bad outcomes for its experts' odds" % [eid, opt.text])
+		check(not opt.get("outcomes", []).is_empty(), "%s: '%s' has outcomes" % [eid, opt.text])
+		for o in opt.outcomes:
+			for ef in o.get("effects", []):
+				if ef.get("type", "") == "fight":
+					for en in ef.enemies:
+						check(DB.enemies.has(en), "%s: enemy %s exists" % [eid, en])
+				if ef.get("type", "") == "recruit" and ef.get("class", "random") != "random":
+					check(DB.classes.has(ef["class"]), "%s: recruit class %s exists" % [eid, ef["class"]])
+			if o.has("then"):
+				check(not str(o.then.get("text", "")).is_empty(), "%s: a follow-up has text" % eid)
+				_check_event_options(eid, o.then.get("options", []))
 
 
 func test_round9_town() -> void:

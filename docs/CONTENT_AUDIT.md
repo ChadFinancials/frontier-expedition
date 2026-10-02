@@ -80,9 +80,11 @@ first-draft. "Revisions" counts the commits that changed the data file after it 
    quirk chances, done for the Fort Providence area's 16. Still to do: Red Canyons (Painted
    Canyon Wall) and Thunder Peaks (Stone Cairn, Giant's Bones, Frozen Pack, Hot Spring), and
    keys for the supplies that open nothing (Bandages, Whiskey, Lamp Oil, Wagon Parts).
-4. 🟨 **Events** (round 9, EVENT_PROPOSALS.md): pass 1 built (pools, ★/✗ experts with quirks,
-   compel, fight setup, every existing first-region event reworked); pass 2 (12 new events,
-   follow-ups) next.
+4. ✅ **Events** (round 9, EVENT_PROPOSALS.md): first region done.
+   - Built: common, region and quest-theme pools; ★/✗ experts with quirks; compel; fight
+     setup; follow-ups; `hide_if`; 12 new events.
+   - Still to do: Red Canyons and Thunder Peaks events get the same treatment when those
+     regions come up.
 5. ⬜ **Town buildings and upgrades** (owner, round 9): what each building and level is worth,
    its costs in chips, Timber, Iron and Hides, the hiring board and bunkhouse tracks.
 6. ⬜ **Supplies, camp skills, side quests.** Smaller passes once the above settle.
