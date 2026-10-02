@@ -5,7 +5,8 @@ extends RefCounted
 ## Effect format: {"type": ..., "target": "actor"|"party"|"random"|"ally", ...}
 ## Types: fatigue{amount}, heal_pct{value}, damage_pct{value}, food{amount}, money{amount|min,max},
 ## money_pct{value}, timber{amount}, iron{amount}, hides{amount}, charters{amount}, item{item,amount}, keepsake{},
-## quirk{quirk}, remove_quirk{}, wagon{amount}, recruit{class}, fight{enemies,surprise,reward},
+## quirk{quirk}, remove_quirk{}, wagon{amount}, recruit{class},
+## fight{enemies,surprise,reward,wounded,drop,foe_mods,foe_mark},
 ## buff{stat,value} (next fight), reveal{amount}, light{amount}, clear_shaken{}.
 ## Any effect may carry "chance" (percent). Camp effects use base/per_rank instead of amount.
 
@@ -124,6 +125,10 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 			"fight":
 				out.fight = {"enemies": e.get("enemies", []).duplicate(), "surprise": e.get("surprise", ""),
 					"reward": e.get("reward", {})}
+				# Fight setup (events): wounded {eid|"*": hp %}, drop [eid], foe_mods [mod], foe_mark {eid|"*": rounds}.
+				for k in ["wounded", "drop", "foe_mods", "foe_mark"]:
+					if e.has(k):
+						out.fight[k] = e[k].duplicate(true)
 			"buff", "next_fight_buff":
 				var uid := 0
 				if e.get("target", "party") == "actor" and actor != null:

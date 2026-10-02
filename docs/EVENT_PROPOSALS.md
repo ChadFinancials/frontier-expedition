@@ -1,7 +1,19 @@
 # Event proposals (round 9, take 2)
 
-Status: **awaiting the owner's picks.** Nothing here is built yet. This replaces the first
-draft. Scope: the first region only (Tallgrass Sea, Dry Gulch Mine, Crow's Nest and the
+Status: **pass 1 of 2 built** (owner's picks: ★/✗ show names only, e.g. "★ Cook"; all 12 new
+events; 30% compel for every bad quirk; two passes).
+- **Pass 1, built:** pools, event experts, compel, fight setup, and the existing events
+  reworked as in sections 3-6. Claim Dispute moves into Dry Gulch.
+- **Pass 2, to do:** the 12 new events, follow-up choices (the Haint Lights grave, the
+  homestead cellar, the Twister's strongbox), "hidden while a class is present" (the Marshal
+  won't steal), and filling out the quest themes.
+- Small changes in the build:
+  - Beast Hunter at Wolf Tracks and the widow's den sets the foes Vulnerable rather than
+    adding Hides.
+  - Gold Fever and Drinker compels use the same 30% as the rest.
+  - Salt at the Buffalo Herd is its own option.
+
+This replaced the first draft. Scope: the first region only (Tallgrass Sea, Dry Gulch Mine, Crow's Nest and the
 Saloon side quests). Red Canyons and the Thunder Peaks come later; their events stay as they
 are for now.
 

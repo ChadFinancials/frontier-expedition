@@ -825,19 +825,60 @@ func event_actor(req: Dictionary) -> Hero:
 	return Stats.pick(company.rng, hs)
 
 
-## Options with availability for the UI.
+## Event experts (★/✗): the curio rules, plus quirks, over the whole company. For each
+## class, survival skill or quirk an option lists, the hero who brings it (highest odds).
+## [{"id", "name", "odds", "e", "hero"}]; odds < 0 is averse (✗).
+func event_experts(opt: Dictionary) -> Array:
+	var out := []
+	var ex: Dictionary = opt.get("experts", {})
+	var table: Array = DB.cfg("curio_skill_odds", [20, 35, 50])
+	for id in ex:
+		var e: Dictionary = ex[id]
+		var best: Hero = null
+		var odds := 0
+		var label := ""
+		for h in party_heroes():
+			var o := 0
+			if id == h.class_id:
+				o = int(e.get("odds", DB.cfg("curio_class_odds", 50)))
+				label = DB.classes[id].name
+			elif DB.survival.has(id) and h.survival.has(id):
+				o = int(e.get("odds", table[clampi(h.survival_rank(id) - 1, 0, table.size() - 1)]))
+				label = DB.survival[id].name
+			elif DB.quirks.has(id) and id in h.quirks:
+				o = int(e.get("odds", DB.cfg("event_quirk_odds", 35)))
+				label = DB.quirks[id].name
+			else:
+				continue
+			if best == null or o > odds:
+				best = h
+				odds = o
+		if best == null:
+			continue
+		if e.get("averse", false):
+			odds = -int(DB.cfg("curio_averse_odds", 50))
+		out.append({"id": id, "name": label, "odds": odds, "e": e, "hero": best})
+	return out
+
+
+## Options with availability for the UI. "experts" lists the ★/✗ marks the company brings.
 func event_options(event_id: String) -> Array:
 	var ev: Dictionary = DB.events.get(event_id, {})
 	var out: Array = []
 	var i := 0
 	for opt in ev.get("options", []):
 		var req: Dictionary = opt.get("requires", {})
+		var experts := event_experts(opt)
+		var free := experts.any(func(x): return x.odds >= 0 and x.e.get("free", false))
 		var ok := true
 		var tag := ""
 		if req.has("item"):
 			var need := int(opt.get("consume", {}).get("item", 1))
-			ok = ok and int(supplies.get(req.item, 0)) >= need
+			ok = ok and (free or int(supplies.get(req.item, 0)) >= need)
 			tag = "[%s]" % DB.items.get(req.item, {}).get("name", req.item)
+		if req.has("hides"):
+			ok = ok and (free or int(loot.get("hides", 0)) >= int(req.hides))
+			tag = "[%d Hides]" % int(req.hides)
 		if req.has("money"):
 			ok = ok and (company.money + int(loot.money)) >= int(req.money)
 		if req.has("skill"):
@@ -849,10 +890,29 @@ func event_options(event_id: String) -> Array:
 		if req.has("quirk"):
 			ok = ok and event_actor(req) != null
 			tag = "[%s]" % DB.quirks.get(req.quirk, {}).get("name", req.quirk)
-		out.append({"index": i, "text": opt.text, "tag": tag, "available": ok,
+		var marks := []
+		for x in experts:
+			marks.append({"mark": "✗" if x.odds < 0 else "★", "name": x.name})
+		out.append({"index": i, "text": opt.text, "tag": tag, "available": ok, "experts": marks,
 			"hidden": not ok and (req.has("skill") or req.has("class") or req.has("quirk"))})
 		i += 1
 	return out
+
+
+## Bad quirks compel: a hero with one may take its option before the company chooses
+## (30%, config event_compel_chance). Returns {"index", "hero", "text"} or {}.
+func event_compel(event_id: String) -> Dictionary:
+	var opts := event_options(event_id)
+	var ev: Dictionary = DB.events.get(event_id, {})
+	for i in ev.get("options", []).size():
+		var opt: Dictionary = ev.options[i]
+		if not opt.get("compel", false) or not opts[i].available:
+			continue
+		var h := event_actor(opt.get("requires", {}))
+		if h != null and company.rng.randf() * 100.0 < float(DB.cfg("event_compel_chance", 30)):
+			var q: String = opt.requires.get("quirk", "")
+			return {"index": i, "hero": h, "text": "%s can't help themselves! (%s)" % [h.hero_name, DB.quirks.get(q, {}).get("name", q)]}
+	return {}
 
 
 ## Returns {"text", "msgs", "fight"}.
@@ -860,32 +920,98 @@ func choose_event_option(event_id: String, idx: int) -> Dictionary:
 	var ev: Dictionary = DB.events.get(event_id, {})
 	var opt: Dictionary = ev.options[idx]
 	var req: Dictionary = opt.get("requires", {})
-	var actor := event_actor(req)
+	var experts := event_experts(opt)
+	# Who acts: the hero who meets the option's requirement, else the best ★ expert.
+	var actor: Hero = null
+	if req.has("skill") or req.has("class") or req.has("quirk"):
+		actor = event_actor(req)
 	if actor == null:
-		actor = Stats.pick(company.rng, party_heroes())
+		var top: Dictionary = {}
+		for x in experts:
+			if x.odds >= 0 and (top.is_empty() or x.odds > top.odds):
+				top = x
+		actor = top.hero if not top.is_empty() else Stats.pick(company.rng, party_heroes())
+	var free := experts.any(func(x): return x.odds >= 0 and x.e.get("free", false))
 	var consume: Dictionary = opt.get("consume", {})
-	if consume.has("item") and req.has("item"):
-		supplies[req.item] = maxi(0, int(supplies.get(req.item, 0)) - int(consume.item))
+	if not free:
+		if consume.has("item") and req.has("item"):
+			supplies[req.item] = maxi(0, int(supplies.get(req.item, 0)) - int(consume.item))
+		if consume.has("hides"):
+			loot.hides = maxi(0, int(loot.get("hides", 0)) - int(consume.hides))
 	if consume.has("money"):
 		var m := int(consume.money)
 		var from_loot := mini(m, int(loot.money))
 		loot.money = int(loot.money) - from_loot
 		company.money = maxi(0, company.money - (m - from_loot))
-	# Weighted outcome; survival passives favour good outcomes.
-	var outcomes: Array = []
+	# Experts add or swap outcomes, then shift the odds: the best ★ and the worst ✗ both count.
+	var table: Array = opt.get("outcomes", []).duplicate(true)
+	var up := 0
+	var down := 0
+	for x in experts:
+		for o in x.e.get("add", []):
+			table.append(o.duplicate(true))
+		for k in x.e.get("swap", {}):
+			table[int(k)] = x.e.swap[k].duplicate(true)
+		up = maxi(up, int(x.odds))
+		down = mini(down, int(x.odds))
+	var odds := clampi(up + down, -int(DB.cfg("curio_averse_odds", 50)), int(DB.cfg("curio_odds_cap", 75)))
+	# Survival passives also favour good outcomes.
 	var bonus := party_passive("river_bonus") if event_id in ["river_crossing", "flash_flood"] else 0.0
 	if event_id in ["hunting_grounds", "buffalo_herd"]:
 		bonus += party_passive("hunt_bonus")
-	for oc in opt.get("outcomes", []):
+	var outcomes: Array = []
+	for oc in table:
 		var w := float(oc.get("weight", 1))
 		if oc.get("good", false):
 			w += bonus
+		elif odds != 0:
+			w *= 1.0 - odds / 100.0
 		outcomes.append({"oc": oc, "weight": w})
 	var picked: Dictionary = Stats.pick_weighted(company.rng, outcomes).oc
+	var good: bool = picked.get("good", false)
+	# A bad outcome lands on the ✗ hero, if there is one.
+	var blame := ""
+	if not good:
+		for x in experts:
+			if x.odds < 0:
+				actor = x.hero
+				blame = x.name
+				break
 	var text := str(picked.get("text", "")).replace("{hero}", actor.hero_name if actor != null else "Someone")
+	if blame != "":
+		text += "  (✗ %s)" % blame
 	var res := Effects.apply(picked.get("effects", []), self, actor)
-	add_log([text] + res.msgs)
-	return {"text": text, "msgs": res.msgs, "fight": res.fight}
+	var msgs: Array = res.msgs
+	# Bonuses: a ★ expert's on a good outcome, a ✗ expert's on a bad one ("always": either).
+	for x in experts:
+		if not x.e.has("bonus"):
+			continue
+		var fits: bool = x.e.get("always", false) or (good and x.odds >= 0) or (not good and x.odds < 0)
+		if fits:
+			var bres := Effects.apply(x.e.bonus, self, x.hero)
+			if not bres.msgs.is_empty():
+				msgs.append("%s %s: %s" % ["✗" if x.odds < 0 else "★", x.name, " ".join(bres.msgs)])
+	# Experts can set up the fight: who strikes first, wounded foes, a foe dropped, foe mods.
+	if res.fight != null:
+		for x in experts:
+			var f: Dictionary = x.e.get("fight", {})
+			for k in f:
+				match k:
+					"surprise":
+						res.fight.surprise = f.surprise
+					"wounded", "foe_mark":
+						var d: Dictionary = res.fight.get(k, {})
+						d.merge(f[k], true)
+						res.fight[k] = d
+					"foe_mods", "drop":
+						var arr: Array = res.fight.get(k, [])
+						res.fight[k] = arr + f[k]
+					"enemies":
+						res.fight.enemies = f.enemies.duplicate()
+			if not f.is_empty():
+				msgs.append("%s %s" % ["✗" if x.odds < 0 else "★", x.name])
+	add_log([text] + msgs)
+	return {"text": text, "msgs": msgs, "fight": res.fight}
 
 
 func event_text(event_id: String) -> String:

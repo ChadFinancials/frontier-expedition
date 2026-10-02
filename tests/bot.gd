@@ -172,8 +172,16 @@ func play_run(co: Company, r: RunState) -> Dictionary:
 	return co.finish_run(r.status)
 
 
-func run_fight(r: RunState, enemies: Array, kind: String, surprise: String = "", reward: Dictionary = {}) -> bool:
-	var e := fight(r.party_heroes(), enemies, r.combat_options(kind, surprise))
+func run_fight(r: RunState, enemies: Array, kind: String, surprise: String = "", reward: Dictionary = {}, setup: Dictionary = {}) -> bool:
+	var opts := r.combat_options(kind, surprise)
+	for k in ["wounded", "foe_mods", "foe_mark"]:
+		if setup.has(k):
+			opts[k] = setup[k]
+	var foes := enemies.duplicate()
+	for d in setup.get("drop", []):
+		if foes.size() > 1 and d in foes:
+			foes.erase(d)
+	var e := fight(r.party_heroes(), foes, opts)
 	var key := "deaths_" + kind + "_t%d" % r.tier()
 	stats[key] = stats.get(key, 0) + e.fallen.size()
 	stats["fights_" + kind + "_t%d" % r.tier()] = stats.get("fights_" + kind + "_t%d" % r.tier(), 0) + 1
@@ -200,9 +208,10 @@ func resolve_node(r: RunState) -> void:
 			stats.events += 1
 			var opts := r.event_options(n.data.event).filter(func(o): return o.available)
 			var o: Dictionary = Stats.pick(rng, opts)
-			var res := r.choose_event_option(n.data.event, o.index)
+			var compel := r.event_compel(n.data.event)
+			var res := r.choose_event_option(n.data.event, compel.index if not compel.is_empty() else o.index)
 			if res.fight != null:
-				run_fight(r, res.fight.enemies, "fight", res.fight.surprise, res.fight.get("reward", {}))
+				run_fight(r, res.fight.enemies, "fight", res.fight.surprise, res.fight.get("reward", {}), res.fight)
 			r.complete_current()
 		"curio":
 			for cu in n.data.curios:

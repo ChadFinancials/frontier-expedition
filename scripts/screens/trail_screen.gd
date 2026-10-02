@@ -313,9 +313,14 @@ func _resolve_node() -> void:
 			refresh()
 
 
-func _to_combat(enemies: Array, kind: String, surprise: String = "", reward: Dictionary = {}) -> void:
-	Main.inst.goto("combat", {"enemies": enemies, "kind": kind, "surprise": surprise, "reward": reward, "return": "trail",
-		"complete_node": kind in ["fight", "elite", "boss", "crossing"]})
+## setup: an event fight's extras (drop, wounded, foe_mods, foe_mark; see Effects "fight").
+func _to_combat(enemies: Array, kind: String, surprise: String = "", reward: Dictionary = {}, setup: Dictionary = {}) -> void:
+	var foes := enemies.duplicate()
+	for d in setup.get("drop", []):
+		if foes.size() > 1 and d in foes:
+			foes.erase(d)
+	Main.inst.goto("combat", {"enemies": foes, "kind": kind, "surprise": surprise, "reward": reward, "return": "trail",
+		"setup": setup, "complete_node": kind in ["fight", "elite", "boss", "crossing"]})
 
 
 func _check_end() -> void:
@@ -373,8 +378,12 @@ func show_event(event_id: String) -> void:
 		v.add_child(PaperFX.framed(art, Vector2(940, 190)))
 	v.add_child(UI.rich(run.event_text(event_id), 23, true, 930))
 	var holder := {"wrap": null}
+	# A bad quirk may take the choice out of the company's hands.
+	var compel := run.event_compel(event_id)
+	if not compel.is_empty():
+		v.add_child(UI.rich("[color=#%s][b]✗ %s[/b][/color]" % [UI.RED.to_html(false), compel.text], 21, true, 930))
 	for o in run.event_options(event_id):
-		if o.hidden:
+		if o.hidden or (not compel.is_empty() and o.index != compel.index):
 			continue
 		var txt: String = ("%s  " % o.tag if o.tag != "" else "") + o.text
 		var idx: int = o.index
@@ -386,6 +395,13 @@ func show_event(event_id: String) -> void:
 		if not o.available:
 			b.tooltip_text = "You don't have what this needs."
 		v.add_child(b)
+		# ★ / ✗: what the company brings to this option (a class, skill or quirk), names only.
+		if not o.experts.is_empty():
+			var marks := []
+			for m in o.experts:
+				var col: Color = UI.RED if m.mark == "✗" else UI.GREEN
+				marks.append("[color=#%s]%s %s[/color]" % [col.to_html(false), m.mark, m.name])
+			v.add_child(UI.rich("      " + "    ".join(marks), 17, true, 930))
 	holder.wrap = Main.inst.modal(p, false)
 
 
@@ -401,7 +417,7 @@ func _event_choice(event_id: String, idx: int) -> void:
 		Main.inst.dialog("Trouble!", body, [["Fight!", func():
 			run.complete_current()
 			Game.save_game()
-			_to_combat(fight.enemies, "fight", fight.get("surprise", ""), fight.get("reward", {})), "Danger"]])
+			_to_combat(fight.enemies, "fight", fight.get("surprise", ""), fight.get("reward", {}), fight), "Danger"]])
 	else:
 		Audio.play("page")
 		Main.inst.dialog(DB.events[event_id].get("title", ""), body, [["Continue", func(): _check_end()]])

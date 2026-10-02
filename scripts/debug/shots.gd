@@ -454,6 +454,11 @@ static func run(main: Main, args: Dictionary) -> void:
 				co.heroes = []
 				for cid in str(args.party).split(","):
 					co.heroes.append(co.make_hero(cid, 1))
+			# quirks=a,b: give these quirks to the first heroes, one each (event ★/✗ checks).
+			if args.has("quirks"):
+				var qs := str(args.quirks).split(",")
+				for qi in mini(qs.size(), co.heroes.size()):
+					co.heroes[qi].quirks = [qs[qi]]
 			var uids: Array = []
 			for h in co.heroes.slice(0, 4):
 				uids.append(h.uid)

@@ -995,7 +995,7 @@ func _make_quest(tid: String, west: String, tier_l: int) -> Dictionary:
 		"palette": base.get("palette", {}), "props": base.get("props", []), "cave_name": base.get("cave_name", "Cave"),
 		"node_weights": t.get("node_weights", {}),
 		"fights": t.fights, "elites": t.get("elites", base.get("elites", [])), "cave_fights": base.get("cave_fights", []),
-		"events": base.get("events", []), "homestead_events": base.get("homestead_events", []),
+		"events": base.get("events", []), "theme_events": t.get("events", []), "homestead_events": base.get("homestead_events", []),
 		"curios": base.get("curios", []), "cave_curios": base.get("cave_curios", []),
 		"final": "boss" if has_boss else "crossing",
 		"boss": {"name": str(b.get("name", "The Boss")), "landmark": place,

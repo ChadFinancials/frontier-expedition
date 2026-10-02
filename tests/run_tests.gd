@@ -72,6 +72,7 @@ func _ready() -> void:
 	print("> test_curio_experts()")
 	test_curio_experts()
 	test_fatigue_states()
+	test_event_pass()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -1180,6 +1181,183 @@ func test_fatigue_states() -> void:
 	a.fatigue_state = "cool_headed"
 	a.state_fresh = true
 	check(Hero.from_dict(a.to_dict()).state_fresh, "fresh flag saves")
+
+
+func test_event_pass() -> void:
+	# Data: requirements, experts, compels and fights point at real things; every event is in a pool.
+	var common: Array = DB.cfg("common_events", [])
+	var in_pool := {}
+	for e in common:
+		check(DB.events.has(e), "common event %s exists" % e)
+		in_pool[e] = true
+	for rid in DB.regions:
+		var r: Dictionary = DB.regions[rid]
+		for e in r.get("events", []) + r.get("homestead_events", []):
+			check(DB.events.has(e), "%s: event %s exists" % [rid, e])
+			in_pool[e] = true
+		for e in r.get("events", []) if not r.has("fixed_map") else []:
+			check(not e in common, "%s: %s isn't also in the common pool" % [rid, e])
+	for tid in DB.quests.templates:
+		for e in DB.quests.templates[tid].get("events", []):
+			check(DB.events.has(e), "quest %s: theme event %s exists" % [tid, e])
+			in_pool[e] = true
+	for eid in DB.events:
+		check(in_pool.has(eid), "event %s is in some pool" % eid)
+		for opt in DB.events[eid].options:
+			var req: Dictionary = opt.get("requires", {})
+			for k in req:
+				check(k in ["item", "money", "hides", "skill", "class", "quirk"], "%s: requirement %s is known" % [eid, k])
+			if req.has("skill"):
+				check(DB.survival.has(req.skill), "%s: skill %s exists" % [eid, req.skill])
+			if req.has("class"):
+				check(DB.classes.has(req["class"]), "%s: class %s exists" % [eid, req["class"]])
+			if req.has("quirk"):
+				check(DB.quirks.has(req.quirk), "%s: quirk %s exists" % [eid, req.quirk])
+			if req.has("item"):
+				check(DB.items.has(req.item), "%s: item %s exists" % [eid, req.item])
+			if opt.get("compel", false):
+				check(req.has("quirk"), "%s: a compel option needs a quirk" % eid)
+			var ex: Dictionary = opt.get("experts", {})
+			for id in ex:
+				check(DB.classes.has(id) or DB.survival.has(id) or DB.quirks.has(id), "%s: expert %s is a class, skill or quirk" % [eid, id])
+				for idx in ex[id].get("swap", {}):
+					check(int(idx) < opt.outcomes.size(), "%s: %s swaps a real outcome" % [eid, id])
+			var shifts := ex.values().any(func(x): return not x.get("averse", false) and int(x.get("odds", 1)) != 0)
+			if shifts:
+				var goods: Array = opt.outcomes.filter(func(o): return o.get("good", false))
+				check(not goods.is_empty() or ex.values().any(func(x): return not x.get("swap", {}).is_empty()), "%s: '%s' has a good outcome for its experts" % [eid, opt.text])
+			for o in opt.outcomes:
+				for ef in o.get("effects", []):
+					if ef.get("type", "") == "fight":
+						for en in ef.enemies:
+							check(DB.enemies.has(en), "%s: enemy %s exists" % [eid, en])
+	# Pools: no repeats until every layer is used up; a quest's theme layer is drawn from.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 12
+	var crow: Dictionary = DB.regions.crows_nest
+	var used: Array = []
+	var picks := {}
+	var total: int = crow.events.size() + common.size()
+	for i in total:
+		picks[MapGen.pick_event(crow, rng, used)] = true
+	check(picks.size() == total, "event pools don't repeat until spent (%d/%d)" % [picks.size(), total])
+	check(MapGen.pick_event(crow, rng, used) != "", "a spent pool falls back to a repeat")
+	var quest := {"events": DB.regions.tallgrass.events, "theme_events": ["haint_lights"]}
+	var themed := 0
+	for i in 400:
+		if MapGen.pick_event(quest, rng, []) == "haint_lights":
+			themed += 1
+	check(themed > 120 and themed < 210, "a quest's theme layer is drawn ~40%% (got %d/400)" % themed)
+	# Experts over the whole company.
+	var co := Company.new()
+	co.new_game(43)
+	var run := RunState.create(co, "tallgrass", 0, [co.heroes[0].uid], {"food": 20})
+	co.run = run
+	var mk := func(cls: String, skills: Dictionary = {}, quirks: Array = []) -> Hero:
+		var h: Hero = co.make_hero(cls, 1)
+		h.survival = {}
+		for sk in skills:
+			h.survival[sk] = {"rank": skills[sk], "xp": 0}
+		h.quirks = quirks.duplicate()
+		co.heroes.append(h)
+		return h
+	var set_party := func(hs: Array) -> void:
+		run.party = hs.map(func(h): return h.uid)
+	var plain: Hero = mk.call("marshal")
+	var wr: Hero = mk.call("wrangler")
+	var fat: Hero = mk.call("gunslinger", {}, ["clumsy"])
+	var good_rate := func(eid: String, idx: int, n: int) -> float:
+		var good_texts: Array = DB.events[eid].options[idx].outcomes.filter(func(o): return o.get("good", false)).map(func(o): return str(o.text))
+		var g := 0
+		for i in n:
+			for h in run.party_heroes():
+				h.fatigue = 0
+				h.hp = h.max_hp()
+			var res := run.choose_event_option(eid, idx)
+			if good_texts.any(func(t): return res.text.begins_with(t)):
+				g += 1
+		return g / float(n)
+	set_party.call([plain])
+	var base: float = good_rate.call("river_crossing", 0, 600)
+	set_party.call([plain, wr])
+	var with_wr: float = good_rate.call("river_crossing", 0, 600)
+	set_party.call([plain, fat])
+	var with_fat: float = good_rate.call("river_crossing", 0, 600)
+	check(with_wr > base + 0.08, "★ Wrangler fords better (%.2f vs %.2f)" % [with_wr, base])
+	check(with_fat < base - 0.05, "✗ Overweight fords worse (%.2f vs %.2f)" % [with_fat, base])
+	set_party.call([plain, wr, fat])
+	var marks: Array = run.event_options("river_crossing")[0].experts
+	check(marks.any(func(m): return m.mark == "★" and m.name == "Wrangler") and marks.any(func(m): return m.mark == "✗" and m.name == "Overweight"), "option lists ★ Wrangler and ✗ Overweight by name")
+	# A swap, a bonus, and a bad outcome landing on the ✗ hero.
+	var rd: Hero = mk.call("rail_driver")
+	set_party.call([plain, rd])
+	var lifted := false
+	for i in 40:
+		if "lifts the wagon" in run.choose_event_option("wagon_stuck", 0).text:
+			lifted = true
+			break
+	check(lifted, "★ Rail Driver swaps in the lift")
+	var ww: Hero = mk.call("marshal", {"wheelwright": 2})
+	set_party.call([ww])
+	var bonus_seen := false
+	for i in 40:
+		ww.fatigue = 0
+		var r2 := run.choose_event_option("broken_axle", 2)
+		if r2.msgs.any(func(m): return str(m).begins_with("★ Wheelwright")):
+			bonus_seen = true
+			break
+	check(bonus_seen, "★ Wheelwright's bonus applies on a good outcome")
+	var sup: Hero = mk.call("marshal", {}, ["superstitious"])
+	set_party.call([plain, sup])
+	sup.fatigue = 0
+	var r3 := run.choose_event_option("gravesite", 0)
+	check(r3.text.ends_with("(✗ Superstitious)") and sup.fatigue >= 10, "a bad outcome lands on the ✗ hero, with their bonus")
+	# free: the Frontier Doctor needs no Antivenom; Hides are spent from the cargo.
+	var doc: Hero = mk.call("frontier_doctor")
+	set_party.call([plain, doc])
+	run.supplies["antivenom"] = 0
+	var av: Dictionary = run.event_options("rattler_in_bedroll").filter(func(o): return o.text.begins_with("Keep Antivenom"))[0]
+	check(av.available, "★ Frontier Doctor: the Antivenom option needs no Antivenom")
+	set_party.call([plain])
+	run.loot.hides = 1
+	var patch: int = run.event_options("torn_canvas").filter(func(o): return o.text.begins_with("Patch it"))[0].index
+	run.choose_event_option("torn_canvas", patch)
+	check(int(run.loot.hides) == 0, "patching the canvas spends a Hide")
+	# Secret quirk options are hidden without the quirk; compel fires about 30%.
+	check(run.event_options("stranger_on_road").filter(func(o): return o.text.begins_with("There's paper")).all(func(o): return o.hidden), "Bounty Hunter's option hidden without the quirk")
+	var dr: Hero = mk.call("marshal", {}, ["drinker"])
+	set_party.call([plain, dr])
+	var compelled := 0
+	for i in 400:
+		var c := run.event_compel("stranger_on_road")
+		if not c.is_empty():
+			compelled += 1
+			check(c.hero == dr, "the Drinker is the one compelled")
+	check(compelled > 90 and compelled < 160, "compel ~30%% (got %d/400)" % compelled)
+	set_party.call([plain])
+	check(run.event_compel("stranger_on_road").is_empty(), "no compel without the quirk")
+	# Fight setup: dropped lookout, wounded foes, expert fight changes, foe mods in the engine.
+	var gs: Hero = mk.call("gunslinger")
+	set_party.call([plain, gs])
+	var pick_idx: int = run.event_options("outlaw_ambush_warning").filter(func(o): return o.text.begins_with("Pick off"))[0].index
+	var r4 := run.choose_event_option("outlaw_ambush_warning", pick_idx)
+	check(r4.fight != null and r4.fight.drop == ["outlaw_rifleman"] and r4.fight.surprise == "enemies", "Gunslinger drops the lookout, strikes first")
+	var mm: Hero = mk.call("mountain_man")
+	set_party.call([plain, mm])
+	var one_haint := false
+	for i in 60:
+		plain.fatigue = 0
+		mm.fatigue = 0
+		var r5 := run.choose_event_option("haint_lights", 0)
+		if r5.fight != null:
+			one_haint = r5.fight.enemies == ["prairie_haint"]
+			break
+	check(one_haint, "★ Mountain Mystic: the haint fight drops to one")
+	var e := CombatEngine.new()
+	e.setup([plain], ["outlaw_brawler", "outlaw_gunhand"], {"wounded": {"*": 60}, "foe_mods": [{"stat": "vulnerable", "value": 15, "rounds": 2}], "foe_mark": {"outlaw_gunhand": 2}})
+	check(e.enemies.all(func(x): return x.hp == maxi(1, int(round(x.max_hp * 0.6)))), "wounded * puts every foe at 60%")
+	check(e.enemies.all(func(x): return x.stat("vulnerable") == 15), "foe_mods: foes start Vulnerable")
+	check(e.enemies[1].mark == 2 and e.enemies[0].mark == 0, "foe_mark marks the named foe")
 
 
 func test_round9_town() -> void:

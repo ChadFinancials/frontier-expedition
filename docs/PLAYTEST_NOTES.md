@@ -75,6 +75,19 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Event pass 1** (owner: common + region pools, ★/✗ names only, 30% compel, two passes):
+  - Event stops draw from a common pool (13 trail-life events, 45%) or the region's own list
+    (55%); side quests add a theme list (40/30/30).
+  - Event options take experts, using the curio rules over the whole company, now with
+    quirks: odds, bonuses, swaps, extra outcomes, free supplies and fight setup (foes
+    wounded, a lookout dropped, foes Vulnerable, who strikes first). The option shows
+    "★ Wrangler  ✗ Overweight".
+  - Bad-quirk options compel at 30%: Drinker ×2, Gold Fever ×2, Too Curious, Hothead ×2,
+    Spooked by Critters.
+  - 26 new secret options for classes and quirks across the existing events.
+  - Wet powder (-5 Acc next fight) after the river tips and the storm.
+  - Prairie Fire's Whiskey text fixed.
+  - The four do-nothing options now give a little.
 - **Breaking Points and True Grit** (owner's pass): renamed away from Darkest Dungeon's terms
   (Second Wind → True Grit, Resolve Test → Gut Check, Death's Door → Last Legs, Deathblow
   Resist → Cheat Death; Breaking Point stays; ids unchanged). Heartsick (was Homesick, which

@@ -191,6 +191,35 @@ static func _battle_curio(n: Dictionary, region: Dictionary, rng: RandomNumberGe
 	n.data["curios"] = [{"id": Stats.pick(rng, region.curios), "done": false}]
 
 
+## An event stop draws from layered pools: the common pool (config common_events) and the
+## region's own list, plus a side quest's theme list. A layer is picked by weight among those
+## with unused events left; no repeats until every layer runs dry.
+static func pick_event(region: Dictionary, rng: RandomNumberGenerator, used: Array) -> String:
+	var common: Array = DB.cfg("common_events", [])
+	var layers: Array = []
+	if region.has("theme_events"):
+		var qw: Dictionary = DB.cfg("quest_event_weights", {"theme": 40, "region": 30, "common": 30})
+		layers = [[region.theme_events, qw.get("theme", 40)], [region.get("events", []), qw.get("region", 30)], [common, qw.get("common", 30)]]
+	else:
+		var w: Dictionary = DB.cfg("event_pool_weights", {"common": 45, "region": 55})
+		layers = [[region.get("events", []), w.get("region", 55)], [common, w.get("common", 45)]]
+	var open: Array = []
+	var every: Array = []
+	for l in layers:
+		var left: Array = l[0].filter(func(e): return DB.events.has(e) and not e in used)
+		if not left.is_empty() and float(l[1]) > 0:
+			open.append({"pool": left, "weight": float(l[1])})
+		every.append_array(l[0].filter(func(e): return DB.events.has(e)))
+	var ev := ""
+	if not open.is_empty():
+		ev = Stats.pick(rng, Stats.pick_weighted(rng, open).pool)
+	elif not every.is_empty():
+		ev = Stats.pick(rng, every)
+	if ev != "":
+		used.append(ev)
+	return ev
+
+
 static func _fill(n: Dictionary, region: Dictionary, rng: RandomNumberGenerator, used_events: Array) -> void:
 	match n.type:
 		"fight":
@@ -204,12 +233,7 @@ static func _fill(n: Dictionary, region: Dictionary, rng: RandomNumberGenerator,
 		"crossing":
 			n.data = {"enemies": region.crossing.enemies.duplicate()}
 		"event":
-			var pool: Array = region.events.filter(func(e): return not e in used_events)
-			if pool.is_empty():
-				pool = region.events
-			var ev: String = Stats.pick(rng, pool)
-			used_events.append(ev)
-			n.data = {"event": ev}
+			n.data = {"event": pick_event(region, rng, used_events)}
 		"homestead":
 			n.data = {"event": Stats.pick(rng, region.homestead_events)}
 		"curio":

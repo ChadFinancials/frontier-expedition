@@ -105,7 +105,7 @@ exist but wait until the start is crisp.
   the queue until beaten, pays Brass Knuckles), rustlers, a wolf den, a haunted homestead,
   claim jumpers, a snake gulch, Crane's scouts. Each has a chance of a boss, a trinket and a
   recruit that rises with Loose Lips (`chances`). They borrow the western region's scenery,
-  events and curios and scale to its tier. They are the main early source of chips, Timber
+  events and curios, add a few theme events of their own, and scale to its tier. They are the main early source of chips, Timber
   and Iron, and the place to train.
 
 ### Scripted boss meetings
@@ -344,8 +344,20 @@ retired in round 7; the Shovel took its curios.)
   makes bad outcomes 50% more likely (Preacher at a whiskey barrel, Mountain Mystic at a
   railroad crate). The Gunslinger and a Tracker strike first when a curio is an ambush. The
   picker shows each as a green ★ or a red ✗ line. A few bad outcomes carry a 15% quirk.
-- **Events** are Oregon Trail-style text choices. Options can need an item, chips, a class, a
-  survival skill or a quirk; a party skill unlocks special options. Outcomes are weighted.
+- **Events** are Oregon Trail-style text choices. Options can need an item, chips, Hides, a
+  class, a survival skill or a quirk; options needing a class, skill or quirk nobody has are
+  hidden (secret options). Outcomes are weighted.
+  - **Pools:** an event stop draws from the common pool (`common_events`: wagon trouble,
+    peddlers, weather, sickness, strangers; 45%) or the region's own list (55%). Side quests
+    add their template's theme list (theme 40 / region 30 / common 30). No repeats until
+    every layer is spent.
+  - **Event experts**, the curio rules over the whole company: classes, survival skills
+    (rank) and **quirks** (35%) improve or worsen an option's odds, add a bonus, swap in a
+    better outcome, set up the fight (foes wounded, a lookout dropped, foes Vulnerable, who
+    strikes first) or make a supply unnecessary. The best ★ and the worst ✗ both count; a bad
+    outcome lands on the ✗ hero. The option shows just the names: ★ Cook, ✗ Overweight.
+  - **Compel:** a bad-quirk option (Drinker, Gold Fever, Too Curious, Hothead, Spooked by
+    Critters) has a 30% chance `[event_compel_chance]` to be taken before you can choose.
 
 ### Ending an expedition
 - **Victory** (boss, crossing or final fight won): loot, XP, quirk rolls (45%, positive 60%

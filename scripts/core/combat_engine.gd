@@ -50,10 +50,18 @@ func setup(party: Array, enemy_ids: Array, opts: Dictionary = {}) -> Array:
 	for eid in enemy_ids:
 		if enemies.size() < 4 and DB.enemies.has(eid):
 			var c := Combatant.from_enemy(eid, _new_id(), tier, in_cave)
-			if wounded.has(eid):
-				c.hp = maxi(1, int(round(c.max_hp * int(wounded[eid]) / 100.0)))
+			if wounded.has(eid) or wounded.has("*"):
+				c.hp = maxi(1, int(round(c.max_hp * int(wounded.get(eid, wounded.get("*", 100))) / 100.0)))
 			enemies.append(c)
 			units[c.id] = c
+	# Event setups: foes caught out (round-1 mods such as Vulnerable) or already Marked.
+	var foe_mark: Dictionary = opts.get("foe_mark", {})
+	for c in enemies:
+		for m in opts.get("foe_mods", []):
+			c.buffs.append({"stat": m.stat, "value": m.value, "rounds": int(m.get("rounds", 1)), "name": m.get("name", "Caught out")})
+		var mk := int(foe_mark.get(c.enemy_id, foe_mark.get("*", 0)))
+		if mk > 0:
+			c.mark = maxi(c.mark, mk)
 	# Buffs from camp and trail ("for the next fight").
 	var start_buffs: Dictionary = opts.get("start_buffs", {})
 	for c in heroes:

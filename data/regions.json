@@ -65,7 +65,7 @@
       "victory": "Old Jeb crumbles into a heap of pale dust and a tin crown. The knocking fades, one wall at a time, and the mine is only a mine again.",
       "enemies": ["tommyknocker", "tommyknocker", "tommyknocker", "knocker_king"], "keepsake": "miners_lamp"},
     "crossing": {"name": "Deep Drift", "enemies": ["tommyknocker", "knocker_king", "giant_bat"]},
-    "events": ["broken_axle", "lost_trail", "wagon_stuck", "gravesite", "peddler", "trinket_peddler", "torn_canvas", "fever_camp", "rattler_in_bedroll", "haint_lights"],
+    "events": ["claim_dispute"],
     "homestead_events": ["homestead_drifter"],
     "curios": ["miners_cache", "strongbox", "abandoned_wagon", "dead_horse", "standing_stone", "cattle_skull"],
     "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "ore_vein", "strongbox"]
@@ -95,7 +95,7 @@
       "victory": "Ruby Blackwing goes over the palisade and is gone into the cottonwoods, leaving her feather charm in the mud. The stockade's stores are yours, and Crane's gang will be a little hungrier this winter.",
       "enemies": ["outlaw_knifeman", "ruby_blackwing", "murder_of_crows"], "keepsake": "crow_feather_charm"},
     "crossing": {"name": "The Stockade", "enemies": ["outlaw_knifeman", "ruby_blackwing", "murder_of_crows"]},
-    "events": ["stranger_on_road", "outlaw_ambush_warning", "outlaw_toll", "wolf_tracks", "abandoned_homestead", "peddler", "trinket_peddler", "hunting_grounds", "fork_in_trail", "torn_canvas"],
+    "events": ["outlaw_ambush_warning", "outlaw_toll", "abandoned_homestead"],
     "homestead_events": ["homestead_family", "homestead_widow"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "scarecrow", "berry_bushes", "dead_horse", "railroad_crate"],
     "cave_curios": ["miners_cache", "bone_pile", "strongbox"]
@@ -140,7 +140,7 @@
         "title": "Crane's Gambit",
         "text": "Silas Crane laughs and fires both revolvers into the air. On the far bank, one of his boys touches a match to a fuse.\n\nThe charge under the near end of the bridge goes up with a roar. Planks and river water rain down, the oxen bolt, and when the smoke clears the gang is across the Redwater and the bridge is burning between you.\n\n\"Toll's gone up, pilgrims!\" Silas calls across the water. \"Come back when you can afford it!\"\n\nThere's no way across tonight. The company gathers what it can and turns for home. But Silas took a bullet in the scramble, and he'll be carrying that wound the next time you meet."}},
     "crossing": {"name": "Crane's Last Crows", "enemies": ["crane_lieutenant", "outlaw_knifeman", "murder_of_crows", "outlaw_rifleman"]},
-    "events": ["river_crossing", "broken_axle", "prairie_fire", "stranger_on_road", "buffalo_herd", "sick_traveler", "rattler_in_bedroll", "thunderstorm", "lost_trail", "wolf_tracks", "abandoned_homestead", "haint_lights", "peddler", "wagon_stuck", "gravesite", "hunting_grounds", "outlaw_ambush_warning", "fork_in_trail", "swollen_creek", "fever_camp", "outlaw_toll", "torn_canvas", "trinket_peddler"],
+    "events": ["river_crossing", "prairie_fire", "buffalo_herd", "sick_traveler", "haint_lights", "wolf_tracks", "hunting_grounds", "abandoned_homestead"],
     "homestead_events": ["homestead_family", "homestead_widow", "homestead_drifter"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "prairie_well", "scarecrow", "berry_bushes", "cattle_skull", "dead_horse", "standing_stone", "railroad_crate"],
     "cave_curios": ["miners_cache", "whiskey_barrel", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox"]
@@ -177,7 +177,7 @@
       "victory": "The Cyclops crashes down the side of the mesa like a rockslide. Its stone rams crumble into gravel. Deadeye Mesa is quiet, and it has fresh water. A fine spot to build.",
       "enemies": ["stone_ram", "cyclops", "canyon_siren"], "keepsake": "cyclops_eye_stone"},
     "crossing": {"name": "Mesa Guardians", "enemies": ["stone_ram", "stone_ram", "hired_gun", "canyon_siren"]},
-    "events": ["river_crossing", "broken_axle", "stranger_on_road", "rattler_in_bedroll", "thunderstorm", "lost_trail", "peddler", "wagon_stuck", "gravesite", "flash_flood", "railroad_survey", "siren_song", "heat_wave", "claim_dispute", "fork_in_trail", "outlaw_ambush_warning", "fever_camp", "outlaw_toll", "torn_canvas", "trinket_peddler"],
+    "events": ["river_crossing", "flash_flood", "railroad_survey", "siren_song", "heat_wave", "claim_dispute", "outlaw_ambush_warning", "outlaw_toll"],
     "homestead_events": ["homestead_family", "homestead_drifter", "homestead_widow"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "cattle_skull", "standing_stone", "miners_cache", "petroglyph_wall", "dead_horse", "railroad_crate"],
     "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "strongbox", "ore_vein"]
@@ -212,7 +212,7 @@
       "victory": "The Titan sinks to its knees and is still, and the snow begins to cover it. Beyond the pass the valley glitters: a thousand lamps, a roar of voices, the spinning wheels of the Great Casino.",
       "enemies": ["stone_giant_youth", "titan", "storm_hawk"], "keepsake": "titan_shard"},
     "crossing": {"name": "Children of the Titan", "enemies": ["stone_giant_youth", "frost_wight", "storm_hawk", "storm_hawk"]},
-    "events": ["broken_axle", "stranger_on_road", "thunderstorm", "lost_trail", "wolf_tracks", "peddler", "wagon_stuck", "gravesite", "avalanche", "blizzard", "frozen_traveler", "giant_footprints", "fork_in_trail", "hunting_grounds", "swollen_creek", "fever_camp", "torn_canvas", "trinket_peddler"],
+    "events": ["wolf_tracks", "hunting_grounds", "avalanche", "blizzard", "frozen_traveler", "giant_footprints"],
     "homestead_events": ["homestead_drifter", "homestead_trapper_cabin"],
     "curios": ["abandoned_wagon", "whiskey_barrel", "old_grave", "strongbox", "standing_stone", "frozen_pack", "cairn", "dead_horse", "giant_bones", "hot_spring"],
     "cave_curios": ["miners_cache", "bone_pile", "glowing_pool", "collapsed_tunnel", "ore_vein", "frozen_pack"]

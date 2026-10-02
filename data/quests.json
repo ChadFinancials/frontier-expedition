@@ -1,12 +1,12 @@
 {
-  "_comment": "Weekly side quests ('chatter' at the Saloon). Each week a settlement with a Saloon rolls quests from these templates (count and loot quality come from the Saloon's chatter and tips upgrade tracks). A quest borrows its look, events and curios from the region west of the settlement and scales to that region's tier. fights/elites are weighted groups; final is the group at the end when there is no boss; boss is the mini-boss group (a boss appears with boss_chance). {place} in names and text is replaced with a random place.",
+  "_comment": "Weekly side quests ('chatter' at the Saloon). Each week a settlement with a Saloon rolls quests from these templates (count and loot quality come from the Saloon's chatter and tips upgrade tracks). A quest borrows its look, events and curios from the region west of the settlement, plus its own theme events (events: drawn 40%, see quest_event_weights) and scales to that region's tier. fights/elites are weighted groups; final is the group at the end when there is no boss; boss is the mini-boss group (a boss appears with boss_chance). {place} in names and text is replaced with a random place.",
 
   "places": ["Cottonwood Creek", "Buzzard Bluff", "Miller's Draw", "Dead Horse Coulee", "Bitter Springs", "Two Pines", "the Salt Flat", "Hangman's Ridge", "Widow's Crossing", "Sawtooth Wash", "Rattlesnake Butte", "Lonesome Hollow"],
 
   "chances": {"boss": [25, 40, 55], "trinket": [10, 22, 35], "recruit": [8, 14, 20]},
 
   "templates": {
-    "mad_dog": {"difficulty": 3, "name": "Mad Dog's Hideout", "desc": "Ma Delaney hears Mulligan, Silas Crane's enforcer, is holed up at {place} with his brawlers. The whole saloon wants him gone.",
+    "mad_dog": {"events": ["outlaw_ambush_warning", "outlaw_toll"], "difficulty": 3, "name": "Mad Dog's Hideout", "desc": "Ma Delaney hears Mulligan, Silas Crane's enforcer, is holed up at {place} with his brawlers. The whole saloon wants him gone.",
       "done_flag": "mad_dog_beaten", "always_boss": true, "priority": 60, "boss_keepsake": "brass_knuckles",
       "node_weights": {"fight": 48, "elite": 10, "event": 16, "curio": 14, "cave": 6, "homestead": 6, "trading_post": 0},
       "fights": [
@@ -18,7 +18,7 @@
       "boss": {"name": "\"Mad Dog\" Mulligan", "intro": "Mulligan's hideout at {place} is a sod house with a whiskey barrel for a front door. A man the size of a woodstove steps out, cracking his knuckles, a black crow feather stuck in his cap.\n\n\"You're the ones who roughed up Pete. Boys! Company!\"",
         "victory": "Mulligan goes down like a felled oak. When he comes to, he's hog-tied on the back of your wagon, and Ma Delaney has a Wanted poster with a reward on it.",
         "enemies": ["mad_dog_mulligan", "outlaw_gunhand"]}},
-    "rustlers": {"name": "Rustlers at {place}", "desc": "A rancher says rustlers are holed up at {place} with half his herd.",
+    "rustlers": {"events": ["buffalo_herd", "outlaw_toll"], "name": "Rustlers at {place}", "desc": "A rancher says rustlers are holed up at {place} with half his herd.",
       "node_weights": {"fight": 48, "elite": 12, "event": 16, "curio": 12, "cave": 4, "homestead": 4, "trading_post": 0},
       "fights": [
         {"enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "weight": 3},
@@ -31,7 +31,7 @@
         "enemies": ["outlaw_brawler", "crane_lieutenant", "outlaw_gunhand", "outlaw_rifleman"]},
       "bonus_hides": 2},
 
-    "wolf_den": {"name": "The Wolves of {place}", "desc": "Homesteaders near {place} are losing stock to a wolf pack that isn't afraid of anything.",
+    "wolf_den": {"events": ["wolf_tracks", "hunting_grounds"], "name": "The Wolves of {place}", "desc": "Homesteaders near {place} are losing stock to a wolf pack that isn't afraid of anything.",
       "node_weights": {"fight": 44, "elite": 10, "event": 18, "curio": 14, "cave": 10, "homestead": 4, "trading_post": 0},
       "fights": [
         {"enemies": ["prairie_wolf", "prairie_wolf", "coyote"], "weight": 3},
@@ -44,7 +44,7 @@
         "enemies": ["prairie_wolf", "buffalo_bull", "prairie_wolf", "coyote"]},
       "bonus_hides": 3},
 
-    "haunted_homestead": {"name": "The Haint at {place}", "desc": "Lights have been seen at the empty homestead at {place}. Folks say the family never left.",
+    "haunted_homestead": {"events": ["haint_lights", "gravesite", "abandoned_homestead"], "name": "The Haint at {place}", "desc": "Lights have been seen at the empty homestead at {place}. Folks say the family never left.",
       "node_weights": {"fight": 36, "elite": 10, "event": 22, "curio": 20, "cave": 8, "homestead": 4, "trading_post": 0},
       "fights": [
         {"enemies": ["prairie_haint", "carrion_crows", "coyote"], "weight": 2},
@@ -56,7 +56,7 @@
         "victory": "The lights go out one by one. Whatever held them here has let go.",
         "enemies": ["prairie_haint", "prairie_haint", "prairie_haint", "carrion_crows"]}},
 
-    "claim_jumpers": {"name": "Claim Jumpers at {place}", "desc": "A prospector's claim at {place} was jumped. He'll share the color if you run them off.",
+    "claim_jumpers": {"events": ["claim_dispute"], "name": "Claim Jumpers at {place}", "desc": "A prospector's claim at {place} was jumped. He'll share the color if you run them off.",
       "node_weights": {"fight": 42, "elite": 12, "event": 16, "curio": 14, "cave": 12, "homestead": 4, "trading_post": 0},
       "fights": [
         {"enemies": ["claim_jumper", "outlaw_gunhand", "claim_jumper"], "weight": 3},
@@ -68,7 +68,7 @@
         "victory": "The claim at {place} is back in honest hands, and the prospector pays in color.",
         "enemies": ["claim_jumper", "dynamiter", "claim_jumper", "dynamiter"]}},
 
-    "snake_gulch": {"name": "Snakes in {place}", "desc": "A wagon went into the gulch at {place} and nobody wants to go get it. Snakes.",
+    "snake_gulch": {"events": ["rattler_in_bedroll", "sick_traveler"], "name": "Snakes in {place}", "desc": "A wagon went into the gulch at {place} and nobody wants to go get it. Snakes.",
       "node_weights": {"fight": 40, "elite": 10, "event": 18, "curio": 18, "cave": 10, "homestead": 4, "trading_post": 0},
       "fights": [
         {"enemies": ["rattlesnake", "rattlesnake", "carrion_crows"], "weight": 3},
@@ -81,7 +81,7 @@
         "enemies": ["gila_monster", "rattlesnake", "gila_monster", "rattlesnake"]},
       "bonus_hides": 1},
 
-    "crow_scouts": {"difficulty": 3, "name": "Crane's Scouts near {place}", "desc": "Riders with black feathers have been seen watching the road from {place}. Silas Crane is keeping an eye on you.",
+    "crow_scouts": {"events": ["outlaw_ambush_warning", "outlaw_toll"], "difficulty": 3, "name": "Crane's Scouts near {place}", "desc": "Riders with black feathers have been seen watching the road from {place}. Silas Crane is keeping an eye on you.",
       "node_weights": {"fight": 46, "elite": 14, "event": 16, "curio": 12, "cave": 4, "homestead": 4, "trading_post": 0},
       "fights": [
         {"enemies": ["outlaw_gunhand", "carrion_crows", "outlaw_rifleman"], "weight": 3},

@@ -168,7 +168,10 @@ regenerate the sheet: `python3 tools/enemy_sheet.py`.
 
 ## Add a trail event
 
-In `data/events.json`, then list its id in a region's `events` (or `homestead_events`):
+In `data/events.json`, then list its id in a pool: `common_events` in config (anywhere), a
+region's `events` or `homestead_events`, or a side-quest template's `events` (theme). An
+event belongs in one of common or a region, not both. `python3 tools/fmt_events.py`
+re-formats the file in its usual layout after a scripted edit.
 
 ```json
 "lost_oxen": {
@@ -185,18 +188,30 @@ In `data/events.json`, then list its id in a region's `events` (or `homestead_ev
 }
 ```
 
-- `requires`: `item`, `money`, `skill` (a survival skill), `class`, `quirk`. Options whose
-  skill, class or quirk nobody has are hidden. Item and money options appear greyed out.
-- `consume`: `{"item": n}` or `{"money": n}`.
-- `{hero}` becomes the hero who meets the requirement, or a random party member.
+- `requires`: `item`, `money`, `hides`, `skill` (a survival skill), `class`, `quirk`. Options
+  whose skill, class or quirk nobody has are hidden. Item, money and Hides options appear
+  greyed out.
+- `consume`: `{"item": n}`, `{"money": n}` or `{"hides": n}`.
+- `compel: true` on a quirk option: 30% the hero with the quirk takes it before you choose.
+- `experts`: `{"<class, skill or quirk id>": {...}}`, the curio expert rules over the whole
+  company. Fields: `odds` (overrides class 50 / skill 20-35-50 by rank / quirk 35),
+  `averse: true` (✗, bad outcomes 50% likelier, and a bad outcome lands on that hero),
+  `bonus` (effects on a good outcome; for ✗, on a bad one; `always: true` on any), `swap`
+  (`{"<outcome index>": outcome}`), `add` (extra outcomes), `free: true` (the supply isn't
+  used, and the option is open without it), `fight` (merged into a resulting fight:
+  `surprise`, `enemies`, `wounded`, `drop`, `foe_mods`, `foe_mark`). The option lists the
+  names only: ★ Cook, ✗ Overweight.
+- `{hero}` becomes the hero who meets the requirement, else the best ★ expert, else a random
+  party member.
 - `art` picks the illustration drawn by `scripts/visual/event_art.gd`.
 
 **Effects** (events, curios and camp; applied by `scripts/core/effects.gd`): `fatigue`,
 `heal_pct`, `damage_pct`, `food`, `money` (`amount`, or `min`/`max`), `money_pct`, `timber`,
 `iron`, `hides`, `charters`, `item {item, amount}`, `keepsake` (optional `rarity` list),
 `quirk {quirk}` (an id, or random / random_positive / random_negative), `remove_quirk`,
-`wagon`, `recruit {class}`, `fight {enemies, surprise, reward}`, `buff {stat, value}` (next
-fight), `reveal {amount}`, `light`, `clear_shaken`.
+`wagon`, `recruit {class}`, `fight {enemies, surprise, reward, wounded {id or "*": hp %},
+drop [id], foe_mods [mod with rounds], foe_mark {id or "*": rounds}}`, `buff {stat, value}`
+(next fight; negative values work: wet powder, hungover), `reveal {amount}`, `light`, `clear_shaken`.
 - `target`: party (default), actor, random.
 - Any effect can have `chance`.
 
