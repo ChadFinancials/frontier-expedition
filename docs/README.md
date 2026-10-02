@@ -13,7 +13,7 @@
 | [`QUIRK_PROPOSALS.md`](QUIRK_PROPOSALS.md) | Every quirk with a proposed edit, plus 10 new ones, awaiting the owner's picks | Until picked and built |
 | [`TRINKET_PROPOSALS.md`](TRINKET_PROPOSALS.md) | Two class trinkets per class plus the general trinkets with edits, awaiting the owner's picks | Until picked and built |
 | [`CURIO_PROPOSALS.md`](CURIO_PROPOSALS.md) | Every curio with its odds and its class and survival-skill experts; the first region's are built | Until the later regions' curios are built |
-| [`FATIGUE_PROPOSALS.md`](FATIGUE_PROPOSALS.md) | Breaking Points and Second Winds: renames away from Darkest Dungeon's terms, a mechanic hook for each, and a sixth Second Wind | Until picked and built |
+| [`FATIGUE_PROPOSALS.md`](FATIGUE_PROPOSALS.md) | Breaking Points and True Grit: the renames away from Darkest Dungeon's terms and a mechanic hook for each; built with the owner's edits | Can be archived |
 | [`HERO_PROPOSALS.md`](HERO_PROPOSALS.md) | Options awaiting the owner's picks: new moves for the classes under 8, and two new hero designs | Until picked and built |
 | [`HERO_REVIEW.md`](HERO_REVIEW.md) | Every class and move with real numbers. **Generated**: `python3 tools/hero_sheet.py` | Regenerate after hero changes |
 | [`ENEMY_REVIEW.md`](ENEMY_REVIEW.md) | Every enemy and move with real numbers. **Generated**: `python3 tools/enemy_sheet.py` | Regenerate after enemy changes |

@@ -110,9 +110,9 @@ exist but wait until the start is crisp.
 
 ### Scripted boss meetings
 - A boss can carry a `first_script`: the first fight stops when a round is reached, a hero
-  hits Death's Door, or the boss drops below a health share. A cutscene plays and the run
+  goes down to Last Legs, or the boss drops below a health share. A cutscene plays and the run
   ends as **Driven Back** (loot and XP kept). Next time the boss starts **wounded** with a new
-  intro. Silas Crane uses it (*Crane's Gambit*: round 3, a hero on Death's Door, or Silas
+  intro. Silas Crane uses it (*Crane's Gambit*: round 3, a hero on Last Legs, or Silas
   under 60%; he returns at 85%).
 
 ---
@@ -134,7 +134,7 @@ exist but wait until the start is crisp.
 - **Survival skills**: two per hero, rank 1-3, ranking up with use. Each gives a party
   passive and camp actions (one at rank 1, a second at rank 2).
 - **Quirks**: up to 4 positive and 4 negative. **Trinkets** (data: keepsakes): two slots.
-- **Fatigue** 0-200, possibly with a **Breaking Point** or **Second Wind**.
+- **Fatigue** 0-200, possibly with a **Breaking Point** or **True Grit**.
 - Class matchups: a class can carry `vs_tags` (the Mountain Mystic gets +20% damage and +2
   accuracy against beasts) or `cave_loot_pct` (the Prospector finds +25% loot in caves).
 
@@ -209,12 +209,13 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
 - Enemy tiers scale HP, damage, accuracy, dodge, resistances and effect chance per region
   tier `[tier_*]`. Bosses are not scaled.
 
-### Death's Door
-- A hero at 0 HP enters **Death's Door**. Further damage (bleed and poison too) triggers a
-  **Deathblow check**: 67% to survive, capped at 87% `[deathblow_base, deathblow_cap]`. The
-  hit that knocks a hero onto Death's Door, and the rest of that same move, can't kill.
+### Last Legs
+- A hero at 0 HP is on **Last Legs** (code: `deaths_door`). Further damage (bleed and poison
+  too) rolls to **Cheat Death** (code: `deathblow`): 67% to survive, capped at 87%
+  `[deathblow_base, deathblow_cap]`. The hit that knocks a hero onto Last Legs, and the rest of
+  that same move, can't kill.
 - Healing lifts them out with **Shaken** (−10% damage, −5 accuracy, −2 speed) for the rest of
-  the expedition, unless a Medic's Set the Bone treats it. Death's Door carries between fights
+  the expedition, unless a Medic's Set the Bone treats it. Last Legs carries between fights
   until healed, with a warning.
 - Enemies die at 0 HP and the survivors step forward.
 
@@ -232,7 +233,7 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
 |---|---|
 | Enemy fatigue attacks | +5 to +15 |
 | Receiving a crit | +8 `[crit_taken_fatigue]` |
-| An ally hits Death's Door | +6 to the rest of the party |
+| An ally goes down to Last Legs | +6 to the rest of the party |
 | An ally dies | +15 to the rest of the party |
 | A move with too little food | +10 and 10% HP `[hunger_*]` |
 | A move with a broken wagon | +6 |
@@ -240,14 +241,35 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
 | Landing a crit | −4 self, −2 the others |
 | Camp, events, the Preacher and some moves | relief |
 
-- **At 100** a hero takes a **Resolve Test**: 25% (+2% per level, plus quirks) for a **Second
-  Wind** (Fatigue drops to 45), otherwise a **Breaking Point**.
-- **Breaking Points** (Homesick, Reckless, Short-Tempered, Cowardly, Greedy, Paranoid) change
-  stats, and each turn there's a 30% chance the hero **acts out** (passes, uses a random move,
-  moves, barks at an ally, refuses a heal). Clears at 25 Fatigue or with treatment in town.
-- **Second Winds** (Steadfast, Inspired, Sharp-Eyed, Grit, Fired Up) boost stats and may heal,
-  relieve or buff at the start of the hero's turn. They last until the expedition ends.
-- **At 200**: **Collapse**. The hero drops to Death's Door (or dies if already there);
+- **At 100** a hero takes a **Gut Check**: 25% (+2% per level, plus quirks and trinkets) for
+  **True Grit** (Fatigue drops to 45), otherwise a **Breaking Point**. It only fires when
+  Fatigue crosses 100 and the hero has no state yet. (In code and data True Grit is still
+  `second_wind`, and the chance is the `resolve` stat.)
+- **Breaking Points** change stats, and each turn there's a 30-40% chance the hero **acts
+  out**. Clears at 25 Fatigue or with treatment in town.
+
+| Breaking Point | Stats | Acts out | Hook |
+|---|---|---|---|
+| Heartsick | −15% Dmg, −2 Spd | pass ×2, bark, back away (30%) | |
+| Reckless | +15% Dmg, −15 Dodge, Vulnerable 10% | random move ×2, charge, bark (35%) | |
+| Ornery | +10% Dmg, −10 Acc | bark ×2, **taunt**, random move (40%) | Taunt draws enemy fire until their next turn; doesn't cost the turn |
+| Cowardly | +10 Dodge, −10% Dmg, −5 Acc, Vulnerable 15% in ranks 1-2 | back away ×2, pass, bark (35%) | |
+| Greedy | +5% Crit, −5 Prot, −10 Grit Chance, +15% Loot | bark ×2, random move, pass (30%); refuses help | Marked (3 rounds) at the start of each fight |
+| Paranoid | +10 Dodge, −10 Acc, −25% Healing Received, +4 Spd in round 1 | bark, back away, pass, random move (30%); refuses help | |
+
+- **True Grit** lasts until the expedition ends. Each state boosts stats and may fire a boon
+  at the start of the hero's turn.
+
+| True Grit | Stats | Each turn | Hook |
+|---|---|---|---|
+| Steadfast | +5 Prot, +5 Cheat Death, +10 Stun Res | 35%: −4 Fatigue to the company | When it lands, the most wounded hero gets +15 Prot for the rest of that fight (or the next one, if it landed on the trail) |
+| Inspired | +2 Spd, +5 Acc | 45%: −6 Fatigue to the company | |
+| Dead-Eye | +12 Acc, +10% Crit, +10% Dmg vs Marked | 30%: Marks an enemy (2 rounds) | |
+| Mule-Headed | +25 Bleed/Poison Res, +20 Stun Res, +10% HP, +15 Cheat Death on Last Legs | 40%: heals 12% HP | |
+| Fired Up | +20% Dmg, +1 Spd, +10% Crit vs Vulnerable | 35%: +12% Dmg to an ally | |
+| Cool-Headed | +20% Healing Received, +20 Debuff Res | 35%: clears every Bleed or every Poison (whichever is worse) from the worst-off hero | |
+
+- **At 200**: **Collapse**. The hero drops to Last Legs (or dies if already there);
   Fatigue resets to 150.
 
 ---

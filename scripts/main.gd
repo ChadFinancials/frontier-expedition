@@ -351,9 +351,9 @@ const HELP_TEXT := """[b]The Company.[/b] Somewhere past the last mountain stand
 
 [b]Combat.[/b] Heroes stand on the left in ranks 1-4 (rank 1 is the front). Every skill can only be used from certain ranks and can only reach certain enemy ranks: the dots on each skill show which. Hover an enemy to see your exact chance to hit, crit chance and damage. Knockback and pulls rearrange lines. You can Swap places with a neighbor, use supplies for free, or Retreat from any fight but a boss.
 
-[b]Death's Door.[/b] A hero at 0 HP isn't dead yet: every further hit rolls a Deathblow check (about 2 in 3 to survive). Heal them to pull them back. They'll be Shaken for the rest of the trip.
+[b]Last Legs.[/b] A hero at 0 HP isn't dead yet: every further hit rolls to Cheat Death (about 2 in 3 to survive). Heal them to pull them back. They'll be Shaken for the rest of the trip.
 
-[b]Fatigue.[/b] Hard travel, frightening foes and dark caves build Fatigue (0-200). At 100 a hero is tested: most hit a [b]Breaking Point[/b] (Homesick, Reckless, Paranoid...) and may act on their own, but some find a [b]Second Wind[/b] and inspire everyone. At 200 they Collapse. Rest in town (Saloon, Chapel, Boot Hill) to recover.
+[b]Fatigue.[/b] Hard travel, frightening foes and dark caves build Fatigue (0-200). At 100 a hero faces a [b]Gut Check[/b]: most hit a [b]Breaking Point[/b] (Heartsick, Reckless, Paranoid...) and may act on their own, but some find [b]True Grit[/b] and carry the company until the expedition ends. At 200 they Collapse. Rest in town (Saloon, Chapel, Boot Hill) to recover.
 
 [b]Survival Skills.[/b] Every hero has two survival skills (Cook, Hunter, Scout, Wheelwright...). At camp, spend 12 hours on their actions: cook, hunt, fell timber, stand night watch, tell tall tales. Skills also help on the trail and unlock special choices in events. They improve with use.
 

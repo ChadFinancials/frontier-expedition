@@ -81,7 +81,7 @@ Three rules hold the codebase together:
 | `CombatEngine` | One battle | See "Combat" below |
 | `Combatant` | A unit inside a battle | Wraps a `Hero` or an enemy definition; stats, statuses, buffs |
 | `Hero` | A company member | Class, level and XP, gear tiers, known and equipped skills, survival skills, quirks, trinkets, Fatigue |
-| `Fatigue` | Static helpers | Adding Fatigue, Resolve Tests, Breaking Points and Second Winds, Collapse. Returns events |
+| `Fatigue` | Static helpers | Adding Fatigue, Gut Checks, Breaking Points and True Grit (`second_wind` in code), Collapse. Returns events |
 | `Effects` | Static `apply` | Out-of-combat effects from events, curios and camp actions (format in `ADDING_CONTENT.md`) |
 | `MapGen` | Static `generate` | Builds an expedition's branching map. Every node's contents are rolled up front, so a mid-run save reloads identically. Also node intel (what the player can see) |
 | `Inventory` | Static helpers | Wagon slots and stacking over the plain `supplies` dictionary |

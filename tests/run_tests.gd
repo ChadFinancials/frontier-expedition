@@ -71,6 +71,7 @@ func _ready() -> void:
 	test_hides()
 	print("> test_curio_experts()")
 	test_curio_experts()
+	test_fatigue_states()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -1094,6 +1095,93 @@ func test_curio_experts() -> void:
 
 
 ## Round 9 town: the free porch seat on the Hiring Board, the bigger first Bunkhouse.
+func test_fatigue_states() -> void:
+	var kinds := {"breaking": 0, "second_wind": 0}
+	for id in DB.fatigue_states:
+		if DB.fatigue_states[id] is Dictionary:
+			kinds[DB.fatigue_states[id].kind] += 1
+	check(kinds.breaking == 6 and kinds.second_wind == 6, "6 Breaking Points and 6 True Grit states")
+	check(DB.fatigue_states.homesick.name == "Heartsick" and DB.fatigue_states.short_tempered.name == "Ornery" and DB.fatigue_states.sharp_eyed.name == "Dead-Eye" and DB.fatigue_states.grit.name == "Mule-Headed", "renamed states keep their ids")
+	check(Stats.STAT_NAMES.deathblow == "Cheat Death" and Stats.STAT_NAMES.resolve == "True Grit Chance", "Cheat Death / True Grit stat names")
+	var co := Company.new()
+	co.new_game(23)
+	var a := co.make_hero("marshal", 1)
+	var b := co.make_hero("gunslinger", 1)
+	for h in [a, b]:
+		h.quirks.clear()
+		h.keepsakes = []
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5
+	# Landing a state flags it fresh.
+	a.fatigue = 95
+	Fatigue.add(a, 10, rng)
+	check(a.fatigue_state != "" and a.state_fresh, "a Gut Check flags the new state fresh")
+	# Greedy: Marked on the fight's first turn, not again.
+	a.fatigue_state = "greedy"
+	a.state_fresh = false
+	var e := CombatEngine.new()
+	e.setup([a, b], ["outlaw_brawler", "outlaw_gunhand"], {"rng": rng})
+	var ca: Combatant = e.heroes[0]
+	var cb: Combatant = e.heroes[1]
+	e._state_hooks([])
+	check(ca.mark > 0, "Greedy starts the fight Marked")
+	ca.mark = 0
+	e._state_hooks([])
+	check(ca.mark == 0, "Greedy's fight_start fires once per fight")
+	# Steadfast lands: the most wounded hero gets +15 Prot for the fight.
+	a.fatigue_state = "steadfast"
+	a.state_fresh = true
+	cb.hp = 3
+	var p0 := cb.stat("prot")
+	e._state_hooks([])
+	check(cb.stat("prot") == p0 + 15 and not a.state_fresh, "Steadfast: most wounded hero +15 Prot, once")
+	e._state_hooks([])
+	check(cb.stat("prot") == p0 + 15, "Steadfast's landing buff doesn't repeat")
+	# Dead-Eye marks a foe; Cool-Headed clears a Bleed.
+	a.fatigue_state = "sharp_eyed"
+	e._apply_boon(ca, {"type": "mark_enemy", "rounds": 2})
+	check(e.enemies.any(func(x): return x.mark > 0), "Dead-Eye calls a target (Marks a foe)")
+	a.fatigue_state = "cool_headed"
+	cb.dots = [{"kind": "bleed", "amount": 3, "rounds": 3}, {"kind": "poison", "amount": 1, "rounds": 2}]
+	e._apply_boon(ca, {"type": "cleanse_ally"})
+	check(not cb.dots.any(func(d): return d.kind == "bleed") and cb.dots.size() == 1, "Cool-Headed clears the worse of Bleed or Poison")
+	# Ornery taunts without losing the turn.
+	a.fatigue_state = "short_tempered"
+	var st: Dictionary = DB.fatigue_states.short_tempered
+	var old_acts: Array = st.acts
+	var old_chance: int = st.act_chance
+	st.acts = ["taunt"]
+	st.act_chance = 100
+	var ev: Array = []
+	var lost := e._maybe_act_out(ca, ev)
+	st.acts = old_acts
+	st.act_chance = old_chance
+	check(not lost and ca.taunt > 0, "Ornery taunts and keeps the turn")
+	# Cowardly: Vulnerable 15% up front only; Reckless always Vulnerable 10%.
+	a.fatigue_state = "cowardly"
+	check(ca.rank == 1 and ca.stat("vulnerable") == 15, "Cowardly Vulnerable in rank 1")
+	e._shift(ca, -2, [])
+	check(ca.rank == 2 and ca.stat("vulnerable") == 15, "Cowardly Vulnerable in rank 2")
+	a.fatigue_state = "reckless"
+	check(ca.stat("vulnerable") == 10, "Reckless Vulnerable 10%")
+	# Paranoid: +4 Speed in round 1.
+	a.fatigue_state = "paranoid"
+	ca.round_num = 2
+	var s2 := ca.stat("speed")
+	ca.round_num = 1
+	check(ca.stat("speed") == s2 + 4, "Paranoid +4 Speed in round 1")
+	# Mule-Headed: +15 Cheat Death on Last Legs.
+	a.fatigue_state = "grit"
+	var cd0 := ca.stat("deathblow")
+	a.deaths_door = true
+	check(ca.stat("deathblow") == minf(cd0 + 15, DB.cfg("deathblow_cap", 87)) and ca.stat("deathblow") > cd0, "Mule-Headed: +15 Cheat Death on Last Legs")
+	a.deaths_door = false
+	# The fresh flag survives a save.
+	a.fatigue_state = "cool_headed"
+	a.state_fresh = true
+	check(Hero.from_dict(a.to_dict()).state_fresh, "fresh flag saves")
+
+
 func test_round9_town() -> void:
 	var co := Company.new()
 	co.new_game(29)

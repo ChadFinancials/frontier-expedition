@@ -1,6 +1,22 @@
 # Breaking Points and Second Winds: proposals (round 9)
 
-Status: **awaiting the owner's picks.** Nothing here is built yet.
+Status: **✅ built with the owner's edits (round 9).** The final tables are in `GDD.md` §6.
+
+Owner's picks:
+- **Names:** keep Breaking Point. Second Wind → **True Grit**, Resolve Test → **Gut Check**,
+  Death's Door → **Last Legs**, Deathblow Resist → **Cheat Death**. Ids and code names are
+  unchanged.
+- **Breaking Points:** all as proposed, except Yellow-Bellied goes back to **Cowardly** with
+  -10% Dmg (was -20%). It keeps Vulnerable 15% in ranks 1-2.
+- **Steadfast:** no Guard, since it could land on a frail hero. When it lands, the most
+  wounded hero gets +15 Prot for the rest of the fight (or the next one, if it landed on the
+  trail). The holder keeps a small lingering buff (+5 Prot, +5 Cheat Death, +10 Stun Res) and
+  the -4 company Fatigue boon until the expedition ends.
+- **Cool-Headed:** +20% Healing Received, +20 Debuff Res, 35% each turn to clear Bleed or
+  Poison. No Fatigue relief.
+- Quirk weighting (question 2) wasn't picked up.
+
+The proposal as first written follows.
 
 ## How it works today
 

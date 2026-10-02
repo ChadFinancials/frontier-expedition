@@ -75,6 +75,16 @@ decided, and what shipped. Update both at the end of every round.
 ## History
 
 ### Round 9
+- **Breaking Points and True Grit** (owner's pass): renamed away from Darkest Dungeon's terms
+  (Second Wind → True Grit, Resolve Test → Gut Check, Death's Door → Last Legs, Deathblow
+  Resist → Cheat Death; Breaking Point stays; ids unchanged). Heartsick (was Homesick, which
+  clashed with the quirk); Reckless Vulnerable 10% instead of -10 Prot; Ornery (was
+  Short-Tempered) taunts on its own; Cowardly -10% Dmg, Vulnerable 15% in ranks 1-2; Greedy
+  starts each fight Marked, +15% Loot; Paranoid +4 Spd in round 1. Steadfast gives the most
+  wounded hero +15 Prot when it lands, then a smaller lingering buff; Dead-Eye (was
+  Sharp-Eyed) Marks enemies, +10% Dmg vs Marked; Mule-Headed (was Grit) +15 Cheat Death on
+  Last Legs; Fired Up +10% Crit vs Vulnerable; new Cool-Headed (+20% Healing Received, +20
+  Debuff Res, clears Bleed or Poison).
 - **Curio experts** (owner: make the class and skill pick matter; first region first, ★/✗
   shown): the 16 curios of the Fort Providence area list experts by class or survival skill
   (better odds, bonuses, swaps, 5 work-as-key pairs, 2 averse classes); Gunslinger and Tracker

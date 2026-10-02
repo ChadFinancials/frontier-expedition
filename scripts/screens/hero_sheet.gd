@@ -101,7 +101,7 @@ func _build() -> void:
 	var stat_rows := [["Max HP", str(h.max_hp())], ["Damage", "%d-%d" % [int(d[0] * mult), int(d[1] * mult)]],
 		["Speed", str(int(h.stat("speed")))], ["Dodge", str(int(h.stat("dodge")))],
 		["Protection", "%d%%" % int(h.stat("prot"))], ["Accuracy", "+%d" % int(h.stat("acc"))],
-		["Crit", "%d%%" % int(h.stat("crit"))], ["Deathblow Res", "%d%%" % int(h.stat("deathblow"))],
+		["Crit", "%d%%" % int(h.stat("crit"))], ["Cheat Death", "%d%%" % int(h.stat("deathblow"))],
 		["Stun Res", "%d%%" % int(h.stat("stun_res"))], ["Bleed Res", "%d%%" % int(h.stat("bleed_res"))],
 		["Poison Res", "%d%%" % int(h.stat("poison_res"))], ["Move Res", "%d%%" % int(h.stat("move_res"))]]
 	for sr in stat_rows:

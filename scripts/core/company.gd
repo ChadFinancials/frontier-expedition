@@ -515,6 +515,7 @@ func do_activity(i: int, bid: String, act_id: String, h: Hero) -> Array:
 	if h.is_breaking():
 		msgs.append("%s is no longer %s." % [h.hero_name, DB.fatigue_states[h.fatigue_state].name])
 		h.fatigue_state = ""
+		h.state_fresh = false
 	for se in act.get("side_effects", []):
 		if rng.randf() * 100.0 < float(se.get("chance", 0)):
 			match se.get("type", ""):
@@ -1208,6 +1209,7 @@ func finish_run(status: String) -> Dictionary:
 		h.location = r.origin
 		if h.is_second_wind():
 			h.fatigue_state = ""
+			h.state_fresh = false
 		if rng.randf() * 100.0 < DB.cfg("quirk_roll_chance", 45):
 			var pos_chance: int = DB.cfg("quirk_positive_on_win", 60) if won else DB.cfg("quirk_positive_on_loss", 40)
 			var q := add_random_quirk(h, rng.randf() * 100.0 < pos_chance)

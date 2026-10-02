@@ -12,8 +12,8 @@ const STAT_NAMES := {
 	"max_hp_pct": "Max HP", "acc": "Accuracy", "dodge": "Dodge", "prot": "Protection",
 	"speed": "Speed", "crit": "Crit", "dmg_pct": "Damage", "dmg_flat": "Damage per hit", "pierce": "Armor Piercing", "stun_res": "Stun Resist",
 	"bleed_res": "Bleed Resist", "poison_res": "Poison Resist", "move_res": "Move Resist",
-	"debuff_res": "Debuff Resist", "deathblow": "Deathblow Resist", "fatigue_pct": "Fatigue Taken",
-	"heal_pct": "Healing Received", "resolve": "Second Wind Chance", "scout": "Scouting",
+	"debuff_res": "Debuff Resist", "deathblow": "Cheat Death", "fatigue_pct": "Fatigue Taken",
+	"heal_pct": "Healing Received", "resolve": "True Grit Chance", "scout": "Scouting",
 	"surprise": "Surprise Chance", "food_pct": "Food Eaten", "loot_pct": "Loot Found",
 	"vulnerable": "Vulnerable", "xp_pct": "XP Gained",
 	"heal_out_pct": "Healing Given", "stun_chance": "Stun Chance", "poison_dot": "Poison Dealt per Turn",
@@ -88,7 +88,7 @@ static func cond_text(cond: String) -> String:
 		"vs_vulnerable":
 			return " vs Vulnerable targets"
 		"deaths_door":
-			return " on Death's Door"
+			return " on Last Legs"
 		"round1":
 			return " in the first round"
 		"guarding":
@@ -115,7 +115,7 @@ const STAT_SHORT := {
 	"max_hp_pct": "HP", "acc": "ACC", "dodge": "DODGE", "prot": "PROT", "speed": "SPD",
 	"crit": "CRIT", "dmg_pct": "DMG", "dmg_flat": "DMG", "pierce": "PIERCE", "stun_res": "STUN RES",
 	"bleed_res": "BLEED RES", "poison_res": "POISON RES", "move_res": "MOVE RES",
-	"debuff_res": "DEBUFF RES", "deathblow": "DEATHBLOW", "heal_pct": "HEALING", "vulnerable": "VULN",
+	"debuff_res": "DEBUFF RES", "deathblow": "CHEAT DEATH", "heal_pct": "HEALING", "vulnerable": "VULN",
 }
 
 

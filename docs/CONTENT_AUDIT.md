@@ -30,10 +30,10 @@ first-draft. "Revisions" counts the commits that changed the data file after it 
   one out at random. No locking, no curio or event sources beyond a handful.
 - Ideas parked in `HERO_PROPOSALS.md`: Glass Jaw (always Vulnerable 10%).
 
-### Breaking Points and Second Winds — 6 + 5 · **never revised**
-- Stat modifiers plus acts (pass, bark, move back, random skill) and turn-start boons.
-- Untouched since the engine pass, so no tie to the newer mechanics (Reckless + Vulnerable was
-  proposed; Steadfast could guard; a Breaking Point could Mark the hero).
+### Breaking Points and True Grit (was Second Winds) — 6 + 6 · **✅ revised round 9**
+- Each state now ties into a newer mechanic (Vulnerable, Mark, Taunt, rank, Last Legs); new
+  True Grit Cool-Headed. See FATIGUE_PROPOSALS.md and GDD §6.
+- Terms renamed away from Darkest Dungeon's: True Grit, Gut Check, Last Legs, Cheat Death.
 
 ### Trinkets (keepsakes) — 19 + 3 boss · **2 revisions, both on day one**
 - Two slots per hero. Rarity common/uncommon/rare/boss, prices 200-700.
@@ -73,7 +73,8 @@ first-draft. "Revisions" counts the commits that changed the data file after it 
 
 1. ✅ **Quirks** (round 9, QUIRK_PROPOSALS.md): 50 quirks, tied to Mark, Vulnerable, Death's
    Door, first round; behaviour quirks (Drinker's bar lock, Gold Fever, Homesick).
-   ⬜ **Breaking Points and Second Winds** were part of this step and are still untouched.
+   ✅ **Breaking Points and True Grit** (round 9, FATIGUE_PROPOSALS.md): a hook each, 6 + 6,
+   in-theme names (True Grit, Gut Check, Last Legs, Cheat Death).
 2. ✅ **Trinkets** (round 9, TRINKET_PROPOSALS.md): 22 class trinkets, general edits, 5 new.
 3. 🟨 **Curios** (round 9, CURIO_PROPOSALS.md): class and skill experts, ★/✗ in the picker and
    quirk chances, done for the Fort Providence area's 16. Still to do: Red Canyons (Painted

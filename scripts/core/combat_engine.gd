@@ -28,6 +28,7 @@ var story_script: Dictionary = {}     # scripted ending (a boss's first meeting)
 var _next_id: int = 1
 var _fresh_dd: Array = []       # heroes knocked onto Death's Door by the move being resolved
 var bounty: int = 0             # chips earned mid-fight (Money Shot kills), paid out with the loot
+var _hooks_started: bool = false   # fight_start state hooks have fired (see _state_hooks)
 var _actor: Combatant = null    # whoever's move is resolving (so a move's own shift isn't "moved by others")
 
 
@@ -207,6 +208,7 @@ func _next_actor() -> Combatant:
 
 func _start_turn(c: Combatant) -> Array:
 	var ev: Array = []
+	_state_hooks(ev)
 	# Damage over time.
 	var still: Array = []
 	for d in c.dots:
@@ -230,6 +232,24 @@ func _start_turn(c: Combatant) -> Array:
 	return ev
 
 
+## Breaking Point / True Grit hooks: fight_start boons fire on the fight's first turn,
+## on_land boons once on the first fight turn after the state lands (mid-fight or on the trail).
+func _state_hooks(ev: Array) -> void:
+	var first := not _hooks_started
+	_hooks_started = true
+	for c in heroes:
+		if c.dead or c.hero.fatigue_state == "":
+			continue
+		var st: Dictionary = DB.fatigue_states.get(c.hero.fatigue_state, {})
+		if c.hero.state_fresh:
+			c.hero.state_fresh = false
+			for b in st.get("on_land", []):
+				ev.append_array(_apply_boon(c, b))
+		elif first:
+			for b in st.get("fight_start", []):
+				ev.append_array(_apply_boon(c, b))
+
+
 func _apply_boon(c: Combatant, boon: Dictionary) -> Array:
 	var ev: Array = []
 	var st_name: String = DB.fatigue_states.get(c.hero.fatigue_state, {}).get("name", "")
@@ -248,6 +268,48 @@ func _apply_boon(c: Combatant, boon: Dictionary) -> Array:
 				ally.buffs.append({"stat": boon.stat, "value": boon.value, "rounds": 2, "name": st_name})
 				ev.append({"t": "boon", "actor": c.id, "text": "%s (%s) rallies %s" % [c.display_name, st_name, ally.display_name]})
 				ev.append({"t": "buff", "target": ally.id, "stat": boon.stat, "value": boon.value})
+		"buff_lowest":
+			# The most wounded hero (Steadfast) holds the buff for the rest of the fight.
+			var hurt := heroes.filter(func(x): return not x.dead)
+			hurt.sort_custom(func(a, b): return a.hp_ratio() < b.hp_ratio())
+			if not hurt.is_empty():
+				var t: Combatant = hurt[0]
+				t.buffs.append({"stat": boon.stat, "value": boon.value, "rounds": 99, "name": st_name})
+				ev.append({"t": "boon", "actor": c.id, "text": "%s (%s) stands over %s" % [c.display_name, st_name, t.display_name if t != c else "themselves"]})
+				ev.append({"t": "buff", "target": t.id, "stat": boon.stat, "value": boon.value})
+		"mark_self":
+			c.mark = maxi(c.mark, int(boon.get("rounds", 3)))
+			ev.append({"t": "boon", "actor": c.id, "text": "%s (%s) draws every eye" % [c.display_name, st_name]})
+			ev.append({"t": "status", "target": c.id, "status": "mark"})
+		"mark_enemy":
+			var foes := enemies.filter(func(x): return not x.dead and not x.corpse)
+			var fresh := foes.filter(func(x): return x.mark <= 0)
+			var t2: Combatant = Stats.pick(rng, fresh if not fresh.is_empty() else foes)
+			if t2 != null:
+				t2.mark = maxi(t2.mark, int(boon.get("rounds", 2)))
+				ev.append({"t": "boon", "actor": c.id, "text": "%s (%s) calls the target: %s" % [c.display_name, st_name, t2.display_name]})
+				ev.append({"t": "status", "target": t2.id, "status": "mark"})
+		"cleanse_ally":
+			# Clears every Bleed or every Poison (whichever hurts more) from the worst-off hero.
+			var best: Combatant = null
+			var best_kind := ""
+			var best_amt := 0
+			for h in heroes:
+				if h.dead:
+					continue
+				for kind in ["bleed", "poison"]:
+					var amt := 0
+					for d in h.dots:
+						if d.kind == kind:
+							amt += int(d.amount) * int(d.rounds)
+					if amt > best_amt:
+						best = h
+						best_kind = kind
+						best_amt = amt
+			if best != null:
+				best.dots = best.dots.filter(func(d): return d.kind != best_kind)
+				ev.append({"t": "boon", "actor": c.id, "text": "%s (%s) talks %s through it" % [c.display_name, st_name, best.display_name if best != c else "themselves"]})
+				ev.append({"t": "cure", "target": best.id})
 	return ev
 
 
@@ -278,6 +340,13 @@ func _maybe_act_out(c: Combatant, ev: Array) -> bool:
 			ev.append({"t": "act_out", "actor": c.id, "text": "%s %s: \"%s\"" % [c.display_name, "backs away" if dir < 0 else "charges ahead", line]})
 			_shift(c, dir, ev)
 			return true
+		"taunt":
+			# Ornery: "Come on then!" Draws enemy fire until their next turn; costs nothing.
+			var taunts: Array = st.get("taunt_barks", lines)
+			c.taunt = maxi(c.taunt, 2)
+			ev.append({"t": "act_out", "actor": c.id, "text": "%s: \"%s\"" % [c.display_name, Stats.pick(rng, taunts)]})
+			ev.append({"t": "status", "target": c.id, "status": "taunt"})
+			return false
 		"random_skill":
 			var opts: Array = []
 			for sid in c.skills:

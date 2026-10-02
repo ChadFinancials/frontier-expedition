@@ -35,9 +35,9 @@ fullscreen. **1-4** pick moves in combat. Right-click cancels targeting or close
   starts knowing 4 and learns the rest at the Drill Hall; 4 are equipped at a time.
   Three rolled color outfits per class.
 - **Four-rank combat** with shown hit and crit chances, bleed, poison, stun, marks, guard,
-  taunt, knockback and pulls, summons, Death's Door and permadeath.
-- **Fatigue**, the stress system: Breaking Points (Homesick, Reckless, Paranoid...) or
-  Second Winds (Steadfast, Inspired, Grit...).
+  taunt, knockback and pulls, summons, Last Legs and permadeath.
+- **Fatigue**, the stress system: a Gut Check at 100 gives a Breaking Point (Heartsick,
+  Reckless, Paranoid...) or True Grit (Steadfast, Dead-Eye, Cool-Headed...).
 - **12 survival skills** (Cook, Hunter, Scout, Wheelwright, Storyteller...) used at camp and
   on the trail, ranking up with use.
 - **37 enemies**, **40 quirks**, **22 trinkets**, **36 trail events**, **21 curios**, 9

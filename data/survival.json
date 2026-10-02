@@ -34,7 +34,7 @@
   "medic": {"name": "Medic", "desc": "Sewed up soldiers in the war. Steady hands.", "passive": {"type": "heal_pct", "base": 10, "per_rank": 5, "text": "Party receives more healing"},
     "actions": [
       {"id": "field_dressing", "name": "Field Dressing", "hours": 2, "target": "ally", "desc": "Clean, stitch and bind a wound. Uses a Bandage.", "effects": [{"type": "heal_pct", "base": 30, "per_rank": 10}], "unlock": 1, "cost": {"bandages": 1}},
-      {"id": "set_the_bone", "name": "Set the Bone", "hours": 3, "target": "ally", "desc": "Cures Shaken (Death's Door recovery) and heals a little.", "effects": [{"type": "clear_shaken"}, {"type": "heal_pct", "base": 10, "per_rank": 5}], "unlock": 2}
+      {"id": "set_the_bone", "name": "Set the Bone", "hours": 3, "target": "ally", "desc": "Cures Shaken (Last Legs recovery) and heals a little.", "effects": [{"type": "clear_shaken"}, {"type": "heal_pct", "base": 10, "per_rank": 5}], "unlock": 2}
     ]},
   "storyteller": {"name": "Storyteller", "desc": "Knows a tale for every campfire, and most of them are even true.", "passive": {"type": "fatigue_pct", "base": -5, "per_rank": -3, "text": "Party takes less Fatigue"},
     "actions": [

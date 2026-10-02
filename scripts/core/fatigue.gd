@@ -1,7 +1,7 @@
 class_name Fatigue
 extends RefCounted
-## Fatigue: the frontier's answer to Stress. 0-200; a Resolve Test at 100 gives a
-## Second Wind or a Breaking Point; Collapse at 200.
+## Fatigue: the frontier's answer to Stress. 0-200; a Gut Check at 100 gives True Grit
+## (kind "second_wind") or a Breaking Point; Collapse at 200.
 ## Every function returns a list of event dictionaries for the UI and message log.
 
 const MAX := 200
@@ -32,6 +32,7 @@ static func add(hero: Hero, amount: int, rng: RandomNumberGenerator, ctx: Dictio
 	if delta < 0 and hero.is_breaking() and hero.fatigue <= DB.cfg("breaking_clear_at", 25):
 		var st := hero.fatigue_state
 		hero.fatigue_state = ""
+		hero.state_fresh = false
 		ev.append({"t": "recovered", "hero": hero.uid, "state": st})
 	return ev
 
@@ -46,12 +47,13 @@ static func resolve_test(hero: Hero, rng: RandomNumberGenerator) -> Array:
 			pool.append(id)
 	var st: String = Stats.pick(rng, pool)
 	hero.fatigue_state = st
+	hero.state_fresh = true
 	if kind == "second_wind":
 		hero.fatigue = DB.cfg("second_wind_fatigue", 45)
 	return [{"t": kind, "hero": hero.uid, "state": st, "chance": chance}]
 
 
-## Fatigue maxed out: drop to Death's Door, or die if already there.
+## Fatigue maxed out: drop to Last Legs (Death's Door), or die if already there.
 static func collapse(hero: Hero) -> Array:
 	var ev: Array = []
 	if hero.deaths_door:
@@ -84,9 +86,9 @@ static func describe(e: Dictionary, hero_name: String) -> String:
 			var a: int = e.get("amount", 0)
 			return "%s %s %d Fatigue" % [hero_name, "gains" if a > 0 else "sheds", absi(a)]
 		"second_wind":
-			return "%s finds a SECOND WIND: %s!" % [hero_name, DB.fatigue_states.get(e.state, {}).get("name", e.state)]
+			return "%s passes a Gut Check and finds TRUE GRIT: %s!" % [hero_name, DB.fatigue_states.get(e.state, {}).get("name", e.state)]
 		"breaking":
-			return "%s hits a BREAKING POINT: %s!" % [hero_name, DB.fatigue_states.get(e.state, {}).get("name", e.state)]
+			return "%s fails a Gut Check and hits a BREAKING POINT: %s!" % [hero_name, DB.fatigue_states.get(e.state, {}).get("name", e.state)]
 		"recovered":
 			return "%s pulls themselves together." % hero_name
 		"collapse":

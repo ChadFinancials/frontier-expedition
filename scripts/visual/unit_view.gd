@@ -160,7 +160,7 @@ class _Hud extends Node2D:
 		draw_rect(Rect2(-w / 2 + 1, y + 1, (w - 2) * f, 10), Color("#c0392b") if not sh.dd else Color("#6b0f0f"))
 		var hp_txt := "%d/%d" % [sh.hp, sh.max_hp]
 		if sh.dd:
-			hp_txt = "DEATH'S DOOR"
+			hp_txt = "LAST LEGS"
 		_text(font, Vector2(0, y + 10), hp_txt, 12, Color.WHITE)
 		y += 14
 		if u.hero != null:

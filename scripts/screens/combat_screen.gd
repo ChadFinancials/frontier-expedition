@@ -88,8 +88,8 @@ func _start(ev: Array) -> void:
 	# Death's Door carries over between fights until the hero is healed: say so up front.
 	for h in engine.heroes:
 		if h.hero != null and h.hero.deaths_door:
-			_popup(h, "Still on Death's Door!", Color("#e05a4a"), 22, 60)
-			_log("[color=#e05a4a]%s is still on Death's Door from before: any hit could be fatal. Heal them to bring them back.[/color]" % h.display_name)
+			_popup(h, "Still on Last Legs!", Color("#e05a4a"), 22, 60)
+			_log("[color=#e05a4a]%s is still on Last Legs from before: any hit could be fatal. Heal them to bring them back.[/color]" % h.display_name)
 	await _play(ev)
 	if kind == "boss":
 		await _banner(DB.regions[run.region_id].boss.name, 1.4)
@@ -554,7 +554,7 @@ func _update_preview() -> void:
 	var title := t.display_name
 	if t.hero == null and t.data.has("title"):
 		title += ", " + str(t.data.title)
-	lines.append("[b]%s[/b]  HP %d/%d%s" % [title, t.hp, t.max_hp, "  [color=#f0a080]DEATH'S DOOR[/color]" if t.deaths_door() else ""])
+	lines.append("[b]%s[/b]  HP %d/%d%s" % [title, t.hp, t.max_hp, "  [color=#f0a080]LAST LEGS[/color]" if t.deaths_door() else ""])
 	if t.hero == null:
 		lines.append("Dodge %d  Prot %d%%  Speed %d  |  Resist: Stun %d%% Bleed %d%% Poison %d%% Move %d%%" % [int(t.stat("dodge")), int(t.stat("prot")), int(t.stat("speed")),
 			int(t.stat("stun_res")), int(t.stat("bleed_res")), int(t.stat("poison_res")), int(t.stat("move_res"))])
@@ -832,20 +832,20 @@ func _result(e: Dictionary) -> void:
 		"deaths_door":
 			var t8 := engine.unit(e.target)
 			if t8 != null:
-				_popup(t8, "DEATH'S DOOR", Color("#ff5a4a"), 30, 70)
+				_popup(t8, "LAST LEGS", Color("#ff5a4a"), 30, 70)
 				Audio.play("heartbeat")
-				_log("[color=#f0a080][b]%s is at Death's Door![/b][/color]" % t8.display_name)
+				_log("[color=#f0a080][b]%s is on Last Legs![/b][/color]" % t8.display_name)
 		"deathblow_resist":
 			var t9 := engine.unit(e.target)
 			if t9 != null:
-				_popup(t9, "Deathblow resisted!", Color("#ffe08a"), 24, 90)
+				_popup(t9, "Cheated death!", Color("#ffe08a"), 24, 90)
 				_log("%s clings to life!" % t9.display_name)
 		"revived":
 			var t10 := engine.unit(e.target)
 			if t10 != null and views.has(t10.id):
 				views[t10.id].sync()
 			if t10 != null:
-				_log("%s is pulled back from Death's Door." % t10.display_name)
+				_log("%s is pulled back from Last Legs." % t10.display_name)
 		"death":
 			var t11 := engine.unit(e.target)
 			if t11 != null and views.has(t11.id):

@@ -207,7 +207,7 @@ func _advance() -> void:
 	var msgs := run.cave_advance()
 	Audio.play("footsteps")
 	for m in msgs:
-		if "Breaking" in m or "BREAKING" in m or "SECOND" in m:
+		if "Breaking" in m or "BREAKING" in m or "TRUE GRIT" in m:
 			Main.inst.toast(m, "purple")
 	var tw := create_tween().set_parallel(true)
 	for f in walkers:

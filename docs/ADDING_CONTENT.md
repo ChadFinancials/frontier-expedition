@@ -39,7 +39,7 @@ Contents: [classes](#add-a-hero-class) · [moves](#add-or-change-a-move) ·
    review sheet: `python3 tools/hero_sheet.py`.
 
 **Stats.** `hp`, `dodge`, `speed`, `acc`, `crit` are flat; `prot` is a percent; `dmg` is the
-weapon's damage range. `res` values are percent resistances; `deathblow` is the Death's Door
+weapon's damage range. `res` values are percent resistances; `deathblow` is the Last Legs (Cheat Death)
 survival chance (default 67). `ranks` are the preferred ranks (shown to the player).
 
 **Moves.** `skills` lists every move the class can learn. The first two are the **stock**
@@ -228,7 +228,7 @@ of `mods`: `{"stat": "dmg_pct", "value": 15, "cond": "vs:beast"}`.
 - Conditions: always, in_cave, on_trail, front, back, low_hp, vs:<tag>, marked, vs_marked,
   vs_vulnerable, deaths_door, round1, guarding (Guarding or Taunting), poisoned.
 - Extra stats beyond the combat ones: `fatigue_pct` (Fatigue taken), `heal_pct` (healing
-  received), `heal_out_pct` (healing given), `resolve` (Second Wind chance), `scout`,
+  received), `heal_out_pct` (healing given), `resolve` (True Grit chance), `scout`,
   `surprise`, `food_pct`, `loot_pct`, `xp_pct`, `vulnerable`, `stun_chance`, `poison_dot`,
   `momentum_start`, `momentum_bonus`, `card_pct` (Stacked Deck boons).
 - A quirk can add `"compulsion": {"tag": "whiskey", "chance": 50, "text": "...", "steals":
@@ -238,6 +238,23 @@ of `mods`: `{"stat": "dmg_pct", "value": 15, "cond": "vs:beast"}`.
   `"class": "<class id>"` (only that class can wear it; it drops at its rarity like any
   other trinket) and may add `"skill_mods": {"<move id>": {"dmg_pct": 15}}` with keys
   `dmg_pct`, `acc`, `crit`, `effect_chance`, `mark_rounds`, `dot`, `heal`, `heal_pct`, `move`.
+
+## Add a Breaking Point or True Grit state
+
+`data/fatigue_states.json`. `kind` is `breaking` (a Breaking Point) or `second_wind` (True
+Grit). The Gut Check at 100 Fatigue picks one at random from the matching kind.
+
+- `mods`: stat modifiers with conditions, as for quirks.
+- Breaking Points: `acts` lists what the hero may do on their own at the start of a turn
+  (`bark`, `pass`, `move_back`, `move_forward`, `random_skill`, `taunt`); `act_chance` is the
+  chance in %. `barks` and `taunt_barks` are the lines. `refuses_help: true` gives a 50%
+  chance to turn down heals, buffs and guards from allies.
+- `turn_start` (True Grit): boons with a `chance` in %. `on_land`: boons fired once, on the
+  first fight turn after the state lands. `fight_start`: boons on the first turn of every
+  fight.
+- Boon types: `heal_self_pct` (value), `party_fatigue` (value), `buff_ally` (stat, value),
+  `buff_lowest` (stat, value; the most wounded hero, rest of the fight), `mark_self` (rounds),
+  `mark_enemy` (rounds), `cleanse_ally` (clears Bleed or Poison).
 
 ## Add a survival skill
 
