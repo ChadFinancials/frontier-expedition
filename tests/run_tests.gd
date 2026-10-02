@@ -1460,6 +1460,7 @@ func test_money_shot() -> void:
 			kills += 1
 			check(e.bounty == 30, "a Money Shot kill pays 30 at level 1 (got %d)" % e.bounty)
 	check(kills == 1, "the 1-HP foe falls to a Money Shot")
+	check(g.kills == 1, "a killing blow counts on the hero's kill tally")
 
 
 func test_iron_justice() -> void:

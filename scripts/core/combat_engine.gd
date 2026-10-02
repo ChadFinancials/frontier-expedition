@@ -222,7 +222,7 @@ func _start_turn(c: Combatant) -> Array:
 	for d in c.dots:
 		var dd := maxi(1, int(round(float(d.amount) * c.vuln_mult())))
 		ev.append({"t": "dot", "target": c.id, "kind": d.kind, "amount": dd})
-		_apply_damage(c, dd, null, ev, true)
+		_apply_damage(c, dd, unit(int(d.get("by", -1))), ev, true)
 		d.rounds -= 1
 		if d.rounds > 0:
 			still.append(d)
@@ -860,7 +860,7 @@ func _apply_effect(a: Combatant, sid: String, e: Dictionary, t: Combatant, ev: A
 					amt *= 1.0 + DB.cfg("tier_dmg_pct", 30) / 100.0 * (a.tier - 1)
 				if crit:
 					amt *= 1.5
-				t.dots.append({"kind": kind, "amount": maxi(1, int(round(amt))), "rounds": e.get("rounds", 3)})
+				t.dots.append({"kind": kind, "amount": maxi(1, int(round(amt))), "rounds": e.get("rounds", 3), "by": a.id})
 				ev.append({"t": "status", "target": t.id, "status": kind})
 		"stun":
 			if _roll_effect(a, sid, e, t, ev):
@@ -1094,6 +1094,9 @@ func _apply_damage(t: Combatant, amount: int, source: Combatant, ev: Array, is_d
 			else:
 				killed.append(t.data.get("id", ""))
 				ev.append({"t": "death", "target": t.id})
+				# The hero sheet's kill tally: killing blows, bleed and poison included.
+				if source != null and source.hero != null:
+					source.hero.kills += 1
 		return
 	# Heroes: Death's Door. The hit that knocks a hero onto it never kills, and neither do
 	# the rest of that same move's hits (a multi-shot volley): the next move rolls Deathblow.

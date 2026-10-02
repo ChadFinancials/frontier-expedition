@@ -87,6 +87,8 @@ decided, and what shipped. Update both at the end of every round.
 - **Noted:** the Gunhand's Double Tap (2 random hits of 3-6) stands out against two or more
   gunhands, since their speed lets them open with it. No change for now.
 - The haul (275 chips, 3 Timber, 3 Iron, 3 Hides) paid for the Bunkhouse.
+- **Hero sheet kill tally:** it was never counted. It now counts killing blows, including bleed
+  and poison ticks from that hero. It starts from 0 for existing heroes.
 
 ### Round 11 (weeks 2-3: Mad Dog's hideout)
 - **Iron Justice** (owner): +15% damage vs outlaws, +5% per move level, stacking with +40% vs
