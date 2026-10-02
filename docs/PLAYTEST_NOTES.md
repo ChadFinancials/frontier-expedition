@@ -29,7 +29,7 @@ decided, and what shipped. Update both at the end of every round.
       a Reload move.
 - [ ] Class workshop, second half (`docs/HERO_PROPOSALS.md`): Preacher and Doctor done.
       Open: the Bayou Poisoner's 8th (Mosquito Swarm too close to Poison Darts; keep
-      workshopping), the Prospector (on hold), the Shotgun Guard and the Train Hopper.
+      workshopping), the Prospector (on hold) and the Shotgun Guard. (Train Hopper shipped.)
 - [ ] Decide whether utility moves need their own per-level upgrade paths (today every move
       level adds the same accuracy, damage, effect and healing bonuses).
 - [ ] Stacked Deck "probably needs tuning" (round 8; owner: save for a later balancing pass). A second deal stacks on the first (two
@@ -41,6 +41,13 @@ decided, and what shipped. Update both at the end of every round.
 - [ ] Watch: Ruby Blackwing is hard and the crow summon strong; probably right (round 7).
 - [ ] Second region onward (Red Canyons, Thunder Peaks, Redwater Ford) waits until the first
       region is crisp.
+
+### Quality of life
+- [ ] **Trinket inventory screen**, like DD's (owner, round 9): a "Trinkets" button in the top
+      bar opens an equip menu showing the stash and every hero's two slots side by side, to
+      drag or click trinkets on and off. Needs an icon per trinket (49 today: 24 general,
+      22 class, 3 boss) from the owner's icon pipeline (`prep_icons.py`) before it's worth
+      building.
 
 ### Visuals
 - [ ] **Backdrops**: about ten more images in the owner's prairie style for stops across side
