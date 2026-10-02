@@ -63,6 +63,15 @@ func _draw() -> void:
 		"iron":
 			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.1, s * 0.75), Vector2(s * 0.25, s * 0.35), Vector2(s * 0.75, s * 0.35), Vector2(s * 0.9, s * 0.75)]), Color("#8c9096"))
 			draw_colored_polygon(PackedVector2Array([Vector2(s * 0.25, s * 0.35), Vector2(s * 0.75, s * 0.35), Vector2(s * 0.7, s * 0.45), Vector2(s * 0.3, s * 0.45)]), Color("#c5cad0"))
+		"hides":
+			# A stretched pelt: four legs, a tail, darker spine.
+			var pelt := PackedVector2Array([Vector2(0.5, 0.08), Vector2(0.62, 0.2), Vector2(0.9, 0.16), Vector2(0.76, 0.36),
+				Vector2(0.8, 0.62), Vector2(0.92, 0.84), Vector2(0.64, 0.74), Vector2(0.54, 0.94), Vector2(0.46, 0.94),
+				Vector2(0.36, 0.74), Vector2(0.08, 0.84), Vector2(0.2, 0.62), Vector2(0.24, 0.36), Vector2(0.1, 0.16), Vector2(0.38, 0.2)])
+			for i in pelt.size():
+				pelt[i] *= s
+			draw_colored_polygon(pelt, Color("#a8743f"))
+			draw_line(Vector2(s * 0.5, s * 0.16), Vector2(s * 0.5, s * 0.86), Color("#6e4524"), maxf(1.0, s * 0.08))
 		"charter":
 			draw_rect(Rect2(s * 0.2, s * 0.12, s * 0.6, s * 0.76), Color("#efe3c8"))
 			for i in 4:

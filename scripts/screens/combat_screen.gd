@@ -1299,6 +1299,8 @@ func _finish() -> void:
 			lines.append("+%d Timber" % res.timber)
 		if int(res.iron) > 0:
 			lines.append("+%d Iron" % res.iron)
+		if int(res.get("hides", 0)) > 0:
+			lines.append("+%d Hides" % res.hides)
 		if int(res.charters) > 0:
 			lines.append("+%d Land Charter%s!" % [res.charters, "s" if res.charters > 1 else ""])
 		for k in res.keepsakes:

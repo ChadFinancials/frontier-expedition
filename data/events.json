@@ -62,7 +62,7 @@
       {"text": "Wait for them to pass.", "outcomes": [
         {"weight": 1, "text": "It takes most of the day. Everyone is restless and hungry.", "effects": [{"type": "food", "amount": -3}, {"type": "fatigue", "amount": 4, "target": "party"}]}]},
       {"text": "Hunt one for meat.", "requires": {"skill": "hunter"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} brings down a young cow cleanly. Meat for days.", "effects": [{"type": "food", "amount": 10}]}]},
+        {"weight": 1, "good": true, "text": "{hero} brings down a young cow cleanly. Meat for days, and a hide worth tanning.", "effects": [{"type": "food", "amount": 10}, {"type": "hides", "amount": 2}]}]},
       {"text": "Push through the herd.", "outcomes": [
         {"weight": 2, "text": "The herd parts. Mostly.", "effects": [{"type": "wagon", "amount": -10}]},
         {"weight": 1, "text": "A bull takes exception to your wagon.", "effects": [{"type": "fight", "enemies": ["buffalo_bull"]}]}]}
@@ -121,7 +121,7 @@
     "text": "Big paw prints circle the camp. They were here last night, watching.",
     "options": [
       {"text": "Set a trap line.", "requires": {"skill": "trapper"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero}'s traps catch two wolves. The pelts will fetch a price.", "effects": [{"type": "money", "min": 80, "max": 140}]}]},
+        {"weight": 1, "good": true, "text": "{hero}'s traps catch two wolves. Prime pelts, and a bounty besides.", "effects": [{"type": "hides", "amount": 2}, {"type": "money", "min": 80, "max": 140}]}]},
       {"text": "Hunt them down before they hunt you.", "outcomes": [
         {"weight": 1, "text": "You find them. Or they find you.", "effects": [{"type": "fight", "enemies": ["prairie_wolf", "prairie_wolf", "coyote"], "surprise": "enemies"}]}]},
       {"text": "Keep a big fire going and move on.", "outcomes": [
@@ -205,10 +205,10 @@
     "text": "Fresh game sign everywhere: pronghorn, deer and turkey. A chance to stock up.",
     "options": [
       {"text": "Go hunting.", "outcomes": [
-        {"weight": 3, "good": true, "text": "A fat pronghorn!", "effects": [{"type": "food", "amount": 5}]},
+        {"weight": 3, "good": true, "text": "A fat pronghorn!", "effects": [{"type": "food", "amount": 5}, {"type": "hides", "amount": 1}]},
         {"weight": 2, "text": "Nothing but sore feet.", "effects": [{"type": "fatigue", "amount": 4, "target": "party"}]}]},
       {"text": "Let the expert handle it.", "requires": {"skill": "hunter"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} comes back with more meat than you can carry.", "effects": [{"type": "food", "amount": 10}]}]},
+        {"weight": 1, "good": true, "text": "{hero} comes back with more meat than you can carry.", "effects": [{"type": "food", "amount": 10}, {"type": "hides", "amount": 2}]}]},
       {"text": "Set snares and forage.", "requires": {"skill": "forager"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} finds roots, greens and a snared rabbit.", "effects": [{"type": "food", "amount": 6}, {"type": "item", "item": "bandages", "amount": 1}]}]}
     ]},
@@ -368,7 +368,7 @@
       {"text": "Rest by the fire.", "outcomes": [
         {"weight": 1, "good": true, "text": "Warm at last.", "effects": [{"type": "heal_pct", "value": 20, "target": "party"}, {"type": "fatigue", "amount": -12, "target": "party"}]}]},
       {"text": "Buy furs and provisions (50 chips).", "requires": {"money": 50}, "consume": {"money": 50}, "outcomes": [
-        {"weight": 1, "good": true, "text": "Furs, pemmican and good advice.", "effects": [{"type": "food", "amount": 8}, {"type": "reveal", "amount": 2}]}]},
+        {"weight": 1, "good": true, "text": "Furs, pemmican and good advice.", "effects": [{"type": "food", "amount": 8}, {"type": "reveal", "amount": 2}, {"type": "hides", "amount": 2}]}]},
       {"text": "Ask the trapper to join you.", "outcomes": [
         {"weight": 1, "good": true, "text": "\"Been meaning to see the ocean before I die.\"", "effects": [{"type": "recruit", "class": "mountain_man"}]}]}
     ]},

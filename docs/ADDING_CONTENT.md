@@ -144,7 +144,8 @@ In `data/enemies.json`: `name`, stats as for classes (`hp`, `dodge`, `prot`, `sp
 `crit`, `dmg`, `res`), `tags` (used by quirks, trinkets and matchups: `outlaw`, `human`,
 `beast`, `mythic`, `reptile`, `cave`...), `skills` (ids in skills.json) and a `look`.
 Optional: `title` (a nickname line for uniques and bosses), `elite: true`, `boss: true`
-(skips tier scaling), `actions` (actions per round, default 1). Stats are the tier-1
+(skips tier scaling), `actions` (actions per round, default 1), `hides` (`[chance %, min, max]`
+dropped when killed; beasts only so far). Stats are the tier-1
 baseline; higher-tier regions scale them (config `tier_*`).
 
 Enemy moves use the same format, plus AI hints in `ai`:
@@ -192,7 +193,7 @@ In `data/events.json`, then list its id in a region's `events` (or `homestead_ev
 
 **Effects** (events, curios and camp; applied by `scripts/core/effects.gd`): `fatigue`,
 `heal_pct`, `damage_pct`, `food`, `money` (`amount`, or `min`/`max`), `money_pct`, `timber`,
-`iron`, `charters`, `item {item, amount}`, `keepsake` (optional `rarity` list),
+`iron`, `hides`, `charters`, `item {item, amount}`, `keepsake` (optional `rarity` list),
 `quirk {quirk}` (an id, or random / random_positive / random_negative), `remove_quirk`,
 `wagon`, `recruit {class}`, `fight {enemies, surprise, reward}`, `buff {stat, value}` (next
 fight), `reveal {amount}`, `light`, `clear_shaken`.
@@ -264,7 +265,7 @@ Optional:
   optionally `title`, `story` (a dialog on arrival) and `lane_y` (0–1). Each node links to
   every node in the next column. Mark the region `"tutorial": true` to turn off mishaps.
 - `no_ambush`: no surprise either way.
-- `boss_rewards`: overrides the boss payout (`money`, `charters`, `timber`, `iron`).
+- `boss_rewards`: overrides the boss payout (`money`, `charters`, `timber`, `iron`, `hides`).
 - `boss.first_script`: a scripted first meeting: `id` (story flag), `unit` (enemy id),
   `round`, `hp_pct`, `deaths_door` (triggers), `wound_pct` (the boss's health next time),
   `title` and `text` (the cutscene). Add `boss.intro_again` for the rematch.
@@ -293,7 +294,7 @@ expedition) and `tutorial_rebuilds` (the ruin that winning it restores).
 `data/quests.json` holds the Saloon's rumor pool. Each template has `name` and `desc`
 (`{place}` is filled in from `places`), `node_weights`, `fights`, `elites`, `final` (the last
 fight when there's no boss), `boss` (`name`, `intro`, `victory`, `enemies`), and optionally
-`always_boss`, `difficulty`, `done_flag` (a story flag set when won; the rumor stops
+`always_boss`, `difficulty`, `bonus_hides` (extra Hides on the reward), `done_flag` (a story flag set when won; the rumor stops
 appearing) and `boss_keepsake`. `chances` sets the odds of a boss, a trinket and a recruit per
 Loose Lips level. Rumors borrow scenery, events and curios from the settlement's western
 region, scale to its tier, and use the painted set in config `quest_backdrop`.

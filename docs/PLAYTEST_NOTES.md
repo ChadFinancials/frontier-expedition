@@ -67,14 +67,27 @@ decided, and what shipped. Update both at the end of every round.
 - [ ] A world map between settlements, later.
 
 ### Economy
-- [ ] **A third town material** beside Timber and Iron (owner, round 9): found on expeditions,
-      carried in the wagon, spent on buildings and upgrades. Options under discussion.
+- [x] ~~A third town material~~: **Hides** shipped in round 9.
+- [ ] Hides icon: the pelt is drawn in code; paint one through the icon pipeline.
 
 ---
 
 ## History
 
 ### Round 9
+- **Hides, a third town material** (owner's pick): the hunting and leather economy beside
+  Timber (building) and Iron (metal). They're cargo, come home in the wagon, and show in the
+  top bar, trail HUD and results.
+  - *Found:* beasts drop them (wolves and coyotes 50% for 1, rattlesnakes 30%, gila monsters
+    40%, buffalo and grizzlies always 2-3, stone rams 1-2: enemy field `hides`); the Hunter's
+    Go Hunting (35% for 1) and the Trapper's Set Snares (30%); Tan Pelts now makes Hides
+    (1 + 1 per rank) and fewer chips (20 + 20 per rank); the Dead Horse's saddle leather; the
+    Buffalo Herd, Good Hunting, Wolf Tracks and Trapper's Cabin events; side quests 0-2 (+tier;
+    Wolves +3, Rustlers +2, Snakes +1: template `bonus_hides`); Crow's Nest boss 3.
+  - *Spent:* armor upgrades take Hides instead of Iron (2/5/9/14; weapons keep Iron); level 1
+    of the Saloon (2), Doctor (2) and Stage Line (4), all three levels growing from there;
+    levels 2-3 of the General Store, Smithy and Drill Hall; both Bunkhouse upgrades (3, 8);
+    growing to a Town (12) or City (30); founding an outpost (4). New games start with 0.
 - Owner's Dry Gulch run (all level 2: Marshal, Prospector, Preacher, Train Hopper): the
   hardest region so far; Marshal on Death's Door, Preacher at 160 Fatigue; caves heavy on
   Fatigue (bats and tommyknockers); End of the Line animation great; income better; three

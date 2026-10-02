@@ -81,6 +81,7 @@
     "hand": [
       {"weight": 4, "text": "{hero} goes through the saddlebags: jerky and a few coins.", "effects": [{"type": "food", "amount": 2}, {"type": "money", "min": 30, "max": 80}]},
       {"weight": 2, "text": "The smell is unbelievable. {hero} gags the whole time.", "effects": [{"type": "fatigue", "amount": 8, "target": "actor"}, {"type": "money", "min": 20, "max": 40}]},
+      {"weight": 2, "text": "{hero} cuts the saddle and tack free: good leather, still supple.", "effects": [{"type": "hides", "amount": 1}]},
       {"weight": 1, "text": "The rider's wanted poster is in the bag. The rider's friends are nearby.", "effects": [{"type": "fight", "enemies": ["outlaw_knifeman", "outlaw_gunhand"]}]}
     ],
     "keys": {"shovel": {"text": "{hero} gives horse and rider a decent burial. In the rider's boot: a trinket.", "effects": [{"type": "keepsake", "chance": 70}, {"type": "fatigue", "amount": -5, "target": "party"}]}}},

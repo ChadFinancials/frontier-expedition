@@ -39,7 +39,7 @@ func setup(params: Dictionary) -> void:
 	var lr := UI.hb(30)
 	lr.alignment = BoxContainer.ALIGNMENT_CENTER
 	v.add_child(lr)
-	for it in [["money", "%d chips" % int(loot.get("money", 0))], ["timber", "%d Timber" % int(loot.get("timber", 0))], ["iron", "%d Iron" % int(loot.get("iron", 0))], ["charter", "%d Charters" % int(loot.get("charters", 0))]]:
+	for it in [["money", "%d chips" % int(loot.get("money", 0))], ["timber", "%d Timber" % int(loot.get("timber", 0))], ["iron", "%d Iron" % int(loot.get("iron", 0))], ["hides", "%d Hides" % int(loot.get("hides", 0))], ["charter", "%d Charters" % int(loot.get("charters", 0))]]:
 		var h := UI.hb(6)
 		h.add_child(ResIcon.make(it[0], 34))
 		h.add_child(UI.lbl(it[1], 26, "InkBold"))

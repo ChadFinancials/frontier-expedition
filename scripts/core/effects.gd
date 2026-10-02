@@ -4,7 +4,7 @@ extends RefCounted
 ##
 ## Effect format: {"type": ..., "target": "actor"|"party"|"random"|"ally", ...}
 ## Types: fatigue{amount}, heal_pct{value}, damage_pct{value}, food{amount}, money{amount|min,max},
-## money_pct{value}, timber{amount}, iron{amount}, charters{amount}, item{item,amount}, keepsake{},
+## money_pct{value}, timber{amount}, iron{amount}, hides{amount}, charters{amount}, item{item,amount}, keepsake{},
 ## quirk{quirk}, remove_quirk{}, wagon{amount}, recruit{class}, fight{enemies,surprise,reward},
 ## buff{stat,value} (next fight), reveal{amount}, light{amount}, clear_shaken{}.
 ## Any effect may carry "chance" (percent). Camp effects use base/per_rank instead of amount.
@@ -69,6 +69,11 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 				if ir < 0:
 					run.loot.iron = maxi(0, int(run.loot.iron) + ir)
 				out.msgs.append("+%d Iron." % ig if ig == ir else "+%d Iron (no room in the wagon for %d more)." % [ig, ir - ig])
+			"hides":
+				var hg: int = run.add_material("hides", amount) if amount > 0 else amount
+				if amount < 0:
+					run.loot["hides"] = maxi(0, int(run.loot.get("hides", 0)) + amount)
+				out.msgs.append("+%d Hides." % hg if hg == amount else "+%d Hides (no room in the wagon for %d more)." % [hg, amount - hg])
 			"charters":
 				run.loot.charters = int(run.loot.charters) + amount
 				out.msgs.append("+%d Land Charter%s!" % [amount, "" if amount == 1 else "s"])

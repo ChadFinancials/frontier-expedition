@@ -43,7 +43,8 @@ func refresh(extra: Dictionary = {}) -> void:
 	_item("week", "Week %d" % co.week, "Each expedition takes a week. Buildings, recruits and the stage line run on weeks.")
 	_item("money", "%d" % co.money, "Chips: the frontier's currency, minted by the Great Casino. Pays for supplies, buildings, treatment and training.")
 	_item("timber", "%d" % co.timber, "Timber: used to build and upgrade buildings.")
-	_item("iron", "%d" % co.iron, "Iron: used for buildings and gear upgrades.")
+	_item("iron", "%d" % co.iron, "Iron: used for buildings and weapon upgrades.")
+	_item("hides", "%d" % co.hides, "Hides: skinned from beasts and trapped on the trail. Leather for armor, harness, bedding and the better buildings.")
 	_item("charter", "%d" % co.charters, "Land Charters: needed to found and grow settlements. Won from bosses and elites.")
 	for k in extra:
 		_item(k, str(extra[k]), "")

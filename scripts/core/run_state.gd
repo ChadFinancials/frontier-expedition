@@ -12,7 +12,7 @@ var current: int = 0
 var day: int = 1
 var supplies: Dictionary = {}
 var wagon: int = 100
-var loot: Dictionary = {"money": 0, "timber": 0, "iron": 0, "charters": 0, "keepsakes": []}
+var loot: Dictionary = {"money": 0, "timber": 0, "iron": 0, "hides": 0, "charters": 0, "keepsakes": []}
 var xp: int = 0
 var kills: int = 0
 var pending_buffs: Array = []    # {stat, value, uid (0 = everyone)}
@@ -344,6 +344,7 @@ func cargo() -> Dictionary:
 	var c := supplies.duplicate()
 	c["timber"] = int(loot.get("timber", 0))
 	c["iron"] = int(loot.get("iron", 0))
+	c["hides"] = int(loot.get("hides", 0))
 	return c
 
 
@@ -460,7 +461,7 @@ func boss_intro() -> String:
 
 ## Called when a fight ends (any result). Updates party order, deaths, loot and XP.
 func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -> Dictionary:
-	var res := {"result": engine.state, "money": 0, "timber": 0, "iron": 0, "charters": 0, "keepsakes": [], "msgs": []}
+	var res := {"result": engine.state, "money": 0, "timber": 0, "iron": 0, "hides": 0, "charters": 0, "keepsakes": [], "msgs": []}
 	pending_buffs.clear()
 	# Party order follows the battle's final formation.
 	var order: Array = []
@@ -502,6 +503,10 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 	var money := engine.bounty
 	for eid in engine.killed:
 		money += rng.randi_range(int(em[0]), int(em[1])) * tier()
+		# Beasts can be skinned: "hides": [chance %, min, max] on the enemy.
+		var hd: Array = DB.enemy(eid).get("hides", [])
+		if hd.size() == 3 and rng.randf() * 100.0 < float(hd[0]):
+			res.hides += rng.randi_range(int(hd[1]), int(hd[2]))
 	money = int(round(money * mult * float(DB.cfg("chips_mult", 1.0))))
 	if kind == "elite":
 		xp += DB.cfg("xp_elite", 2)
@@ -521,6 +526,7 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		money += int(qr.get("money", 0))
 		res.timber += int(qr.get("timber", 0))
 		res.iron += int(qr.get("iron", 0))
+		res.hides += int(qr.get("hides", 0))
 		if str(qr.get("trinket", "")) != "":
 			res.keepsakes.append(company.random_keepsake([qr.trinket]))
 		if int(qr.get("recruit", 0)) > 0:
@@ -543,6 +549,7 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		res.charters = int(br.get("charters", 2 if first else 1))
 		res.timber += int(br.get("timber", 0))
 		res.iron += int(br.get("iron", 0))
+		res.hides += int(br.get("hides", 0))
 		var bk: String = region().get("boss", {}).get("keepsake", "")
 		res.keepsakes.append(bk if first and bk != "" else company.random_keepsake(["rare", "uncommon"]))
 		boss_won = true
@@ -569,6 +576,7 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 					res.msgs.append("%s the %s will join the company when you return." % [nh.hero_name, nh.class_name_text()])
 				res.timber += int(sr.get("timber", 0))
 				res.iron += int(sr.get("iron", 0))
+				res.hides += int(sr.get("hides", 0))
 	if kind == "crossing" and not quest:
 		xp += DB.cfg("xp_elite", 2) + 2
 		money += int(DB.cfg("boss_money", 400) * tier() / 3.0 * float(DB.cfg("chips_mult", 1.0)))
@@ -581,7 +589,7 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		res.keepsakes.append(company.random_keepsake())
 	res.money = money
 	loot.money = int(loot.money) + money
-	for mat in ["timber", "iron"]:
+	for mat in ["timber", "iron", "hides"]:
 		var want := int(res[mat])
 		var got := add_material(mat, want)
 		res[mat] = got
@@ -633,7 +641,7 @@ func use_item(item_id: String, h: Hero) -> Array:
 # --- Curios ---------------------------------------------------------------------------
 
 ## Loot a Gold Fever hero keeps for themself.
-const STOLEN := ["money", "money_pct", "keepsake", "timber", "iron", "charters"]
+const STOLEN := ["money", "money_pct", "keepsake", "timber", "iron", "hides", "charters"]
 
 
 func _steals(h: Hero, cu: Dictionary) -> bool:

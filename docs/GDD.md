@@ -52,9 +52,9 @@ exist but wait until the start is crisp.
 ### Tiers `[tiers, found_cost]`
 | Tier | Building slots | Max building level | Cost |
 |---|---|---|---|
-| Outpost | 3 | 1 | Founding: 1 Charter, 600 chips, 15 Timber, 8 Iron |
-| Town | 6 | 2 | 3 Charters, 2000 chips, 40 Timber, 25 Iron |
-| City | 9 | 3 | 6 Charters, 5000 chips, 90 Timber, 60 Iron |
+| Outpost | 3 | 1 | Founding: 1 Charter, 600 chips, 15 Timber, 8 Iron, 4 Hides |
+| Town | 6 | 2 | 3 Charters, 2000 chips, 40 Timber, 25 Iron, 12 Hides |
+| City | 9 | 3 | 6 Charters, 5000 chips, 90 Timber, 60 Iron, 30 Hides |
 
 - **Founding** needs that region's boss beaten. A new outpost starts with a free Stage Line.
 - **Fort Providence** starts as a Town that Silas Crane burned: only the **Hiring Board**
@@ -127,7 +127,8 @@ exist but wait until the start is crisp.
   5 per boss. Each level above 1: +12% max HP, +5% damage, +3 accuracy, +1% crit
   `[level_*]`. Level caps gear and move levels.
 - **Gear**: weapon and armor tiers 1-5 (Smithy; a tier needs that hero level). Weapon +12%
-  damage per tier; armor +8% max HP and +2 dodge per tier.
+  damage per tier; armor +8% max HP and +2 dodge per tier. Weapon tiers cost Iron, armor tiers
+  Hides (2/5/9/14) `[gear_costs]`.
 - **Move level** 1-5 (Drill Hall; at most one above the hero's level): +4 accuracy, +8%
   damage, +6% effect chance, +15% healing and damage over time per level `[skill_level_*]`.
 - **Survival skills**: two per hero, rank 1-3, ranking up with use. Each gives a party
@@ -281,7 +282,7 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
 | Salt | Curio key for strange, mythic things; stops spoilage (store level 2) |
 | Wagon Parts | Repair the wagon |
 
-Timber and Iron found on the trail are cargo and take wagon slots too. (The Crowbar was
+Timber, Iron and Hides found on the trail are cargo and take wagon slots too. (The Crowbar was
 retired in round 7; the Shovel took its curios.)
 
 ### Wagon
@@ -336,15 +337,19 @@ retired in round 7; the Shovel took its curios.)
 
 ## 9. Economy
 
-- Currency: **chips**. Materials: **Timber** and **Iron** (gate building and gear), and
+- Currency: **chips**. Materials: **Timber** (building), **Iron** (metal: weapons, the Smithy),
+  **Hides** (leather: armor, the Saloon, Doctor, Stage Line, Bunkhouse and settlement growth), and
   **Charters** (from region bosses, needed to found and grow settlements).
 - Fights pay 10-24 chips per enemy × region tier `[enemy_money]`. Elites add 1-3 Timber and
   1-2 Iron. Region bosses pay 500 chips × tier `[boss_money]`, a Charter and a trinket. Side
   quests pay 160-300 chips (more in harder tiers). Every chip earned passes through the
   `chips_mult` dial (1.0).
-  Rumors pay a set reward (chips, Timber, Iron, maybe a trinket or recruit).
-- Buildings cost roughly 300-450 / 800-1100 / 1800-2400 chips per level plus Timber and Iron
-  (`buildings.json`). Gear, move training and treatment costs are in config.
+  Rumors pay a set reward (chips, Timber, Iron, Hides, maybe a trinket or recruit).
+- Hides come from beasts (wolves, coyotes, snakes, gila monsters; buffalo, grizzlies and stone
+  rams always), the Hunter and Trapper at camp, hunting and trapping events, the Dead Horse
+  and beast-themed side quests.
+- Buildings cost roughly 300-450 / 800-1100 / 1800-2400 chips per level plus Timber, Iron and
+  Hides (`buildings.json`). Gear, move training and treatment costs are in config.
 - Trading posts sell at 2.2× `[trade_markup]`.
 
 ---

@@ -135,6 +135,7 @@ func refresh() -> void:
 		["money", "+%d" % int(run.loot.money), "Chips won this expedition."],
 		["timber", "+%d" % int(run.loot.timber), "Timber found."],
 		["iron", "+%d" % int(run.loot.iron), "Iron found."],
+		["hides", "+%d" % int(run.loot.get("hides", 0)), "Hides taken: skin beasts, trap and hunt."],
 		["charter", "+%d" % int(run.loot.charters), "Land Charters found."],
 		["xp", "%d XP" % run.xp, "Experience each survivor earns."],
 		["eye", "Scouting %d" % int(run.scout_score()), _scout_tip()]]

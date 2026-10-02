@@ -78,7 +78,7 @@
     "props": ["tree", "grass", "fence", "rock"],
     "cave_name": "Root Cellar",
     "node_weights": {"fight": 46, "elite": 12, "event": 18, "curio": 12, "cave": 4, "homestead": 4, "trading_post": 4},
-    "boss_rewards": {"money": 440, "charters": 0, "timber": 6, "iron": 2},
+    "boss_rewards": {"money": 440, "charters": 0, "timber": 6, "iron": 2, "hides": 3},
     "side_reward": {"timber": 6},
     "fights": [
       {"enemies": ["outlaw_brawler", "outlaw_gunhand", "carrion_crows"], "weight": 3},

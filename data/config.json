@@ -4,6 +4,7 @@
   "start_money": 750,
   "start_timber": 4,
   "start_iron": 1,
+  "start_hides": 0,
   "start_heroes": ["marshal", "gunslinger"],
   "start_promised": ["preacher"],
   "start_missing": ["sharpshooter"],
@@ -125,9 +126,9 @@
   "tiers": [
     {"id": "outpost", "name": "Outpost", "slots": 3, "max_level": 1},
     {"id": "town", "name": "Town", "slots": 6, "max_level": 2,
-      "cost": {"charters": 3, "money": 2000, "timber": 40, "iron": 25}},
+      "cost": {"charters": 3, "money": 2000, "timber": 40, "iron": 25, "hides": 12}},
     {"id": "city", "name": "City", "slots": 9, "max_level": 3,
-      "cost": {"charters": 6, "money": 5000, "timber": 90, "iron": 60}}
+      "cost": {"charters": 6, "money": 5000, "timber": 90, "iron": 60, "hides": 30}}
   ],
   "ruin_rebuild_pct": 100,
   "trade_markup": 2.2,
@@ -135,12 +136,13 @@
   "free_kit": {"food": 16, "bandages": 1, "wagon_parts": 1},
   "tutorial_party": ["marshal", "gunslinger"],
   "tutorial_supplies": {"food": 10, "bandages": 2, "wagon_parts": 1},
-  "found_cost": {"charters": 1, "money": 600, "timber": 15, "iron": 8},
+  "found_cost": {"charters": 1, "money": 600, "timber": 15, "iron": 8, "hides": 4},
 
   "gear_costs": {
     "weapon": [0, 250, 600, 1200, 2000],
     "armor": [0, 200, 500, 1000, 1700],
-    "iron": [0, 2, 5, 9, 14]
+    "iron": [0, 2, 5, 9, 14],
+    "hides": [0, 2, 5, 9, 14]
   },
   "skill_costs": [0, 150, 400, 800, 1400],
   "doctor_quirk_cost": 250,

@@ -76,7 +76,7 @@ Three rules hold the codebase together:
 
 | Class | Holds | Notes |
 |---|---|---|
-| `Company` | The campaign: chips, Timber, Iron, Charters, heroes, settlements and buildings, the week, story flags, saloon quests, the current `run` | All town services (build, upgrade, treat, train, hire, stage line) are methods here. `start_run` / `finish_run` open and settle an expedition. `advance_week` runs the weekly clock. `to_dict` / `from_dict` is the save format |
+| `Company` | The campaign: chips, Timber, Iron, Hides, Charters, heroes, settlements and buildings, the week, story flags, saloon quests, the current `run` | All town services (build, upgrade, treat, train, hire, stage line) are methods here. `start_run` / `finish_run` open and settle an expedition. `advance_week` runs the weekly clock. `to_dict` / `from_dict` is the save format |
 | `RunState` | One expedition: the map (`nodes`, `current`), party, supplies, wagon, loot, log, cave state | Travel, scouting, camp, curios, events, caves and trading posts. `after_combat` settles a fight. `combat_options` builds a fight's modifiers |
 | `CombatEngine` | One battle | See "Combat" below |
 | `Combatant` | A unit inside a battle | Wraps a `Hero` or an enemy definition; stats, statuses, buffs |
@@ -224,7 +224,7 @@ while not engine.is_over():
 | Town painting | `assets/art/town/<image>.png`, plus `town_art` spots in `settlements.json` | `TownView.set_art`: painted buildings become the plots, marked with name, CLOSED and VACANT boards | The drawn street |
 
 - Icon keys are an item's `icon` field in `items.json` or a resource kind in `res_icon.gd`
-  (`money, timber, iron, charter, week, wagon, xp, eye, skull...`).
+  (`money, timber, iron, hides, charter, week, wagon, xp, eye, skull...`).
 - Backdrop key order: an explicit `bg_key` (the title screen uses `title`), then the region's
   `backdrop` field, or `quest_backdrop` from config for a Saloon quest (outdoor scenes only),
   then `<region>_<mode>`. A numbered set is stepped through by map progress

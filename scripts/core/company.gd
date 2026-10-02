@@ -7,6 +7,7 @@ var week: int = 1
 var money: int = 0
 var timber: int = 0
 var iron: int = 0
+var hides: int = 0              # Hides: the third town material (beasts, trapping), for leatherwork
 var charters: int = 0
 var heroes: Array = []          # Hero (alive only)
 var dead: Array = []            # {name, class_id, level, note, week}
@@ -35,6 +36,7 @@ func new_game(seed_value: int = -1) -> void:
 	money = DB.cfg("start_money", 750)
 	timber = DB.cfg("start_timber", 10)
 	iron = DB.cfg("start_iron", 5)
+	hides = DB.cfg("start_hides", 0)
 	var start_site := site_by_index(0)
 	var st := {"index": 0, "site": start_site.id, "tier": start_site.get("start_tier", "outpost"),
 		"buildings": start_site.get("start_buildings", {}).duplicate(), "ruins": start_site.get("start_ruins", []).duplicate(),
@@ -204,7 +206,8 @@ func kill_hero(h: Hero, note: String = "") -> void:
 
 func can_afford(cost: Dictionary) -> bool:
 	return money >= int(cost.get("money", 0)) and timber >= int(cost.get("timber", 0)) \
-		and iron >= int(cost.get("iron", 0)) and charters >= int(cost.get("charters", 0))
+		and iron >= int(cost.get("iron", 0)) and hides >= int(cost.get("hides", 0)) \
+		and charters >= int(cost.get("charters", 0))
 
 
 func pay(cost: Dictionary) -> bool:
@@ -213,6 +216,7 @@ func pay(cost: Dictionary) -> bool:
 	money -= int(cost.get("money", 0))
 	timber -= int(cost.get("timber", 0))
 	iron -= int(cost.get("iron", 0))
+	hides -= int(cost.get("hides", 0))
 	charters -= int(cost.get("charters", 0))
 	return true
 
@@ -225,6 +229,8 @@ static func cost_text(cost: Dictionary) -> String:
 		parts.append("%d Timber" % int(cost.timber))
 	if int(cost.get("iron", 0)) > 0:
 		parts.append("%d Iron" % int(cost.iron))
+	if int(cost.get("hides", 0)) > 0:
+		parts.append("%d Hides" % int(cost.hides))
 	if int(cost.get("charters", 0)) > 0:
 		parts.append("%d Charter%s" % [int(cost.charters), "" if int(cost.charters) == 1 else "s"])
 	return ", ".join(parts) if not parts.is_empty() else "Free"
@@ -564,7 +570,9 @@ func gear_cost(i: int, kind: String, next_tier_value: int) -> Dictionary:
 	var lvl := maxi(1, building_level(i, "smithy"))
 	var mult: float = DB.buildings.smithy.cost_mult[lvl - 1]
 	var idx := next_tier_value - 1
-	return {"money": int(round(int(gc.get(kind, [0, 0, 0, 0])[idx]) * mult)), "iron": int(gc.get("iron", [0, 0, 0, 0])[idx])}
+	# Weapons take Iron; armor is leather first, so it takes Hides.
+	var mat := "hides" if kind == "armor" else "iron"
+	return {"money": int(round(int(gc.get(kind, [0, 0, 0, 0])[idx]) * mult)), mat: int(gc.get(mat, [0, 0, 0, 0])[idx])}
 
 
 func can_upgrade_gear(i: int, h: Hero, kind: String) -> String:
@@ -970,6 +978,7 @@ func _make_quest(tid: String, west: String, tier_l: int) -> Dictionary:
 		"money": int(rng.randi_range(160, 300) * mult * float(DB.cfg("chips_mult", 1.0))),
 		"timber": rng.randi_range(1, 3) + tl,
 		"iron": rng.randi_range(1, 3) + tl,
+		"hides": rng.randi_range(0, 2) + tl + int(t.get("bonus_hides", 0)),
 		"trinket": "",
 		"recruit": 0,
 	}
@@ -1020,6 +1029,8 @@ static func quest_hints(reg: Dictionary) -> String:
 		parts.append("%d Timber" % int(r.timber))
 	if int(r.get("iron", 0)) > 0:
 		parts.append("%d Iron" % int(r.iron))
+	if int(r.get("hides", 0)) > 0:
+		parts.append("%d Hides" % int(r.hides))
 	if str(r.get("trinket", "")) != "":
 		parts.append("a %s trinket" % r.trinket)
 	if int(r.get("recruit", 0)) > 0:
@@ -1081,6 +1092,7 @@ func complete_tutorial(skipped: bool = false) -> String:
 		money += int(br.get("money", 0))
 		timber += int(br.get("timber", 0))
 		iron += int(br.get("iron", 0))
+		hides += int(br.get("hides", 0))
 		var k: String = reg.get("boss", {}).get("keepsake", "")
 		if k != "":
 			stash.append(k)
@@ -1154,11 +1166,12 @@ func finish_run(status: String) -> Dictionary:
 	survivors = r.party_heroes()
 	if status == "defeat" or survivors.is_empty():
 		summary.status = "defeat"
-		summary.loot = {"money": 0, "timber": 0, "iron": 0, "charters": 0, "keepsakes": []}
+		summary.loot = {"money": 0, "timber": 0, "iron": 0, "hides": 0, "charters": 0, "keepsakes": []}
 	else:
 		money += int(r.loot.money)
 		timber += int(r.loot.timber)
 		iron += int(r.loot.iron)
+		hides += int(r.loot.get("hides", 0))
 		charters += int(r.loot.charters)
 		for k in r.loot.keepsakes:
 			if k != "":
@@ -1230,7 +1243,7 @@ func to_dict() -> Dictionary:
 	var hs: Array = []
 	for h in heroes:
 		hs.append(h.to_dict())
-	return {"version": 1, "week": week, "money": money, "timber": timber, "iron": iron, "charters": charters,
+	return {"version": 1, "week": week, "money": money, "timber": timber, "iron": iron, "hides": hides, "charters": charters,
 		"heroes": hs, "dead": dead.duplicate(true), "settlements": settlements.duplicate(true),
 		"stash": stash.duplicate(), "known_keys": known_keys.duplicate(true), "beaten": beaten.duplicate(),
 		"next_uid": next_uid, "victory_seen": victory_seen,
@@ -1244,6 +1257,7 @@ static func from_dict(d: Dictionary) -> Company:
 	c.money = int(d.get("money", 0))
 	c.timber = int(d.get("timber", 0))
 	c.iron = int(d.get("iron", 0))
+	c.hides = int(d.get("hides", 0))
 	c.charters = int(d.get("charters", 0))
 	for hd in d.get("heroes", []):
 		c.heroes.append(Hero.from_dict(hd))

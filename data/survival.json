@@ -8,7 +8,7 @@
     ]},
   "hunter": {"name": "Hunter", "desc": "Can bring down a pronghorn at three hundred yards.", "passive": {"type": "hunt_bonus", "base": 1, "per_rank": 1, "text": "Hunting events yield more food"},
     "actions": [
-      {"id": "go_hunting", "name": "Go Hunting", "hours": 4, "target": "self", "desc": "Brings back food. Might come back empty-handed.", "effects": [{"type": "food", "base": 4, "per_rank": 2, "fail": 20}], "unlock": 1},
+      {"id": "go_hunting", "name": "Go Hunting", "hours": 4, "target": "self", "desc": "Brings back food, and sometimes a hide. Might come back empty-handed.", "effects": [{"type": "food", "base": 4, "per_rank": 2, "fail": 20}, {"type": "hides", "base": 1, "per_rank": 0, "chance": 35}], "unlock": 1},
       {"id": "stalk_prey", "name": "Stalker's Eye", "hours": 2, "target": "party", "desc": "Party gains Accuracy for the next fight.", "effects": [{"type": "next_fight_buff", "stat": "acc", "base": 5, "per_rank": 3}], "unlock": 2}
     ]},
   "forager": {"name": "Forager", "desc": "Knows which roots feed you and which kill you.", "passive": {"type": "forage", "base": 20, "per_rank": 10, "text": "Chance to find food at trail stops"},
@@ -43,8 +43,8 @@
     ]},
   "trapper": {"name": "Trapper", "desc": "Runs a trap line and knows what a good pelt is worth.", "passive": {"type": "loot_pct", "base": 8, "per_rank": 6, "text": "More money from fights"},
     "actions": [
-      {"id": "set_snares", "name": "Set Snares", "hours": 3, "target": "self", "desc": "Catches food overnight.", "effects": [{"type": "food", "base": 3, "per_rank": 1}], "unlock": 1},
-      {"id": "pelt_trade", "name": "Tan Pelts", "hours": 3, "target": "self", "desc": "Prepares pelts to sell.", "effects": [{"type": "money", "base": 50, "per_rank": 40}], "unlock": 2}
+      {"id": "set_snares", "name": "Set Snares", "hours": 3, "target": "self", "desc": "Catches food overnight, now and then a pelt worth keeping.", "effects": [{"type": "food", "base": 3, "per_rank": 1}, {"type": "hides", "base": 1, "per_rank": 0, "chance": 30}], "unlock": 1},
+      {"id": "pelt_trade", "name": "Tan Pelts", "hours": 3, "target": "self", "desc": "Scrapes, salts and tans the pelts: Hides for town, and a few chips.", "effects": [{"type": "hides", "base": 1, "per_rank": 1}, {"type": "money", "base": 20, "per_rank": 20}], "unlock": 2}
     ]},
   "angler": {"name": "Angler", "desc": "Can find a fish in a mud puddle.", "passive": {"type": "river_bonus", "base": 1, "per_rank": 1, "text": "Knows the fords: river crossings go better"},
     "actions": [

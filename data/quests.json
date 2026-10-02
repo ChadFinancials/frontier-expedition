@@ -28,7 +28,8 @@
       "final": ["outlaw_knifeman", "outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"],
       "boss": {"name": "The Rustler Boss", "intro": "The rustlers' boss stands on a water barrel at {place}, a stolen brand still smoking in his hand. \"Nobody told you this is my land now?\"",
         "victory": "The rustlers scatter into the brush, leaving the herd and everything they stole.",
-        "enemies": ["outlaw_brawler", "crane_lieutenant", "outlaw_gunhand", "outlaw_rifleman"]}},
+        "enemies": ["outlaw_brawler", "crane_lieutenant", "outlaw_gunhand", "outlaw_rifleman"]},
+      "bonus_hides": 2},
 
     "wolf_den": {"name": "The Wolves of {place}", "desc": "Homesteaders near {place} are losing stock to a wolf pack that isn't afraid of anything.",
       "node_weights": {"fight": 44, "elite": 10, "event": 18, "curio": 14, "cave": 10, "homestead": 4, "trading_post": 0},
@@ -40,7 +41,8 @@
       "final": ["prairie_wolf", "prairie_wolf", "coyote", "prairie_wolf"],
       "boss": {"name": "The Pack at the Den", "intro": "The den is a cut bank at {place}, littered with bones. The whole pack comes out at once, and the biggest wolf you've ever seen leads them.",
         "victory": "The pack breaks and runs. The homesteaders at {place} will sleep tonight.",
-        "enemies": ["prairie_wolf", "buffalo_bull", "prairie_wolf", "coyote"]}},
+        "enemies": ["prairie_wolf", "buffalo_bull", "prairie_wolf", "coyote"]},
+      "bonus_hides": 3},
 
     "haunted_homestead": {"name": "The Haint at {place}", "desc": "Lights have been seen at the empty homestead at {place}. Folks say the family never left.",
       "node_weights": {"fight": 36, "elite": 10, "event": 22, "curio": 20, "cave": 8, "homestead": 4, "trading_post": 0},
@@ -76,7 +78,8 @@
       "final": ["gila_monster", "rattlesnake", "rattlesnake", "carrion_crows"],
       "boss": {"name": "The Nest", "intro": "The wagon at the bottom of {place} is alive with snakes, and something much bigger is coiled in the bed.",
         "victory": "The gulch goes quiet. The wagon's cargo is still there, mostly.",
-        "enemies": ["gila_monster", "rattlesnake", "gila_monster", "rattlesnake"]}},
+        "enemies": ["gila_monster", "rattlesnake", "gila_monster", "rattlesnake"]},
+      "bonus_hides": 1},
 
     "crow_scouts": {"difficulty": 3, "name": "Crane's Scouts near {place}", "desc": "Riders with black feathers have been seen watching the road from {place}. Silas Crane is keeping an eye on you.",
       "node_weights": {"fight": 46, "elite": 14, "event": 16, "curio": 12, "cave": 4, "homestead": 4, "trading_post": 0},

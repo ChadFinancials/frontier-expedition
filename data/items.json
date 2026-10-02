@@ -12,5 +12,6 @@
   "salt": {"name": "Salt", "store_level": 2, "price": 15, "stack": 4, "desc": "Old wisdom says it keeps strange things at bay.", "use": null, "icon": "salt"},
   "wagon_parts": {"name": "Wagon Parts", "store_level": 1, "price": 20, "stack": 4, "desc": "A spare axle, wheel spokes and pins. Repairs the wagon by 30.", "use": {"type": "wagon", "amount": 30}, "icon": "wheel"},
   "timber": {"name": "Timber", "store_level": 99, "price": 0, "stack": 5, "cargo": true, "desc": "Building lumber for your settlements. Heavy: five to a wagon slot.", "use": null, "icon": "timber"},
+  "hides": {"name": "Hides", "store_level": 99, "price": 0, "stack": 5, "cargo": true, "desc": "Skinned and salted hides for leatherwork back in town. Five to a wagon slot.", "use": null, "icon": "hides"},
   "iron": {"name": "Iron", "store_level": 99, "price": 0, "stack": 5, "cargo": true, "desc": "Scrap and ore for your settlements. Heavy: five to a wagon slot.", "use": null, "icon": "iron"}
 }

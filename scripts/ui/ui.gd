@@ -513,6 +513,8 @@ static func camp_effects_text(action: Dictionary, rank: int, party: Array = []) 
 				lines.append("+%d Timber" % v)
 			"iron":
 				lines.append("+%d Iron%s" % [v, (" (%d%% chance)" % int(e.chance)) if e.has("chance") else ""])
+			"hides":
+				lines.append("+%d Hides%s" % [v, (" (%d%% chance)" % int(e.chance)) if e.has("chance") else ""])
 			"item":
 				lines.append("%d%% chance of %s" % [int(e.get("chance", 100)), DB.items.get(e.get("item", ""), {}).get("name", "an item")])
 			"wagon":

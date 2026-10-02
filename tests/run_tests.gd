@@ -67,6 +67,8 @@ func _ready() -> void:
 	test_trinket_pass()
 	print("> test_round9_town()")
 	test_round9_town()
+	print("> test_hides()")
+	test_hides()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -529,6 +531,7 @@ func test_settlement_services() -> void:
 	co.money += 3000
 	co.timber += 60
 	co.iron += 40
+	co.hides += 40
 	check(co.settlement(0).recruits.size() == 3 and Hero.from_dict(co.settlement(0).recruits[0]).class_id == "preacher", "hiring board: the promised preacher plus two recruits")
 	var h: Hero = co.heroes[0]
 	h.fatigue = 80
@@ -552,6 +555,7 @@ func test_settlement_services() -> void:
 	co.money += 3000
 	co.timber += 60
 	co.iron += 30
+	co.hides += 30
 	check(co.upgrade_track(0, "hiring_board", "notices"), "second notices upgrade in a town")
 	check(co.can_upgrade_track(0, "hiring_board", "notices") != "", "track is capped")
 	# Stage line needs a second settlement.
@@ -561,6 +565,7 @@ func test_settlement_services() -> void:
 	co.charters += 1
 	co.timber += 50
 	co.iron += 50
+	co.hides += 50
 	check(co.found(1), "found Redwater Ford")
 	check(co.can_send(0, 1, co.heroes[1]) == "", "can send along stage line")
 	var traveler: Hero = co.heroes[1]
@@ -657,6 +662,7 @@ func test_tutorial_and_story() -> void:
 	co.money += 5000
 	co.timber += 50
 	co.iron += 50
+	co.hides += 50
 	check(co.upgrade_track(0, "saloon", "chatter"), "upgrade the saloon's chatter")
 	co.advance_week()
 	check(co.settlement(0).get("quests", []).size() == 2, "more chatter, more rumors each week")
@@ -948,6 +954,41 @@ func test_round8_balance() -> void:
 
 ## Vulnerable (+% damage taken, all sources), dispel, tag-conditioned effects, refresh and
 ## Transfusion (owner's round 8 picks).
+## Hides, the third town material: skinned from beasts, spent on leatherwork.
+func test_hides() -> void:
+	var co := Company.new()
+	co.new_game(37)
+	check(co.hides == 0, "the company starts with no Hides")
+	# Armor upgrades take Hides, weapons take Iron.
+	var ac := co.gear_cost(0, "armor", 2)
+	var wc := co.gear_cost(0, "weapon", 2)
+	check(int(ac.get("hides", 0)) == 2 and not ac.has("iron") and int(wc.get("iron", 0)) == 2 and not wc.has("hides"), "armor costs Hides, weapons Iron (%s / %s)" % [ac, wc])
+	check(Company.cost_text({"money": 10, "hides": 3}).contains("3 Hides"), "costs list Hides")
+	check(not co.can_afford({"hides": 1}), "can't pay Hides you don't have")
+	# A won fight against beasts drops Hides into the wagon.
+	var uids: Array = []
+	for h in co.heroes:
+		uids.append(h.uid)
+	var run := RunState.create(co, "tallgrass", 0, uids, {"food": 4})
+	co.run = run
+	var got := 0
+	for k in 10:
+		var e := CombatEngine.new()
+		e.setup(co.heroes, ["buffalo_bull"], {})
+		e.killed = ["buffalo_bull"]
+		e.state = "victory"
+		var res := run.after_combat(e, "fight")
+		got += int(res.hides)
+	check(got >= 20 and int(run.loot.hides) == mini(got, 25), "a buffalo always gives 2-3 Hides (%d over 10, %d carried)" % [got, int(run.loot.hides)])
+	check(int(run.cargo().get("hides", 0)) == int(run.loot.hides), "Hides ride in the wagon")
+	# Home: Hides join the company stock, and survive a save.
+	var carried := int(run.loot.hides)
+	co.finish_run("abandoned")
+	check(co.hides == carried, "Hides come home (%d)" % co.hides)
+	var co2 := Company.from_dict(DB.normalize(JSON.parse_string(JSON.stringify(co.to_dict()))))
+	check(co2.hides == co.hides, "Hides save and load")
+
+
 ## Round 9 town: the free porch seat on the Hiring Board, the bigger first Bunkhouse.
 func test_round9_town() -> void:
 	var co := Company.new()

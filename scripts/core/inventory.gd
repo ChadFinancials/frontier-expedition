@@ -4,7 +4,7 @@ extends RefCounted
 ## dictionary; this works out how many slots that fills (each item stacks up to its
 ## `stack` size) and how much more fits. The wagon has `wagon_slots` slots (config).
 
-const ORDER := ["food", "bandages", "antivenom", "whiskey", "lamp_oil", "wagon_parts", "rope", "shovel", "crowbar", "salt", "timber", "iron"]
+const ORDER := ["food", "bandages", "antivenom", "whiskey", "lamp_oil", "wagon_parts", "rope", "shovel", "crowbar", "salt", "timber", "iron", "hides"]
 
 
 static func capacity() -> int:
