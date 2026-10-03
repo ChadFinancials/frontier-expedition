@@ -82,6 +82,8 @@ decided, and what shipped. Update both at the end of every round.
   were trivial. The Rail Driver rolled very good starting moves.
 - A couple of fights were just a Cutthroat and a Rifleman: easy, though both are fast.
 - Ruby Blackwing was moderate; Fan of Knives missed its bleeds a lot.
+- **Ruby's fight** (owner): Carrion Crows added in rank 4, in both the boss fight and the
+  Stockade repeat.
 - The loot (491 chips, 12 Timber, 2 Iron, 3 Hides, Blackwing Feather) felt fair.
 - Built the Drill Hall; Laying On of Hands and Quick Draw to level 2.
 - **Open:** the weapon upgrade felt steep at 5 Iron. In the data, tier 1→2 is 250 chips and
