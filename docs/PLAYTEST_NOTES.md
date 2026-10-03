@@ -86,9 +86,8 @@ decided, and what shipped. Update both at the end of every round.
   Stockade repeat.
 - The loot (491 chips, 12 Timber, 2 Iron, 3 Hides, Blackwing Feather) felt fair.
 - Built the Drill Hall; Laying On of Hands and Quick Draw to level 2.
-- **Open:** the weapon upgrade felt steep at 5 Iron. In the data, tier 1→2 is 250 chips and
-  2 Iron; tier 2→3 is 600 chips and 5 Iron (Smithy level 1). The owner suggested 400 chips
-  and 3 Iron. Waiting to confirm which step.
+- The weapon upgrade that felt steep (5 Iron) was tier 2→3 (600 chips, 5 Iron), not the
+  first one. Owner: no change needed.
 
 ### Round 12 (week 3: Rustlers at Miller's Draw)
 - **Rustlers:**
