@@ -56,6 +56,12 @@ If no fight is left ahead on the map, the duelist's gang jumps you at the next s
 | **Hanging Tree** | The hangman turns to face you | Bullseye: the rope's shot through and the homesteader joins; the hangman's gang waits ahead |
 | **Mad Dog** (boss) | A standoff as you reach the hideout, right before the boss fight | Bosses can't die to it: a bullseye leaves him at 50% HP and bleeding |
 
+### Who draws
+
+You pick the hero. The picker shows ★/✗ names, as at curios:
+- ★ Gunslinger, ★ Marshal, ★ Bounty Hunter quirk
+- ✗ Butterfingers, ✗ Jumpy, ✗ Drinker (hungover)
+
 ### Part 1: The Draw (reaction)
 
 - A dusty street, two silhouettes. A random wait of 1.5-4.0 seconds, then **"DRAW!"** with a
