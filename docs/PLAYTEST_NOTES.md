@@ -21,11 +21,17 @@ decided, and what shipped. Update both at the end of every round.
 ### Gameplay
 - [ ] **The Lone Wanderer storyline (owner, later):** meet the wanderer again over time, as a
       recurring event that builds into a small quest line. The MVP duel is in.
-- [ ] **Wagon as a "5th member" in battles**: some enemies attack or sabotage it; tie it to
-      wear and tear. Rework **enemy ambushes** around it (switched off in round 7 with
-      config `hero_ambush: false`, including night-camp ambushes).
-- [ ] Find more places for the wagon and resources to matter (materials already take wagon
-      space; mishaps and events drain supplies).
+- [ ] **Townsfolk (owner, next):** a roster of townspeople who staff the buildings, with
+      wages and population growth; a separate pool from the heroes. Proposal with questions in
+      `docs/TOWNSFOLK_PROPOSALS.md`.
+- [ ] **Wagon (owner, after the townsfolk):**
+  - Some enemies and battles target the wagon, which sits behind the party: it loses
+    condition and/or cargo. Rework **enemy ambushes** around this (switched off in round 7
+    with config `hero_ambush: false`, including night-camp ambushes).
+  - The wagon has **no** combat role beyond being a target: no cover, no wagon actions.
+  - A **wagon upgrade track** (a building in town), with **expanded cargo** the big one.
+  - More places for the wagon and resources to matter (materials already take wagon space;
+    mishaps and events drain supplies).
 - [ ] Money: round 9 doubled every chip source (owner was running short: one quest paid about
       200, one bar visit and one move). Recheck after a few weeks of play; `chips_mult` in
       config scales all of it at once.
@@ -78,6 +84,16 @@ decided, and what shipped. Update both at the end of every round.
 ---
 
 ## History
+
+### Round 15: the wagon and the town (owner's direction)
+- Brainstorm on the wagon and the town. The owner's picks:
+  - **Wagon:** some enemies and battles target the wagon in the back (condition or cargo
+    lost), plus an upgrade track with expanded cargo. No cover or wagon combat actions.
+  - **Townsfolk first:** a roster like the heroes', with upkeep and growth. Heroes and
+    townsfolk are always separate pools (no retiring into townsfolk).
+- Drafted `docs/TOWNSFOLK_PROPOSALS.md`: trades and staff seats, traits, levels, settlers
+  and trail rescues, wages, population gates on tier upgrades, screens, save compatibility,
+  and six questions.
 
 ### Round 14: High Noon (owner's design)
 - **The duel:**

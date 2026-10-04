@@ -16,6 +16,7 @@
 | [`MINIGAME_PROPOSALS.md`](MINIGAME_PROPOSALS.md) | Hands-on moments: the High Noon duel and four curio skill-check games, made easier or harder by ★/✗; both built | Can be archived |
 | [`EVENT_PROPOSALS.md`](EVENT_PROPOSALS.md) | Event pools (common, region, side-quest theme), ★/✗ experts on event options, quirk compels, follow-ups, every first-region event reworked plus 12 new; built in two passes. The pre-pass events are in an appendix | Until the later regions' events are done |
 | [`FATIGUE_PROPOSALS.md`](FATIGUE_PROPOSALS.md) | Breaking Points and True Grit: the renames away from Darkest Dungeon's terms and a mechanic hook for each; built with the owner's edits | Can be archived |
+| [`TOWNSFOLK_PROPOSALS.md`](TOWNSFOLK_PROPOSALS.md) | Townsfolk: a roster of townspeople who staff the buildings (trades, levels, traits), with wages and population growth; separate from the heroes. Awaiting the owner's picks | Until picked and built |
 | [`HERO_PROPOSALS.md`](HERO_PROPOSALS.md) | Options awaiting the owner's picks: new moves for the classes under 8, and two new hero designs | Until picked and built |
 | [`HERO_REVIEW.md`](HERO_REVIEW.md) | Every class and move with real numbers. **Generated**: `python3 tools/hero_sheet.py` | Regenerate after hero changes |
 | [`ENEMY_REVIEW.md`](ENEMY_REVIEW.md) | Every enemy and move with real numbers. **Generated**: `python3 tools/enemy_sheet.py` | Regenerate after enemy changes |
