@@ -546,24 +546,24 @@ func _do_curio(cu: Dictionary, item: String, curios: Array, holder: Dictionary) 
 		intro = comp.text + "\n\n"
 		item = ""
 	var go := func(hero: Hero):
-		var res := run.interact_curio(cu.id, hero, item)
-		cu.done = true
-		Audio.play("coin" if res.key_worked else "page")
-		Game.save_game()
-		refresh()
-		var body: String = intro + res.text + ("\n\n" + "\n".join(res.msgs) if not res.msgs.is_empty() else "")
-		if res.fight != null:
-			Main.inst.dialog("Ambush!", body, [["Fight!", func():
-				if curios.all(func(x): return x.done):
-					run.complete_current()
-				Game.save_game()
-				_to_combat(res.fight.enemies, "fight", res.fight.get("surprise", "")), "Danger"]])
-		else:
-			Main.inst.dialog(DB.curios[cu.id].name, body, [["Continue", func():
-				if run.party_heroes().is_empty():
-					_check_end()
-				else:
-					show_curios(curios)]])
+		SkillCheck.investigate(run, cu.id, hero, item, func(res: Dictionary):
+			cu.done = true
+			Audio.play("coin" if res.key_worked else "page")
+			Game.save_game()
+			refresh()
+			var body: String = intro + res.text + ("\n\n" + "\n".join(res.msgs) if not res.msgs.is_empty() else "")
+			if res.fight != null:
+				Main.inst.dialog("Ambush!", body, [["Fight!", func():
+					if curios.all(func(x): return x.done):
+						run.complete_current()
+					Game.save_game()
+					_to_combat(res.fight.enemies, "fight", res.fight.get("surprise", "")), "Danger"]])
+			else:
+				Main.inst.dialog(DB.curios[cu.id].name, body, [["Continue", func():
+					if run.party_heroes().is_empty():
+						_check_end()
+					else:
+						show_curios(curios)]]))
 	if h != null:
 		go.call(h)
 	else:

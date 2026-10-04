@@ -1,7 +1,8 @@
-class_name DuelLab
+class_name MinigameLab
 extends RefCounted
 ## Dev tool (main menu, dev tools on): play High Noon over and over against any opponent,
-## with any class and quirks, and see the numbers behind each result.
+## with any class and quirks, and see the numbers behind each result; and try each curio
+## skill check at any difficulty.
 
 const CLASSES := ["gunslinger", "marshal", "preacher", "rail_driver", "gambler"]
 const QUIRKS := ["eagle_eye", "outlaw_hunter", "butterfingers", "jumpy", "drinker", "hard_of_hearing"]
@@ -12,7 +13,9 @@ const OPPONENTS := [
 	{"name": "A fast gun (later regions)", "draw": 0.32, "tier": 3},
 ]
 
-static var state := {"cls": "gunslinger", "quirks": [], "opp": 0, "last": ""}
+const GAMES := ["tumblers", "pattern", "quick", "steady"]
+
+static var state := {"cls": "gunslinger", "quirks": [], "opp": 0, "last": "", "game": "tumblers", "diff": 3}
 
 
 static func open() -> void:
@@ -20,7 +23,8 @@ static func open() -> void:
 	p.custom_minimum_size = Vector2(760, 0)
 	var v := UI.vb(10)
 	p.add_child(v)
-	v.add_child(UI.hdr("DEV: Duel Lab", 32, true))
+	v.add_child(UI.hdr("DEV: Minigame Lab", 32, true))
+	v.add_child(UI.lbl("High Noon", 22, "InkBold"))
 	var holder := {"wrap": null}
 	var reopen := func():
 		Main.inst.close_modal(holder.wrap)
@@ -52,14 +56,32 @@ static func open() -> void:
 		row3.add_child(UI.btn(("● " if state.opp == i else "") + "%s (%.2f s)" % [OPPONENTS[i].name, OPPONENTS[i].draw], func():
 			state.opp = ii
 			reopen.call(), "Small"))
-	if str(state.last) != "":
-		v.add_child(UI.rich(str(state.last), 17, true, 720))
-	var br := UI.hb(12)
-	v.add_child(br)
-	br.add_child(UI.btn("Duel!", func():
+	v.add_child(UI.btn("Duel!", func():
 		Main.inst.close_modal(holder.wrap)
 		_duel(), "Danger", 200))
-	br.add_child(UI.btn("Close", func(): Main.inst.close_modal(holder.wrap), "", 140))
+	v.add_child(UI.lbl("Curio skill checks", 22, "InkBold"))
+	var row4 := HFlowContainer.new()
+	v.add_child(row4)
+	for g in GAMES:
+		var gg: String = g
+		row4.add_child(UI.btn(("● " if state.game == g else "") + g.capitalize(), func():
+			state.game = gg
+			reopen.call(), "Small"))
+	var row5 := HFlowContainer.new()
+	v.add_child(row5)
+	for dlev in [1, 2, 3, 4, 5]:
+		var dl: int = dlev
+		row5.add_child(UI.btn(("● " if state.diff == dlev else "") + "Difficulty %d" % dlev, func():
+			state.diff = dl
+			reopen.call(), "Small"))
+	v.add_child(UI.btn("Try the check", func():
+		Main.inst.close_modal(holder.wrap)
+		SkillCheck.open({"game": state.game, "difficulty": state.diff, "title": state.game.capitalize(), "text": "A test run."}, func(r: String):
+			state.last = "[b]Last check: %s at difficulty %d → %s[/b]" % [state.game.capitalize(), state.diff, r.capitalize()]
+			open()), "Good", 200))
+	if str(state.last) != "":
+		v.add_child(UI.rich(str(state.last), 17, true, 720))
+	v.add_child(UI.btn("Close", func(): Main.inst.close_modal(holder.wrap), "", 140))
 	holder.wrap = Main.inst.modal(p)
 
 

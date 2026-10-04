@@ -722,8 +722,39 @@ func _has_ambush(cu: Dictionary) -> bool:
 	return false
 
 
-## item_id "" = by hand. Returns {"text", "msgs", "fight", "key_worked"}.
-func interact_curio(curio_id: String, h: Hero, item_id: String = "") -> Dictionary:
+## The hands-on check a curio asks for when investigated by hand (see SkillCheck), or {}
+## when it has none, a supply is used, or an expert works as the key.
+## {"game", "difficulty" 1-5, "title", "text", "curio"}. The hero's ★ make it easier (a class
+## or good quirk -1, a skill expert at rank 2+ -1), ✗ harder (+1), plus game-wide quirks
+## (config check_quirks) and the curio's own ("quirks").
+func curio_check(curio_id: String, h: Hero, item_id: String = "") -> Dictionary:
+	var cu: Dictionary = DB.curios.get(curio_id, {})
+	var ck: Dictionary = cu.get("check", {})
+	if ck.is_empty() or item_id != "":
+		return {}
+	var experts := curio_experts(curio_id, h)
+	for x in experts:
+		if x.e.has("as_key") and cu.get("keys", {}).has(x.e.as_key):
+			return {}
+	var d := int(ck.get("difficulty", 3))
+	for x in experts:
+		if x.odds < 0:
+			d += 1
+		elif x.odds > 0:
+			if DB.survival.has(x.id):
+				d -= 1 if h.survival_rank(x.id) >= 2 else 0
+			else:
+				d -= 1
+	var qm: Dictionary = DB.cfg("check_quirks", {}).get(str(ck.game), {})
+	for q in h.quirks:
+		d += int(qm.get(q, 0)) + int(ck.get("quirks", {}).get(q, 0))
+	return {"game": str(ck.game), "difficulty": clampi(d, 1, 5), "title": str(cu.get("name", "")), "text": str(ck.get("text", "")), "curio": curio_id}
+
+
+## item_id "" = by hand. check: a SkillCheck result for a curio that asks for one
+## ("clean": almost always a good outcome; "close": a plain roll leaning bad; "botched": a
+## bad outcome). Returns {"text", "msgs", "fight", "key_worked"}.
+func interact_curio(curio_id: String, h: Hero, item_id: String = "", check: String = "") -> Dictionary:
 	var cu: Dictionary = DB.curios.get(curio_id, {})
 	var out := {"text": "", "msgs": [], "fight": null, "key_worked": false}
 	var outcome: Dictionary
@@ -759,11 +790,20 @@ func interact_curio(curio_id: String, h: Hero, item_id: String = "") -> Dictiona
 			for idx in x.e.get("swap", {}):
 				hand[int(idx)] = x.e.swap[idx]
 		odds = clampi(odds, -int(DB.cfg("curio_averse_odds", 50)), int(DB.cfg("curio_odds_cap", 75)))
+		# A skill check replaces the experts' odds (they already set its difficulty).
+		if check != "":
+			odds = -int(DB.cfg("check_close_bad", 30)) if check == "close" else 0
 		if odds != 0:
 			for o in hand:
 				if not o.get("good", false):
 					o.weight = float(o.get("weight", 1)) * (1.0 - odds / 100.0)
 		outcome = Stats.pick_weighted(company.rng, hand)
+		var goods := hand.filter(func(o): return o.get("good", false))
+		var bads := hand.filter(func(o): return not o.get("good", false))
+		if check == "clean" and not goods.is_empty() and company.rng.randf() * 100.0 < float(DB.cfg("check_clean_good", 90)):
+			outcome = Stats.pick(company.rng, goods)
+		elif check == "botched" and not bads.is_empty():
+			outcome = Stats.pick(company.rng, bads)
 		for x in experts:
 			if outcome.get("good", false) and x.odds >= 0 and x.e.has("bonus"):
 				bonus.append(x)

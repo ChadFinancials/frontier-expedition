@@ -230,6 +230,9 @@ name, opponent, draw, tier, gang, gang_name, bounty, reward, on {result: [effect
 In `data/curios.json`, then add its id to a region's `curios` or `cave_curios`:
 - `hand`: weighted random outcomes when investigated by hand.
 - `keys`: `{item_id: outcome}` gives a guaranteed result when that supply is used.
+- `check`: `{"game": "tumblers" | "pattern" | "quick" | "steady", "text": "...", "difficulty": 3,
+  "quirks": {"<quirk id>": +1/-1}}` makes investigating by hand a skill check (see the GDD).
+  The curio needs both good and bad hand outcomes.
 - `tags`: `whiskey`, `treasure` or `strange`, which trigger quirk compulsions.
 - `"good": true` on a hand outcome marks it good; the rest count as bad for experts.
 - `experts`: `{"<class id or survival skill id>": {...}}`. The hero who investigates by hand

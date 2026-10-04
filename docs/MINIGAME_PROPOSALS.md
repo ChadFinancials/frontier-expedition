@@ -1,6 +1,6 @@
 # Hands-on moments: High Noon duels and skill checks (proposal)
 
-Status: **High Noon built** (round 3 picks below); skill checks next.
+Status: **✅ both built** (High Noon and the curio skill checks; round 3 picks below). Tuning numbers are in config `duel` and `checks`.
 
 Owner's round 3 picks:
 - The Lone Wanderer is a duel for pride only: no recruit, no wager.
@@ -10,7 +10,7 @@ Owner's round 3 picks:
 - Mad Dog gets a standoff right before his fight; other bosses can get one later.
 - Skill checks: clean → almost always good; sloppier → likelier bad; botched → bad. Tune
   after it's built.
-- A dev "Duel Lab" button for testing duels without an expedition.
+- A dev button for testing without an expedition: "DEV: Minigames" (duels and skill checks).
 
 The goal is to give expeditions moments where the player's own hands decide things, built
 around the West rather than Darkest Dungeon. Two features:

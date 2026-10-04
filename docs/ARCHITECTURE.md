@@ -84,6 +84,7 @@ Three rules hold the codebase together:
 | `Fatigue` | Static helpers | Adding Fatigue, Gut Checks, Breaking Points and True Grit (`second_wind` in code), Collapse. Returns events |
 | `Effects` | Static `apply` | Out-of-combat effects from events, curios and camp actions (format in `ADDING_CONTENT.md`) |
 | `Duel` | Static helpers | High Noon scoring: the hero's edge, aim zones, results and a screenless `roll` for tests and the bot. `HighNoon` (scripts/ui) is the screen; `RunState.resolve_duel` applies a result and parks the duelist's gang for the next fight (`duel_gang`) |
+| `SkillCheck` | Control (scripts/ui) | The four curio check games. `SkillCheck.investigate` plays a curio's check (`RunState.curio_check` sets the difficulty) and passes the result to `interact_curio` |
 | `MapGen` | Static `generate` | Builds an expedition's branching map. Every node's contents are rolled up front, so a mid-run save reloads identically. Also node intel (what the player can see). `pick_event` draws event stops from the common, region and quest-theme pools |
 | `Inventory` | Static helpers | Wagon slots and stacking over the plain `supplies` dictionary |
 | `Stats` | Static helpers | The shared modifier format `{stat, value, cond}` used by quirks, trinkets, Fatigue states and buffs; weighted picks |

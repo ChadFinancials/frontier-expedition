@@ -19,6 +19,8 @@ decided, and what shipped. Update both at the end of every round.
       Vulkan (OpenGL ignored it). Check whether that is enough.
 
 ### Gameplay
+- [ ] **The Lone Wanderer storyline (owner, later):** meet the wanderer again over time, as a
+      recurring event that builds into a small quest line. The MVP duel is in.
 - [ ] **Wagon as a "5th member" in battles**: some enemies attack or sabotage it; tie it to
       wear and tear. Rework **enemy ambushes** around it (switched off in round 7 with
       config `hero_ambush: false`, including night-camp ambushes).
@@ -86,7 +88,12 @@ decided, and what shipped. Update both at the end of every round.
   - A miss Rattles the hero (-10 Acc, -5 Dodge) for the expedition.
 - **Where:** the Lone Wanderer (new, for pride), the Outlaw Toll, the Wanted Poster, the
   Hanging Tree, and Mad Dog's standoff before his fight.
-- **Dev:** "DEV: Duel Lab" on the main menu lets you try any class, quirks and opponent, with
+- **Curio skill checks:**
+  - Tumblers (Strongbox, Railroad Crate), Pattern (Standing Stone, Lonely Grave), Quick hands
+    (Collapsed Tunnel, Abandoned Wagon), Steady hand (Prairie Well, Miner's Cache).
+  - Difficulty 1-5 from the hero's ★/✗ and quirks.
+  - Clean → good 90%; close → leans bad; botched → bad. Supplies and as-key heroes skip it.
+- **Dev:** "DEV: Minigames" on the main menu lets you try any class, quirks and opponent, with
   the timing numbers shown.
 
 ### Round 13 (week 4: the Crow's Nest)

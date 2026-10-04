@@ -77,6 +77,7 @@ func _ready() -> void:
 	test_money_shot()
 	test_iron_justice()
 	test_high_noon()
+	test_skill_checks()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -1550,6 +1551,59 @@ func test_high_noon() -> void:
 	var toll_i: int = run.event_options("outlaw_toll").filter(func(o): return o.text == "Call out the leader.")[0].index
 	check(not run.choose_event_option("outlaw_toll", toll_i).duel.is_empty(), "choosing a duel option hands back the duel")
 	check(not DB.quests.templates.mad_dog.boss.get("duel", {}).is_empty(), "Mad Dog faces you in the street first")
+
+
+func test_skill_checks() -> void:
+	var games: Dictionary = DB.cfg("checks", {})
+	for cid in DB.curios:
+		var ck: Dictionary = DB.curios[cid].get("check", {})
+		if not ck.is_empty():
+			check(games.has(str(ck.game)), "%s: check game %s exists" % [cid, ck.game])
+			check(DB.curios[cid].hand.any(func(o): return o.get("good", false)) and DB.curios[cid].hand.any(func(o): return not o.get("good", false)), "%s: a check has good and bad outcomes to land on" % cid)
+	var co := Company.new()
+	co.new_game(61)
+	var mk := func(cls: String, quirks: Array = [], skills: Dictionary = {}) -> Hero:
+		var h: Hero = co.make_hero(cls, 1)
+		h.quirks = quirks.duplicate()
+		h.survival = {}
+		for sk in skills:
+			h.survival[sk] = {"rank": skills[sk], "xp": 0}
+		co.heroes.append(h)
+		return h
+	var run := RunState.create(co, "tallgrass", 0, [co.heroes[0].uid], {"food": 10})
+	co.run = run
+	var pr: Hero = mk.call("preacher")
+	var gb: Hero = mk.call("gambler")
+	var bf: Hero = mk.call("preacher", ["butterfingers"])
+	var mm: Hero = mk.call("mountain_man")
+	var mn: Hero = mk.call("preacher", [], {"miner": 3})
+	check(run.curio_check("strongbox", pr).difficulty == 3, "no expert: difficulty 3")
+	check(run.curio_check("strongbox", gb).difficulty == 2, "★ Gambler at the strongbox: difficulty 2")
+	check(run.curio_check("strongbox", bf).difficulty == 4, "Butterfingers at a lock: difficulty 4")
+	check(run.curio_check("railroad_crate", mm).difficulty == 4, "✗ Mountain Mystic at the railroad crate: difficulty 4")
+	check(run.curio_check("miners_cache", mn).difficulty == 2, "Miner rank 3 at the cache: difficulty 2")
+	check(run.curio_check("strongbox", pr, "shovel").is_empty(), "a supply skips the check")
+	check(run.curio_check("old_grave", pr).is_empty(), "an as-key expert (Preacher at a grave) skips the check")
+	check(run.curio_check("scarecrow", pr).is_empty(), "curios without a check roll as before")
+	# Results drive the outcome.
+	var good_share := func(cid: String, tier: String, n: int) -> float:
+		var goods: Array = DB.curios[cid].hand.filter(func(o): return o.get("good", false)).map(func(o): return str(o.text).replace("{hero}", pr.hero_name))
+		var g := 0
+		for i in n:
+			pr.hp = pr.max_hp()
+			pr.fatigue = 0
+			pr.quirks = []
+			var res := run.interact_curio(cid, pr, "", tier)
+			if goods.any(func(t): return res.text.ends_with(t)):
+				g += 1
+		return g / float(n)
+	var clean: float = good_share.call("strongbox", "clean", 300)
+	var close: float = good_share.call("strongbox", "close", 300)
+	var plain: float = good_share.call("strongbox", "", 300)
+	var botched: float = good_share.call("strongbox", "botched", 200)
+	check(clean > 0.85, "a clean check is almost always good (%.2f)" % clean)
+	check(close < plain, "a close check leans bad (%.2f vs %.2f)" % [close, plain])
+	check(botched == 0.0, "a botched check is always bad")
 
 
 func test_round9_town() -> void:

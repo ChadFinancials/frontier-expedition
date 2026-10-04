@@ -174,18 +174,18 @@ func _curio_room() -> void:
 	var go := func(item: String):
 		Main.inst.close_modal(holder.wrap)
 		var doit := func(h: Hero):
-			var res := run.interact_curio(cid, h, item)
-			room.curio_done = true
-			if not room.get("treasure", false):
-				room.done = true
-			Game.save_game()
-			Audio.play("coin" if res.key_worked else "page")
-			var body: String = (comp.text + "\n\n" if not comp.is_empty() else "") + res.text + ("\n\n" + "\n".join(res.msgs) if not res.msgs.is_empty() else "")
-			if res.fight != null:
-				Main.inst.dialog("Ambush!", body, [["Fight!", func(): Main.inst.goto("combat", {"enemies": res.fight.enemies, "kind": "fight", "return": "cave",
-					"surprise": res.fight.get("surprise", "")}), "Danger"]])
-			else:
-				Main.inst.message(DB.curios[cid].name, body, func(): _refresh())
+			SkillCheck.investigate(run, cid, h, item, func(res: Dictionary):
+				room.curio_done = true
+				if not room.get("treasure", false):
+					room.done = true
+				Game.save_game()
+				Audio.play("coin" if res.key_worked else "page")
+				var body: String = (comp.text + "\n\n" if not comp.is_empty() else "") + res.text + ("\n\n" + "\n".join(res.msgs) if not res.msgs.is_empty() else "")
+				if res.fight != null:
+					Main.inst.dialog("Ambush!", body, [["Fight!", func(): Main.inst.goto("combat", {"enemies": res.fight.enemies, "kind": "fight", "return": "cave",
+						"surprise": res.fight.get("surprise", "")}), "Danger"]])
+				else:
+					Main.inst.message(DB.curios[cid].name, body, func(): _refresh()))
 		if not comp.is_empty():
 			doit.call(comp.hero)
 		else:

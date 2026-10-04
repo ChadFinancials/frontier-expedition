@@ -3,6 +3,7 @@
 
   "abandoned_wagon": {"name": "Abandoned Wagon", "art": "wagon", "tags": ["treasure"],
     "desc": "A prairie schooner on its side, canvas flapping. Whoever owned it left in a hurry.",
+    "check": {"game": "quick", "text": "Something moves in the bedroll. Quick hands!", "quirks": {"afraid_of_snakes": 1}},
     "experts": {"wheelwright": {"bonus": [{"type": "timber", "amount": 1}, {"type": "wagon", "amount": 10}], "hint": "+1 Timber, mends the wagon"}, "woodcutter": {"bonus": [{"type": "timber", "amount": 2}], "hint": "+2 Timber"}, "train_hopper": {"bonus": [{"type": "food", "amount": 2}], "hint": "a drifter's nose, +2 Food"}},
     "hand": [
       {"weight": 4, "good": true, "text": "{hero} finds a sack of flour and some tinned peaches.", "effects": [{"type": "food", "amount": 4}]},
@@ -25,6 +26,7 @@
 
   "old_grave": {"name": "Lonely Grave", "art": "grave", "tags": ["treasure", "strange"],
     "desc": "A wooden cross, the name worn away. Somebody piled stones on it to keep the wolves off.",
+    "check": {"game": "pattern", "text": "The epitaph's verses are scattered on the stone. Read them back in order."},
     "experts": {"preacher": {"as_key": "salt", "hint": "says the old words"}, "storyteller": {"bonus": [{"type": "fatigue", "amount": -6, "target": "party"}], "hint": "party -6 Fatigue"}},
     "hand": [
       {"weight": 3, "good": true, "text": "{hero} says a few words over the grave. The company feels a little lighter.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}]},
@@ -36,6 +38,7 @@
 
   "strongbox": {"name": "Stagecoach Strongbox", "art": "strongbox", "tags": ["treasure"],
     "desc": "Wells Fargo stenciled on the side. Still locked.",
+    "check": {"game": "tumblers", "text": "Three tumblers in a Wells Fargo lock. Feel for each as the needle crosses the notch."},
     "experts": {"gambler": {"bonus": [{"type": "money", "min": 40, "max": 80}], "hint": "picks the lock, +40-80 chips"}, "marshal": {"bonus": [{"type": "money", "amount": 60}], "hint": "the Wells Fargo reward, +60 chips"}},
     "hand": [
       {"weight": 3, "good": true, "text": "{hero} bashes at the lock until it gives. Some banknotes inside.", "effects": [{"type": "money", "min": 60, "max": 140}]},
@@ -46,6 +49,7 @@
 
   "prairie_well": {"name": "Prairie Well", "art": "well", "tags": [],
     "desc": "A stone well with a broken windlass. Something glints far below.",
+    "check": {"game": "steady", "text": "Hold the rope steady on the way down."},
     "experts": {"frontier_doctor": {"hint": "tests the water first"}, "angler": {"as_key": "rope", "hint": "fishes it out on a line"}, "medic": {"odds": 0, "bonus": [{"type": "heal_pct", "value": 8, "target": "party"}], "hint": "party heals 8% more"}},
     "hand": [
       {"weight": 3, "good": true, "text": "The water is sweet and cold. Everyone drinks.", "effects": [{"type": "heal_pct", "value": 8, "target": "party"}]},
@@ -97,6 +101,7 @@
 
   "standing_stone": {"name": "Standing Stone", "art": "stone", "tags": ["strange"],
     "desc": "A slab of rock twice a man's height, humming faintly. Much too big for anyone to have stood it up.",
+    "check": {"game": "pattern", "text": "The runes glow one after another. Trace them in the same order."},
     "experts": {"mountain_man": {"swap": {"2": {"weight": 1, "good": true, "text": "{hero} listens to the stone a long while, and comes away changed for the better.", "effects": [{"type": "quirk", "quirk": "random_positive", "target": "actor"}]}}, "bonus": [{"type": "buff", "stat": "dmg_pct", "value": 5, "target": "party"}], "hint": "only good changes, party +5% Dmg"}, "storyteller": {"hint": "knows the old stories"}},
     "hand": [
       {"weight": 3, "good": true, "text": "{hero} puts a hand on it and feels... strength. Old strength.", "effects": [{"type": "buff", "stat": "dmg_pct", "value": 15, "target": "actor"}, {"type": "heal_pct", "value": 10, "target": "actor"}]},
@@ -107,6 +112,7 @@
 
   "miners_cache": {"name": "Miner's Cache", "art": "crate", "tags": ["treasure"],
     "desc": "Crates and a pickaxe jammed into a crevice. Somebody meant to come back for these.",
+    "check": {"game": "steady", "text": "Old blasting powder in the bottom of the crate. A steady hand, now."},
     "experts": {"prospector": {"odds": 75, "bonus": [{"type": "iron", "amount": 1}], "hint": "knows old powder, +1 Iron"}, "miner": {"bonus": [{"type": "iron", "amount": 1}], "hint": "+1 Iron"}},
     "hand": [
       {"weight": 4, "good": true, "text": "{hero} finds candles, lamp oil and hardtack.", "effects": [{"type": "item", "item": "lamp_oil", "amount": 1}, {"type": "food", "amount": 2}]},
@@ -138,6 +144,7 @@
 
   "collapsed_tunnel": {"name": "Collapsed Tunnel", "art": "rubble", "tags": ["treasure"],
     "desc": "A side tunnel choked with rubble. There's a draft coming through.",
+    "check": {"game": "quick", "text": "The roof groans. Shore up the beams as the rocks come down!"},
     "experts": {"rail_driver": {"bonus": [{"type": "iron", "amount": 1}], "hint": "moves rock for a living, +1 Iron"}, "prospector": {"hint": "a small, careful charge"}, "miner": {"hint": "knows how rock falls"}, "woodcutter": {"hint": "shores it with timber"}},
     "hand": [
       {"weight": 3, "good": true, "text": "{hero} shifts enough rock to find an old lunch pail with coins inside.", "effects": [{"type": "money", "min": 40, "max": 100}]},
@@ -156,6 +163,7 @@
 
   "railroad_crate": {"name": "Railroad Supply Crate", "art": "crate", "tags": ["treasure"],
     "desc": "Stenciled 'PROPERTY OF THE WESTERN TERRITORIES RAILROAD - NO TRESPASSING'.",
+    "check": {"game": "tumblers", "text": "A company padlock, rusted stiff."},
     "experts": {"train_hopper": {"as_key": "shovel", "hint": "knows the yard locks"}, "rail_driver": {"bonus": [{"type": "iron", "amount": 1}], "hint": "still has a key, +1 Iron"}, "mountain_man": {"averse": true, "hint": "hates the railroad, and it shows"}},
     "hand": [
       {"weight": 3, "good": true, "text": "Spikes, fishplates and coal. The iron is useful.", "effects": [{"type": "iron", "amount": 3}]},

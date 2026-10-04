@@ -28,6 +28,20 @@ static func run(main: Main, args: Dictionary) -> void:
 	match scenario:
 		"menu":
 			await main.goto("menu", {}, true)
+		"check":
+			# A curio skill check mid-play: game=tumblers|pattern|quick|steady, d=1-5, t=seconds in.
+			await main.goto("menu", {}, true)
+			var sc := SkillCheck.open({"game": str(args.get("game", "tumblers")), "difficulty": int(args.get("d", "3")), "title": "Stagecoach Strongbox", "text": "A test run."}, func(_r): pass)
+			await main.get_tree().process_frame
+			if str(args.get("phase", "play")) == "play":
+				sc._begin()
+				sc.t = float(args.get("t", "0.3"))
+				if sc.game == "tumblers":
+					sc.pin = 1
+				elif sc.game == "pattern" and sc.t > sc.show_time:
+					sc.typed = [sc.seq[0], "left" if sc.seq[1] != "left" else "up"]
+				elif sc.game == "steady":
+					sc.marker = 0.55
 		"duel":
 			# High Noon at a given phase: phase=intro|wait|draw|aim|result (tier=... for result).
 			await main.goto("menu", {}, true)

@@ -395,7 +395,29 @@ retired in round 7; the Shovel took its curios.)
   - Mad Dog's standoff before his boss fight: a boss can't die to it; a bullseye leaves him
     at 50% HP and bleeding
 - No Cancel on "Who draws?": a duel has to be answered.
-- **Dev tool:** "DEV: Duel Lab" on the main menu.
+- **Dev tool:** "DEV: Minigames" on the main menu (duels and skill checks).
+
+### Curio skill checks
+- Eight first-region curios ask for a hands-on check when investigated by hand. Using the
+  right supply, or a hero who works as the key, skips it. Walking past is still allowed.
+- **The four games** (`scripts/ui/skill_check.gd`, tuning in config `checks`):
+
+  | Game | How it plays | Curios |
+  |---|---|---|
+  | Tumblers | Stop a sweeping needle on the notch, 3 pins | Strongbox, Railroad Crate |
+  | Pattern | Repeat 4-7 flashed arrows | Standing Stone, Lonely Grave |
+  | Quick hands | Press each shown key before its ring closes | Collapsed Tunnel, Abandoned Wagon |
+  | Steady hand | Hold to keep a marker in a drifting band for 4 s | Prairie Well, Miner's Cache |
+
+- **Difficulty 1-5:** base 3. A ★ class or good quirk -1; a skill expert -1 at rank 2+; a ✗
+  +1. Game quirks (config `check_quirks`): Butterfingers +1 at locks and steady hands, Keen-Eyed
+  -1 at locks, Rock Steady -1 and Drinker +1 steady, Quick Feet and Jumpy -1 and Slowpoke +1
+  quick hands, Quick Study -1 and Simple +1 patterns, Spooked by Critters +1 at the wagon.
+- **Result:**
+  - **Clean** (no slips): a good outcome 90% of the time.
+  - **Close** (one slip): the plain roll, leaning bad.
+  - **Botched:** a bad outcome.
+  - Expert bonuses still apply on a good outcome.
 
 ### Ending an expedition
 - **Victory** (boss, crossing or final fight won): loot, XP, quirk rolls (45%, positive 60%
