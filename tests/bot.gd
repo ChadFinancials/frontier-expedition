@@ -172,9 +172,16 @@ func play_run(co: Company, r: RunState) -> Dictionary:
 	return co.finish_run(r.status)
 
 
+## A duel played without a screen: a random hero, a typical reaction, a random aim.
+func bot_duel(r: RunState, duel: Dictionary) -> Dictionary:
+	var h: Hero = Stats.pick(rng, r.party_heroes())
+	stats["duels"] = stats.get("duels", 0) + 1
+	return r.resolve_duel(duel, h, Duel.roll(h, float(duel.get("draw", 0.55)), rng))
+
+
 func run_fight(r: RunState, enemies: Array, kind: String, surprise: String = "", reward: Dictionary = {}, setup: Dictionary = {}) -> bool:
 	var opts := r.combat_options(kind, surprise)
-	for k in ["wounded", "foe_mods", "foe_mark"]:
+	for k in ["wounded", "foe_mods", "foe_mark", "duelist"]:
 		if setup.has(k):
 			opts[k] = setup[k]
 	var foes := enemies.duplicate()
@@ -197,7 +204,15 @@ func resolve_node(r: RunState) -> void:
 	var n := r.current_node()
 	match n.type:
 		"fight", "elite", "boss", "crossing":
-			var won := run_fight(r, n.data.enemies, n.type)
+			var won := false
+			var g := r.gang_fight(n)
+			var bd: Dictionary = r.region().get("boss", {}).get("duel", {}) if n.type == "boss" else {}
+			if not g.is_empty():
+				won = run_fight(r, g.enemies, n.type, "", g.reward, g.setup)
+			elif not bd.is_empty():
+				won = run_fight(r, n.data.enemies, n.type, "", {}, bot_duel(r, bd).setup)
+			else:
+				won = run_fight(r, n.data.enemies, n.type)
 			if won:
 				r.complete_current()
 			elif n.type in ["boss", "crossing"]:
@@ -210,6 +225,8 @@ func resolve_node(r: RunState) -> void:
 			var o: Dictionary = Stats.pick(rng, opts)
 			var compel := r.event_compel(n.data.event)
 			var res := r.choose_event_option(n.data.event, compel.index if not compel.is_empty() else o.index)
+			if not res.get("duel", {}).is_empty():
+				bot_duel(r, res.duel)
 			while res.get("then", false):
 				var fo := r.followup_options().filter(func(x): return x.available)
 				res = r.choose_followup(Stats.pick(rng, fo).index)

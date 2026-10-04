@@ -76,6 +76,7 @@ func _ready() -> void:
 	test_starter_quest()
 	test_money_shot()
 	test_iron_justice()
+	test_high_noon()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -1482,6 +1483,73 @@ func test_iron_justice() -> void:
 	m.skill_levels["marshal_iron_justice"] = 3
 	var base3 := e.dmg_mult(mc, "marshal_iron_justice", wolf)
 	check(is_equal_approx(e.dmg_mult(mc, "marshal_iron_justice", outlaw) - base3, 0.25), "Iron Justice +25% vs outlaws at level 3")
+
+
+func test_high_noon() -> void:
+	var co := Company.new()
+	co.new_game(53)
+	var mk := func(cls: String, quirks: Array = []) -> Hero:
+		var h: Hero = co.make_hero(cls, 1)
+		h.quirks = quirks.duplicate()
+		h.keepsakes = []
+		co.heroes.append(h)
+		return h
+	var gs: Hero = mk.call("gunslinger")
+	var pr: Hero = mk.call("preacher")
+	var bf: Hero = mk.call("preacher", ["butterfingers"])
+	# Scoring.
+	var z := Duel.zones(pr, false)
+	check(Duel.aim_tier(0.5, z) == "bullseye" and Duel.aim_tier(0.0, z) == "miss" and Duel.aim_tier(1.0, z) == "miss", "dead centre is a bullseye, the edges miss")
+	check(Duel.aim_tier(0.5 + z.hit / 2.0 - 0.001, z) == "hit" and Duel.aim_tier(0.5 + z.graze / 2.0 - 0.001, z) == "graze", "the bands sit inside each other")
+	check(Duel.zones(gs, false).hit > z.hit and Duel.zones(bf, false).hit < z.hit, "Gunslinger widens the zones, Butterfingers narrows them")
+	check(Duel.zones(pr, true).hit < z.hit, "too slow shrinks the zones")
+	check(Duel.edge(gs) > Duel.edge(pr), "the Gunslinger draws faster")
+	check(Duel.beat_draw(pr, 0.30, 0.55) and not Duel.beat_draw(pr, 0.70, 0.55), "reaction vs their draw")
+	check(Duel.hint(gs).contains("★ Gunslinger") and Duel.hint(bf).contains("✗ Butterfingers"), "Who draws? shows the names")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4
+	var tiers := {}
+	for i in 400:
+		var r := Duel.roll(pr, 0.55, rng)
+		tiers[r.tier] = tiers.get(r.tier, 0) + 1
+	check(tiers.get("bullseye", 0) < 40 and tiers.get("miss", 0) > 100, "rolled duels: bullseyes are rare (%s)" % str(tiers))
+	# A gang duel: the gang waits at the next fight, carrying the result.
+	var run := RunState.create(co, "tallgrass", 0, [gs.uid, pr.uid], {"food": 20})
+	co.run = run
+	var duel := {"kind": "gang", "name": "Snake-Eye Pike", "opponent": "crane_lieutenant", "draw": 0.45, "gang": ["crane_lieutenant", "outlaw_gunhand"], "gang_name": "Pike's gang", "bounty": 200}
+	var before := int(run.loot.money)
+	run.resolve_duel(duel, gs, {"tier": "bullseye", "slow": false})
+	check(int(run.loot.money) > before, "a bullseye pays a wanted man's bounty at once")
+	var g := run.gang_fight({"type": "fight"})
+	check(g.setup.get("drop", []) == ["crane_lieutenant"] and run.duel_gang.is_empty(), "bullseye: the duelist is dropped from the gang's fight")
+	run.resolve_duel(duel, gs, {"tier": "hit", "slow": false})
+	check(run.gang_fight({"type": "event"}).is_empty() and not run.duel_gang.is_empty(), "the gang waits for a fight stop")
+	g = run.gang_fight({"type": "elite"})
+	check(g.setup.duelist.hp_pct == 50 and g.setup.duelist.bleed_pct > 0 and int(g.reward.money) == 200, "hit: 50% HP and bleeding; the bounty rides on the later fight")
+	run.resolve_duel(duel, gs, {"tier": "graze", "slow": false})
+	g = run.gang_fight({"type": "fight"})
+	check(not g.setup.duelist.has("hp_pct") and g.setup.duelist.bleed_pct > 0, "graze: bleeding only")
+	# Missing (or jumping the gun) Rattles the hero for the expedition; too slow costs HP.
+	pr.hp = pr.max_hp()
+	var acc0 := pr.stat("acc")
+	run.resolve_duel(duel, pr, {"tier": "jumped", "slow": false})
+	check(pr.rattled and pr.stat("acc") == acc0 - 10 and pr.hp < pr.max_hp(), "jumped: Rattled (-10 Acc) and hit")
+	check(Hero.from_dict(pr.to_dict()).rattled, "Rattled saves")
+	# Boss duels set up the fight at once; a boss can't die to one.
+	var bs := run.resolve_duel({"kind": "boss", "name": "Mulligan", "opponent": "mad_dog_mulligan"}, gs, {"tier": "bullseye", "slow": false})
+	check(bs.setup.duelist.hp_pct == 50 and not bs.setup.has("drop"), "boss bullseye: 50% HP and bleeding, not dead")
+	# The engine applies it to the first enemy with that id only.
+	var e := CombatEngine.new()
+	e.setup([gs], ["outlaw_gunhand", "outlaw_gunhand"], {"duelist": {"id": "outlaw_gunhand", "hp_pct": 50, "bleed_pct": 8, "rounds": 3}})
+	check(e.enemies[0].hp < e.enemies[0].max_hp and not e.enemies[0].dots.is_empty() and e.enemies[1].hp == e.enemies[1].max_hp, "the duelist alone starts wounded and bleeding")
+	# Events and the Mad Dog standoff carry duels.
+	check("lone_wanderer" in DB.cfg("common_events", []), "the Lone Wanderer is a common event")
+	for pair in [["outlaw_toll", "Call out the leader."], ["wanted_poster", "Go after him."], ["hanging_tree", "Cut him down."], ["lone_wanderer", "Accept."]]:
+		var opts: Array = DB.events[pair[0]].options.filter(func(o): return o.text == pair[1])
+		check(opts.size() == 1 and opts[0].outcomes[0].effects[0].type == "duel", "%s: '%s' is a duel" % pair)
+	var toll_i: int = run.event_options("outlaw_toll").filter(func(o): return o.text == "Call out the leader.")[0].index
+	check(not run.choose_event_option("outlaw_toll", toll_i).duel.is_empty(), "choosing a duel option hands back the duel")
+	check(not DB.quests.templates.mad_dog.boss.get("duel", {}).is_empty(), "Mad Dog faces you in the street first")
 
 
 func test_round9_town() -> void:

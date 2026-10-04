@@ -77,6 +77,18 @@ decided, and what shipped. Update both at the end of every round.
 
 ## History
 
+### Round 14: High Noon (owner's design)
+- **The duel:**
+  - Two parts: react to DRAW! (false cues first; too early is jumping the gun), then stop a
+    swinging sight on bullseye, hit or graze.
+  - Results carry into the duelist's gang fight at the next fight stop: dead, 50% HP and
+    bleeding, or bleeding.
+  - A miss Rattles the hero (-10 Acc, -5 Dodge) for the expedition.
+- **Where:** the Lone Wanderer (new, for pride), the Outlaw Toll, the Wanted Poster, the
+  Hanging Tree, and Mad Dog's standoff before his fight.
+- **Dev:** "DEV: Duel Lab" on the main menu lets you try any class, quirks and opponent, with
+  the timing numbers shown.
+
 ### Round 13 (week 4: the Crow's Nest)
 - Party: Preacher, Gunslinger, Wrangler, Rail Driver. It felt very strong and most fights
   were trivial. The Rail Driver rolled very good starting moves.

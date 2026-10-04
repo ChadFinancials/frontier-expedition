@@ -52,6 +52,8 @@ func _build() -> void:
 	col.add_child(ft)
 	if not compact:
 		var st := hero.status_text()
+		if hero.rattled:
+			st = "Rattled" + ("  |  " + st if st != "Ready" else "")
 		if hero.fatigue_state != "":
 			st = DB.fatigue_states[hero.fatigue_state].name + ("  |  " + st if st != "Ready" else "")
 		var sl := UI.lbl(st, 15, "Ink")

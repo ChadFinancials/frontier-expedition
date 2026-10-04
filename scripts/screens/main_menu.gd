@@ -55,6 +55,9 @@ func setup(_params: Dictionary) -> void:
 	row2.add_child(UI.btn("How to Play", func(): Main.inst.help_panel(), "", 170))
 	row2.add_child(UI.btn("Settings", func(): Main.inst.settings_panel(), "", 170))
 	row2.add_child(UI.btn("Quit", func(): get_tree().quit(), "Danger", 170))
+	# Dev tools: try High Noon without an expedition.
+	if Game.settings.get("dev_tools", true):
+		row2.add_child(UI.btn("DEV: Duel Lab", func(): DuelLab.open(), "Small", 170))
 	box.position.x = (1920 - (560 if Game.has_save() else 280)) / 2.0
 	Audio.play_music("music_trail")
 

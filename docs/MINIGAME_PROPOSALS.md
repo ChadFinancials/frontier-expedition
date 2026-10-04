@@ -1,6 +1,16 @@
 # Hands-on moments: High Noon duels and skill checks (proposal)
 
-Status: **round 2 with the owner's direction; awaiting the last picks.** Nothing here is built yet.
+Status: **High Noon built** (round 3 picks below); skill checks next.
+
+Owner's round 3 picks:
+- The Lone Wanderer is a duel for pride only: no recruit, no wager.
+- Curios can still be passed by. Investigating by hand means playing the check, unless the
+  right item or an as-key class is used.
+- Rattled lasts until the expedition ends.
+- Mad Dog gets a standoff right before his fight; other bosses can get one later.
+- Skill checks: clean → almost always good; sloppier → likelier bad; botched → bad. Tune
+  after it's built.
+- A dev "Duel Lab" button for testing duels without an expedition.
 
 The goal is to give expeditions moments where the player's own hands decide things, built
 around the West rather than Darkest Dungeon. Two features:

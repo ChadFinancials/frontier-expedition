@@ -370,6 +370,33 @@ retired in round 7; the Shovel took its curios.)
     Dispute) and Crow's Nest 6 (outlaw country: Smoke Signals, Outlaw Toll, the Abandoned
     Homestead, the Wanted Poster, the Hanging Tree, a Stagecoach in Trouble).
 
+### High Noon (duels)
+- A two-part duel (`scripts/core/duel.gd` scores it; `scripts/ui/high_noon.gd` plays it; tuning
+  in config `duel`).
+  1. **The Draw:** a 1.5-4 s wait, maybe a false cue (a caw, a tumbleweed), then DRAW! and
+     the bell. Click or press Space. Too early: jumped the gun.
+  2. **The Aim:** a sight swings over a bar. Zones from the centre: bullseye 4%, hit 14%,
+     graze 30% of the bar; the rest misses.
+- **The hero's edge** against the opponent's draw time (0.55 s outlaw, 0.45 s Pike, 0.50 s
+  Mad Dog): Gunslinger -0.10 s, Marshal -0.05 s, Quick Draw levels, Speed above 4.
+- **Aim zones:** Gunslinger ×1.4, Marshal ×1.2, Eagle Eye ×1.2, Bounty Hunter ×1.1,
+  Butterfingers ×0.75, Accuracy ±10%.
+- **Quirks:** Jumpy gets an extra false cue, Drinker a wobbly sight, Hard of Hearing no bell.
+- **Too slow:** they fire first, the hero loses 15% HP, and the zones shrink by a third.
+- **Results:** bullseye → the duelist is dead; hit → 50% HP and bleeding; graze → bleeding;
+  miss or jumped → the hero is **Rattled** (-10 Acc, -5 Dodge) until the expedition ends.
+- **The duelist's gang** waits at the next fight or elite stop, carrying the result. A
+  wanted man's bounty pays at once on a bullseye; otherwise it rides on that fight.
+- **Duels:**
+  - The Lone Wanderer (common; for pride: Fatigue relief, or Fatigue on a loss)
+  - Outlaw Toll "Call out the leader" (anyone)
+  - Wanted Poster (Snake-Eye Pike)
+  - Hanging Tree (a bullseye or hit frees the homesteader, who joins)
+  - Mad Dog's standoff before his boss fight: a boss can't die to it; a bullseye leaves him
+    at 50% HP and bleeding
+- No Cancel on "Who draws?": a duel has to be answered.
+- **Dev tool:** "DEV: Duel Lab" on the main menu.
+
 ### Ending an expedition
 - **Victory** (boss, crossing or final fight won): loot, XP, quirk rolls (45%, positive 60%
   on a win and 40% otherwise), and founding if it was a region boss.

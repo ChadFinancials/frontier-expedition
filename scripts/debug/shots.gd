@@ -28,6 +28,29 @@ static func run(main: Main, args: Dictionary) -> void:
 	match scenario:
 		"menu":
 			await main.goto("menu", {}, true)
+		"duel":
+			# High Noon at a given phase: phase=intro|wait|draw|aim|result (tier=... for result).
+			await main.goto("menu", {}, true)
+			var dh: Hero = Game.company.make_hero(str(args.get("cls", "gunslinger")), 1)
+			var hn := HighNoon.open(dh, {"name": "Snake-Eye Pike", "draw": 0.45, "tier": 2}, func(_r): pass)
+			await main.get_tree().process_frame
+			var ph := str(args.get("phase", "intro"))
+			if ph != "intro":
+				hn._start()
+			if ph == "wait":
+				hn.cue_t = 0.9
+				hn.cue_text = "*caw*"
+				hn.wait_time = 99.0
+			elif ph == "draw":
+				hn.wait_time = 0.0
+				hn.opp_fire = 99.0
+			elif ph in ["aim", "result"]:
+				hn.phase = "aim"
+				hn.headline = "Aim"
+				hn.subline = "Click or press Space to fire."
+				if ph == "result":
+					hn.sight = float(args.get("pos", "0.51"))
+					hn._press()
 		"lineup":
 			await main.goto("menu", {}, true)
 			main.screen.queue_free()

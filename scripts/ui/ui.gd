@@ -552,6 +552,8 @@ static func hero_tooltip(h: Hero) -> String:
 		"HP %d/%d   Fatigue %d/200" % [h.hp, h.max_hp(), h.fatigue]]
 	if h.fatigue_state != "":
 		lines.append(DB.fatigue_states[h.fatigue_state].name + ": " + DB.fatigue_states[h.fatigue_state].desc)
+	if h.rattled:
+		lines.append("Rattled (lost a duel): -10 Accuracy, -5 Dodge until the expedition ends")
 	var sv: Array = []
 	for s in h.survival:
 		sv.append("%s %d" % [DB.survival[s].name, int(h.survival[s].rank)])

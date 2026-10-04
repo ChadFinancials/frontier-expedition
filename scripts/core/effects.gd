@@ -6,13 +6,13 @@ extends RefCounted
 ## Types: fatigue{amount}, heal_pct{value}, damage_pct{value}, food{amount}, money{amount|min,max},
 ## money_pct{value}, timber{amount}, iron{amount}, hides{amount}, charters{amount}, item{item,amount}, keepsake{},
 ## quirk{quirk}, remove_quirk{}, wagon{amount}, recruit{class},
-## fight{enemies,surprise,reward,wounded,drop,foe_mods,foe_mark},
+## fight{enemies,surprise,reward,wounded,drop,foe_mods,foe_mark}, duel{...} (see RunState.resolve_duel),
 ## buff{stat,value} (next fight), reveal{amount}, light{amount}, clear_shaken{}.
 ## Any effect may carry "chance" (percent). Camp effects use base/per_rank instead of amount.
 
 ## Returns {"msgs": [String], "fight": Dictionary or null}
 static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = null, rank: int = 1) -> Dictionary:
-	var out := {"msgs": [], "fight": null}
+	var out := {"msgs": [], "fight": null, "duel": {}}
 	var c: Company = run.company
 	var rng := c.rng
 	for e in effects:
@@ -122,6 +122,9 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 				nh.location = run.origin
 				run.recruits.append(nh.to_dict())
 				out.msgs.append("%s the %s will join the company when you return." % [nh.hero_name, DB.classes[cls].name])
+			"duel":
+				# High Noon: the screen plays it, then RunState.resolve_duel applies the result.
+				out.duel = e.duplicate(true)
 			"fight":
 				out.fight = {"enemies": e.get("enemies", []).duplicate(), "surprise": e.get("surprise", ""),
 					"reward": e.get("reward", {})}

@@ -1007,7 +1007,7 @@ func _make_quest(tid: String, west: String, tier_l: int, starter: bool = false) 
 		"boss": {"name": str(b.get("name", "The Boss")), "landmark": place,
 			"intro": str(b.get("intro", "")).replace("{place}", place),
 			"victory": str(b.get("victory", "")).replace("{place}", place),
-			"enemies": b.get("enemies", t.get("final", []))},
+			"enemies": b.get("enemies", t.get("final", [])), "duel": b.get("duel", {})},
 		"crossing": {"name": str(t.name).replace("{place}", place), "enemies": t.get("final", [])},
 		"quest_reward": reward,
 		"done_flag": t.get("done_flag", ""), "boss_keepsake": t.get("boss_keepsake", ""),
@@ -1213,6 +1213,7 @@ func finish_run(status: String) -> Dictionary:
 		h.expeditions += 1
 		h.deaths_door = false
 		h.shaken = false
+		h.rattled = false
 		h.hp = h.max_hp()
 		h.location = r.origin
 		if h.is_second_wind():

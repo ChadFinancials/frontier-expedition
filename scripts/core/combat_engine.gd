@@ -62,6 +62,17 @@ func setup(party: Array, enemy_ids: Array, opts: Dictionary = {}) -> Array:
 		var mk := int(foe_mark.get(c.enemy_id, foe_mark.get("*", 0)))
 		if mk > 0:
 			c.mark = maxi(c.mark, mk)
+	# A High Noon duelist carries the duel's result into the fight: the first enemy with that
+	# id starts at hp_pct and/or bleeding (bleed_pct of max HP a round).
+	var du: Dictionary = opts.get("duelist", {})
+	if not du.is_empty():
+		for c in enemies:
+			if c.enemy_id == str(du.get("id", "")):
+				if du.has("hp_pct"):
+					c.hp = maxi(1, int(round(c.max_hp * float(du.hp_pct) / 100.0)))
+				if float(du.get("bleed_pct", 0)) > 0:
+					c.dots.append({"kind": "bleed", "amount": maxi(1, int(round(c.max_hp * float(du.bleed_pct) / 100.0))), "rounds": int(du.get("rounds", 3))})
+				break
 	# Buffs from camp and trail ("for the next fight").
 	var start_buffs: Dictionary = opts.get("start_buffs", {})
 	for c in heroes:

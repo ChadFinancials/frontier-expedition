@@ -77,7 +77,7 @@ func setup(p: Dictionary) -> void:
 	engine = CombatEngine.new()
 	var opts: Dictionary = run.combat_options(kind, p.get("surprise", "")) if run != null else {"rng": Game.company.rng}
 	var setup: Dictionary = p.get("setup", {})
-	for k in ["wounded", "foe_mods", "foe_mark"]:
+	for k in ["wounded", "foe_mods", "foe_mark", "duelist"]:
 		if setup.has(k):
 			opts[k] = setup[k]
 	var ev := engine.setup(run.party_heroes() if run != null else [], p.get("enemies", []), opts)

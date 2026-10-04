@@ -280,9 +280,26 @@ func _resolve_node() -> void:
 		return
 	match n.type:
 		"fight", "elite":
-			_to_combat(n.data.enemies, n.type)
+			# A High Noon duelist's gang may be waiting here instead.
+			var g := run.gang_fight(n)
+			if not g.is_empty():
+				Game.save_game()
+				Main.inst.dialog(g.title, g.text, [["Fight!", func(): _to_combat(g.enemies, n.type, "", g.reward, g.setup), "Danger"]])
+			else:
+				_to_combat(n.data.enemies, n.type)
 		"boss":
 			var b: Dictionary = run.region().boss
+			# Some bosses (Mad Dog) face you in the street first.
+			var bd: Dictionary = b.get("duel", {})
+			if not bd.is_empty():
+				Main.inst.dialog(b.name, run.boss_intro(), [["Face him", func():
+					_start_duel(bd, func(out: Dictionary):
+						Main.inst.dialog("High Noon", "%s\n\n%s" % [out.text, "\n".join(out.msgs)], [["Fight!", func(): _to_combat(n.data.enemies, "boss", "", {}, out.setup), "Danger"]])), "Danger"],
+					["Turn Back", func():
+						var summary2 := Game.company.finish_run("abandoned")
+						Game.save_game()
+						Main.inst.goto("results", {"summary": summary2})]])
+				return
 			Main.inst.dialog(b.name, run.boss_intro(), [["Fight!", func(): _to_combat(n.data.enemies, "boss"), "Danger"],
 				["Turn Back", func():
 					var summary := Game.company.finish_run("abandoned")
@@ -418,6 +435,14 @@ func _event_result(event_id: String, res: Dictionary) -> void:
 	Game.save_game()
 	refresh()
 	var body := "%s\n\n%s" % [res.text, "\n".join(res.msgs)]
+	var duel: Dictionary = res.get("duel", {})
+	if not duel.is_empty():
+		Main.inst.dialog(DB.events[event_id].get("title", ""), body, [["Step into the street", func():
+			_start_duel(duel, func(out: Dictionary):
+				Game.save_game()
+				refresh()
+				Main.inst.dialog("High Noon", "%s\n\n%s" % [out.text, "\n".join(out.msgs)], [["Continue", func(): _check_end()]])), "Danger"]])
+		return
 	if fight != null:
 		Main.inst.dialog("Trouble!", body, [["Fight!", func():
 			run.complete_current()
@@ -429,6 +454,14 @@ func _event_result(event_id: String, res: Dictionary) -> void:
 	else:
 		Audio.play("page")
 		Main.inst.dialog(DB.events[event_id].get("title", ""), body, [["Continue", func(): _check_end()]])
+
+
+## High Noon: "Who draws?" (★/✗ names), the duel screen, then the result applied.
+func _start_duel(duel: Dictionary, then: Callable) -> void:
+	HeroPicker.pick(run.party_heroes(), "Who draws?", func(h: Hero):
+		HighNoon.open(h, duel, func(r: Dictionary):
+			then.call(run.resolve_duel(duel, h, r))),
+		func(x: Hero): return Duel.hint(x), "", true)
 
 
 ## The second choice an outcome opened (dig up the grave, or leave a coin?).

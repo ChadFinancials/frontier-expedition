@@ -249,6 +249,8 @@ func status_chips() -> Array:
 		chips.append({"text": "Guarding", "kind": "good"})
 	if taunt > 0:
 		chips.append({"text": "Taunt", "kind": "good"})
+	if hero != null and hero.rattled:
+		chips.append({"text": "Rattled", "kind": "bad"})
 	# Death's Door has no chip: the HP bar already reads DEATH'S DOOR.
 	var totals := {}
 	for b in buffs:

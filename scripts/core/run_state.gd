@@ -25,6 +25,7 @@ var driven_back: bool = false    # a boss's scripted first meeting sent the comp
 var cave: Dictionary = {}        # {node, room, light} while inside a cave
 var camp: Dictionary = {}        # camp phase state
 var pending_fight: Dictionary = {} # fight queued by an event/curio/ambush
+var duel_gang: Dictionary = {}    # a High Noon duelist's gang, waiting at the next fight or elite stop
 
 
 func _init(c: Company = null) -> void:
@@ -1031,7 +1032,96 @@ func _choose_option(event_id: String, opt: Dictionary) -> Dictionary:
 	if not then.is_empty() and res.fight == null:
 		followup = {"event": event_id, "text": str(then.get("text", "")).replace("{hero}", actor.hero_name if actor != null else "Someone"),
 			"options": then.get("options", [])}
-	return {"text": text, "msgs": msgs, "fight": res.fight, "then": not followup.is_empty()}
+	return {"text": text, "msgs": msgs, "fight": res.fight, "then": not followup.is_empty(), "duel": res.get("duel", {})}
+
+
+# --- High Noon -------------------------------------------------------------------------
+
+## Applies a High Noon result (see Duel). duel: {"name" (who you face), "opponent" (enemy
+## id), "draw" (their draw time), "tier" (sight speed), "kind": "gang" | "wanderer" | "boss",
+## "gang": [enemy ids], "gang_name", "bounty", "on": {result: [effects]}, "text": {result:
+## line}}. r: {"tier": bullseye/hit/graze/miss/jumped, "slow": bool}.
+## Returns {"text", "msgs", "setup"}; setup is for a boss fight that follows at once.
+func resolve_duel(duel: Dictionary, h: Hero, r: Dictionary) -> Dictionary:
+	var c := Duel.cfg()
+	var tier: String = r.get("tier", "miss")
+	var opp: String = duel.get("name", "the stranger")
+	var boss: bool = duel.get("kind", "") == "boss"
+	var msgs: Array = []
+	var lines := {
+		"jumped": "%s goes for the gun too soon. %s doesn't." % [h.hero_name, opp],
+		"bullseye": ("%s's shot takes %s square. %s staggers, bleeding hard, but stays on his feet." % [h.hero_name, opp, opp]) if boss
+			else "%s's shot takes %s clean. %s doesn't get up." % [h.hero_name, opp, opp],
+		"hit": "%s puts a bullet in %s, who reels away bleeding." % [h.hero_name, opp],
+		"graze": "%s's bullet only grazes %s." % [h.hero_name, opp],
+		"miss": "%s's shot goes wide. %s grins." % [h.hero_name, opp],
+	}
+	var text: String = str(duel.get("text", {}).get(tier, lines.get(tier, "")))
+	text = text.replace("{hero}", h.hero_name).replace("{opp}", opp)
+	if r.get("slow", false) and tier != "jumped":
+		text = "%s clears leather first and the bullet finds %s. %s" % [opp, h.hero_name, text]
+	if r.get("slow", false) or tier == "jumped":
+		var dmg := maxi(1, int(ceil(h.max_hp() * float(c.get("hit_pct", 15)) / 100.0)))
+		h.hp = maxi(1, h.hp - dmg)
+		msgs.append("%s takes %d damage." % [h.hero_name, dmg])
+	if tier in ["miss", "jumped"] and not h.rattled:
+		h.rattled = true
+		msgs.append("%s is Rattled until the expedition ends (-10 Accuracy, -5 Dodge)." % h.hero_name)
+	var setup := {}
+	match duel.get("kind", "gang"):
+		"gang":
+			var reward: Dictionary = duel.get("reward", {}).duplicate()
+			if tier == "bullseye" and int(duel.get("bounty", 0)) > 0:
+				var pay := int(int(duel.bounty) * float(DB.cfg("chips_mult", 1.0)))
+				loot.money = int(loot.money) + pay
+				msgs.append("The bounty is yours: +%d chips." % pay)
+			elif int(duel.get("bounty", 0)) > 0:
+				reward["money"] = int(reward.get("money", 0)) + int(duel.bounty)
+			duel_gang = {"name": duel.get("gang_name", "%s's gang" % opp), "opp": opp, "duelist": duel.get("opponent", ""),
+				"tier": "miss" if tier == "jumped" else tier, "enemies": duel.get("gang", []).duplicate(), "reward": reward}
+			msgs.append("%s rides off. You'll meet them again further down the trail." % duel_gang.name)
+		"boss":
+			setup = duelist_setup(str(duel.get("opponent", "")), tier, true)
+	var ores := Effects.apply(duel.get("on", {}).get(tier, []), self, h)
+	msgs.append_array(ores.msgs)
+	add_log([text] + msgs)
+	return {"text": text, "msgs": msgs, "setup": setup}
+
+
+## How a duel's result carries into the fight with the duelist: dead (dropped; a boss can't
+## die to it), 50% HP and bleeding, or just bleeding.
+func duelist_setup(eid: String, tier: String, boss: bool) -> Dictionary:
+	var c := Duel.cfg()
+	var bleed := {"bleed_pct": float(c.get("bleed_pct", 8)), "rounds": int(c.get("bleed_rounds", 3))}
+	match tier:
+		"bullseye":
+			if not boss:
+				return {"drop": [eid]}
+			var d := bleed.duplicate()
+			d.merge({"id": eid, "hp_pct": 50})
+			return {"duelist": d}
+		"hit":
+			var d2 := bleed.duplicate()
+			d2.merge({"id": eid, "hp_pct": 50})
+			return {"duelist": d2}
+		"graze":
+			var d3 := bleed.duplicate()
+			d3["id"] = eid
+			return {"duelist": d3}
+	return {}
+
+
+## A duelist's gang waits at the next fight or elite stop: {"title", "text", "enemies",
+## "setup", "reward"} for that stop, or {} (and the gang is used up).
+func gang_fight(n: Dictionary) -> Dictionary:
+	if duel_gang.is_empty() or not n.get("type", "") in ["fight", "elite"]:
+		return {}
+	var g := duel_gang
+	duel_gang = {}
+	var state := {"bullseye": "without %s, who never got up" % g.opp, "hit": "%s is still bleeding from your shot" % g.opp,
+		"graze": "%s is bleeding from the graze" % g.opp, "miss": "%s is spoiling for it" % g.opp}
+	return {"title": g.name, "text": "%s catches up with you, and %s." % [g.name, state.get(g.tier, "")],
+		"enemies": g.enemies, "setup": duelist_setup(str(g.duelist), str(g.tier), false), "reward": g.get("reward", {})}
 
 
 func event_text(event_id: String) -> String:
@@ -1251,7 +1341,7 @@ func trade_buy(item_id: String) -> bool:
 # --- Save / load ----------------------------------------------------------------------
 
 const FIELDS := ["region_id", "origin", "party", "nodes", "current", "day", "supplies", "wagon", "loot",
-	"xp", "kills", "pending_buffs", "recruits", "log", "status", "boss_won", "driven_back", "cave", "camp", "pending_fight"]
+	"xp", "kills", "pending_buffs", "recruits", "log", "status", "boss_won", "driven_back", "cave", "camp", "pending_fight", "duel_gang"]
 
 
 func to_dict() -> Dictionary:

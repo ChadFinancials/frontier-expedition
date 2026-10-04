@@ -13,7 +13,7 @@
 | [`QUIRK_PROPOSALS.md`](QUIRK_PROPOSALS.md) | Every quirk with a proposed edit, plus 10 new ones, awaiting the owner's picks | Until picked and built |
 | [`TRINKET_PROPOSALS.md`](TRINKET_PROPOSALS.md) | Two class trinkets per class plus the general trinkets with edits, awaiting the owner's picks | Until picked and built |
 | [`CURIO_PROPOSALS.md`](CURIO_PROPOSALS.md) | Every curio with its odds and its class and survival-skill experts; the first region's are built | Until the later regions' curios are built |
-| [`MINIGAME_PROPOSALS.md`](MINIGAME_PROPOSALS.md) | Hands-on moments: the two-part High Noon duel (reaction, then a swinging aim bar) and four skill-check games for curios, made easier or harder by ★/✗. Awaiting the owner's picks | Until picked and built |
+| [`MINIGAME_PROPOSALS.md`](MINIGAME_PROPOSALS.md) | Hands-on moments: the High Noon duel (built) and four skill-check games for curios (next), made easier or harder by ★/✗ | Until the skill checks are built |
 | [`EVENT_PROPOSALS.md`](EVENT_PROPOSALS.md) | Event pools (common, region, side-quest theme), ★/✗ experts on event options, quirk compels, follow-ups, every first-region event reworked plus 12 new; built in two passes. The pre-pass events are in an appendix | Until the later regions' events are done |
 | [`FATIGUE_PROPOSALS.md`](FATIGUE_PROPOSALS.md) | Breaking Points and True Grit: the renames away from Darkest Dungeon's terms and a mechanic hook for each; built with the owner's edits | Can be archived |
 | [`HERO_PROPOSALS.md`](HERO_PROPOSALS.md) | Options awaiting the owner's picks: new moves for the classes under 8, and two new hero designs | Until picked and built |

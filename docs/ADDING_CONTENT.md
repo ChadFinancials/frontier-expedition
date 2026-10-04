@@ -219,7 +219,9 @@ re-formats the file in its usual layout after a scripted edit.
 `quirk {quirk}` (an id, or random / random_positive / random_negative), `remove_quirk`,
 `wagon`, `recruit {class}`, `fight {enemies, surprise, reward, wounded {id or "*": hp %},
 drop [id], foe_mods [mod with rounds], foe_mark {id or "*": rounds}}`, `buff {stat, value}`
-(next fight; negative values work: wet powder, hungover), `reveal {amount}`, `light`, `clear_shaken`.
+(next fight; negative values work: wet powder, hungover), `duel {kind: gang|wanderer|boss,
+name, opponent, draw, tier, gang, gang_name, bounty, reward, on {result: [effects]}, text
+{result: line}}` (High Noon, see GDD), `reveal {amount}`, `light`, `clear_shaken`.
 - `target`: party (default), actor, random.
 - Any effect can have `chance`.
 

@@ -4,7 +4,8 @@ extends RefCounted
 ## info (optional) returns a line of text shown under each hero, e.g. what they'd gain.
 
 
-static func pick(heroes: Array, title: String, cb: Callable, info: Callable = Callable(), empty_text: String = "Nobody here can do that right now.") -> void:
+## must_pick: no Cancel (a duel has to be answered).
+static func pick(heroes: Array, title: String, cb: Callable, info: Callable = Callable(), empty_text: String = "Nobody here can do that right now.", must_pick: bool = false) -> void:
 	var p := UI.panel()
 	p.custom_minimum_size = Vector2(600, 0)
 	var v := UI.vb(8)
@@ -34,5 +35,6 @@ static func pick(heroes: Array, title: String, cb: Callable, info: Callable = Ca
 					var col: Variant = UI.GREEN if seg.begins_with("★") else (UI.RED if seg.begins_with("✗") else null)
 					parts.append(("[color=#%s]%s[/color]" % [col.to_html(false), seg]) if col != null else seg)
 				list.add_child(UI.rich("   " + "    ".join(parts), 16, true))
-	v.add_child(UI.btn("Cancel", func(): Main.inst.close_modal(holder.wrap), "Small"))
-	holder.wrap = Main.inst.modal(p)
+	if not must_pick:
+		v.add_child(UI.btn("Cancel", func(): Main.inst.close_modal(holder.wrap), "Small"))
+	holder.wrap = Main.inst.modal(p, not must_pick)

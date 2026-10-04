@@ -13,6 +13,7 @@ var fatigue_state: String = ""   # id in fatigue_states.json, or ""
 var state_fresh: bool = false    # the state just landed; its on_land boons fire in the next fight turn
 var deaths_door: bool = false
 var shaken: bool = false         # Death's Door recovery, lasts the expedition
+var rattled: bool = false        # lost a High Noon duel; lasts the expedition
 var quirks: Array = []           # quirk ids
 var survival: Dictionary = {}    # skill id -> {"rank": int, "xp": int}
 var skill_levels: Dictionary = {} # combat skill id -> level 1..max_skill_level (config)
@@ -53,6 +54,8 @@ func all_mods() -> Array:
 		mods.append_array(DB.fatigue_states.get(fatigue_state, {}).get("mods", []))
 	if shaken:
 		mods.append_array(DB.cfg("shaken_mods", []))
+	if rattled:
+		mods.append_array(DB.cfg("rattled_mods", []))
 	return mods
 
 
@@ -184,7 +187,7 @@ func add_xp(amount: int) -> int:
 const FIELDS := ["uid", "hero_name", "class_id", "level", "xp", "hp", "fatigue", "fatigue_state",
 	"deaths_door", "shaken", "quirks", "survival", "skill_levels", "equipped", "known", "weapon_tier",
 	"armor_tier", "keepsakes", "location", "busy_weeks", "busy_reason", "transit_to",
-	"transit_weeks", "alive", "expeditions", "kills", "death_note", "look_seed", "state_fresh"]
+	"transit_weeks", "alive", "expeditions", "kills", "death_note", "look_seed", "state_fresh", "rattled"]
 
 
 func to_dict() -> Dictionary:
