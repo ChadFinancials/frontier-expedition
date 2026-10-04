@@ -34,7 +34,7 @@ Three rules hold the codebase together:
 |---|---|
 | `project.godot` | Engine settings, version (`config/version`), the three autoloads, main scene. Renderer: Vulkan (Forward+) with 2D MSAA, falling back to OpenGL (Compatibility) |
 | `scenes/main.tscn` | The only scene: a `Main` node. Every screen is built in code |
-| `data/` | All content and balance (16 JSON tables, listed below) |
+| `data/` | All content and balance (17 JSON tables, listed below) |
 | `scripts/autoload/` | `DB` (data), `Game` (company, save, settings), `Audio` (sound) |
 | `scripts/core/` | The rules: combat, campaign, expedition, heroes, fatigue, map generation |
 | `scripts/main.gd` | Root node: screen switching, modals, dialogs, toasts, pause and help menus |
@@ -63,7 +63,8 @@ Three rules hold the codebase together:
   floats). `DB.cfg(key, default)` reads `config.json`. `DB.validate()` cross-checks references
   between tables and is run by the tests. Tables: `config, classes, skills, enemies, regions,
   settlements, buildings, survival, quirks, keepsakes, items, curios, events, fatigue_states,
-  names, quests`.
+  names, quests, townsfolk` (`names`, `quests` and `townsfolk` are whole documents, not
+  tables of entries, so they get no `id`s).
 - **`Game`** (`scripts/autoload/game.gd`) owns `Game.company` (the `Company`), saving to
   `user://save.json` (`save_game`, `load_game`) and settings in `user://settings.json` (sfx,
   music, fullscreen, combat speed, paper look). F11 toggles fullscreen. On Windows `user://` is
@@ -82,6 +83,7 @@ Three rules hold the codebase together:
 | `Combatant` | A unit inside a battle | Wraps a `Hero` or an enemy definition; stats, statuses, buffs |
 | `Hero` | A company member | Class, level and XP, gear tiers, known and equipped skills, survival skills, quirks, trinkets, Fatigue |
 | `Fatigue` | Static helpers | Adding Fatigue, Gut Checks, Breaking Points and True Grit (`second_wind` in code), Collapse. Returns events |
+| `Townsfolk` | Static helpers | A townsperson is a plain dictionary in `Company.townsfolk` (a separate pool from heroes). Helpers: work level, wage, the help they give in a building (`value_in`), titles and trait text. `Company` owns the rest: seats (`staff_seats`, `post_townsperson`), the bonuses read by each service (`staff_value`, `staff_mult`, `staff_masters`), `production`, and `_townsfolk_week` in the weekly clock. `TownsfolkPanel` (screens) is the roster; `TownsfolkCard` (ui) the card and picker |
 | `Effects` | Static `apply` | Out-of-combat effects from events, curios and camp actions (format in `ADDING_CONTENT.md`) |
 | `Duel` | Static helpers | High Noon scoring: the hero's edge, aim zones, results and a screenless `roll` for tests and the bot. `HighNoon` (scripts/ui) is the screen; `RunState.resolve_duel` applies a result and parks the duelist's gang for the next fight (`duel_gang`) |
 | `SkillCheck` | Control (scripts/ui) | The four curio check games. `SkillCheck.investigate` plays a curio's check (`RunState.curio_check` sets the difficulty) and passes the result to `interact_curio` |
@@ -115,7 +117,9 @@ results screen ◄─ Company.finish_run() ◄─ boss / crossing won, turn back
 - **Autosave:** screens call `Game.save_game()` after every settled action (arriving at a
   stop, a fight's end, a camp step, a town action). A save made mid-expedition resumes on the
   trail.
-- **Weekly clock:** one expedition is one week. `Company.advance_week` counts down treatments
+- **Weekly clock:** one expedition is one week. `Company.advance_week` first runs the
+  townsfolk week (producers deliver, staff learn, wages are paid, the unpaid and restless
+  leave, Tipplers roll for a week off), then counts down treatments
   and stage-line trips, tops chips up to `grubstake_floor`, then refreshes every settlement:
   building slots clear, the Saloon rolls new quests, the Hiring Board new recruits and the
   General Store new trinket stock.

@@ -100,7 +100,8 @@
       {"text": "Tend them properly.", "requires": {"skill": "medic"},
         "experts": {"sickly": {"averse": true, "always": true, "bonus": [{"type": "damage_pct", "value": 15, "target": "actor"}, {"type": "fatigue", "amount": 6, "target": "actor"}]}},
         "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} works through the night. The father lives. The family sings your names as you leave.", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "quirk", "quirk": "random_positive", "target": "actor", "chance": 50}]}]},
+        {"weight": 1, "good": true, "text": "{hero} works through the night. The father lives. The family sings your names as you leave.", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "quirk", "quirk": "random_positive", "target": "actor", "chance": 50}]},
+        {"weight": 1, "good": true, "text": "{hero} works through the night and the father lives. Come spring, the family says, they'll look for your town: \"Folks like you are folks worth living near.\"", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "townsfolk", "trade": ["laborer", "logger", "trapper", "sawbones"]}]}]},
       {"text": "Give them some food.", "requires": {"item": "food"}, "consume": {"item": 4}, "outcomes": [
         {"weight": 1, "good": true, "text": "It isn't much, but it's something. You feel good about it.", "effects": [{"type": "fatigue", "amount": -5, "target": "party"}]}]},
       {"text": "Sit with the family.", "requires": {"class": "preacher"}, "outcomes": [
@@ -371,7 +372,8 @@
       {"text": "Run the surveyors off.", "outcomes": [
         {"weight": 1, "text": "The company men don't run.", "effects": [{"type": "fight", "enemies": ["railroad_enforcer", "railroad_enforcer", "outlaw_rifleman"]}]}]},
       {"text": "Invoke the law.", "requires": {"class": "marshal"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} points out that their stakes are on a homestead claim. The surveyors grumble and move the line. The settler gives you supplies.", "effects": [{"type": "food", "amount": 5}, {"type": "fatigue", "amount": -8, "target": "party"}]}]}
+        {"weight": 1, "good": true, "text": "{hero} points out that their stakes are on a homestead claim. The surveyors grumble and move the line. The settler gives you supplies.", "effects": [{"type": "food", "amount": 5}, {"type": "fatigue", "amount": -8, "target": "party"}]},
+        {"weight": 1, "good": true, "text": "The surveyors move their line. The settler looks at the stakes, then at the orchard. \"They'll be back. I'd sooner start over somewhere with law in it.\" They ask the way to your town.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}, {"type": "townsfolk", "trade": ["laborer", "logger"]}]}]}
     ]},
 
   "siren_song": {"title": "A Song in the Canyon", "art": "siren",
@@ -401,7 +403,8 @@
     "text": "Two prospectors are shouting over a stake, guns half drawn. \"Tell him! This here's MY claim!\"",
     "options": [
       {"text": "Settle it fairly.", "requires": {"class": "marshal"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} reads the claim papers and settles it. Both pay a finder's fee to keep it official.", "effects": [{"type": "money", "min": 100, "max": 180}]}]},
+        {"weight": 1, "good": true, "text": "{hero} reads the claim papers and settles it. Both pay a finder's fee to keep it official.", "effects": [{"type": "money", "min": 100, "max": 180}]},
+        {"weight": 1, "good": true, "text": "{hero} settles it by the papers. The loser spits, then shrugs: \"Reckon I'd rather draw wages than dig for nothing. Your town got a mine?\"", "effects": [{"type": "money", "min": 40, "max": 80}, {"type": "townsfolk", "trade": "mucker"}]}]},
       {"text": "Assess the ore yourself.", "requires": {"skill": "miner"}, "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} points out the real vein is twenty yards over. Both are grateful.", "effects": [{"type": "iron", "amount": 3}, {"type": "fatigue", "amount": -4, "target": "party"}]}]},
       {"text": "Blast a test hole.", "requires": {"class": "prospector"}, "outcomes": [
@@ -468,7 +471,8 @@
       {"text": "Trade for supplies (30 chips).", "requires": {"money": 30}, "consume": {"money": 30}, "outcomes": [
         {"weight": 1, "good": true, "text": "Sacks of potatoes and salt pork.", "effects": [{"type": "food", "amount": 10}]}]},
       {"text": "Help with chores in exchange for lumber.", "outcomes": [
-        {"weight": 1, "text": "A day of hard work, a wagon full of boards.", "effects": [{"type": "timber", "amount": 5}, {"type": "fatigue", "amount": 6, "target": "party"}]}]}
+        {"weight": 1, "text": "A day of hard work, a wagon full of boards.", "effects": [{"type": "timber", "amount": 5}, {"type": "fatigue", "amount": 6, "target": "party"}]},
+        {"weight": 1, "good": true, "text": "A day of hard work, a wagon full of boards, and the eldest asking if your town needs a strong back.", "effects": [{"type": "timber", "amount": 4}, {"type": "fatigue", "amount": 6, "target": "party"}, {"type": "townsfolk", "trade": ["laborer", "logger"]}]}]}
     ]},
 
   "homestead_widow": {"title": "Widow's Claim", "art": "cabin",
@@ -506,7 +510,8 @@
       {"text": "Buy furs and provisions (50 chips).", "requires": {"money": 50}, "consume": {"money": 50}, "outcomes": [
         {"weight": 1, "good": true, "text": "Furs, pemmican and good advice.", "effects": [{"type": "food", "amount": 8}, {"type": "reveal", "amount": 2}, {"type": "hides", "amount": 2}]}]},
       {"text": "Ask the trapper to join you.", "outcomes": [
-        {"weight": 1, "good": true, "text": "\"Been meaning to see the ocean before I die.\"", "effects": [{"type": "recruit", "class": "mountain_man"}]}]}
+        {"weight": 1, "good": true, "text": "\"Been meaning to see the ocean before I die.\"", "effects": [{"type": "recruit", "class": "mountain_man"}]},
+        {"weight": 1, "good": true, "text": "\"Too old to ride with gunhands. But I hear your town buys hides.\" The trapper starts packing up the traps.", "effects": [{"type": "townsfolk", "trade": "trapper"}]}]}
     ]},
 
   "swollen_creek": {"title": "Swollen Creek", "art": "river",
@@ -632,6 +637,7 @@
         "experts": {"wrangler": {"bonus": [{"type": "money", "min": 60, "max": 60}]}, "clumsy": {"averse": true}},
         "outcomes": [
         {"weight": 3, "good": true, "text": "A long, dusty day. The trail boss pays in cash.", "effects": [{"type": "money", "min": 80, "max": 140}, {"type": "fatigue", "amount": 6, "target": "party"}]},
+        {"weight": 1, "good": true, "text": "A long, dusty day. At sundown the cook throws down the apron: \"Two thousand miles of beans. Point me at your town.\"", "effects": [{"type": "money", "min": 60, "max": 100}, {"type": "fatigue", "amount": 6, "target": "party"}, {"type": "townsfolk", "trade": ["barkeep", "laborer"]}]},
         {"weight": 1, "text": "Something spooks the herd. Stampede!", "effects": [{"type": "damage_pct", "value": 15, "target": "random"}, {"type": "wagon", "amount": -10}]}]},
       {"text": "Cut out a stray for supper.", "hide_if": ["marshal"], "outcomes": [
         {"weight": 2, "good": true, "text": "One stray, never missed. Steak tonight.", "effects": [{"type": "food", "amount": 10}]},
@@ -659,6 +665,7 @@
         "experts": {"miner": {}, "woodcutter": {}, "rail_driver": {}, "claustrophobic": {"averse": true, "bonus": [{"type": "fatigue", "amount": 10, "target": "actor"}]}},
         "outcomes": [
         {"weight": 1, "good": true, "text": "A half-starved miner crawls out into the light. \"I owe you. I'll ride with you, if you'll have me.\"", "effects": [{"type": "recruit", "class": "prospector"}]},
+        {"weight": 1, "good": true, "text": "A miner crawls out, coughing dust. \"I'm done with company mines. If your town's got honest work, count me in.\"", "effects": [{"type": "townsfolk", "trade": "mucker"}]},
         {"weight": 1, "good": true, "text": "A miner crawls out, and presses his poke into {hero}'s hands.", "effects": [{"type": "money", "min": 100, "max": 160}]},
         {"weight": 1, "text": "The roof comes down on {hero}.", "effects": [{"type": "damage_pct", "value": 20, "target": "actor"}, {"type": "quirk", "quirk": "claustrophobic", "target": "actor", "chance": 30}]}]},
       {"text": "Mark the spot and move on.", "outcomes": [
@@ -741,7 +748,7 @@
     "text": "Gunfire ahead. A stagecoach is pinned down behind its own dead horses, and outlaws are working around the flanks.",
     "options": [
       {"text": "Ride to the rescue.", "outcomes": [
-        {"weight": 1, "text": "You hit them from behind.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "surprise": "enemies", "reward": {"money": 160}}]}]},
+        {"weight": 1, "text": "You hit them from behind.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "surprise": "enemies", "reward": {"money": 160, "settler": {"trade": ["storekeeper", "sawbones", "parson", "undertaker"]}}}]}]},
       {"text": "Wait, then pick over what's left.",
         "experts": {"gold_fever": {"odds": 0, "bonus": [{"type": "money", "min": 40, "max": 80}]}, "preacher": {"averse": true, "always": true, "bonus": [{"type": "fatigue", "amount": 12, "target": "actor"}]}, "marshal": {"averse": true, "always": true, "bonus": [{"type": "fatigue", "amount": 12, "target": "actor"}]}},
         "outcomes": [

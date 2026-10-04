@@ -163,10 +163,15 @@ func refresh() -> void:
 			"[color=#7fb069]Boss defeated.[/color]" if region_id in co.beaten else "Boss: %s." % reg2.boss.name]
 	info_label.text = txt
 	UI.clear(action_row)
+	var tb := UI.btn("Townsfolk (%d/%d)" % [co.population(index), co.housing(index)], open_townsfolk, "")
+	tb.tooltip_text = "The people who live here and staff the buildings. Wages: %d chips a week." % co.townsfolk_wages()
+	action_row.add_child(tb)
 	var nt := co.next_tier(st.tier)
 	if not nt.is_empty():
 		var ub := UI.btn("Grow to %s" % nt.name, _upgrade_tier, "")
-		ub.tooltip_text = "Upgrade this %s to a %s: more building plots and bigger buildings.\nCost: %s" % [tier.name, nt.name, Company.cost_text(nt.cost)]
+		var pop_need := int(nt.get("population", 0))
+		ub.tooltip_text = "Upgrade this %s to a %s: more building plots and bigger buildings.\nCost: %s%s" % [tier.name, nt.name, Company.cost_text(nt.cost),
+			"\nNeeds %d townsfolk living here (%d now)." % [pop_need, co.population(index)] if pop_need > 0 else ""]
 		action_row.add_child(ub)
 	var rest := UI.btn("Rest a Week", _rest_week, "")
 	rest.tooltip_text = "Let a week pass without an expedition. Heroes finish treatments, the stage line moves, new recruits arrive."
@@ -259,10 +264,18 @@ func open_hero(h: Hero) -> void:
 	sheet.wrap = Main.inst.modal(sheet)
 
 
-func open_building(bid: String) -> void:
+func open_townsfolk() -> TownsfolkPanel:
+	var p := TownsfolkPanel.new()
+	p.setup(index, func(): refresh())
+	p.wrap = Main.inst.modal(p)
+	return p
+
+
+func open_building(bid: String) -> BuildingPanel:
 	var p := BuildingPanel.new()
 	p.setup(bid, index, func(): refresh())
 	p.wrap = Main.inst.modal(p)
+	return p
 
 
 func _on_building(bid: String) -> void:

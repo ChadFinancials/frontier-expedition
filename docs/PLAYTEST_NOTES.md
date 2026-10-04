@@ -21,9 +21,9 @@ decided, and what shipped. Update both at the end of every round.
 ### Gameplay
 - [ ] **The Lone Wanderer storyline (owner, later):** meet the wanderer again over time, as a
       recurring event that builds into a small quest line. The MVP duel is in.
-- [ ] **Townsfolk (owner, next):** a roster of townspeople who staff the buildings, with
-      wages and population growth; a separate pool from the heroes. Proposal with questions in
-      `docs/TOWNSFOLK_PROPOSALS.md`.
+- [ ] **Townsfolk: playtest the first build** (round 15). Watch how fast settlers arrive (eight
+      events, about 1 in 5 quests), whether wages bite, and whether the producers are worth a
+      plot. Later: moving townsfolk and heroes between settlements.
 - [ ] **Wagon (owner, after the townsfolk):**
   - Some enemies and battles target the wagon, which sits behind the party: it loses
     condition and/or cargo. Rework **enemy ambushes** around this (switched off in round 7
@@ -91,9 +91,20 @@ decided, and what shipped. Update both at the end of every round.
     lost), plus an upgrade track with expanded cargo. No cover or wagon combat actions.
   - **Townsfolk first:** a roster like the heroes', with upkeep and growth. Heroes and
     townsfolk are always separate pools (no retiring into townsfolk).
-- Drafted `docs/TOWNSFOLK_PROPOSALS.md`: trades and staff seats, traits, levels, settlers
-  and trail rescues, wages, population gates on tier upgrades, screens, save compatibility,
-  and six questions.
+- Drafted `docs/TOWNSFOLK_PROPOSALS.md`, then built it with the owner's answers:
+  - Traits are their own pool, not hero quirks.
+  - Empty buildings work as before.
+  - Townsfolk come only from expeditions and quests: eight trail events, plus a settler on
+    about 1 in 5 Saloon quests. Nobody is given at the start, and the Hiring Board stays heroes
+    only.
+  - Staff seats: 0 / 1 / 2 by building level.
+  - Wages: 10 / 20 / 30 chips a week.
+  - Producers: the Lumber Yard, Iron Mine and Trapping Post, with Loggers, Muckers and
+    Trappers.
+  - Moving between towns: later.
+  - Screens: a Townsfolk roster, staff seats on building panels, and settler lines on the
+    results screen.
+  - Growing to a City now needs 8 townsfolk.
 
 ### Round 14: High Noon (owner's design)
 - **The duel:**

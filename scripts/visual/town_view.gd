@@ -457,6 +457,36 @@ func _draw_building(art: String, b: Vector2, level: int, bname: String) -> void:
 				draw_line(Vector2(cx - 14, b.y - ch + 16), Vector2(cx + 14, b.y - ch + 16), Color("#d9cfb8"), 7)
 			draw_line(b + Vector2(-w / 2, -14), b + Vector2(w / 2, -14), Color("#5a3822"), 3)
 			_sign(b + Vector2(0, -110), "BOOT HILL", w * 0.7)
+		"lumber":
+			# An open-sided saw shed and a log pile.
+			_rect(Rect2(b.x - w / 2, b.y - h * 0.7, 10, h * 0.7), wood2)
+			_rect(Rect2(b.x + w / 2 - 70, b.y - h * 0.7, 10, h * 0.7), wood2)
+			_poly([b + Vector2(-w / 2 - 10, -h * 0.7), b + Vector2(w / 2 - 50, -h * 0.7), b + Vector2(w / 2 - 70, -h * 0.9), b + Vector2(-w / 2 + 10, -h * 0.9)], Color("#5e3f27"))
+			draw_circle(b + Vector2(-w / 4, -h * 0.35), 22, Color("#9aa0a6"))
+			for k in 3:
+				for m in 3 - k:
+					draw_circle(b + Vector2(w / 2 - 50 + m * 22 + k * 11, -12 - k * 20), 11, Color("#b07a45"))
+					draw_circle(b + Vector2(w / 2 - 50 + m * 22 + k * 11, -12 - k * 20), 5, Color("#d9b07a"))
+			_sign(b + Vector2(0, -h * 0.98), "LUMBER", w * 0.6)
+		"mine":
+			# A timbered adit into a hillside, with an ore cart.
+			_poly([b + Vector2(-w / 2 - 10, 0), b + Vector2(-w / 4, -h * 0.9), b + Vector2(w / 4, -h * 1.0), b + Vector2(w / 2 + 10, 0)], Color("#8a7a62"))
+			_rect(Rect2(b.x - 34, b.y - 80, 68, 80), Color("#1e1610"))
+			draw_line(b + Vector2(-38, 0), b + Vector2(-38, -84), wood, 8)
+			draw_line(b + Vector2(38, 0), b + Vector2(38, -84), wood, 8)
+			draw_line(b + Vector2(-44, -84), b + Vector2(44, -84), wood, 9)
+			_rect(Rect2(b.x + 52, b.y - 30, 40, 22), Color("#4a4a50"))
+			draw_circle(b + Vector2(60, -6), 6, Color("#2a2a2e"))
+			draw_circle(b + Vector2(84, -6), 6, Color("#2a2a2e"))
+			_sign(b + Vector2(0, -h * 1.08), "IRON MINE", w * 0.7)
+		"trapper":
+			# A small cabin, and a hide stretched on a frame.
+			_rect(Rect2(b.x - w / 2, b.y - h * 0.6, w * 0.55, h * 0.6), Color("#7a5232"))
+			_poly([b + Vector2(-w / 2 - 8, -h * 0.6), b + Vector2(w * 0.05 + 8, -h * 0.6), b + Vector2(-w * 0.22, -h * 0.9)], Color("#4a3322"))
+			var fx := b.x + w * 0.27
+			draw_rect(Rect2(fx - 32, b.y - 96, 64, 76), Color("#3a2618"), false, 4)
+			_poly([Vector2(fx - 24, b.y - 88), Vector2(fx + 24, b.y - 90), Vector2(fx + 20, b.y - 52), Vector2(fx + 26, b.y - 28), Vector2(fx - 26, b.y - 30), Vector2(fx - 20, b.y - 56)], Color("#b98a5a"), false)
+			_sign(b + Vector2(0, -h * 0.98), "TRAPPING POST", w * 0.8)
 	# Level stars.
 	for k in level:
 		draw_colored_polygon(PackedVector2Array(Figure.star_pts(b + Vector2(-(level - 1) * 12 + k * 24, 22), 9, 4, 5)), Color("#e0bd4f"))

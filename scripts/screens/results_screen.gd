@@ -74,6 +74,8 @@ func setup(params: Dictionary) -> void:
 			v.add_child(UI.lbl("✝ %s, Level %d %s. %s" % [d.name, int(d.level), DB.classes.get(d.class_id, {}).get("name", ""), d.note], 19, "Ink"))
 	for r in s.get("recruits", []):
 		v.add_child(UI.lbl("Joined on the trail: %s" % r, 19, "InkBold"))
+	for t in s.get("settlers", []):
+		v.add_child(UI.lbl(t, 19, "InkBold"))
 	for m in s.get("week_msgs", []):
 		v.add_child(UI.lbl(m, 18, "Ink"))
 	var row2 := UI.hb(16)

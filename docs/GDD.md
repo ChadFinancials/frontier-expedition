@@ -50,11 +50,11 @@ exist but wait until the start is crisp.
 | 3 | The Great Casino (the Thunder Peaks) | *(the end of the trail)* | — |
 
 ### Tiers `[tiers, found_cost]`
-| Tier | Building slots | Max building level | Cost |
-|---|---|---|---|
-| Outpost | 3 | 1 | Founding: 1 Charter, 600 chips, 15 Timber, 8 Iron, 4 Hides |
-| Town | 6 | 2 | 3 Charters, 2000 chips, 40 Timber, 25 Iron, 12 Hides |
-| City | 9 | 3 | 6 Charters, 5000 chips, 90 Timber, 60 Iron, 30 Hides |
+| Tier | Building slots | Max building level | Townsfolk housed | To grow here | Cost |
+|---|---|---|---|---|---|
+| Outpost | 3 | 1 | 4 | | Founding: 1 Charter, 600 chips, 15 Timber, 8 Iron, 4 Hides |
+| Town | 6 | 2 | 8 | 4 townsfolk | 3 Charters, 2000 chips, 40 Timber, 25 Iron, 12 Hides |
+| City | 9 | 3 | 12 | 8 townsfolk | 6 Charters, 5000 chips, 90 Timber, 60 Iron, 30 Hides |
 
 - **Founding** needs that region's boss beaten. A new outpost starts with a free Stage Line.
 - **Fort Providence** starts as a Town that Silas Crane burned: only the **Hiring Board**
@@ -75,12 +75,60 @@ exist but wait until the start is crisp.
 | **Hiring Board** | New recruits each week | Tracks: More Notices (count), Word of Mouth (level and quirks), Bunkhouse (company size) |
 | **Stage Line** | Sends heroes between settlements, one week per stop | Seats |
 | **Boot Hill** | Remembers the dead; visiting heroes shed Fatigue | Slots |
+| **Lumber Yard** | Cuts Timber every week | 2 / 3 / 4 a week, plus its staff |
+| **Iron Mine** | Digs Iron every week | 1 / 2 / 3 a week, plus its staff |
+| **Trapping Post** | Brings in Hides every week | 1 / 2 / 3 a week, plus its staff |
 
 - A hero treated at the Saloon, Chapel, Doctor or Boot Hill sits out the next expedition.
 - Heroes come home at full HP, with Shaken cleared. Fatigue, quirks and Breaking Points come
   home with them.
 - Without a General Store the wagon leaves with a free kit `[free_kit]` and nothing is sold.
 - If chips fall below `[grubstake_floor]` (150) at the week's end, a Casino agent tops them up.
+
+### Townsfolk (`data/townsfolk.json`)
+The people who run the town: a roster like the heroes', and **a separate pool**. Heroes never
+become townsfolk and townsfolk never ride out.
+- **A townsperson:** a name, a **trade**, a level (Greenhorn, Hand, Master) and one **trait**
+  (★ good or ✗ bad, their own pool, nothing shared with hero quirks). They live in one
+  settlement and draw a wage.
+- **Where they come from:** only expeditions and side quests. Trail events (Sick Traveler,
+  Railroad Surveyors, Claim Dispute, the Trapper's Cabin, Tapping Underground, the Cattle
+  Drive, the Homestead; the passengers saved at the Stagecoach) and a chance on Saloon quest
+  rewards (`chances.settler` 20/25/30% by Loose Lips). They ride home with the company and
+  settle in the town it left from; a full town turns them away. The Hiring Board stays heroes
+  only. A new game, and the owner's save, start with nobody.
+- **Staff seats:** none at building level 1, one at level 2, two at level 3 `[staff_seats]`
+  (none at the Hiring Board or Stage Line). An empty seat changes nothing: buildings work as
+  they always have, and staff only add.
+
+| Trade | Building | Greenhorn / Hand / Master add | A Master also |
+|---|---|---|---|
+| Barkeep | Saloon | +5 / 10 / 15 Fatigue relief | +1 side quest a week |
+| Parson | Chapel | +5 / 10 / 15 relief | |
+| Sawbones | Doctor's Office | -10 / 20 / 30% treatment cost | +1 bed |
+| Blacksmith | Smithy | -10 / 15 / 20% gear chips | |
+| Drillmaster | Drill Hall | -10 / 15 / 20% training chips | |
+| Storekeeper | General Store | +5 / 10 / 15% discount | +1 trinket on the shelf |
+| Undertaker | Boot Hill | +5 / 10 / 15 relief | |
+| Logger | Lumber Yard | +2 / 3 / 4 Timber a week | |
+| Mucker | Iron Mine | +1 / 2 / 3 Iron a week | |
+| Trapper | Trapping Post | +1 / 2 / 3 Hides a week | |
+| Laborer | anywhere | half a Greenhorn's help, then a full Greenhorn's from Hand | |
+
+- **Wrong trade:** anyone else in a seat gives half a Greenhorn's help. Staff discounts cap at
+  40% `[discount_cap]`.
+- **Learning:** 2 progress a week on the job `[xp_per_week]`; Hand at 8, Master at 24
+  `[level_xp]` (four weeks, then eight more).
+- **Wages** `[wages]`: 10 / 20 / 30 chips a week by level, paid at the week's start, before the
+  Casino's grubstake. Idle folk are paid too. Unpaid two weeks running `[unpaid_leave_weeks]`,
+  they leave.
+- **Traits:** ★ Hard Worker (works a level up), Thrifty (half wage), Apt Pupil (learns twice as
+  fast), Handy (a full Greenhorn's help anywhere), Well Liked (coworkers in town learn faster),
+  Loyal (never leaves); ✗ Lazybones (works a level down), Grasping (wage +50%), Set in Their
+  Ways (stops at Hand), Tippler (20% a week off work), Grumbler (coworkers learn slower),
+  Restless (idle two weeks or more: 10% a week to move on).
+- **Growth:** a Town houses 8 and a City 12; growing to a City needs 8 townsfolk living there.
+- Moving townsfolk (and heroes) between settlements comes later, with the multi-town work.
 
 ### The start `[start_*]`
 - 750 chips, 4 Timber, 1 Iron. The company is the Marshal and the Gunslinger. The Preacher
@@ -454,6 +502,8 @@ retired in round 7; the Shovel took its curios.)
 - Buildings cost roughly 300-450 / 800-1100 / 1800-2400 chips per level plus Timber, Iron and
   Hides (`buildings.json`). Gear, move training and treatment costs are in config.
 - Trading posts sell at 2.2× `[trade_markup]`.
+- Townsfolk cost 10-30 chips a week each; the Lumber Yard, Iron Mine and Trapping Post (and
+  their staff) are a steady trickle of materials.
 
 ---
 

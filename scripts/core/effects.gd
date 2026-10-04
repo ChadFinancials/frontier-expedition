@@ -5,7 +5,7 @@ extends RefCounted
 ## Effect format: {"type": ..., "target": "actor"|"party"|"random"|"ally", ...}
 ## Types: fatigue{amount}, heal_pct{value}, damage_pct{value}, food{amount}, money{amount|min,max},
 ## money_pct{value}, timber{amount}, iron{amount}, hides{amount}, charters{amount}, item{item,amount}, keepsake{},
-## quirk{quirk}, remove_quirk{}, wagon{amount}, recruit{class},
+## quirk{quirk}, remove_quirk{}, wagon{amount}, recruit{class}, townsfolk{trade,level,trait} (settles in town),
 ## fight{enemies,surprise,reward,wounded,drop,foe_mods,foe_mark}, duel{...} (see RunState.resolve_duel),
 ## buff{stat,value} (next fight), reveal{amount}, light{amount}, clear_shaken{}.
 ## Any effect may carry "chance" (percent). Camp effects use base/per_rank instead of amount.
@@ -122,6 +122,11 @@ static func apply(effects: Array, run: RunState, actor: Hero, target: Hero = nul
 				nh.location = run.origin
 				run.recruits.append(nh.to_dict())
 				out.msgs.append("%s the %s will join the company when you return." % [nh.hero_name, DB.classes[cls].name])
+			"townsfolk":
+				# Someone met on the trail who'd rather settle in your town than ride with you.
+				var tp := c.make_townsperson(c.pick_trade(e.get("trade", "random")), int(e.get("level", 1)), str(e.get("trait", "random")))
+				run.townsfolk.append(tp)
+				out.msgs.append("%s will settle in your town when you return (%s)." % [Townsfolk.title(tp), Townsfolk.trait_text(tp)])
 			"duel":
 				# High Noon: the screen plays it, then RunState.resolve_duel applies the result.
 				out.duel = e.duplicate(true)

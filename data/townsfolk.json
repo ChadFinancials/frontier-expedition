@@ -1,0 +1,57 @@
+{
+  "_comment": "Townsfolk: the people who staff the town's buildings (a separate pool from heroes; see docs/GDD.md 'Townsfolk'). trades: building is where the trade belongs; values[level-1] is what one staffer of that level adds there (kind: relief = Fatigue shed on that building's activities, discount = percent off its chip prices, store = extra percent off at the General Store, produce = materials a week). master: what a Master in their own trade adds on top. Laborers work anywhere. traits: one per person, a separate pool from hero quirks. wages[level-1] chips a week. housing: most townsfolk a settlement holds, by tier. xp: weekly progress on the job; levels: progress needed for Hand and Master. Staff seats by building level: config staff_seats (buildings can override with staff_seats).",
+
+  "trades": {
+    "barkeep":     {"name": "Barkeep", "building": "saloon", "kind": "relief", "values": [5, 10, 15], "master": "quests",
+      "desc": "Pours the drinks and listens to the talk."},
+    "parson":      {"name": "Parson", "building": "chapel", "kind": "relief", "values": [5, 10, 15],
+      "desc": "Keeps the chapel and the peace."},
+    "sawbones":    {"name": "Sawbones", "building": "doctor", "kind": "discount", "values": [10, 20, 30], "master": "bed",
+      "desc": "Sets bones and mixes tonics for the doctor."},
+    "blacksmith":  {"name": "Blacksmith", "building": "smithy", "kind": "discount", "values": [10, 15, 20],
+      "desc": "Works the forge between the hero's visits."},
+    "drillmaster": {"name": "Drillmaster", "building": "drill_hall", "kind": "discount", "values": [10, 15, 20],
+      "desc": "An old army sergeant who runs the drills."},
+    "storekeeper": {"name": "Storekeeper", "building": "general_store", "kind": "store", "values": [5, 10, 15], "master": "trinket",
+      "desc": "Knows every wholesaler from here to St. Louis."},
+    "undertaker":  {"name": "Undertaker", "building": "boot_hill", "kind": "relief", "values": [5, 10, 15],
+      "desc": "Digs the graves and keeps them tidy."},
+    "logger":      {"name": "Logger", "building": "lumber_yard", "kind": "produce", "values": [2, 3, 4],
+      "desc": "Fells and saws timber."},
+    "mucker":      {"name": "Mucker", "building": "mine", "kind": "produce", "values": [1, 2, 3],
+      "desc": "Shovels ore out of the drifts."},
+    "trapper":     {"name": "Trapper", "building": "trapping_post", "kind": "produce", "values": [1, 2, 3],
+      "desc": "Runs trap lines along the creeks."},
+    "laborer":     {"name": "Laborer", "building": "", "kind": "any",
+      "desc": "A strong back for any building. A Greenhorn gives half a Greenhorn's help anywhere; a Hand or Master gives a full Greenhorn's."}
+  },
+
+  "traits": {
+    "hard_worker": {"name": "Hard Worker", "good": true, "desc": "Works like one level higher (a Master stays a Master)."},
+    "thrifty":     {"name": "Thrifty", "good": true, "desc": "Asks half the usual wage."},
+    "apt_pupil":   {"name": "Apt Pupil", "good": true, "desc": "Learns the job twice as fast."},
+    "handy":       {"name": "Handy", "good": true, "desc": "Gives a full Greenhorn's help in any building, trade or not."},
+    "well_liked":  {"name": "Well Liked", "good": true, "desc": "Everyone else working in town learns the job faster."},
+    "loyal":       {"name": "Loyal", "good": true, "desc": "Never leaves town, paid or not."},
+    "lazybones":   {"name": "Lazybones", "good": false, "desc": "Works like one level lower (a Greenhorn does nothing)."},
+    "grasping":    {"name": "Grasping", "good": false, "desc": "Asks half again the usual wage."},
+    "set_in_ways": {"name": "Set in Their Ways", "good": false, "desc": "Never gets past Hand."},
+    "tippler":     {"name": "Tippler", "good": false, "desc": "One week in five, sleeps it off and doesn't show up for work."},
+    "grumbler":    {"name": "Grumbler", "good": false, "desc": "Everyone else working in town learns the job slower."},
+    "restless":    {"name": "Restless", "good": false, "desc": "Left idle two weeks or more, may move on (1 in 10 each week)."}
+  },
+
+  "levels": ["Greenhorn", "Hand", "Master"],
+  "level_xp": [8, 24],
+  "xp_per_week": 2,
+  "wages": [10, 20, 30],
+  "housing": {"outpost": 4, "town": 8, "city": 12},
+  "unpaid_leave_weeks": 2,
+  "tippler_chance": 20,
+  "restless_chance": 10,
+  "discount_cap": 40,
+
+  "first": ["Hattie", "Abner", "Ezra", "Mabel", "Josiah", "Orrin", "Tillie", "Amos", "Della", "Jebediah", "Prudence", "Cyrus", "Ada", "Hiram", "Lottie", "Ephraim", "Nell", "Rufus", "Clementine", "Obadiah", "Winnie", "Thaddeus", "Etta", "Lem", "Rosalind", "Gus", "Augusta", "Barnaby", "Ida", "Wendell"],
+  "last": ["Coombs", "Pettibone", "Haskell", "McCready", "Fairweather", "Dunlap", "Ostrander", "Whitlock", "Grubb", "Calloway", "Spratt", "Bixby", "Thorne", "Ledbetter", "Quimby", "Truesdale", "Hobbs", "Wickham", "Pruitt", "Vance"],
+  "nicknames": ["Old", "Big", "Little", "Cousin"]
+}

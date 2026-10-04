@@ -18,6 +18,7 @@ var xp: int = 0
 var kills: int = 0
 var pending_buffs: Array = []    # {stat, value, uid (0 = everyone)}
 var recruits: Array = []         # hero dicts that join at the end
+var townsfolk: Array = []        # townsperson dicts who move to town at the end (see Townsfolk)
 var log: Array = []
 var status: String = "active"    # active, victory, defeat, abandoned
 var boss_won: bool = false
@@ -536,6 +537,10 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 			nh.location = origin
 			recruits.append(nh.to_dict())
 			res.msgs.append("%s the %s asks to ride with you, and will join when you return." % [nh.hero_name, nh.class_name_text()])
+		if int(qr.get("settler", 0)) > 0:
+			var tp := company.make_townsperson("random", int(qr.settler))
+			townsfolk.append(tp)
+			res.msgs.append("%s wants a fresh start, and will settle in your town when you return." % Townsfolk.title(tp))
 		boss_won = true
 		if kind == "boss":
 			var flag: String = region().get("done_flag", "")
@@ -589,6 +594,12 @@ func after_combat(engine: CombatEngine, kind: String, reward: Dictionary = {}) -
 		money += int(int(reward.money) * float(DB.cfg("chips_mult", 1.0)))
 	if reward.get("keepsake", false):
 		res.keepsakes.append(company.random_keepsake())
+	if reward.has("settler"):
+		# Someone the fight saved, who wants to settle in your town.
+		var sd: Dictionary = reward.settler
+		var tp := company.make_townsperson(company.pick_trade(sd.get("trade", "random")), int(sd.get("level", 1)))
+		townsfolk.append(tp)
+		res.msgs.append("%s, saved from the outlaws, will settle in your town when you return." % Townsfolk.title(tp))
 	res.money = maxi(0, money)
 	loot.money = maxi(0, int(loot.money) + money)
 	for mat in ["timber", "iron", "hides"]:
@@ -1381,7 +1392,7 @@ func trade_buy(item_id: String) -> bool:
 # --- Save / load ----------------------------------------------------------------------
 
 const FIELDS := ["region_id", "origin", "party", "nodes", "current", "day", "supplies", "wagon", "loot",
-	"xp", "kills", "pending_buffs", "recruits", "log", "status", "boss_won", "driven_back", "cave", "camp", "pending_fight", "duel_gang"]
+	"xp", "kills", "pending_buffs", "recruits", "townsfolk", "log", "status", "boss_won", "driven_back", "cave", "camp", "pending_fight", "duel_gang"]
 
 
 func to_dict() -> Dictionary:

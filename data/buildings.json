@@ -1,5 +1,5 @@
 {
-  "_comment": "costs[i] is the price to build (i=0) or upgrade to level i+1. Per-level values are arrays indexed by level-1. Services are implemented per building id in scripts/core/company.gd.",
+  "_comment": "costs[i] is the price to build (i=0) or upgrade to level i+1. Per-level values are arrays indexed by level-1. Services are implemented per building id in scripts/core/company.gd. staff_seats[level-1]: townsfolk seats (default config staff_seats). produce: materials made each week by level, before staff (Lumber Yard, Mine, Trapping Post).",
 
   "saloon": {"name": "Saloon", "art": "saloon", "order": 1,
     "desc": "Whiskey, cards and a piano nobody's tuned since '49. Heroes shed Fatigue here, and sit out the next expedition.",
@@ -65,12 +65,24 @@
   "stage_line": {"name": "Stage Line", "art": "stage", "order": 8,
     "desc": "A stable, a stagecoach and a driver who's seen it all. Sends heroes between settlements: one week per stop.",
     "costs": [{"money": 300, "timber": 10, "iron": 3, "hides": 4}, {"money": 800, "timber": 20, "iron": 8, "hides": 8}, {"money": 1800, "timber": 35, "iron": 15, "hides": 14}],
-    "seats": [2, 3, 4]},
+    "seats": [2, 3, 4], "staff_seats": [0, 0, 0]},
   "boot_hill": {"name": "Boot Hill", "art": "graveyard", "order": 9,
     "desc": "Wooden crosses on a windy rise. The company remembers its dead. Visiting heroes shed Fatigue.",
     "costs": [{"money": 150, "timber": 6, "iron": 0}, {"money": 400, "timber": 12, "iron": 2}, {"money": 900, "timber": 20, "iron": 5}],
     "slots": [1, 2, 3],
     "activities": [
       {"id": "remember", "name": "Pay Respects", "cost": [40, 40, 40], "relief": [25, 35, 45], "side_effects": [{"chance": 10, "type": "quirk", "quirk": "good_humor", "text": "%s makes peace with the past."}]}
-    ]}
+    ]},
+  "lumber_yard": {"name": "Lumber Yard", "art": "lumber", "order": 10,
+    "desc": "A sawpit, a log pile and a mule to drag them. Cuts Timber every week; Loggers cut more.",
+    "costs": [{"money": 350, "timber": 6, "iron": 2}, {"money": 800, "timber": 14, "iron": 6}, {"money": 1800, "timber": 28, "iron": 12, "hides": 4}],
+    "produce": {"timber": [2, 3, 4]}},
+  "mine": {"name": "Iron Mine", "art": "mine", "order": 11,
+    "desc": "A timbered adit into the hill behind town. Digs Iron every week; Muckers dig more.",
+    "costs": [{"money": 400, "timber": 14, "iron": 0}, {"money": 900, "timber": 24, "iron": 4}, {"money": 2000, "timber": 40, "iron": 10, "hides": 4}],
+    "produce": {"iron": [1, 2, 3]}},
+  "trapping_post": {"name": "Trapping Post", "art": "trapper", "order": 12,
+    "desc": "Stretching frames and a smokehouse by the creek. Brings in Hides every week; Trappers bring more.",
+    "costs": [{"money": 300, "timber": 10, "iron": 2}, {"money": 750, "timber": 18, "iron": 5}, {"money": 1600, "timber": 30, "iron": 10}],
+    "produce": {"hides": [1, 2, 3]}}
 }

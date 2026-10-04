@@ -217,7 +217,9 @@ re-formats the file in its usual layout after a scripted edit.
 `heal_pct`, `damage_pct`, `food`, `money` (`amount`, or `min`/`max`), `money_pct`, `timber`,
 `iron`, `hides`, `charters`, `item {item, amount}`, `keepsake` (optional `rarity` list),
 `quirk {quirk}` (an id, or random / random_positive / random_negative), `remove_quirk`,
-`wagon`, `recruit {class}`, `fight {enemies, surprise, reward, wounded {id or "*": hp %},
+`wagon`, `recruit {class}`, `townsfolk {trade, level, trait}` (someone who settles in the
+expedition's home town when the company returns; `trade` is an id, a list to pick from, or
+"random"), `fight {enemies, surprise, reward, wounded {id or "*": hp %},
 drop [id], foe_mods [mod with rounds], foe_mark {id or "*": rounds}}`, `buff {stat, value}`
 (next fight; negative values work: wet powder, hungover), `duel {kind: gang|wanderer|boss,
 name, opponent, draw, tier, gang, gang_name, bounty, reward, on {result: [effects]}, text
@@ -352,8 +354,8 @@ expedition) and `tutorial_rebuilds` (the ruin that winning it restores).
 (`{place}` is filled in from `places`), `node_weights`, `fights`, `elites`, `final` (the last
 fight when there's no boss), `boss` (`name`, `intro`, `victory`, `enemies`), and optionally
 `always_boss`, `difficulty`, `bonus_hides` (extra Hides on the reward), `done_flag` (a story flag set when won; the rumor stops
-appearing) and `boss_keepsake`. `chances` sets the odds of a boss, a trinket and a recruit per
-Loose Lips level. Rumors borrow scenery, events and curios from the settlement's western
+appearing) and `boss_keepsake`. `chances` sets the odds of a boss, a trinket, a recruit and a
+settler (a townsperson for the town) per Loose Lips level. Rumors borrow scenery, events and curios from the settlement's western
 region, scale to its tier, and use the painted set in config `quest_backdrop`.
 
 ## Items
@@ -372,6 +374,28 @@ such as `slots`, `seats` (Stage Line), `max_tier` (Smithy), `max_skill` (Drill H
 `side_effects`) are what heroes do in a slot. A building can have upgrade `tracks` instead of
 plain levels (the Hiring Board, the Saloon): each track has `name`, `desc`, `values` (per
 track level) and `costs`. Code reads a track with `Company.track_value(i, bid, track)`.
+`staff_seats` (per level) overrides config `staff_seats` ([0, 1, 2]) for townsfolk seats;
+`produce` (`{"timber": [per level]}`) makes a building deliver materials every week (the
+Lumber Yard, Iron Mine and Trapping Post).
+
+## Townsfolk
+
+`data/townsfolk.json` (a separate pool from heroes; nothing here may share a name with a hero
+quirk or Fatigue state, which a test checks):
+- `trades`: `name`, `desc`, `building` (where the trade belongs; "" for the Laborer, who works
+  anywhere), `kind` (`relief` adds to that building's activity relief, `discount` takes a
+  percent off its chip prices, `store` adds to the General Store discount, `produce` adds
+  materials a week) and `values` (what one staffer adds, by level). `master`: what a Master in
+  their own building adds on top (`quests` a side quest, `bed` a Doctor's bed, `trinket` one
+  more on the store shelf); the code reads it per building in `Company`.
+- `traits`: `name`, `good`, `desc`. Their effects are coded in `Townsfolk` and
+  `Company._townsfolk_week` by id.
+- Numbers: `levels` (names), `level_xp` (progress for Hand and Master), `xp_per_week`,
+  `wages` (by level), `housing` (by tier), `unpaid_leave_weeks`, `tippler_chance`,
+  `restless_chance`, `discount_cap`.
+- Names: `first`, `last`, `nicknames` ("Old Abner").
+- A fight's `reward` can carry `settler {trade}`: someone the fight saves settles in town.
+- Tiers in config take `population`: townsfolk needed to grow to that tier.
 
 ## Config
 

@@ -78,6 +78,7 @@ func _ready() -> void:
 	test_iron_justice()
 	test_high_noon()
 	test_skill_checks()
+	test_townsfolk()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -2127,3 +2128,156 @@ func econ_probe(n: int) -> void:
 	for reg in by_region:
 		var v: Array = by_region[reg]
 		print("  %s: %d runs, timber %.1f, iron %.1f" % [reg, v[0], v[1] / maxf(1, v[0]), v[2] / maxf(1, v[0])])
+
+
+func test_townsfolk() -> void:
+	# Data: a separate pool from heroes (no shared names with hero quirks or Breaking Points /
+	# True Grit), every trade belongs somewhere real, every producer has its trade.
+	var hero_names := {}
+	for q in DB.quirks:
+		hero_names[str(DB.quirks[q].name)] = true
+	for f in DB.fatigue_states:
+		hero_names[str(DB.fatigue_states[f].name)] = true
+	var tf: Dictionary = DB.townsfolk
+	for t in tf.traits:
+		check(not hero_names.has(str(tf.traits[t].name)), "townsfolk trait %s doesn't share a hero quirk's name" % t)
+	for t in tf.trades:
+		var b := str(tf.trades[t].get("building", ""))
+		check(b == "" or DB.buildings.has(b), "trade %s belongs at a real building" % t)
+	for b in ["lumber_yard", "mine", "trapping_post"]:
+		check(DB.buildings.has(b) and Townsfolk.trade_for(b) != "", "%s exists and has its trade" % b)
+
+	var co := Company.new()
+	co.new_game(41)
+	co.complete_tutorial()
+	co.money += 20000
+	co.timber += 300
+	co.iron += 200
+	co.hides += 100
+	check(co.townsfolk.is_empty() and co.population(0) == 0, "a new game starts with no townsfolk")
+	var relief0 := co.activity_relief(0, "saloon", "bar")
+	check(relief0 == 45, "an unstaffed Saloon works as before (%d)" % relief0)
+	# Seats: none at level 1, one at 2, two at 3; never on the Stage Line or Hiring Board.
+	check(co.staff_seats(0, "saloon") == 0, "no staff seats at level 1")
+	co.build(0, "saloon")
+	check(co.staff_seats(0, "saloon") == 1, "one seat at level 2")
+	check(co.staff_seats(0, "hiring_board") == 0 and co.staff_seats_max("hiring_board") == 0 and co.staff_seats_max("stage_line") == 0, "no seats at the Hiring Board or Stage Line")
+	check(co.staff_seats_max("saloon") == 2, "two seats at most")
+	# A Hand Barkeep at the Saloon: +10 relief.
+	var bk := co.make_townsperson("barkeep", 2, "loyal")
+	check(bk.level == 2 and bk.trade == "barkeep" and bk.trait == "loyal" and str(bk.name).contains(" "), "make a Hand Barkeep (%s)" % bk.name)
+	co.welcome_townsperson(bk, 0)
+	check(co.population(0) == 1, "they settle in town")
+	check(co.post_townsperson(bk, "saloon"), "put the barkeep to work")
+	check(co.activity_relief(0, "saloon", "bar") == co.activity_relief(0, "saloon", "bar") and co.staff_value(0, "saloon") == 10.0, "a Hand Barkeep adds 10 relief")
+	var other := co.make_townsperson("parson", 1, "loyal")
+	co.welcome_townsperson(other, 0)
+	check(co.can_post(other, "saloon") == "No free seat", "the one seat is taken")
+	co.settlement(0).buildings.saloon = 3   # (a Town caps buildings at level 2; as if a City)
+	check(co.staff_seats(0, "saloon") == 2, "two seats at level 3")
+	check(co.post_townsperson(other, "saloon") and is_equal_approx(co.staff_value(0, "saloon"), 12.5), "a Parson at the Saloon gives half a Greenhorn's help (%.1f)" % co.staff_value(0, "saloon"))
+	# Laborers, Hard Workers, Lazybones, Handy.
+	var lab := co.make_townsperson("laborer", 1, "thrifty")
+	check(is_equal_approx(Townsfolk.value_in(lab, "chapel"), 2.5), "a Greenhorn Laborer: half a Greenhorn's help")
+	lab.level = 2
+	check(is_equal_approx(Townsfolk.value_in(lab, "chapel"), 5.0), "a Hand Laborer: a full Greenhorn's")
+	var hw := co.make_townsperson("sawbones", 1, "hard_worker")
+	check(Townsfolk.work_level(hw) == 2 and Townsfolk.value_in(hw, "doctor") == 20.0, "a Hard Worker works a level up")
+	var lz := co.make_townsperson("sawbones", 1, "lazybones")
+	check(Townsfolk.value_in(lz, "doctor") == 0.0, "a Greenhorn Lazybones does nothing")
+	var hd := co.make_townsperson("logger", 1, "handy")
+	check(Townsfolk.value_in(hd, "chapel") == 5.0, "Handy: a full Greenhorn's help anywhere")
+	var sw := co.make_townsperson("sawbones", 3, "set_in_ways")
+	check(sw.level == 2, "Set in Their Ways never gets past Hand")
+	# Discounts: a Sawbones at the Doctor's Office; a Master adds a bed.
+	co.build(0, "doctor")
+	co.build(0, "doctor")
+	var h: Hero = co.heroes[0]
+	var dc0 := co.doctor_cost(0, h)
+	var beds0 := co.slot_cap(0, "doctor")
+	var saw := co.make_townsperson("sawbones", 3, "loyal")
+	co.welcome_townsperson(saw, 0)
+	co.post_townsperson(saw, "doctor")
+	check(co.doctor_cost(0, h) == int(round(dc0 * 0.7)) or absi(co.doctor_cost(0, h) - int(round(dc0 * 0.7))) <= 1, "a Master Sawbones takes 30%% off (%d -> %d)" % [dc0, co.doctor_cost(0, h)])
+	check(co.slot_cap(0, "doctor") == beds0 + 1, "a Master Sawbones adds a bed")
+	# Tippler: sleeping it off is no help at all.
+	saw.off = true
+	check(co.staff_value(0, "doctor") == 0.0 and co.slot_cap(0, "doctor") == beds0, "nobody's help while sleeping one off")
+	saw.off = false
+	# A Master Barkeep brings one more side quest.
+	bk.level = 3
+	var q0: int = co.settlement(0).quests.size()
+	co._refresh_settlement(co.settlement(0))
+	check(co.settlement(0).quests.size() == q0 + 1, "a Master Barkeep adds a side quest (%d -> %d)" % [q0, co.settlement(0).quests.size()])
+	bk.level = 2
+	# Producers: the yard's own cut plus a Logger's.
+	check(co.build(0, "lumber_yard"), "build a Lumber Yard")
+	check(int(co.production(0, "lumber_yard").get("timber", 0)) == 2, "a level 1 Lumber Yard cuts 2 Timber a week")
+	co.build(0, "lumber_yard")
+	var lg := co.make_townsperson("logger", 1, "loyal")
+	co.welcome_townsperson(lg, 0)
+	co.post_townsperson(lg, "lumber_yard")
+	check(int(co.production(0, "lumber_yard").timber) == 5, "level 2 plus a Greenhorn Logger: 3 + 2 Timber")
+	# The week: Timber comes in, wages go out, the job is learned.
+	var t0 := co.timber
+	var m0 := co.money
+	var wages := co.townsfolk_wages()
+	co.advance_week()
+	check(co.timber == t0 + 5, "the yard delivers at the week's start (%d -> %d)" % [t0, co.timber])
+	check(co.money == m0 - wages, "wages are paid (%d a week)" % wages)
+	check(Townsfolk.wage(lab) == 10 and Townsfolk.wage(co.make_townsperson("logger", 1, "grasping")) == 15, "Thrifty and Grasping wages")
+	for n in 3:
+		co.advance_week()
+	check(int(lg.level) == 2, "a Greenhorn becomes a Hand after four weeks on the job (xp %d)" % int(lg.xp))
+	check(int(co.production(0, "lumber_yard").timber) == 6, "a Hand Logger cuts 3")
+	# Unpaid: two weeks and they leave; Loyal folk stay.
+	var gr := co.make_townsperson("trapper", 1, "grasping")
+	co.welcome_townsperson(gr, 0)
+	co.money = 0
+	co.advance_week()
+	check(int(gr.unpaid) == 1 and co.townsfolk.has(gr), "one unpaid week: a warning")
+	co.money = 0
+	co.advance_week()
+	check(not co.townsfolk.has(gr), "two unpaid weeks: they leave")
+	check(co.townsfolk.has(bk), "Loyal folk stay unpaid")
+	# Growth: a City needs eight townsfolk; housing caps the town.
+	co.charters = 10
+	co.money = 20000
+	check(co.can_upgrade_tier(0).contains("townsfolk"), "a City needs townsfolk (%s)" % co.can_upgrade_tier(0))
+	while co.population(0) < co.housing(0):
+		co.welcome_townsperson(co.make_townsperson("laborer", 1, "loyal"), 0)
+	check(co.population(0) == 8, "a Town houses eight")
+	check(co.welcome_townsperson(co.make_townsperson(), 0).contains("moves on"), "no room: the settler moves on")
+	check(co.can_upgrade_tier(0) == "", "eight townsfolk: a City is allowed")
+	# On the trail: an event sends someone home; they arrive with the company.
+	var co2 := Company.new()
+	co2.new_game(42)
+	co2.complete_tutorial()
+	var uids: Array = []
+	for hh in co2.heroes:
+		uids.append(hh.uid)
+	var run := RunState.create(co2, "tallgrass", 0, uids, {"food": 4})
+	co2.run = run
+	var out := Effects.apply([{"type": "townsfolk", "trade": ["mucker", "trapper"]}], run, co2.heroes[0])
+	check(run.townsfolk.size() == 1 and str(run.townsfolk[0].trade) in ["mucker", "trapper"] and str(out.msgs[0]).contains("settle"), "an event's settler waits in the wagon")
+	var saved := RunState.from_dict(DB.normalize(JSON.parse_string(JSON.stringify(run.to_dict()))), co2)
+	check(saved.townsfolk.size() == 1, "the settler survives a mid-expedition save")
+	var sm := co2.finish_run("abandoned")
+	check(co2.population(0) == 1 and sm.settlers.size() == 1, "they settle when the company comes home")
+	# Events and quests: settler outcomes exist; quest hints mention them.
+	var settler_events := 0
+	for eid in DB.events:
+		for o in DB.events[eid].options:
+			for oc in o.get("outcomes", []):
+				for ef in oc.get("effects", []):
+					if ef.get("type", "") == "townsfolk" or ef.get("reward", {}).has("settler"):
+						settler_events += 1
+	check(settler_events >= 6, "trail events can send settlers home (%d)" % settler_events)
+	check(Company.quest_hints({"quest_reward": {"money": 100, "settler": 1}}).contains("settler"), "a quest's settler shows in its hints")
+	# Save: kept; an old save without townsfolk loads with nobody.
+	var co3 := Company.from_dict(DB.normalize(JSON.parse_string(JSON.stringify(co.to_dict()))))
+	check(co3.townsfolk.size() == co.townsfolk.size() and co3.staff_value(0, "saloon") == co.staff_value(0, "saloon"), "townsfolk and their posts save and load")
+	var old := co.to_dict()
+	old.erase("townsfolk")
+	var co4 := Company.from_dict(DB.normalize(JSON.parse_string(JSON.stringify(old))))
+	check(co4.townsfolk.is_empty() and co4.activity_relief(0, "saloon", "bar") == co.activity_relief(0, "saloon", "bar") - int(round(co.staff_value(0, "saloon"))), "an old save loads with no townsfolk and plain buildings")

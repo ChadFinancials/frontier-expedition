@@ -6,7 +6,7 @@ const DATA_DIR := "res://data/"
 const TABLES := [
 	"config", "classes", "skills", "enemies", "regions", "settlements",
 	"buildings", "survival", "quirks", "keepsakes", "items", "curios", "events",
-	"fatigue_states", "names", "quests",
+	"fatigue_states", "names", "quests", "townsfolk",
 ]
 
 var config: Dictionary = {}
@@ -25,6 +25,7 @@ var events: Dictionary = {}
 var fatigue_states: Dictionary = {}
 var names: Dictionary = {}
 var quests: Dictionary = {}
+var townsfolk: Dictionary = {}
 
 var load_errors: Array = []
 
@@ -43,7 +44,7 @@ func load_all() -> void:
 			load_errors.append("Missing or invalid table: %s" % t)
 	# Every entry gets its own id for convenience.
 	for t in TABLES:
-		if t in ["config", "names", "quests"]:
+		if t in ["config", "names", "quests", "townsfolk"]:
 			continue
 		var table: Dictionary = get(t)
 		for k in table.keys():

@@ -50,7 +50,10 @@ func _build() -> void:
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	sc.add_child(body)
 	v.add_child(sc)
+	_staff(body)
 	match bid:
+		"lumber_yard", "mine", "trapping_post":
+			_producer(body)
 		"saloon", "chapel", "boot_hill":
 			_activities(body)
 		"doctor":
@@ -69,6 +72,82 @@ func _build() -> void:
 	if bid == "boot_hill":
 		_memorial(body)
 	_upgrade_footer(v)
+
+
+## Townsfolk seats: none at level 1, then one, then two (see Company.staff_seats). The
+## right trade is marked ★; anyone else lends a hand for less.
+func _staff(body: VBoxContainer) -> void:
+	var co: Company = Game.company
+	var most := co.staff_seats_max(bid)
+	if most <= 0:
+		return
+	var own := Townsfolk.trade_for(bid)
+	var own_name: String = DB.townsfolk.trades[own].name
+	var card := UI.panel("Card")
+	body.add_child(card)
+	var cv := UI.vb(6)
+	card.add_child(cv)
+	var cap := co.staff_seats(index, bid)
+	var staff := co.staff_at(index, bid)
+	var head := UI.hb(14)
+	cv.add_child(head)
+	head.add_child(UI.lbl("Staff", 22, "InkBold"))
+	var total := co.staff_value(index, bid)
+	if total > 0.0:
+		head.add_child(UI.lbl("Together: %s" % Townsfolk.value_text(bid, total), 18, "Ink"))
+	if cap <= 0:
+		cv.add_child(UI.wrap(UI.lbl("Staff seats open when the %s reaches level 2 (one seat), then level 3 (two). A %s works best here; any townsperson can lend a hand for less." % [DB.buildings[bid].name, own_name], 17, "Ink"), 1100))
+		return
+	cv.add_child(UI.wrap(UI.lbl("A %s works best here (★). Anyone else gives half a Greenhorn's help; Laborers give a full Greenhorn's once they're Hands." % own_name, 16, "Ink"), 1100))
+	var row := UI.hb(10)
+	cv.add_child(row)
+	for n in cap:
+		if n < staff.size():
+			var p: Dictionary = staff[n]
+			var sv := UI.vb(4)
+			row.add_child(sv)
+			var tc := TownsfolkCard.make(p)
+			tc.custom_minimum_size.x = 520
+			sv.add_child(tc)
+			var sub := UI.hb(10)
+			sv.add_child(sub)
+			sub.add_child(UI.lbl(("★ " if Townsfolk.fits(p, bid) else "") + "Adds " + Townsfolk.value_text(bid, Townsfolk.value_in(p, bid)), 16, "InkBold"))
+			sub.add_child(UI.btn("Let go", func():
+				co.unpost_townsperson(p)
+				_changed(), "Small"))
+		else:
+			row.add_child(UI.btn("+ Staff", func(): _pick_staff(), "Tab", 220))
+	if co.townsfolk_at(index).is_empty():
+		cv.add_child(UI.lbl("Nobody lives here yet. Townsfolk turn up on expeditions and side quests.", 16, "Ink"))
+
+
+func _pick_staff() -> void:
+	var co: Company = Game.company
+	var free := co.townsfolk_at(index).filter(func(p): return str(p.post) != bid)
+	free.sort_custom(func(a, b): return int(Townsfolk.fits(a, bid)) > int(Townsfolk.fits(b, bid)))
+	TownsfolkCard.pick(free, "Who works at the %s?" % DB.buildings[bid].name, func(p: Dictionary):
+		if co.post_townsperson(p, bid):
+			Audio.play("coin")
+			Main.inst.toast("%s goes to work at the %s." % [p.name, DB.buildings[bid].name], "good")
+			_changed(),
+		func(p: Dictionary):
+			var t := ("★ " if Townsfolk.fits(p, bid) else "") + "Would add " + Townsfolk.value_text(bid, Townsfolk.value_in(p, bid))
+			if str(p.post) != "":
+				t += " (leaves the %s)" % DB.buildings.get(str(p.post), {}).get("name", "?")
+			return t,
+		"Nobody free lives here. Townsfolk turn up on expeditions and side quests.")
+
+
+## Lumber Yard, Iron Mine, Trapping Post: what comes in each week.
+func _producer(body: VBoxContainer) -> void:
+	var co: Company = Game.company
+	var made := co.production(index, bid)
+	var lvl := co.building_level(index, bid)
+	for mat in made:
+		var base: Array = DB.buildings[bid].produce[mat]
+		var own := int(base[mini(lvl, base.size()) - 1])
+		body.add_child(UI.lbl("Brings in %d %s a week: %d from the %s, %d from its staff." % [int(made[mat]), str(mat).capitalize(), own, DB.buildings[bid].name, int(made[mat]) - own], 20, "InkBold"))
+	body.add_child(UI.lbl("Delivered at the start of each week.", 17, "Ink"))
 
 
 func _hero_picker(parent: Control, filter: Callable, empty_text: String = "No available heroes here.") -> void:
@@ -471,6 +550,12 @@ func _empty_plot(v: VBoxContainer) -> void:
 	head.add_child(UI.spacer(0, 0, true))
 	head.add_child(UI.btn("Close", func(): Main.inst.close_modal(wrap), "Small"))
 	v.add_child(UI.lbl("Choose something to build here.", 19, "Ink"))
+	var sc := ScrollContainer.new()
+	sc.custom_minimum_size = Vector2(1190, 640)
+	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	v.add_child(sc)
+	var list := UI.vb(10)
+	sc.add_child(list)
 	var st := co.settlement(index)
 	var ids: Array = DB.buildings.keys()
 	ids.sort_custom(func(a, b): return DB.buildings[a].get("order", 0) < DB.buildings[b].get("order", 0))
@@ -498,4 +583,4 @@ func _empty_plot(v: VBoxContainer) -> void:
 		b.disabled = why != ""
 		b.tooltip_text = why
 		row.add_child(b)
-		v.add_child(row)
+		list.add_child(row)

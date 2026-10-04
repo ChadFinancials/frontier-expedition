@@ -10,6 +10,7 @@ var iron: int = 0
 var hides: int = 0              # Hides: the third town material (beasts, trapping), for leatherwork
 var charters: int = 0
 var heroes: Array = []          # Hero (alive only)
+var townsfolk: Array = []       # townsperson dicts (see Townsfolk): a separate pool from heroes
 var dead: Array = []            # {name, class_id, level, note, week}
 var settlements: Array = []     # {index, site, tier, buildings{id:lvl}, recruits[], stock[], used{}}
 var stash: Array = []           # keepsake ids not equipped
@@ -368,6 +369,9 @@ func can_upgrade_tier(i: int) -> String:
 	var nt := next_tier(st.get("tier", ""))
 	if nt.is_empty():
 		return "Already a City"
+	var need := int(nt.get("population", 0))
+	if population(i) < need:
+		return "A %s needs %d townsfolk living here (%d now)" % [nt.name, need, population(i)]
 	if not can_afford(nt.get("cost", {})):
 		return "Can't afford: " + cost_text(nt.get("cost", {}))
 	return ""
@@ -423,6 +427,8 @@ func slot_cap(i: int, bid: String) -> int:
 	if lvl <= 0:
 		return 0
 	var b: Dictionary = DB.buildings.get(bid, {})
+	if bid == "doctor":
+		return int(b.slots[mini(lvl, b.slots.size()) - 1]) + staff_masters(i, bid)
 	if b.has("slots"):
 		return int(b.slots[mini(lvl, b.slots.size()) - 1])
 	if b.has("seats"):
@@ -474,7 +480,7 @@ func activity_cost(i: int, bid: String, act_id: String) -> int:
 func activity_relief(i: int, bid: String, act_id: String) -> int:
 	var lvl := maxi(1, building_level(i, bid))
 	var r: Array = activity(bid, act_id).get("relief", [0])
-	return int(r[mini(lvl, r.size()) - 1])
+	return int(r[mini(lvl, r.size()) - 1]) + int(round(staff_value(i, bid)))
 
 
 ## Seats for one activity: its own "slots" by level if it has them (the free porch has one),
@@ -535,7 +541,7 @@ func do_activity(i: int, bid: String, act_id: String, h: Hero) -> Array:
 
 func doctor_cost(i: int, h: Hero) -> int:
 	var lvl := maxi(1, building_level(i, "doctor"))
-	var mult: float = DB.buildings.doctor.cost_mult[lvl - 1]
+	var mult: float = DB.buildings.doctor.cost_mult[lvl - 1] * staff_mult(i, "doctor")
 	return int(round((DB.cfg("doctor_quirk_cost", 250) + DB.cfg("doctor_quirk_cost_per_level", 50) * (h.level - 1)) * mult))
 
 
@@ -569,7 +575,7 @@ func treat_quirk(i: int, h: Hero, q: String) -> bool:
 func gear_cost(i: int, kind: String, next_tier_value: int) -> Dictionary:
 	var gc: Dictionary = DB.cfg("gear_costs", {})
 	var lvl := maxi(1, building_level(i, "smithy"))
-	var mult: float = DB.buildings.smithy.cost_mult[lvl - 1]
+	var mult: float = DB.buildings.smithy.cost_mult[lvl - 1] * staff_mult(i, "smithy")
 	var idx := next_tier_value - 1
 	# Weapons take Iron; armor is leather first, so it takes Hides.
 	var mat := "hides" if kind == "armor" else "iron"
@@ -625,7 +631,7 @@ func starting_moves(class_id: String) -> Array:
 
 func learn_cost(i: int) -> int:
 	var lvl := maxi(1, building_level(i, "drill_hall"))
-	var mult: float = DB.buildings.drill_hall.cost_mult[lvl - 1]
+	var mult: float = DB.buildings.drill_hall.cost_mult[lvl - 1] * staff_mult(i, "drill_hall")
 	return int(round(int(DB.cfg("learn_cost", 300)) * mult))
 
 
@@ -654,7 +660,7 @@ func learn_skill(i: int, h: Hero, sid: String) -> bool:
 
 func skill_cost(i: int, next_level: int) -> int:
 	var lvl := maxi(1, building_level(i, "drill_hall"))
-	var mult: float = DB.buildings.drill_hall.cost_mult[lvl - 1]
+	var mult: float = DB.buildings.drill_hall.cost_mult[lvl - 1] * staff_mult(i, "drill_hall")
 	return int(round(int(DB.cfg("skill_costs", [0, 150, 400, 800])[next_level - 1]) * mult))
 
 
@@ -693,7 +699,7 @@ func store_discount(i: int) -> int:
 	var lvl := building_level(i, "general_store")
 	if lvl <= 0:
 		return 0
-	return int(DB.buildings.general_store.discount[lvl - 1])
+	return int(DB.buildings.general_store.discount[lvl - 1]) + int(round(staff_pct(i, "general_store")))
 
 
 func item_price(i: int, item_id: String) -> int:
@@ -809,11 +815,264 @@ func send_hero(from_i: int, to_i: int, h: Hero) -> bool:
 	return true
 
 
+# Townsfolk -----------------------------------------------------------------------------
+# A separate pool from heroes (see Townsfolk). They come from expeditions and quests only,
+# live in one settlement, draw a weekly wage, and staff its buildings.
+
+func townsfolk_cfg() -> Dictionary:
+	return DB.townsfolk
+
+
+## A new townsperson. trade/trait "random" (or "") picks one.
+func make_townsperson(trade_id: String = "random", lvl: int = 1, trait_id: String = "random") -> Dictionary:
+	var tf := townsfolk_cfg()
+	var trades: Array = tf.get("trades", {}).keys()
+	if not trade_id in trades:
+		trade_id = Stats.pick(rng, trades)
+	var traits: Dictionary = tf.get("traits", {})
+	if not traits.has(trait_id):
+		var good := rng.randf() < 0.55
+		trait_id = Stats.pick(rng, traits.keys().filter(func(t): return traits[t].get("good", false) == good))
+	var p := {"uid": next_uid, "name": townsperson_name(), "trade": trade_id, "level": 1, "xp": 0,
+		"trait": trait_id, "home": 0, "post": "", "unpaid": 0, "idle": 0, "off": false}
+	next_uid += 1
+	p.level = mini(clampi(lvl, 1, 3), Townsfolk.max_level(p))
+	if p.level >= 2:
+		p.xp = int(tf.get("level_xp", [8, 24])[p.level - 2])
+	return p
+
+
+## A trade from data: one id, a list to pick from, or "random".
+func pick_trade(spec: Variant) -> String:
+	if spec is Array:
+		return str(Stats.pick(rng, spec)) if not spec.is_empty() else "random"
+	return str(spec)
+
+
+## "Hattie Coombs" or "Old Abner": first and last, now and then a nickname instead.
+func townsperson_name() -> String:
+	var tf := townsfolk_cfg()
+	var used := {}
+	for p in townsfolk:
+		used[str(p.name)] = true
+	for n in 20:
+		var first: String = Stats.pick(rng, tf.get("first", ["Sam"]))
+		var nm := ""
+		if rng.randf() < 0.2 and not tf.get("nicknames", []).is_empty():
+			nm = "%s %s" % [Stats.pick(rng, tf.nicknames), first]
+		else:
+			nm = "%s %s" % [first, Stats.pick(rng, tf.get("last", ["Smith"]))]
+		if not used.has(nm):
+			return nm
+	return "%s %d" % [Stats.pick(rng, tf.get("first", ["Sam"])), next_uid]
+
+
+func townsperson(uid: int) -> Dictionary:
+	for p in townsfolk:
+		if int(p.uid) == uid:
+			return p
+	return {}
+
+
+func townsfolk_at(i: int) -> Array:
+	return townsfolk.filter(func(p): return int(p.home) == i)
+
+
+func population(i: int) -> int:
+	return townsfolk_at(i).size()
+
+
+## Most townsfolk a settlement can house (by tier).
+func housing(i: int) -> int:
+	var st := settlement(i)
+	return int(townsfolk_cfg().get("housing", {}).get(st.get("tier", "outpost"), 4)) if not st.is_empty() else 0
+
+
+## Someone met on the trail moves to settlement i. Returns the line for the week report.
+func welcome_townsperson(p: Dictionary, i: int) -> String:
+	if population(i) >= housing(i):
+		return "%s finds no room at %s and moves on." % [Townsfolk.title(p), settlement_name(i)]
+	p.home = i
+	p.post = ""
+	townsfolk.append(p)
+	return "%s settles at %s (%s). Give them work at a building." % [Townsfolk.title(p), settlement_name(i), Townsfolk.trait_text(p)]
+
+
+## Staff seats a building has at its current level: none at level 1 by default, then 1 and 2.
+func staff_seats(i: int, bid: String) -> int:
+	var lvl := building_level(i, bid)
+	if lvl <= 0 or Townsfolk.trade_for(bid) == "":
+		return 0
+	var seats: Array = DB.buildings.get(bid, {}).get("staff_seats", DB.cfg("staff_seats", [0, 1, 2]))
+	return int(seats[mini(lvl, seats.size()) - 1])
+
+
+## The seats a building could ever have (to show "opens at level 2").
+func staff_seats_max(bid: String) -> int:
+	if Townsfolk.trade_for(bid) == "":
+		return 0
+	var seats: Array = DB.buildings.get(bid, {}).get("staff_seats", DB.cfg("staff_seats", [0, 1, 2]))
+	var costs: Array = DB.buildings.get(bid, {}).get("costs", [])
+	return int(seats[mini(costs.size(), seats.size()) - 1]) if not costs.is_empty() else 0
+
+
+func staff_at(i: int, bid: String) -> Array:
+	return townsfolk.filter(func(p): return int(p.home) == i and str(p.post) == bid)
+
+
+## Everything the building's staff add, in its own unit (see Townsfolk.value_in).
+func staff_value(i: int, bid: String) -> float:
+	var v := 0.0
+	for p in staff_at(i, bid):
+		v += Townsfolk.value_in(p, bid)
+	return v
+
+
+## Staff percent off, capped.
+func staff_pct(i: int, bid: String) -> float:
+	return minf(float(townsfolk_cfg().get("discount_cap", 40)), staff_value(i, bid))
+
+
+## Price multiplier from a discount trade's staff (1.0 with nobody there).
+func staff_mult(i: int, bid: String) -> float:
+	return 1.0 - staff_pct(i, bid) / 100.0
+
+
+func staff_masters(i: int, bid: String) -> int:
+	var n := 0
+	for p in staff_at(i, bid):
+		if Townsfolk.is_master_at(p, bid):
+			n += 1
+	return n
+
+
+func can_post(p: Dictionary, bid: String) -> String:
+	if p.is_empty():
+		return "Nobody"
+	var i := int(p.home)
+	if building_level(i, bid) <= 0:
+		return "Not built"
+	var cap := staff_seats(i, bid)
+	if cap <= 0:
+		return "Staff seats open at level 2"
+	if str(p.post) == bid:
+		return "Already working there"
+	if staff_at(i, bid).size() >= cap:
+		return "No free seat"
+	return ""
+
+
+func post_townsperson(p: Dictionary, bid: String) -> bool:
+	if can_post(p, bid) != "":
+		return false
+	p.post = bid
+	p.idle = 0
+	return true
+
+
+func unpost_townsperson(p: Dictionary) -> void:
+	p.post = ""
+
+
+## Materials a producer makes this week: its own base by level plus its staff.
+func production(i: int, bid: String) -> Dictionary:
+	var lvl := building_level(i, bid)
+	var prod: Dictionary = DB.buildings.get(bid, {}).get("produce", {})
+	var out := {}
+	if lvl <= 0:
+		return out
+	for mat in prod:
+		var base: Array = prod[mat]
+		out[mat] = int(base[mini(lvl, base.size()) - 1]) + int(round(staff_value(i, bid)))
+	return out
+
+
+## The weekly round for townsfolk: wages, work and learning, comings and goings, and what
+## the producers made. Runs before the Casino's grubstake check.
+func _townsfolk_week(msgs: Array) -> void:
+	var tf := townsfolk_cfg()
+	# What last week's work made (the producers), before anyone moves.
+	for st in settlements:
+		var i := int(st.index)
+		for bid in st.get("buildings", {}):
+			var made := production(i, bid)
+			var parts: Array = []
+			for mat in made:
+				var n := int(made[mat])
+				if n <= 0:
+					continue
+				set(mat, int(get(mat)) + n)
+				parts.append("%d %s" % [n, str(mat).capitalize()])
+			if not parts.is_empty():
+				msgs.append("The %s at %s brings in %s." % [DB.buildings[bid].name, settlement_name(i), ", ".join(parts)])
+	# Learning the job: helped by a Well Liked coworker, slowed by a Grumbler.
+	var levels: Array = tf.get("level_xp", [8, 24])
+	for st in settlements:
+		var i := int(st.index)
+		var working := townsfolk_at(i).filter(func(p): return str(p.post) != "")
+		var liked := working.filter(func(p): return Townsfolk.has_trait(p, "well_liked"))
+		var grumps := working.filter(func(p): return Townsfolk.has_trait(p, "grumbler"))
+		for p in working:
+			if p.get("off", false):
+				continue
+			var gain := int(tf.get("xp_per_week", 2)) * (2 if Townsfolk.has_trait(p, "apt_pupil") else 1)
+			if liked.any(func(o): return o != p):
+				gain += 1
+			if grumps.any(func(o): return o != p):
+				gain = maxi(1, gain - 1)
+			p.xp = int(p.xp) + gain
+			while int(p.level) < Townsfolk.max_level(p) and int(p.xp) >= int(levels[int(p.level) - 1]):
+				p.level = int(p.level) + 1
+				msgs.append("%s has learned the trade: a %s now." % [p.name, Townsfolk.level_name(int(p.level))])
+	# Wages, paid in order while the chips last.
+	var leaving: Array = []
+	for p in townsfolk:
+		var w := Townsfolk.wage(p)
+		if money >= w:
+			money -= w
+			p.unpaid = 0
+		else:
+			p.unpaid = int(p.get("unpaid", 0)) + 1
+			if Townsfolk.has_trait(p, "loyal"):
+				continue
+			if int(p.unpaid) >= int(tf.get("unpaid_leave_weeks", 2)):
+				leaving.append(p)
+				msgs.append("%s hasn't been paid in %d weeks and leaves %s." % [p.name, int(p.unpaid), settlement_name(int(p.home))])
+			else:
+				msgs.append("No chips for %s's wages this week. Another week unpaid and they'll leave." % p.name)
+	# Idle hands, and the restless.
+	for p in townsfolk:
+		if p in leaving:
+			continue
+		if str(p.post) == "":
+			p.idle = int(p.get("idle", 0)) + 1
+			if Townsfolk.has_trait(p, "restless") and int(p.idle) >= 2 and rng.randf() * 100.0 < float(tf.get("restless_chance", 10)):
+				leaving.append(p)
+				msgs.append("%s got tired of sitting around and moved on." % p.name)
+		else:
+			p.idle = 0
+	for p in leaving:
+		townsfolk.erase(p)
+	# Who shows up for work this coming week.
+	for p in townsfolk:
+		p.off = Townsfolk.has_trait(p, "tippler") and str(p.post) != "" and rng.randf() * 100.0 < float(tf.get("tippler_chance", 20))
+		if p.off:
+			msgs.append("%s is sleeping one off and won't be at the %s this week." % [p.name, DB.buildings.get(str(p.post), {}).get("name", "job")])
+
+
+func townsfolk_wages() -> int:
+	var n := 0
+	for p in townsfolk:
+		n += Townsfolk.wage(p)
+	return n
+
+
 # Weekly clock --------------------------------------------------------------------------
 
 func advance_week() -> Array:
 	var msgs: Array = []
 	week += 1
+	_townsfolk_week(msgs)
 	var floor_money: int = DB.cfg("grubstake_floor", 150)
 	if money < floor_money:
 		msgs.append("A Casino agent stakes the company %d chips. (\"The house always wants you back at the table.\")" % (floor_money - money))
@@ -867,7 +1126,7 @@ func _refresh_settlement(st: Dictionary) -> void:
 	st.stock = []
 	var gs := building_level(i, "general_store")
 	if gs > 0:
-		for n in int(DB.buildings.general_store.keepsake_stock[gs - 1]):
+		for n in int(DB.buildings.general_store.keepsake_stock[gs - 1]) + staff_masters(i, "general_store"):
 			var k := random_keepsake()
 			if k != "" and not k in st.stock:
 				st.stock.append(k)
@@ -936,7 +1195,7 @@ func _roll_quests(st: Dictionary) -> void:
 	var west: String = site_by_index(i).get("region_west", "")
 	if west == "":
 		return
-	var count := int(track_value(i, "saloon", "chatter"))
+	var count := int(track_value(i, "saloon", "chatter")) + staff_masters(i, "saloon")
 	var tier_l := int(track_value(i, "saloon", "tips"))
 	var templates: Array = DB.quests.get("templates", {}).keys().filter(func(k): return not story_flags.has(DB.quests.templates[k].get("done_flag", "-")))
 	# Until the company has run a side quest, the board offers an easy starter job (no story
@@ -993,6 +1252,8 @@ func _make_quest(tid: String, west: String, tier_l: int, starter: bool = false) 
 		reward.trinket = "rare" if tl >= 1 else "uncommon"
 	if rng.randf() * 100.0 < float(ch.get("recruit", [8, 14, 20])[tl]):
 		reward.recruit = 1 + tl
+	if rng.randf() * 100.0 < float(ch.get("settler", [20, 25, 30])[tl]):
+		reward["settler"] = 1 + (1 if tl >= 1 and rng.randf() < 0.5 else 0)
 	var b: Dictionary = t.get("boss", {})
 	var reg := {
 		"name": str(t.name).replace("{place}", place), "tier": tier, "rec_level": base.get("rec_level", "1"),
@@ -1042,6 +1303,8 @@ static func quest_hints(reg: Dictionary) -> String:
 		parts.append("a %s trinket" % r.trinket)
 	if int(r.get("recruit", 0)) > 0:
 		parts.append("a hand who wants to join")
+	if int(r.get("settler", 0)) > 0:
+		parts.append("a settler for your town")
 	var s := "Rumored reward: " + ", ".join(parts) + "."
 	if reg.get("final", "") == "boss":
 		s += " Word is there's a boss: " + str(reg.boss.name) + "."
@@ -1165,7 +1428,7 @@ func start_run(i: int, party_uids: Array, supplies: Dictionary, region: String =
 func finish_run(status: String) -> Dictionary:
 	var r := run
 	var summary := {"status": status, "region": r.region_id, "origin": r.origin, "heroes": [], "loot": r.loot.duplicate(true),
-		"recruits": [], "boss_won": r.boss_won, "found_site": -1, "week_msgs": []}
+		"recruits": [], "settlers": [], "boss_won": r.boss_won, "found_site": -1, "week_msgs": []}
 	var survivors := r.party_heroes()
 	var won := status == "victory"
 	summary["story"] = ""
@@ -1185,6 +1448,8 @@ func finish_run(status: String) -> Dictionary:
 		for k in r.loot.keepsakes:
 			if k != "":
 				stash.append(k)
+		for p in r.townsfolk:
+			summary.settlers.append(welcome_townsperson(p.duplicate(true), r.origin))
 		for rd in r.recruits:
 			var nh := Hero.from_dict(rd)
 			nh.location = r.origin
@@ -1257,7 +1522,7 @@ func to_dict() -> Dictionary:
 	for h in heroes:
 		hs.append(h.to_dict())
 	return {"version": 1, "week": week, "money": money, "timber": timber, "iron": iron, "hides": hides, "charters": charters,
-		"heroes": hs, "dead": dead.duplicate(true), "settlements": settlements.duplicate(true),
+		"heroes": hs, "townsfolk": townsfolk.duplicate(true), "dead": dead.duplicate(true), "settlements": settlements.duplicate(true),
 		"stash": stash.duplicate(), "known_keys": known_keys.duplicate(true), "beaten": beaten.duplicate(),
 		"next_uid": next_uid, "victory_seen": victory_seen,
 		"tutorial_done": tutorial_done, "story_flags": story_flags.duplicate(), "missing": missing.duplicate(true), "quest_regions": quest_regions.duplicate(true), "stats": stats.duplicate(),
@@ -1274,6 +1539,7 @@ static func from_dict(d: Dictionary) -> Company:
 	c.charters = int(d.get("charters", 0))
 	for hd in d.get("heroes", []):
 		c.heroes.append(Hero.from_dict(hd))
+	c.townsfolk = d.get("townsfolk", []).duplicate(true)
 	c.dead = d.get("dead", []).duplicate(true)
 	c.settlements = d.get("settlements", []).duplicate(true)
 	c.stash = d.get("stash", []).duplicate()

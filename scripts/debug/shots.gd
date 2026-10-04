@@ -607,8 +607,20 @@ static func run(main: Main, args: Dictionary) -> void:
 				h.fatigue = 55
 			var acts: Array = DB.buildings.saloon.activities
 			cb.do_activity(0, "saloon", acts[0].id, cb.heroes[0])
+			# folk=1: a few townsfolk, a level 2 Saloon and Lumber Yard, and someone at work.
+			if args.has("folk"):
+				_folk(cb)
 			await main.goto("settlement", {"index": 0}, true)
-			main.screen.open_building(args.get("id", "saloon"))
+			var bp: BuildingPanel = main.screen.open_building(args.get("id", "saloon"))
+			if args.has("pick"):
+				bp._pick_staff()
+		"townsfolk":
+			Game.company.complete_tutorial()
+			_folk(Game.company)
+			await main.goto("settlement", {"index": 0}, true)
+			var tp: TownsfolkPanel = main.screen.open_townsfolk()
+			if args.has("assign"):
+				tp._assign(Game.company.townsfolk[int(args.assign)])
 	for i in wait:
 		await tree.process_frame
 	# soak=N: sit idle for N seconds, printing what grows (leak and crash hunting).
@@ -632,6 +644,23 @@ static func run(main: Main, args: Dictionary) -> void:
 	img.save_png(out)
 	print("saved ", out)
 	tree.quit()
+
+
+## A small town for townsfolk screenshots.
+static func _folk(co: Company) -> void:
+	co.money += 5000
+	co.timber += 100
+	co.iron += 50
+	co.hides += 20
+	co.build(0, "saloon")
+	co.build(0, "lumber_yard")
+	co.build(0, "lumber_yard")
+	var specs := [["barkeep", 2, "well_liked"], ["logger", 1, "hard_worker"], ["mucker", 1, "tippler"], ["laborer", 2, "thrifty"], ["sawbones", 1, "restless"]]
+	for sp in specs:
+		co.welcome_townsperson(co.make_townsperson(sp[0], sp[1], sp[2]), 0)
+	co.post_townsperson(co.townsfolk[0], "saloon")
+	co.post_townsperson(co.townsfolk[1], "lumber_yard")
+	co.townsfolk[0].xp = 14
 
 
 ## Plays hero turns in the open combat with each hero's first move (or skill=...), printing
