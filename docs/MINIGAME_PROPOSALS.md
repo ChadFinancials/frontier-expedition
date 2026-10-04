@@ -1,6 +1,6 @@
 # Hands-on moments: High Noon duels and skill checks (proposal)
 
-Status: **awaiting the owner's picks.** Nothing here is built yet.
+Status: **round 2 with the owner's direction; awaiting the last picks.** Nothing here is built yet.
 
 The goal is to give expeditions moments where the player's own hands decide things, built
 around the West rather than Darkest Dungeon. Two features:
@@ -8,37 +8,53 @@ around the West rather than Darkest Dungeon. Two features:
 1. **High Noon:** a two-part duel before certain fights.
 2. **Skill checks:** short hands-on tasks at some curios.
 
-## Rules that apply to both
+## Rules that apply to both (owner, round 2)
 
-- **Always skippable.** Every minigame screen has a "Roll for it" button. It resolves with
-  the same odds the ★/✗ experts give today, so the player never has to play one.
-- A settings toggle, **Minigames: Play / Always roll**, sets the default.
+- **No skipping.** When a minigame comes up, you play it. The only way around one is the
+  right item: a Shovel forces a Strongbox open, Rope gets you down the Well, and so on, as
+  supply keys work today.
+  - As-key experts (the Preacher "works as Salt" at a grave) also count as the right item.
+  - Inside the code the scoring is still plain logic, so the tests and the balance bot
+    resolve minigames without a screen.
 - **The company changes the difficulty, not the payout.** A ★ expert (class, survival skill
-  rank, quirk) makes the game easier; a ✗ makes it harder. Playing well beats the odds.
+  rank, quirk) makes the game easier; a ✗ makes it harder.
 - **Controls:** the mouse or Space for timing; arrow keys or WASD for patterns.
 - **Short:** 5-15 seconds each.
-- **Testable:** the scoring is plain logic with no screen. The tests and the balance bot use
-  "Roll for it".
+- Risk to keep in mind: with no skip, the duel's reaction part must stay fair for slower
+  hands. ★ help and a generous base window matter.
 
 ## 1. High Noon
 
-### Where it happens (first region)
+### Duels are their own stops, and the consequence comes later
 
-| Where | Who you face | Win big (bullseye) | Lose (miss) |
-|---|---|---|---|
-| Outlaw Toll: "Call out the leader" (Gunslinger), and a new "Call him out" option for anyone | The leader | The others ride off: no fight, their toll purse (40-80 chips) | Fight; they strike first |
-| Wanted Poster: "Go after him" | Snake-Eye Pike | Pike drops before the fight, bounty paid; his partner still fights | Fight; Pike strikes first |
-| Hanging Tree: "Cut him down" | The hangman | You shoot the rope: the homesteader joins and the outlaws fight leaderless (Vulnerable) | Fight; they strike first |
-| Mad Dog Mulligan (boss intro) | Mulligan | Mulligan starts at 50% HP | Fight; he strikes first |
-| Crow's Nest elite (Crow Lieutenant) | The lieutenant | The lieutenant starts at 40% HP | Fight; they strike first |
+A duel is a stop on the trail, not an opener glued to a fight. Whoever you face rides off,
+and their gang is **a fight further down this map**. That fight is marked on the map once
+you know about it ("Pike's gang: Pike is bleeding"). Your shot decides how that later fight
+starts:
 
-### Who draws
+| Your result | The duelist in the later fight |
+|---|---|
+| **Bullseye** (hard: a 4% zone) | Dead: removed from the fight. His bounty is paid now if he's wanted |
+| **Hit** | Starts at 50% HP and bleeding |
+| **Graze** | Starts bleeding (3 rounds) |
+| **Miss** | Unhurt, and your hero is **Rattled** |
+| **Too slow** (he fires first) | Your hero takes a hit (15% HP) and still gets a shot, with narrower zones |
+| **Jumped the gun** | No shot at all: your hero is Rattled and takes the hit |
 
-The "Who draws?" picker shows ★/✗ names, as at curios:
-- ★ Gunslinger, ★ Marshal, ★ Bounty Hunter quirk
-- ✗ Butterfingers, ✗ Jumpy, ✗ Drinker (hungover)
+**Rattled:** -10 Accuracy and -5 Dodge until the next camp. It shows as a status on the hero
+card, like Shaken. (The duration is the owner's call: next fight only, or until camp.)
 
-Any hero can step up.
+If no fight is left ahead on the map, the duelist's gang jumps you at the next stop instead.
+
+### Where duels come from (first region)
+
+| Duel | How it starts | Stakes beyond the later fight |
+|---|---|---|
+| **The Lone Wanderer** (new event, common pool) | A stranger at a crossroads: "Heard you're quick. Let's find out." You may decline (+Fatigue) or put up chips | Win: double your wager, or the wanderer, beaten fair, asks to join (recruit). Lose: Rattled, the wager gone. No later fight: it's about pride |
+| **Outlaw Toll:** "Call out the leader" | The leader steps out | The toll gang becomes the later fight |
+| **Wanted Poster:** "Go after him" | You find Snake-Eye Pike at a waterhole | Pike's gang (Crow Lieutenant + outlaw) waits further on; bullseye pays the 200 bounty now |
+| **Hanging Tree** | The hangman turns to face you | Bullseye: the rope's shot through and the homesteader joins; the hangman's gang waits ahead |
+| **Mad Dog** (boss) | A standoff as you reach the hideout, right before the boss fight | Bosses can't die to it: a bullseye leaves him at 50% HP and bleeding |
 
 ### Part 1: The Draw (reaction)
 
@@ -77,10 +93,10 @@ to fire. The zones run from the edges to the centre:
 
 | Zone | Width at base | Result |
 |---|---|---|
-| Miss (edges) | the rest | the duel is lost (table above) |
-| Graze | 30% | the target starts at 75% HP; normal turn order |
-| Hit | 14% | the target starts at 40% HP, and the company strikes first |
-| Bullseye (centre) | 4% | the "win big" result above |
+| Miss (edges) | the rest | the miss result above |
+| Graze | 30% | bleeding |
+| Hit | 14% | 50% HP and bleeding |
+| Bullseye (centre) | 4% | dead (bosses: 50% HP and bleeding) |
 
 - The sight speeds up with the opponent's tier.
 - Zone widths scale with the hero:
@@ -88,8 +104,6 @@ to fire. The zones run from the edges to the centre:
   - Butterfingers -25%
   - Hungover (Drinker after a night's drinking) makes the sight wobble
   - The hero's accuracy stat adds up to ±10%
-- **Roll for it** uses about: bullseye 8%, hit 30%, graze 35%, miss 27%. ★ shifts that toward
-  hits and ✗ toward misses, as the curio odds do.
 
 ### Look
 
@@ -98,8 +112,9 @@ sign. The DRAW text slams in. Sounds already exist: bell, gunshot, crows.
 
 ## 2. Skill checks at curios
 
-"Investigate by hand" on some curios opens a 5-10 second task instead of a dice roll.
-Supply keys are still the sure thing, and as-key experts still skip the task.
+"Investigate by hand" on some curios opens a 5-10 second task instead of a dice roll, and it
+can't be skipped. The right supply (a Shovel on the Strongbox) is the only way around it, as
+are as-key experts.
 
 ### Four reusable games
 
@@ -146,16 +161,16 @@ The other curios keep the dice roll for now. The four games can be reused for la
 1. **High Noon** first:
    - the duel scene and the scoring logic
    - "Who draws?"
-   - the five places above
-   - the settings toggle
-   - tests on the scoring and the roll odds
+   - carrying the duelist into a later fight (map marker included)
+   - Rattled
+   - the Lone Wanderer, plus the four existing events above
+   - tests
 2. **Skill checks:** the four games as reusable scenes, the eight curios, and tests.
 
 ## Questions for the owner
 
-1. **Duel places:** are the five above right? Should any outlaw fight with a Gunslinger in the
-   company also offer "Call one out"? That would be optional and once per fight.
-2. **Bosses:** a bullseye leaves Mad Dog at 50% HP rather than ending the fight. OK?
+1. **Rattled:** until the next camp, or the next fight only?
+2. **Mad Dog:** keep the boss standoff right before the fight (the one duel that isn't
+   separate)?
 3. **Skill checks:** should a clean result guarantee a good outcome? That's stronger than the
    ★ odds, which never guarantee one, but it rewards skill.
-4. **Default setting:** Play or Always roll?
