@@ -96,9 +96,9 @@ func _staff(body: VBoxContainer) -> void:
 	if total > 0.0:
 		head.add_child(UI.lbl("Together: %s" % Townsfolk.value_text(bid, total), 18, "Ink"))
 	if cap <= 0:
-		cv.add_child(UI.wrap(UI.lbl("Staff seats open when the %s reaches level 2 (one seat), then level 3 (two). A %s works best here; any townsperson can lend a hand for less." % [DB.buildings[bid].name, own_name], 17, "Ink"), 1100))
+		cv.add_child(UI.lbl("Opens at level 2. Best: %s ★" % own_name, 17, "Ink"))
 		return
-	cv.add_child(UI.wrap(UI.lbl("A %s works best here (★). Anyone else gives half a Greenhorn's help; Laborers give a full Greenhorn's once they're Hands." % own_name, 16, "Ink"), 1100))
+	head.add_child(UI.lbl("Best: %s ★" % own_name, 17, "Ink"))
 	var row := UI.hb(10)
 	cv.add_child(row)
 	for n in cap:
@@ -199,9 +199,8 @@ func _activities(body: VBoxContainer) -> void:
 		for q in qs:
 			var reg: Dictionary = DB.regions.get(q, {})
 			cv.add_child(UI.rich("[b]%s[/b]: %s  %s" % [reg.get("name", "?"), reg.get("desc", ""), Company.quest_hints(reg)], 17, true, 1100))
-		cv.add_child(UI.lbl("Take these jobs from Plan Expedition. Upgrade Chatter and Loose Lips below for more and better jobs.", 16, "Ink"))
 	if bid != "hiring_board":
-		body.add_child(UI.lbl("Click an empty slot to send a hero. They shed Fatigue and sit out the next expedition. Visiting also clears a Breaking Point.", 18, "InkBold"))
+		body.add_child(UI.lbl("Heroes sent here sit out the next expedition. A visit also clears a Breaking Point.", 18, "InkBold"))
 	for a in DB.buildings[bid].get("activities", []):
 		var aid: String = a.id
 		var key: String = bid + "/" + aid
@@ -242,7 +241,7 @@ func _activities(body: VBoxContainer) -> void:
 
 func _doctor(body: VBoxContainer) -> void:
 	var co: Company = Game.company
-	body.add_child(UI.lbl("Click an empty bed to treat one bad quirk. The patient sits out the next expedition.", 18, "InkBold"))
+	body.add_child(UI.lbl("Treats one bad quirk. The patient sits out the next expedition.", 18, "InkBold"))
 	_slot_row(body, "doctor", co.slot_cap(index, "doctor"), func():
 		var elig := co.service_candidates(index).filter(func(h): return not h.negative_quirks().is_empty())
 		HeroPicker.pick(elig, "Who sees the Doctor?", func(h: Hero): _doctor_choose(h),
@@ -287,18 +286,16 @@ func _bench(body: VBoxContainer, title: String) -> Hero:
 	row.add_child(sb)
 	var info := UI.vb(4)
 	row.add_child(info)
-	if h == null:
-		info.add_child(UI.lbl("Click the slot to choose a hero.", 19, "Ink"))
-	else:
+	if h != null:
 		info.add_child(UI.hdr(h.hero_name, 26, true))
-		info.add_child(UI.lbl("Level %d %s  (click the slot to switch)" % [h.level, h.class_name_text()], 18, "Ink"))
+		info.add_child(UI.lbl("Level %d %s" % [h.level, h.class_name_text()], 18, "Ink"))
 	return h
 
 
 func _smithy(body: VBoxContainer) -> void:
 	var co: Company = Game.company
 	var lvl := co.building_level(index, "smithy")
-	body.add_child(UI.lbl("This Smithy can make gear up to tier %d. Gear tier can't exceed a hero's level." % int(DB.buildings.smithy.max_tier[lvl - 1]), 18, "InkBold"))
+	body.add_child(UI.lbl("Gear up to tier %d (never above the hero's level)." % int(DB.buildings.smithy.max_tier[lvl - 1]), 18, "InkBold"))
 	var h := _bench(body, "Who needs gear?")
 	if h == null:
 		return
@@ -326,7 +323,7 @@ func _smithy(body: VBoxContainer) -> void:
 func _drill(body: VBoxContainer) -> void:
 	var co: Company = Game.company
 	var lvl := co.building_level(index, "drill_hall")
-	body.add_child(UI.lbl("Teaches heroes the moves they haven't learned yet (%d chips each), and trains known moves up to level %d. A move can be at most one level above its hero's level." % [co.learn_cost(index), int(DB.buildings.drill_hall.max_skill[lvl - 1])], 18, "InkBold"))
+	body.add_child(UI.lbl("New moves %d chips each. Trains moves up to level %d (at most one above the hero's level)." % [co.learn_cost(index), int(DB.buildings.drill_hall.max_skill[lvl - 1])], 18, "InkBold"))
 	var h := _bench(body, "Who trains?")
 	if h == null:
 		return
@@ -368,7 +365,7 @@ func _drill(body: VBoxContainer) -> void:
 func _store(body: VBoxContainer) -> void:
 	var co: Company = Game.company
 	var st := co.settlement(index)
-	body.add_child(UI.lbl("Supplies are bought when you plan an expedition (%d%% discount here). This week's trinkets:" % co.store_discount(index), 19, "InkBold"))
+	body.add_child(UI.lbl("%d%% off supplies (bought when you plan an expedition). This week's trinkets:" % co.store_discount(index), 19, "InkBold"))
 	if st.stock.is_empty():
 		body.add_child(UI.lbl("Sold out. New stock arrives next week.", 18, "Ink"))
 	for k in st.stock:
@@ -395,7 +392,7 @@ func _store(body: VBoxContainer) -> void:
 func _hiring(body: VBoxContainer) -> void:
 	var co: Company = Game.company
 	var st := co.settlement(index)
-	body.add_child(UI.lbl("Hands looking for work this week (%d a week). Hiring is free. Company size: %d / %d" % [int(co.track_value(index, "hiring_board", "notices")), co.heroes.size(), co.roster_cap()], 19, "InkBold"))
+	body.add_child(UI.lbl("Company: %d / %d" % [co.heroes.size(), co.roster_cap()], 19, "InkBold"))
 	if st.recruits.is_empty():
 		body.add_child(UI.lbl("Nobody's left. More will turn up next week.", 18, "Ink"))
 	var i := 0
@@ -429,7 +426,7 @@ func _hiring(body: VBoxContainer) -> void:
 
 func _stage(body: VBoxContainer) -> void:
 	var co: Company = Game.company
-	body.add_child(UI.lbl("Click an empty seat to send a hero. Each stop along the trail takes a week of travel.", 18, "InkBold"))
+	body.add_child(UI.lbl("One week of travel per stop along the trail.", 18, "InkBold"))
 	var dests: Array = []
 	for s in co.settlements:
 		if int(s.index) != index:

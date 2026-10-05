@@ -49,7 +49,7 @@ func setup(params: Dictionary) -> void:
 	var rv := UI.vb(8)
 	rp.add_child(rv)
 	rv.add_child(UI.hdr("Choose Your Party", 28, true))
-	rv.add_child(UI.lbl("Click heroes to add or remove them (up to 4). Tired, busy or travelling heroes can't go.", 18, "Ink"))
+	rv.add_child(UI.lbl("Up to 4 heroes.", 18, "Ink"))
 	var sc := ScrollContainer.new()
 	sc.custom_minimum_size = Vector2(850, 700)
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -113,7 +113,6 @@ func setup(params: Dictionary) -> void:
 	var suph := UI.hb(10)
 	supv.add_child(suph)
 	suph.add_child(UI.hdr("Store & Wagon", 26, true))
-	suph.add_child(UI.lbl("Click store goods to load them; click a wagon slot to put one back.", 16, "Ink"))
 	suph.add_child(UI.spacer(0, 0, true))
 	suph.add_child(UI.btn("Recommended", func():
 		supplies = _default_load()

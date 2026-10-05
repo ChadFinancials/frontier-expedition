@@ -1,4 +1,4 @@
-# Hero proposals (round 8)
+# Hero proposals (round 8, plus round 17 heals)
 
 Options for the owner to pick from. Nothing here is in the game yet. **Revision 2** (the
 owner's picks and revised specs) comes first; the original option lists follow for
@@ -16,6 +16,23 @@ attack expects about 6-7 damage per turn and a good stun about 0.4-0.5 expected 
 - 🛠 means the move needs a new mechanic. Each 🛠 lists the work it needs.
 
 ---
+
+## Round 17: a small heal for the classes without one (awaiting picks)
+
+The owner takes the Preacher on every expedition because almost nobody else can heal. These
+are small heals added to moves that already exist, so the Preacher and Frontier Doctor stay
+the real healers. For scale, Laying On of Hands heals 6-10 and Good Boy 2-5.
+
+| Class | Today | Proposal |
+|---|---|---|
+| Gunslinger | No heal | **Duck and Weave** also heals the user 2-4 ("catch a breath") |
+| Marshal | Flash the Badge cures stun and debuffs | **Flash the Badge** also heals that ally 2-4 |
+| Gambler | No heal | **Poker Face** also heals the user 2-4 |
+| Prospector | No heal | **Raise the Lamp** also heals the whole party 1-2 |
+| Bayou Poisoner | Questionable Mushroom poisons the user for Fatigue relief | **Questionable Mushroom** becomes a bayou remedy for an ally: heals 3-6 and -4 Fatigue, with a 25% chance of a light poison |
+| Rail Driver, Wrangler, Mountain Mystic, Train Hopper | Already have a self or ally heal | No change |
+
+Heals rise with the move's level, as every heal does today.
 
 ## Revision 2: the owner's picks and revised specs
 

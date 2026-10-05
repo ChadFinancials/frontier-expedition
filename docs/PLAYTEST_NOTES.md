@@ -32,6 +32,12 @@ decided, and what shipped. Update both at the end of every round.
   - A **wagon upgrade track** (a building in town), with **expanded cargo** the big one.
   - More places for the wagon and resources to matter (materials already take wagon space;
     mishaps and events drain supplies).
+- [ ] **More to do before the Tallgrass Sea (round 17, owner's ideas, awaiting picks):**
+  - a Lone Wanderer rumor whose finale is a duel, not a fight
+  - more Saloon rumor templates
+  - short trips with a campfire halfway where you can head home early (supplies low, the
+    wagon struggling) without the turn-back penalty
+- [ ] **Small heals for every class** (round 17): proposal in `HERO_PROPOSALS.md`.
 - [ ] Money: round 9 doubled every chip source (owner was running short: one quest paid about
       200, one bar visit and one move). Recheck after a few weeks of play; `chips_mult` in
       config scales all of it at once.
@@ -84,6 +90,30 @@ decided, and what shipped. Update both at the end of every round.
 ---
 
 ## History
+
+### Round 17 (week 5 with the main company)
+- **Skill checks:** at most difficulty 2 in the first region. Config `check_base` [2, 3, 3] and
+  `check_cap` [2, 4, 5] by region tier.
+- **The Lone Wanderer:** losing now costs +3 Fatigue (was +6, to the whole party). The owner
+  saw +12; I could only find the +6.
+- **Slower levels:** the Preacher hit level 3 in week 5. XP thresholds go from 19 / 56 / 113 /
+  188 to 24 / 80 / 160 / 260, aiming for level 2 around week 3, level 3 around week 7 (after
+  the Tallgrass Sea), level 4 around week 12 and level 5 around week 20. Levels already
+  reached are kept.
+- **Explainer text trimmed:**
+  - The combat hint bar is gone: the move tooltips, enemy hit chances and the round and turn
+    order line already cover it.
+  - The Bones tooltip no longer says to attack them.
+  - "Click ..." instructions are gone from the building panels, staff seats, Saloon chatter,
+    Hiring Board, embark screen, wagon bar and hero sheet.
+  - The "click a glowing stop" toast only shows in the tutorial.
+- Noted:
+  - Gila monsters: strong but fun.
+  - The steady hand is better but still a bit clunky.
+  - The reward felt good.
+- **Waiting on the owner:**
+  - small heals for the classes without one (`HERO_PROPOSALS.md`, round 17)
+  - more to do between the story trips and the Tallgrass Sea (see the backlog)
 
 ### Round 16: High Noon and skill checks in the dev lab (owner)
 - **High Noon:**

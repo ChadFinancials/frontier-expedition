@@ -91,7 +91,7 @@ static func bones(of: Combatant, uid: int) -> Combatant:
 	c.id = uid
 	c.side = "enemy"
 	c.corpse = true
-	c.data = {"id": "bones", "name": "Bones", "title": "What's left of the %s. Clear them to reach whoever's behind." % of.display_name,
+	c.data = {"id": "bones", "name": "Bones", "title": "What's left of the %s." % of.display_name,
 		"look": {"body": "bones", "big": of.data.get("look", {}).get("body", "human") in ["giant", "bull", "bear"]}}
 	c.display_name = "Bones"
 	c.max_hp = maxi(1, int(DB.cfg("bones_hp", 2)))

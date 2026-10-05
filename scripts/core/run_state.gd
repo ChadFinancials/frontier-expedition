@@ -747,7 +747,9 @@ func curio_check(curio_id: String, h: Hero, item_id: String = "") -> Dictionary:
 	for x in experts:
 		if x.e.has("as_key") and cu.get("keys", {}).has(x.e.as_key):
 			return {}
-	var d := int(ck.get("difficulty", 3))
+	# Base and ceiling by the region's tier: the first region never asks more than a 2.
+	var ti := clampi(tier(), 1, 3) - 1
+	var d := int(ck.get("difficulty", DB.cfg("check_base", [2, 3, 3])[ti]))
 	for x in experts:
 		if x.odds < 0:
 			d += 1
@@ -759,7 +761,7 @@ func curio_check(curio_id: String, h: Hero, item_id: String = "") -> Dictionary:
 	var qm: Dictionary = DB.cfg("check_quirks", {}).get(str(ck.game), {})
 	for q in h.quirks:
 		d += int(qm.get(q, 0)) + int(ck.get("quirks", {}).get(q, 0))
-	return {"game": str(ck.game), "difficulty": clampi(d, 1, 5), "title": str(cu.get("name", "")), "text": str(ck.get("text", "")), "curio": curio_id}
+	return {"game": str(ck.game), "difficulty": clampi(d, 1, int(DB.cfg("check_cap", [2, 4, 5])[ti])), "title": str(cu.get("name", "")), "text": str(ck.get("text", "")), "curio": curio_id}
 
 
 ## item_id "" = by hand. check: a SkillCheck result for a curio that asks for one

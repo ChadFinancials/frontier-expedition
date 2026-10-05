@@ -20,7 +20,6 @@ var views: Dictionary = {}       # combatant id -> UnitView
 var hud_panel: PanelContainer
 var hero_info: VBoxContainer
 var skill_row: HBoxContainer
-var hint_label: RichTextLabel
 var action_row: HBoxContainer
 var log_label: RichTextLabel
 var order_label: RichTextLabel
@@ -134,9 +133,6 @@ func _build_hud() -> void:
 	var mid := UI.vb(8)
 	mid.custom_minimum_size.x = 960
 	h.add_child(mid)
-	hint_label = UI.rich("", 17, false, 940)
-	hint_label.custom_minimum_size = Vector2(940, 24)
-	mid.add_child(UI.inset(hint_label))
 	skill_row = UI.hb(8)
 	mid.add_child(skill_row)
 	action_row = UI.hb(8)
@@ -231,7 +227,6 @@ func _show_controls() -> void:
 	views[c.id].set_glow("active")
 	_update_order()
 	_fill_hero_info(c)
-	hint_label.text = "[b]%s's turn[/b]: pick a move below (hover it for details)." % c.display_name
 	UI.clear(skill_row)
 	var i := 0
 	for sid in c.skills:
@@ -360,9 +355,6 @@ func _select_skill(sid: String) -> void:
 		if b.has_node("SelFrame"):
 			b.get_node("SelFrame").visible = s == sid
 			b.get_node("SelTag").visible = s == sid
-	var sk := DB.skill(sid)
-	var who := "a glowing [color=#e05a4a]enemy[/color]" if hostile else "a glowing [color=#7fb069]ally[/color]"
-	hint_label.text = "[b]%s[/b] is selected: click %s to use it, or pick another move." % [sk.get("name", sid), who]
 
 
 func _fill_hero_info(c: Combatant) -> void:
@@ -427,7 +419,6 @@ func _fill_enemy_info(c: Combatant) -> void:
 		["dodge", str(int(c.stat("dodge"))), "Dodge"], ["prot", "%d%%" % int(c.stat("prot")), "Protection"],
 		["speed", str(int(c.stat("speed"))), "Speed"]]))
 	_buff_line(c)
-	hint_label.text = "[color=#e05a4a]Enemy turn[/color]: watch the arrow to see who they're targeting."
 	skill_row.add_child(UI.lbl("Enemy turn...", 22, "Bold"))
 
 
@@ -447,7 +438,6 @@ func _hide_controls() -> void:
 	awaiting = false
 	selected_skill = ""
 	preview.visible = false
-	hint_label.text = ""
 	UI.clear(skill_row)
 	UI.clear(action_row)
 	for id in views:
@@ -1313,7 +1303,7 @@ func _finish() -> void:
 			lines.append("+%d Land Charter%s!" % [res.charters, "s" if res.charters > 1 else ""])
 		for k in res.keepsakes:
 			if k != "":
-				lines.append("Trinket: %s  (click a hero's card on the trail to equip it)" % DB.keepsakes[k].name)
+				lines.append("Trinket: %s" % DB.keepsakes[k].name)
 	lines.append_array(res.msgs)
 	var ret: String = params.get("return", "trail")
 	if run.party_heroes().is_empty():

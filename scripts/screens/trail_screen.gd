@@ -99,7 +99,7 @@ func setup(_params: Dictionary) -> void:
 	if _has_story(run.current_node()):
 		call_deferred("_show_story", run.current_node(), Callable())
 		return
-	if run.day == 1 and run.current == 0:
+	if run.day == 1 and run.current == 0 and run.region().get("tutorial", false):
 		Main.inst.toast("Click a glowing stop on the map to travel on. Hover a stop to see what's there.")
 	# Arrived somewhere that hasn't been dealt with yet (e.g. after loading a save).
 	if not run.current_node().done:
@@ -148,7 +148,7 @@ func refresh() -> void:
 		_make_walkers()
 		refresh())
 	UI.clear(item_row)
-	item_row.add_child(UI.lbl("Wagon: %d of %d slots  (click to use)" % [Inventory.slots_used(run.cargo()), Inventory.capacity()], 16, "Bold"))
+	item_row.add_child(UI.lbl("Wagon: %d / %d slots" % [Inventory.slots_used(run.cargo()), Inventory.capacity()], 16, "Bold"))
 	var grid := InventoryGrid.make(run.cargo(), 50.0, 8, func(it: String):
 		if DB.items.get(it, {}).get("cargo", false):
 			return "Building material, carried home for your settlements."

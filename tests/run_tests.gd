@@ -1572,7 +1572,8 @@ func test_skill_checks() -> void:
 			h.survival[sk] = {"rank": skills[sk], "xp": 0}
 		co.heroes.append(h)
 		return h
-	var run := RunState.create(co, "tallgrass", 0, [co.heroes[0].uid], {"food": 10})
+	# A tier 2 region (base 3, ceiling 4); the first region is checked below.
+	var run := RunState.create(co, "red_canyons", 0, [co.heroes[0].uid], {"food": 10})
 	co.run = run
 	var pr: Hero = mk.call("preacher")
 	var gb: Hero = mk.call("gambler")
@@ -1584,6 +1585,8 @@ func test_skill_checks() -> void:
 	check(run.curio_check("strongbox", bf).difficulty == 4, "Butterfingers at a lock: difficulty 4")
 	check(run.curio_check("railroad_crate", mm).difficulty == 4, "✗ Mountain Mystic at the railroad crate: difficulty 4")
 	check(run.curio_check("miners_cache", mn).difficulty == 2, "Miner rank 3 at the cache: difficulty 2")
+	var run1 := RunState.create(co, "tallgrass", 0, [co.heroes[0].uid], {"food": 10})
+	check(run1.curio_check("strongbox", pr).difficulty == 2 and run1.curio_check("strongbox", bf).difficulty == 2 and run1.curio_check("strongbox", gb).difficulty == 1, "the first region: base 2, never above 2")
 	check(run.curio_check("strongbox", pr, "shovel").is_empty(), "a supply skips the check")
 	check(run.curio_check("old_grave", pr).is_empty(), "an as-key expert (Preacher at a grave) skips the check")
 	check(run.curio_check("scarecrow", pr).is_empty(), "curios without a check roll as before")
@@ -1620,7 +1623,7 @@ func test_round9_town() -> void:
 	co.do_activity(0, "hiring_board", "porch", a)
 	check(a.fatigue >= 45 and a.fatigue < 60, "the porch takes off up to 15 Fatigue (now %d)" % a.fatigue)
 	check(co.can_do_activity(0, "hiring_board", "porch", b) != "", "the porch has one seat a week")
-	check(int(DB.cfg("xp_levels", [])[1]) == 19, "XP thresholds +25% (level 2 at 19)")
+	check(int(DB.cfg("xp_levels", [])[1]) == 24 and int(DB.cfg("xp_levels", [])[2]) == 80, "XP thresholds: level 2 at 24, level 3 at 80 (round 17: slower)")
 	var base := co.roster_cap()
 	co.settlement(0)["tracks"] = {"hiring_board": {"bunks": 1}}
 	check(co.roster_cap() == base + 4, "first Bunkhouse: +4 bunks (%d -> %d)" % [base, co.roster_cap()])

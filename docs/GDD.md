@@ -173,7 +173,7 @@ become townsfolk and townsfolk never ride out.
   plus two random others `[starting_moves, stock_moves]`, learns the rest at the Drill Hall,
   and equips 4.
 - **Look**: each class has three color **outfits**; a hero rolls one, plus skin and hair.
-- **Level** 1-5 from XP at `[xp_levels]` 15 / 45 / 90 / 150. XP: 1 per stop, 2 per elite,
+- **Level** 1-5 from XP at `[xp_levels]` 24 / 80 / 160 / 260. XP: 1 per stop, 2 per elite,
   5 per boss. Each level above 1: +12% max HP, +5% damage, +3 accuracy, +1% crit
   `[level_*]`. Level caps gear and move levels.
 - **Gear**: weapon and armor tiers 1-5 (Smithy; a tier needs that hero level). Weapon +12%

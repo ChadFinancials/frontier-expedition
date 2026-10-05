@@ -34,11 +34,11 @@ func _build() -> void:
 	head.add_child(UI.btn("Close", func(): Main.inst.close_modal(wrap), "Small"))
 	var st := co.settlement(index)
 	var tier := co.tier_info(st.tier)
-	var lines: Array = ["Living here: [b]%d of %d[/b] (a %s houses %d)." % [co.population(index), co.housing(index), tier.name, co.housing(index)]]
+	var lines: Array = ["Living here: [b]%d of %d[/b]" % [co.population(index), co.housing(index)]]
 	var wages := 0
 	for p in co.townsfolk_at(index):
 		wages += Townsfolk.wage(p)
-	lines.append("Wages: [b]%d chips a week[/b], paid at the start of each week. Unpaid for %d weeks in a row, they leave." % [wages, int(DB.townsfolk.get("unpaid_leave_weeks", 2))])
+	lines.append("Wages: [b]%d chips a week[/b]" % wages)
 	var nt := co.next_tier(st.tier)
 	if not nt.is_empty() and int(nt.get("population", 0)) > 0:
 		lines.append("Growing to a %s takes %d townsfolk living here." % [nt.name, int(nt.population)])

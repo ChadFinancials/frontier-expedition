@@ -82,7 +82,7 @@ func _build() -> void:
 	mid.custom_minimum_size.x = 640
 	root.add_child(mid)
 	mid.add_child(UI.hdr("Combat Skills  (%d/4 equipped, %d/%d learned)" % [h.equipped.size(), h.known.size(), h.cls().get("skills", []).size()], 24, true))
-	mid.add_child(UI.lbl("Click a skill to equip or unequip it. Pips: gold = ranks it can be used from (4-3-2-1), red = enemy ranks it reaches (1-2-3-4).", 16, "Ink"))
+	mid.add_child(UI.lbl("Equip up to 4. Gold pips: ranks it's used from. Red: ranks it reaches.", 16, "Ink"))
 	for sid in h.cls().get("skills", []):
 		mid.add_child(_skill_row(sid))
 	mid.add_child(UI.lbl("Preferred ranks: %s" % ", ".join(h.cls().get("ranks", []).map(func(x): return str(x))), 18, "Ink"))
