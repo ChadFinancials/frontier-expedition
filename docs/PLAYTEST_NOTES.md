@@ -27,7 +27,9 @@ every round.
   to its guardian).
   - Also fixed for Hammer Frenzy, Poison Darts, Gas Cloud, Sticky Frog and the enemies' random
     volleys (Double Tap, Fan of Knives, Crane's Fusillade and others).
-  - Single-target multi-hit moves still stop when their target dies.
+  - Owner: every multi-hit move should land all its hits. Twin Shots (two shots at one
+    target) now sends its second shot to another valid target if the first kills its
+    target. Area moves are unchanged; they already hit everything in reach.
 - **Mad Dog's hideout:** "good and challenging". The standoff before the boss fight is "fun
   and a great mechanic" (owner). Other bosses getting a standoff stays in the backlog.
 

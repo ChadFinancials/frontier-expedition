@@ -754,13 +754,16 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 		"sfx": sk.get("sfx", ""), "hostile": is_hostile(sk)})
 
 	var crit_any := false
-	var random_pick: bool = sk.get("random_hits", 0) > 0 or sk.get("random_targets", 0) > 0
+	# Every multi-hit move lands all its hits while a valid target stands: random volleys,
+	# and repeated shots at one target (Twin Shots) once that target falls.
+	var random_pick: bool = sk.get("random_hits", 0) > 0 or sk.get("random_targets", 0) > 0 \
+		or (is_hostile(sk) and not sk.get("aoe", false) and int(sk.get("hits", 1)) > 1)
 	var hit_ids: Array = []
 	for i in targets.size():
 		var t: Combatant = targets[i]
 		if t.dead and random_pick:
-			# A random shot whose pick already fell (an earlier hit killed it, or cleared its
-			# bones) finds another target instead of going to waste.
+			# A shot whose target already fell (an earlier hit killed it, or cleared its bones)
+			# finds another valid target instead of going to waste.
 			t = _repick(a, sid, hit_ids if sk.get("random_targets", 0) > 0 else [])
 			if t == null:
 				continue

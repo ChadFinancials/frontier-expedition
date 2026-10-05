@@ -289,6 +289,10 @@ Every move with its numbers: `HERO_REVIEW.md` (generated from the data).
 - Enemy tiers scale HP, damage, accuracy, dodge, resistances and effect chance per region
   tier `[tier_*]`. Bosses are not scaled.
 
+- **Multi-hit moves land every hit:** a random volley (Fan the Hammer, Poison Darts, enemy
+  volleys) or a repeated shot (Twin Shots) whose target has already fallen moves to another
+  valid target, bones included.
+
 ### Last Legs
 - A hero at 0 HP is on **Last Legs** (code: `deaths_door`). Further damage (bleed and poison
   too) rolls to **Cheat Death** (code: `deathblow`): 67% to survive, capped at 87%

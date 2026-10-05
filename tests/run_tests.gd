@@ -2620,4 +2620,24 @@ func test_random_hits_repick() -> void:
 		if swings >= 3:
 			full += 1
 	check(full == tries, "Fan the Hammer always fires all three shots (%d of %d volleys)" % [full, tries])
+	# Twin Shots: when its target falls to the first shot, the second finds another.
+	gs.known = ["gs_twin"]
+	gs.equipped = ["gs_twin"]
+	var both := 0
+	for k in 30:
+		var e2 := CombatEngine.new()
+		var r2 := RandomNumberGenerator.new()
+		r2.seed = 2000 + k
+		e2.setup([gs], ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], {"rng": r2})
+		var c2: Combatant = e2.heroes[0]
+		var pile: Combatant = e2.enemies.filter(func(x): return x.rank == 2)[0]
+		pile.corpse = true   # bones in rank 2: the first shot clears them
+		pile.hp = 1
+		for x in e2.enemies:
+			if x != pile:
+				x.hp = 999
+		var ev2 := e2.use_skill(c2, "gs_twin", pile.id)
+		if ev2.filter(func(x): return x.t in ["hit", "miss"] and int(x.get("actor", -1)) == c2.id and int(x.get("target", -1)) != c2.id).size() >= 2:
+			both += 1
+	check(both == 30, "Twin Shots always fires both shots (%d of 30)" % both)
 	gs.hp = gs.max_hp()
