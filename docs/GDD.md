@@ -421,12 +421,14 @@ retired in round 7; the Shovel took its curios.)
 ### High Noon (duels)
 - A two-part duel (`scripts/core/duel.gd` scores it; `scripts/ui/high_noon.gd` plays it; tuning
   in config `duel`).
-  1. **The Draw:** a 1.5-4 s wait, maybe a false cue (a caw, a tumbleweed), then DRAW! and
+  1. **The Draw:** a 1.5-8 s wait, maybe a false cue (a caw, a tumbleweed), then DRAW! and
      the bell. Click or press Space. Too early: jumped the gun.
-  2. **The Aim:** a sight swings over a bar. Zones from the centre: bullseye 4%, hit 14%,
-     graze 30% of the bar; the rest misses.
-- **The hero's edge** against the opponent's draw time (0.55 s outlaw, 0.45 s Pike, 0.50 s
-  Mad Dog): Gunslinger -0.10 s, Marshal -0.05 s, Quick Draw levels, Speed above 4.
+  2. **The Aim:** a sight swings over a bar from a random start, and its pace wanders
+     (0.65-1.45× its speed, changing every 0.25-0.6 s). Zones from the centre: bullseye 3%,
+     hit 10%, graze 22% of the bar; the rest misses. Take the shot within 4 s `[aim_time]` or
+     it goes wide (a miss).
+- **The hero's edge** against the opponent's draw time (0.48 s outlaw leader and hangman,
+  0.44 s the Lone Wanderer, 0.45 s Mad Dog, 0.40 s Pike): Gunslinger -0.10 s, Marshal -0.05 s, Quick Draw levels, Speed above 4.
 - **Aim zones:** Gunslinger ×1.4, Marshal ×1.2, Eagle Eye ×1.2, Bounty Hunter ×1.1,
   Butterfingers ×0.75, Accuracy ±10%.
 - **Quirks:** Jumpy gets an extra false cue, Drinker a wobbly sight, Hard of Hearing no bell.
@@ -452,10 +454,10 @@ retired in round 7; the Shovel took its curios.)
 
   | Game | How it plays | Curios |
   |---|---|---|
-  | Tumblers | Stop a sweeping needle on the notch, 3 pins | Strongbox, Railroad Crate |
+  | Tumblers | Stop a sweeping needle on the notch, 3 pins; Space or a click anywhere. Each pin lights green or red | Strongbox, Railroad Crate |
   | Pattern | Repeat 4-7 flashed arrows | Standing Stone, Lonely Grave |
-  | Quick hands | Press each shown key before its ring closes | Collapsed Tunnel, Abandoned Wagon |
-  | Steady hand | Hold to keep a marker in a drifting band for 4 s | Prairie Well, Miner's Cache |
+  | Quick hands | Type each letter (A-Z) before its ring closes: 1.1 / 0.9 / 0.75 / 0.65 / 0.55 s by difficulty | Collapsed Tunnel, Abandoned Wagon |
+  | Steady hand | Hold to keep a marker in a band for 5 s. The band moves like a hooked fish: it rests, then glides to a new spot, now and then darting (more often at higher difficulty) | Prairie Well, Miner's Cache |
 
 - **Difficulty 1-5:** base 3. A ★ class or good quirk -1; a skill expert -1 at rank 2+; a ✗
   +1. Game quirks (config `check_quirks`): Butterfingers +1 at locks and steady hands, Keen-Eyed

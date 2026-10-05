@@ -4,7 +4,8 @@ extends Control
 ## for the scoring). Opens as a modal; calls back with {"tier", "slow", "reaction", "pos"}.
 ##   1. Wait for "DRAW!" (false cues first), then click or press Space. Too early: jumped.
 ##      Too late: they fire first (the hero takes a hit; the aim zones shrink).
-##   2. A sight swings across the aim bar; click or Space to fire.
+##   2. A sight swings across the aim bar, speeding up and slowing down; click or Space to
+##      fire. Hold too long (config aim_time) and the shot goes wide.
 
 signal finished(result: Dictionary)
 
@@ -28,6 +29,11 @@ var reaction := -1.0
 var zones: Dictionary = {}
 var sight := 0.0
 var speed := 1.0
+var aim_phase := 0.0          # the sight's swing, advanced at a pace that wanders
+var pace := 1.0               # current multiple of speed
+var pace_to := 1.0            # the pace it's easing toward
+var pace_t := 0.0             # seconds until a new pace is picked
+var aim_time := 4.0
 var pos := 0.5
 var tier := ""
 var flash := {"hero": 0.0, "opp": 0.0}
@@ -61,6 +67,7 @@ func _ready() -> void:
 	opp_fire = float(duel.get("draw", 0.55)) + Duel.edge(hero)
 	zones = Duel.zones(hero, false)
 	speed = Duel.sight_speed(hero, int(duel.get("tier", 1)))
+	aim_time = float(c.get("aim_time", 4.0))
 	headline = "High Noon"
 	subline = "%s faces %s. When the bell rings and DRAW! shows, click or press Space. Not before." % [hero.hero_name, duel.get("name", "the stranger")]
 	buttons = UI.hb(12)
@@ -177,11 +184,29 @@ func _process(delta: float) -> void:
 			if t >= 0.9:
 				phase = "aim"
 				t = 0.0
+				# Start the swing at a random point, so the first pass can't be learned.
+				aim_phase = rng.randf()
 				headline = "Aim"
 				subline = "Click or press Space to fire."
 		"aim":
+			# The sight's pace wanders: it eases toward a new speed every fraction of a second.
+			pace_t -= delta
+			if pace_t <= 0.0:
+				var dc := Duel.cfg()
+				var pw: Array = dc.get("sight_wobble", [0.65, 1.45])
+				var pe: Array = dc.get("sight_wobble_every", [0.25, 0.6])
+				pace_to = rng.randf_range(float(pw[0]), float(pw[1]))
+				pace_t = rng.randf_range(float(pe[0]), float(pe[1]))
+			pace = lerpf(pace, pace_to, minf(1.0, delta * 6.0))
+			aim_phase += delta * speed * pace
 			var wob := 0.02 * sin(t * 13.0) if "drinker" in hero.quirks else 0.0
-			sight = clampf(0.5 + 0.5 * sin(t * speed * TAU) + wob, 0.0, 1.0)
+			sight = clampf(0.5 + 0.5 * sin(aim_phase * TAU) + wob, 0.0, 1.0)
+			if t >= aim_time:
+				# Held too long: the moment passes and the shot goes wide.
+				pos = sight
+				tier = "miss"
+				Audio.play("gunshot", 0.7)
+				_finish("Held too long", "%s's hand shakes and the shot goes wide." % hero.hero_name)
 	queue_redraw()
 
 
@@ -226,7 +251,7 @@ func _draw() -> void:
 	if cue_t > 0.0 and phase == "wait":
 		draw_string(f, Vector2(0, 150), cue_text, HORIZONTAL_ALIGNMENT_CENTER, W, 30, Color(0.17, 0.11, 0.08, cue_t))
 	var hs := 64 if headline == "DRAW!" else 44
-	var hc := Color("#a8392e") if headline in ["DRAW!", "Too slow!", "Jumped the gun!", "Missed"] else Color("#2a1d14")
+	var hc := Color("#a8392e") if headline in ["DRAW!", "Too slow!", "Jumped the gun!", "Missed", "Held too long"] else Color("#2a1d14")
 	draw_string(f, Vector2(0, 225 if headline == "DRAW!" else 130), headline, HORIZONTAL_ALIGNMENT_CENTER, W, hs, hc)
 	draw_string(f, Vector2(40, STREET_H + 60), subline, HORIZONTAL_ALIGNMENT_CENTER, W - 80, 22, Color("#2a1d14"))
 	# The aim bar: miss at the edges, then graze, hit, bullseye at the centre.
@@ -240,3 +265,10 @@ func _draw() -> void:
 		var sx := BAR.position.x + BAR.size.x * (pos if phase == "result" else sight)
 		draw_colored_polygon(PackedVector2Array([Vector2(sx - 12, BAR.position.y - 18), Vector2(sx + 12, BAR.position.y - 18), Vector2(sx, BAR.position.y - 2)]), Color("#2a1d14"))
 		draw_line(Vector2(sx, BAR.position.y), Vector2(sx, BAR.end.y), Color("#2a1d14"), 3)
+		# The time left to take the shot.
+		if phase == "aim":
+			var left := maxf(0.0, aim_time - t)
+			var lc := Color("#a8392e") if left < 1.0 else Color("#2a1d14")
+			var tw := (BAR.size.x * 0.3) * left / maxf(0.01, aim_time)
+			draw_rect(Rect2(BAR.get_center().x - tw / 2, BAR.end.y + 10, tw, 8), lc)
+			draw_string(UI.font_bold, Vector2(BAR.end.x + 12, BAR.get_center().y + 8), "%.1f" % left, HORIZONTAL_ALIGNMENT_LEFT, 80, 24, lc)

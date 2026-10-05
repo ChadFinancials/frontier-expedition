@@ -85,6 +85,30 @@ decided, and what shipped. Update both at the end of every round.
 
 ## History
 
+### Round 16: High Noon and skill checks in the dev lab (owner)
+- **High Noon:**
+  - Smaller good zones: bullseye 4→3%, hit 14→10%, graze 30→22%.
+  - The sight's pace now wanders instead of swinging smoothly, and it starts at a random
+    point.
+  - 4 s to take the shot, or it goes wide. A countdown shows under the bar.
+  - The owner reacts in about 0.26 s, so opponents draw a little quicker: leader and hangman
+    0.55→0.48, Pike 0.45→0.40, Mad Dog 0.50→0.45, the Lone Wanderer 0.50→0.44, the lab's
+    fast gun 0.32→0.30.
+  - The wait before DRAW is now 1.5-8 s (was 1.5-4).
+- **Tumblers:**
+  - A missed pin's light turns red.
+  - The needle flashes green on a hit and red on a miss.
+  - A click anywhere counts.
+  - Difficulty 4 and 5 eased: notch 17→20° and 12→17°, sweeps 1.0→0.95 and 1.2→1.05.
+- **Pattern:** felt right; no change.
+- **Quick hands:**
+  - Letters A-Z instead of arrows.
+  - The ring closes faster: 1.4/1.2/1.0/0.85/0.7 → 1.1/0.9/0.75/0.65/0.55 s.
+- **Steady hand:** reworked like Stardew's fishing.
+  - The band rests for 0.8 s, then glides to new spots, easing in and out.
+  - It sometimes darts (0-40% of moves by difficulty).
+  - Top speed is 0.16-0.36 bar heights a second by difficulty, and the check lasts 5 s.
+
 ### Round 15: the wagon and the town (owner's direction)
 - Brainstorm on the wagon and the town. The owner's picks:
   - **Wagon:** some enemies and battles target the wagon in the back (condition or cargo

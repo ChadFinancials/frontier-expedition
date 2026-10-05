@@ -7,10 +7,10 @@ extends RefCounted
 const CLASSES := ["gunslinger", "marshal", "preacher", "rail_driver", "gambler"]
 const QUIRKS := ["eagle_eye", "outlaw_hunter", "butterfingers", "jumpy", "drinker", "hard_of_hearing"]
 const OPPONENTS := [
-	{"name": "Outlaw leader", "draw": 0.55, "tier": 1},
-	{"name": "Mad Dog Mulligan (boss)", "draw": 0.50, "tier": 1, "kind": "boss"},
-	{"name": "Snake-Eye Pike", "draw": 0.45, "tier": 2},
-	{"name": "A fast gun (later regions)", "draw": 0.32, "tier": 3},
+	{"name": "Outlaw leader", "draw": 0.48, "tier": 1},
+	{"name": "Mad Dog Mulligan (boss)", "draw": 0.45, "tier": 1, "kind": "boss"},
+	{"name": "Snake-Eye Pike", "draw": 0.40, "tier": 2},
+	{"name": "A fast gun (later regions)", "draw": 0.30, "tier": 3},
 ]
 
 const GAMES := ["tumblers", "pattern", "quick", "steady"]

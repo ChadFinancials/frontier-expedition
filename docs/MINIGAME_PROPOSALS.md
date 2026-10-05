@@ -1,6 +1,6 @@
 # Hands-on moments: High Noon duels and skill checks (proposal)
 
-Status: **✅ both built** (High Noon and the curio skill checks; round 3 picks below). Tuning numbers are in config `duel` and `checks`.
+Status: **✅ both built** (High Noon and the curio skill checks; round 3 picks below), then retuned after the owner's lab playtest (PLAYTEST_NOTES round 16). The numbers below are the original proposal; the current ones are in `GDD.md` and config `duel` and `checks`.
 
 Owner's round 3 picks:
 - The Lone Wanderer is a duel for pride only: no recruit, no wager.

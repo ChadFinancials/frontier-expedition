@@ -38,6 +38,7 @@ static func run(main: Main, args: Dictionary) -> void:
 				sc.t = float(args.get("t", "0.3"))
 				if sc.game == "tumblers":
 					sc.pin = 1
+					sc.pin_ok = [false]
 				elif sc.game == "pattern" and sc.t > sc.show_time:
 					sc.typed = [sc.seq[0], "left" if sc.seq[1] != "left" else "up"]
 				elif sc.game == "steady":
@@ -60,6 +61,7 @@ static func run(main: Main, args: Dictionary) -> void:
 				hn.opp_fire = 99.0
 			elif ph in ["aim", "result"]:
 				hn.phase = "aim"
+				hn.t = 0.0
 				hn.headline = "Aim"
 				hn.subline = "Click or press Space to fire."
 				if ph == "result":

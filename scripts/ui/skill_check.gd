@@ -2,10 +2,11 @@ class_name SkillCheck
 extends Control
 ## A hands-on curio check (see RunState.curio_check). Four games, each 5-10 seconds, tuned by
 ## difficulty 1-5 from config "checks":
-##   tumblers  a needle sweeps a dial; press Space or click as it crosses the notch (3 pins)
+##   tumblers  a needle sweeps a dial; press Space or click anywhere as it crosses the notch
 ##   pattern   arrows flash, then type them back (arrow keys or WASD, or click the arrows)
-##   quick     a key pops up inside a closing ring; press it before the ring closes
-##   steady    hold Space or the mouse to lift the marker; keep it inside the drifting band
+##   quick     a letter A-Z pops up inside a closing ring; type it before the ring closes
+##   steady    hold Space or the mouse to lift the marker; keep it inside the band, which
+##             wanders: it rests, then glides (or darts) to a new spot, like a hooked fish
 ## Calls back with "clean", "close" or "botched".
 
 signal finished(result: String)
@@ -38,6 +39,8 @@ var notch := 0.0
 var notch_w := 20.0
 var sweeps := 0.8
 var pin_flash := 0.0
+var pin_hit := false           # the last press: on the notch (green flash) or not (red)
+var pin_ok: Array = []         # per pin: true on the notch, false a miss
 # pattern
 var seq: Array = []
 var typed: Array = []
@@ -45,7 +48,7 @@ var show_time := 2.0
 # quick
 var prompts := 3
 var prompt_i := 0
-var prompt_dir := "up"
+var prompt_letter := "A"
 var window := 1.0
 var prompt_t := 0.0
 var gap := 0.0
@@ -58,6 +61,10 @@ var drift := 0.3
 var holding := false
 var out_time := 0.0
 var seconds := 4.0
+var zone_to := 0.5             # where the band is heading
+var zone_v := 0.0              # its speed (bar heights a second)
+var zone_max := 0.25           # top speed for this move
+var zone_wait := 0.8           # seconds until it picks a new spot
 
 
 ## Opens a check {"game", "difficulty", "title", "text"}; cb gets "clean", "close" or "botched".
@@ -93,10 +100,10 @@ func _ready() -> void:
 	game = str(check.get("game", "tumblers"))
 	d = clampi(int(check.get("difficulty", 3)), 1, 5)
 	headline = str(check.get("title", "A careful job"))
-	var how := {"tumblers": "Press Space or click when the needle crosses the notch. Three pins.",
+	var how := {"tumblers": "Press Space or click anywhere when the needle crosses the notch. Three pins.",
 		"pattern": "Watch the arrows, then type them back (arrow keys or WASD, or click them).",
-		"quick": "Press the key shown before its ring closes (arrow keys or WASD, or click them).",
-		"steady": "Hold Space or the mouse to lift the marker. Keep it inside the band."}
+		"quick": "Type the letter shown before its ring closes.",
+		"steady": "Hold Space or the mouse to lift the marker. Keep it inside the band as it wanders."}
 	subline = "%s\n%s   Difficulty %d of 5." % [check.get("text", ""), how.get(game, ""), d]
 	buttons = UI.hb(12)
 	buttons.position = Vector2(W / 2 - 100, H - 68)
@@ -125,11 +132,14 @@ func _begin() -> void:
 			window = float(_cfg("window", 1.0))
 			_next_prompt()
 		"steady":
-			seconds = float(_cfg("seconds", 4.0))
+			seconds = float(_cfg("seconds", 5.0))
 			zone_h = float(_cfg("zone", 0.25))
-			drift = float(_cfg("drift", 0.3))
+			drift = float(_cfg("speed", 0.25))
+			zone_c = 0.5
+			zone_to = 0.5
+			zone_wait = float(_cfg("calm", 0.8))
 			subline = "Hold steady..."
-	if game in ["pattern", "quick"]:
+	if game == "pattern":
 		arrow_row = UI.hb(10)
 		arrow_row.position = Vector2(W / 2 - 190, H - 84)
 		add_child(arrow_row)
@@ -149,7 +159,7 @@ func _begin() -> void:
 			ab.add_child(gl)
 			ab.focus_mode = Control.FOCUS_NONE
 			arrow_row.add_child(ab)
-		arrow_row.visible = game == "quick"
+		arrow_row.visible = false
 
 
 func _new_notch() -> void:
@@ -157,7 +167,9 @@ func _new_notch() -> void:
 
 
 func _next_prompt() -> void:
-	prompt_dir = Stats.pick(rng, DIRS)
+	var last := prompt_letter
+	while prompt_letter == last:
+		prompt_letter = char(rng.randi_range(KEY_A, KEY_Z))
 	prompt_t = 0.0
 	subline = "%d of %d" % [prompt_i + 1, prompts]
 
@@ -175,20 +187,25 @@ func _input(event: InputEvent) -> void:
 		if game == "tumblers" and event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
 			get_viewport().set_input_as_handled()
 			_tumbler_press()
-		elif game in ["pattern", "quick"] and KEY_DIR.has(event.keycode):
+		elif game == "pattern" and KEY_DIR.has(event.keycode):
 			get_viewport().set_input_as_handled()
 			_dir_pressed(KEY_DIR[event.keycode])
+		elif game == "quick" and event.keycode >= KEY_A and event.keycode <= KEY_Z:
+			get_viewport().set_input_as_handled()
+			_letter_pressed(char(event.keycode))
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if game == "steady":
 			holding = event.pressed
 			get_viewport().set_input_as_handled()
-		elif game == "tumblers" and event.pressed and ARENA.has_point(get_local_mouse_position()):
+		elif game == "tumblers" and event.pressed:
 			get_viewport().set_input_as_handled()
 			_tumbler_press()
 
 
 func _tumbler_press() -> void:
-	if absf(needle - notch) <= notch_w / 2.0:
+	pin_hit = absf(needle - notch) <= notch_w / 2.0
+	pin_ok.append(pin_hit)
+	if pin_hit:
 		Audio.play("click")
 	else:
 		slips += 1
@@ -216,13 +233,17 @@ func _dir_pressed(dir: String) -> void:
 		typed.append(dir)
 		if typed.size() >= seq.size():
 			_done()
-	elif game == "quick" and gap <= 0.0:
-		if dir == prompt_dir:
-			Audio.play("click")
-		else:
-			slips += 1
-			Audio.play("clang", 0.6)
-		_advance_prompt()
+
+
+func _letter_pressed(letter: String) -> void:
+	if phase != "play" or gap > 0.0:
+		return
+	if letter == prompt_letter:
+		Audio.play("click")
+	else:
+		slips += 1
+		Audio.play("clang", 0.6)
+	_advance_prompt()
 
 
 func _advance_prompt() -> void:
@@ -279,12 +300,32 @@ func _process(delta: float) -> void:
 				marker = clampf(marker + vel * delta, 0.0, 1.0)
 				if marker <= 0.0 or marker >= 1.0:
 					vel = 0.0
-				zone_c = 0.5 + 0.3 * sin(t * drift * TAU) + (0.06 * sin(t * 5.3) if d >= 4 else 0.0)
+				_move_zone(delta)
 				if absf(marker - zone_c) > zone_h / 2.0:
 					out_time += delta
 				if t >= seconds:
 					_done()
 	queue_redraw()
+
+
+## The band behaves like a hooked fish: it rests, then picks a new spot and glides there,
+## easing in and out; sometimes (more often at higher difficulty) it darts instead.
+func _move_zone(delta: float) -> void:
+	zone_wait -= delta
+	var half := zone_h / 2.0
+	if zone_wait <= 0.0:
+		var dart := rng.randf() * 100.0 < float(_cfg("dart", 20))
+		var reach := rng.randf_range(0.15, 0.45) * (1.3 if dart else 1.0)
+		zone_to = clampf(zone_c + reach * (1.0 if rng.randf() < 0.5 else -1.0), half, 1.0 - half)
+		# Near an edge it heads back the other way.
+		if absf(zone_to - zone_c) < 0.08:
+			zone_to = clampf(1.0 - zone_c, half, 1.0 - half)
+		zone_max = drift * (rng.randf_range(1.8, 2.4) if dart else rng.randf_range(0.6, 1.2))
+		zone_wait = float(_cfg("hold", 1.2)) * rng.randf_range(0.6, 1.4) * (0.6 if dart else 1.0)
+	# Ease toward the target: speed up gently, slow down on arrival.
+	var want := clampf((zone_to - zone_c) * 3.0, -zone_max, zone_max)
+	zone_v = move_toward(zone_v, want, drift * 2.5 * delta)
+	zone_c = clampf(zone_c + zone_v * delta, half, 1.0 - half)
 
 
 func _draw() -> void:
@@ -311,10 +352,15 @@ func _draw() -> void:
 			var a1 := deg_to_rad(notch + notch_w / 2.0) - PI / 2.0
 			draw_arc(base, r - 8, a0, a1, 16, Color("#6e9a4a"), 16.0)
 			var na := deg_to_rad(needle) - PI / 2.0
-			draw_line(base, base + Vector2(cos(na), sin(na)) * (r + 10), Color("#a8392e") if pin_flash > 0 else ink, 4.0)
+			var ncol := ink
+			if pin_flash > 0:
+				ncol = Color("#4f8a2e") if pin_hit else Color("#a8392e")
+			draw_line(base, base + Vector2(cos(na), sin(na)) * (r + 10), ncol, 4.0 if pin_flash <= 0 else 6.0)
 			draw_circle(base, 8, ink)
 			for i in pins:
-				var col := Color("#6e9a4a") if i < pin else Color("#b9a27a")
+				var col := Color("#b9a27a")
+				if i < pin_ok.size():
+					col = Color("#6e9a4a") if pin_ok[i] else Color("#a8392e")
 				draw_circle(Vector2(c.x - (pins - 1) * 22 + i * 44, ARENA.position.y + 30), 12, col)
 		"pattern":
 			var showing := t < show_time and phase == "play"
@@ -333,7 +379,7 @@ func _draw() -> void:
 			if phase == "play" and gap <= 0.0:
 				var frac := 1.0 - prompt_t / window
 				draw_arc(c, 30 + 70 * frac, 0, TAU, 48, Color("#a8392e"), 5.0)
-				draw_string(f, Vector2(c.x - 60, c.y + 26), GLYPH[prompt_dir], HORIZONTAL_ALIGNMENT_CENTER, 120, 72, ink)
+				draw_string(f, Vector2(c.x - 60, c.y + 26), prompt_letter, HORIZONTAL_ALIGNMENT_CENTER, 120, 72, ink)
 		"steady":
 			var track := Rect2(c.x - 40, ARENA.position.y + 20, 80, ARENA.size.y - 40)
 			draw_rect(track, Color("#b9a27a"))

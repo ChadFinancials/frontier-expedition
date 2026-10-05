@@ -78,6 +78,7 @@ func _ready() -> void:
 	test_iron_justice()
 	test_high_noon()
 	test_skill_checks()
+	test_minigame_tuning()
 	test_townsfolk()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
@@ -2281,3 +2282,62 @@ func test_townsfolk() -> void:
 	old.erase("townsfolk")
 	var co4 := Company.from_dict(DB.normalize(JSON.parse_string(JSON.stringify(old))))
 	check(co4.townsfolk.is_empty() and co4.activity_relief(0, "saloon", "bar") == co.activity_relief(0, "saloon", "bar") - int(round(co.staff_value(0, "saloon"))), "an old save loads with no townsfolk and plain buildings")
+
+
+func test_minigame_tuning() -> void:
+	# Round 16 playtest: High Noon numbers.
+	var dc: Dictionary = DB.cfg("duel", {})
+	check(float(dc.wait[0]) == 1.5 and float(dc.wait[1]) == 8.0 and float(dc.get("aim_time", 0)) == 4.0, "the draw waits 1.5-8 s; 4 s to take the shot")
+	var z: Dictionary = dc.zones
+	check(float(z.bullseye) < float(z.hit) and float(z.hit) < float(z.graze) and float(z.graze) <= 0.22, "aim zones nest and are tighter (%s)" % z)
+	# Steady hand: the band rests, then glides; it never leaves the bar or jumps.
+	var sc := SkillCheck.new()
+	sc.game = "steady"
+	sc.d = 3
+	sc.rng.seed = 5
+	sc.zone_h = 0.25
+	sc.drift = 0.25
+	sc.zone_wait = 0.8
+	var lo := 1.0
+	var hi := 0.0
+	var fastest := 0.0
+	var moved_early := false
+	var prev := sc.zone_c
+	for i in 300:
+		sc._move_zone(1.0 / 60.0)
+		lo = minf(lo, sc.zone_c)
+		hi = maxf(hi, sc.zone_c)
+		fastest = maxf(fastest, absf(sc.zone_c - prev) * 60.0)
+		if i < 40 and absf(sc.zone_c - 0.5) > 0.001:
+			moved_early = true
+		prev = sc.zone_c
+	check(not moved_early, "the band rests at the start")
+	check(lo >= 0.125 - 0.0001 and hi <= 0.875 + 0.0001, "the band stays on the bar (%.2f-%.2f)" % [lo, hi])
+	check(hi - lo > 0.15, "the band wanders (%.2f)" % (hi - lo))
+	check(fastest < 0.7, "the band glides, never jumps (%.2f bar/s at most)" % fastest)
+	# Tumblers: a miss is recorded, so its pin shows red.
+	sc.game = "tumblers"
+	sc.pins = 3
+	sc.notch = 0.0
+	sc.notch_w = 20.0
+	sc.needle = 50.0
+	sc._tumbler_press()
+	sc.notch = 0.0
+	sc.needle = 2.0
+	sc._tumbler_press()
+	check(sc.pin_ok == [false, true] and sc.slips == 1, "tumbler pins remember misses and hits")
+	# Quick hands: letters.
+	sc.game = "quick"
+	sc.phase = "play"
+	sc.prompts = 4
+	sc.prompt_i = 0
+	sc.slips = 0
+	sc._next_prompt()
+	check(sc.prompt_letter.length() == 1 and sc.prompt_letter >= "A" and sc.prompt_letter <= "Z", "quick hands shows a letter (%s)" % sc.prompt_letter)
+	sc._letter_pressed(sc.prompt_letter)
+	check(sc.slips == 0 and sc.prompt_i == 1, "the right letter counts")
+	sc.gap = 0.0
+	sc._next_prompt()
+	sc._letter_pressed("A" if sc.prompt_letter != "A" else "B")
+	check(sc.slips == 1, "a wrong letter is a slip")
+	sc.free()
