@@ -98,9 +98,9 @@ Resists: stun 35, bleed 35, poison 35, move 40, debuff 35, deathblow 67
 |---|---|---|---|---|---|
 | ★ **Sic 'Em**: Biscuit the cattle dog goes for the ankles. Bleed; bonus against Marked targets. | 23 | one of 1234 | 92 | 5-8, +50% vs marked | bleed 2 x3 rounds |
 | ★ **Lasso**: Ropes a back-line enemy and hauls them forward. Pull 2 and Mark. | 234 | one of 34 | 94 | 2-3 | pull 2; mark 2 rounds |
-| **Hogtie**: Ties the enemy up like a calf at branding. Stuns. | 23 | one of 12 | 92 | 2-2 | stun; vulnerable +10 for 2 rounds |
+| **Hogtie**: Ties the enemy up like a calf at branding. Stuns. | 12 | one of 12 | 92 | 2-2 | stun; vulnerable +10 for 2 rounds |
 | **Crack the Whip**: A whip-crack over an ally's head (or their own): get moving! Gains Damage and Speed. | 234 | one ally in 1234 | - | - | dmg_flat +2 for 3 rounds; speed +2 for 3 rounds |
-| **Good Boy**: Biscuit trots over and leans on someone. Heals a little, and often takes the edge off. | 234 | one ally in 1234 | - | - | heals 2-5 HP; -2 to -5 fatigue (relief) (60%) |
+| **Good Boy**: Biscuit trots over and leans on someone. Heals a little, and often takes the edge off. | 123 | one ally in 1234 | - | - | heals 2-5 HP; -2 to -5 fatigue (relief) (60%) |
 | **Round 'Em Up**: A drover's whistle that gets everyone moving. The party gains Accuracy. | 1234 | whole party | - | - | acc +5 for 3 rounds |
 | **Snarl**: Biscuit bares every tooth he has at the front line. They back off a step: less Protection and Damage. | 12 | ALL of 12 | 97 | - | prot -5 for 3 rounds; dmg_flat -2 for 3 rounds |
 | **Lightspeed Whip**: Twenty feet of braided leather that reaches the very back. Bonus against Marked targets. | 23 | one of 4 | 92 | 5-10, +50% vs marked | - |

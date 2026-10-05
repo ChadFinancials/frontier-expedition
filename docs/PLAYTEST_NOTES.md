@@ -109,6 +109,8 @@ decided, and what shipped. Update both at the end of every round.
   hero move with a crit bonus (Iron Justice, Grizzly Chop, Quick Draw, Point Blank, Called
   Shot, Pickaxe, Scalpel Toss, Ride the Rods), and on the hero crit buffs (From the Shadows
   4→3, the King of Diamonds 8→7).
+- **Wrangler, more to do from rank 1:** Hogtie is used from ranks 1-2 (was 2-3), and Good
+  Boy from ranks 1-3 (was 2-4). Nothing else changes.
 
 ### Round 19 (week 6)
 - **Questionable Mushroom's poison:**
