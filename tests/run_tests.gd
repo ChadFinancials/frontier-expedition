@@ -1642,6 +1642,8 @@ func test_round9_town() -> void:
 	var base := co.roster_cap()
 	co.settlement(0)["tracks"] = {"hiring_board": {"bunks": 1}}
 	check(co.roster_cap() == base + 4, "first Bunkhouse: +4 bunks (%d -> %d)" % [base, co.roster_cap()])
+	co.settlement(0)["tracks"] = {"hiring_board": {"bunks": 2}}
+	check(co.roster_cap() == base + 8, "second Bunkhouse: +4 more (%d -> %d)" % [base, co.roster_cap()])
 
 
 ## Round 9 trinket pass: class trinkets (class lock, move bonuses) and the new hooks.

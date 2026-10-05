@@ -63,8 +63,8 @@
         "costs": [{"money": 500}, {"money": 1200}]},
       "reputation": {"name": "Word of Mouth", "desc": "Better recruits: a chance of higher levels, and better quirks.", "values": [0, 1, 2],
         "costs": [{"money": 700, "timber": 10, "iron": 6}, {"money": 1600, "timber": 20, "iron": 14}]},
-      "bunks": {"name": "Bunkhouse", "desc": "Bunks out back: room for more heroes in the company.", "values": [0, 4, 6],
-        "costs": [{"money": 600, "timber": 6, "hides": 3}, {"money": 700, "timber": 8, "hides": 4}]}
+      "bunks": {"name": "Bunkhouse", "desc": "Bunks out back: room for more heroes in the company.", "values": [0, 4, 8],
+        "costs": [{"money": 400, "timber": 4, "hides": 2}, {"money": 600, "timber": 6, "hides": 3}]}
     }},
   "stage_line": {"name": "Stage Line", "art": "stage", "order": 8, "unlock": {"settlements": 2},
     "desc": "A stable, a stagecoach and a driver who's seen it all. Sends heroes between settlements: one week per stop.",
