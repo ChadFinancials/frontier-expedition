@@ -33,11 +33,11 @@ decided, and what shipped. Update both at the end of every round.
   - More places for the wagon and resources to matter (materials already take wagon space;
     mishaps and events drain supplies).
 - [ ] **More to do before the Tallgrass Sea (round 17, owner's ideas, awaiting picks):**
-  - a Lone Wanderer rumor whose finale is a duel, not a fight
   - more Saloon rumor templates
   - short trips with a campfire halfway where you can head home early (supplies low, the
     wagon struggling) without the turn-back penalty
-- [ ] **Small heals for every class** (round 17): proposal in `HERO_PROPOSALS.md`.
+- [ ] **Small heals** (round 17-18): Flash the Badge is done. Still open: the Gambler or the
+      Gunslinger, and a party Questionable Mushroom.
 - [ ] Money: round 9 doubled every chip source (owner was running short: one quest paid about
       200, one bar visit and one move). Recheck after a few weeks of play; `chips_mult` in
       config scales all of it at once.
@@ -90,6 +90,21 @@ decided, and what shipped. Update both at the end of every round.
 ---
 
 ## History
+
+### Round 18: picks from round 17
+- Flash the Badge now heals 2-3.
+- **The Lone Wanderer's challenges:**
+  - A new one-level Saloon upgrade, the Stranger's Table (300 chips, 6 Timber, 2 Hides), puts
+    the challenge on the board on top of the chatter.
+  - Three chapters, each a short trip ending in a showdown duel: no gang and no fight. The
+    Wanderer draws 0.44, then 0.40, then 0.36 s.
+  - Win on a bullseye, hit or graze; a bullseye pays half again. A loss sends you home and the
+    challenge returns.
+  - The last chapter pays the Wanderer's Silver Dollar, which draws 0.05 s faster in High
+    Noon.
+- **Still open:**
+  - a heal for the Gambler or the Gunslinger (or neither)
+  - a party version of Questionable Mushroom
 
 ### Round 17 (week 5 with the main company)
 - **Skill checks:** at most difficulty 2 in the first region. Config `check_base` [2, 3, 3] and

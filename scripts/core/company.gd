@@ -1197,7 +1197,7 @@ func _roll_quests(st: Dictionary) -> void:
 		return
 	var count := int(track_value(i, "saloon", "chatter")) + staff_masters(i, "saloon")
 	var tier_l := int(track_value(i, "saloon", "tips"))
-	var templates: Array = DB.quests.get("templates", {}).keys().filter(func(k): return not story_flags.has(DB.quests.templates[k].get("done_flag", "-")))
+	var templates: Array = DB.quests.get("templates", {}).keys().filter(func(k): return quest_open(i, k) and not DB.quests.templates[k].get("extra", false))
 	# Until the company has run a side quest, the board offers an easy starter job (no story
 	# rumor, no boss) so there's a gentle trip before Dry Gulch and the Crow's Nest.
 	var starter := not story_flags.has("quest_run")
@@ -1215,6 +1215,32 @@ func _roll_quests(st: Dictionary) -> void:
 		quest_regions[qid] = reg
 		DB.regions[qid] = reg
 		st.quests.append(qid)
+	# Extra rumors (the Lone Wanderer's challenges) sit on the board on top of the chatter,
+	# one at a time, until they're done.
+	if not starter:
+		for k in DB.quests.templates:
+			if DB.quests.templates[k].get("extra", false) and quest_open(i, k):
+				var xid := "q_%d_%d_x" % [i, week]
+				var xreg := _make_quest(k, west, tier_l)
+				quest_regions[xid] = xreg
+				DB.regions[xid] = xreg
+				st.quests.append(xid)
+				break
+
+
+## Can this rumor template turn up at settlement i? Not once done; not before its story flag
+## (requires_flag) or its building track (requires_track {building: track}).
+func quest_open(i: int, tid: String) -> bool:
+	var t: Dictionary = DB.quests.templates.get(tid, {})
+	if story_flags.has(t.get("done_flag", "-")):
+		return false
+	if str(t.get("requires_flag", "")) != "" and not story_flags.has(str(t.requires_flag)):
+		return false
+	var rt: Dictionary = t.get("requires_track", {})
+	for bid in rt:
+		if track_level(i, bid, str(rt[bid])) < 1:
+			return false
+	return true
 
 
 ## Keeps only the quests still on offer somewhere or being played right now.
@@ -1268,7 +1294,8 @@ func _make_quest(tid: String, west: String, tier_l: int, starter: bool = false) 
 		"boss": {"name": str(b.get("name", "The Boss")), "landmark": place,
 			"intro": str(b.get("intro", "")).replace("{place}", place),
 			"victory": str(b.get("victory", "")).replace("{place}", place),
-			"enemies": b.get("enemies", t.get("final", [])), "duel": b.get("duel", {})},
+			"enemies": b.get("enemies", t.get("final", [])), "duel": b.get("duel", {}),
+			"showdown": b.get("showdown", false), "lose": str(b.get("lose", "")).replace("{place}", place)},
 		"crossing": {"name": str(t.name).replace("{place}", place), "enemies": t.get("final", [])},
 		"quest_reward": reward,
 		"done_flag": t.get("done_flag", ""), "boss_keepsake": t.get("boss_keepsake", ""),
@@ -1306,7 +1333,9 @@ static func quest_hints(reg: Dictionary) -> String:
 	if int(r.get("settler", 0)) > 0:
 		parts.append("a settler for your town")
 	var s := "Rumored reward: " + ", ".join(parts) + "."
-	if reg.get("final", "") == "boss":
+	if reg.get("final", "") == "boss" and reg.get("boss", {}).get("showdown", false):
+		s += " It ends in a showdown with " + str(reg.boss.name) + ": no gang, just the draw."
+	elif reg.get("final", "") == "boss":
 		s += " Word is there's a boss: " + str(reg.boss.name) + "."
 	return s
 

@@ -604,6 +604,8 @@ static func keepsake_effects(k: String) -> Array:
 		out.append("%s only" % DB.classes.get(d["class"], {}).get("name", d["class"]))
 	for m in d.get("mods", []):
 		out.append(Stats.mod_text(m))
+	if float(d.get("duel_edge", 0.0)) > 0.0:
+		out.append("High Noon: draws %.2f s faster" % float(d.duel_edge))
 	var words := {"dmg_pct": "%+d%% Damage", "acc": "%+d Accuracy", "crit": "%+d%% Crit",
 		"effect_chance": "%+d%% effect chance", "mark_rounds": "Marks %+d round", "dot": "%+d Bleed/Poison a turn",
 		"heal": "heals %+d", "heal_pct": "heals %+d%%", "move": "moves the target %+d more rank"}

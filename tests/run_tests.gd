@@ -80,6 +80,7 @@ func _ready() -> void:
 	test_skill_checks()
 	test_minigame_tuning()
 	test_townsfolk()
+	test_wanderer_quests()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -2344,3 +2345,66 @@ func test_minigame_tuning() -> void:
 	sc._letter_pressed("A" if sc.prompt_letter != "A" else "B")
 	check(sc.slips == 1, "a wrong letter is a slip")
 	sc.free()
+
+
+func test_wanderer_quests() -> void:
+	# Flash the Badge patches an ally up a little (round 17).
+	var fb: Array = DB.skill("marshal_flash_badge").effects.filter(func(e): return e.type == "heal")
+	check(fb.size() == 1 and int(fb[0].min) == 2 and int(fb[0].max) == 3, "Flash the Badge heals 2-3")
+	var co := Company.new()
+	co.new_game(51)
+	co.complete_tutorial()
+	co.story_flags["quest_run"] = true
+	co.money += 5000
+	co.timber += 50
+	co.hides += 20
+	var has_wanderer := func() -> String:
+		for q in co.settlement(0).quests:
+			if str(DB.regions[q].get("template", "")).begins_with("wanderer"):
+				return str(DB.regions[q].template)
+		return ""
+	co._refresh_settlement(co.settlement(0))
+	check(has_wanderer.call() == "", "no Wanderer rumor before the Stranger's Table")
+	var plain: int = co.settlement(0).quests.size()
+	check(co.upgrade_track(0, "saloon", "strangers_table"), "buy the Stranger's Table")
+	check(co.can_upgrade_track(0, "saloon", "strangers_table") != "", "the Stranger's Table is a single upgrade")
+	co._refresh_settlement(co.settlement(0))
+	check(has_wanderer.call() == "wanderer_1" and co.settlement(0).quests.size() == plain + 1, "chapter 1 appears on top of the usual chatter")
+	var qid: String = co.settlement(0).quests.filter(func(q): return str(DB.regions[q].template) == "wanderer_1")[0]
+	var reg: Dictionary = DB.regions[qid]
+	check(reg.final == "boss" and reg.boss.showdown and reg.boss.enemies.is_empty() and str(reg.boss.duel.kind) == "showdown", "it ends in a showdown, not a fight")
+	check(Company.quest_hints(reg).contains("showdown"), "the rumor says it ends in a showdown")
+	# Lose: driven back with nothing more; the rumor comes back.
+	var uids: Array = []
+	for h in co.heroes:
+		uids.append(h.uid)
+	var run := co.start_run(0, uids, {"food": 6}, qid)
+	check(run != null, "take the Wanderer's job")
+	run.current = run.nodes.size() - 1
+	var m0 := int(run.loot.money)
+	var lost := run.finish_showdown("miss")
+	check(not lost.won and run.driven_back and int(run.loot.money) == m0, "a miss loses the showdown: no reward")
+	var sm := co.finish_run("driven_back")
+	check(not co.story_flags.has("wanderer_1"), "chapter 1 isn't done after a loss")
+	co._refresh_settlement(co.settlement(0))
+	check(has_wanderer.call() == "wanderer_1", "the challenge comes back")
+	# Win with a bullseye: the reward plus half its chips again; chapter 2 opens.
+	qid = co.settlement(0).quests.filter(func(q): return str(DB.regions[q].template) == "wanderer_1")[0]
+	for h in co.heroes:
+		h.busy_weeks = 0
+	run = co.start_run(0, uids, {"food": 6}, qid)
+	run.current = run.nodes.size() - 1
+	var pay := int(DB.regions[qid].quest_reward.money)
+	var won := run.finish_showdown("bullseye")
+	check(won.won and run.boss_won and int(won.money) >= pay + int(pay * 0.5), "a bullseye wins with a bonus (%d for a %d purse)" % [int(won.money), pay])
+	co.finish_run("victory")
+	check(co.story_flags.has("wanderer_1"), "chapter 1 done")
+	co._refresh_settlement(co.settlement(0))
+	check(has_wanderer.call() == "wanderer_2", "chapter 2 follows")
+	# The last chapter pays the Silver Dollar, which quickens the draw.
+	check(str(DB.quests.templates.wanderer_3.get("boss_keepsake", "")) == "wanderers_dollar", "chapter 3 pays the Wanderer's Silver Dollar")
+	var gs: Hero = co.make_hero("gunslinger", 1)
+	var e0 := Duel.edge(gs)
+	gs.keepsakes.append("wanderers_dollar")
+	check(is_equal_approx(Duel.edge(gs) - e0, 0.05), "the Silver Dollar draws 0.05 s faster")
+	check(UI.keepsake_effects("wanderers_dollar").any(func(t): return str(t).contains("High Noon")), "its tooltip says so")

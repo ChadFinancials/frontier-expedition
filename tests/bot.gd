@@ -207,6 +207,12 @@ func resolve_node(r: RunState) -> void:
 			var won := false
 			var g := r.gang_fight(n)
 			var bd: Dictionary = r.region().get("boss", {}).get("duel", {}) if n.type == "boss" else {}
+			if n.type == "boss" and r.region().get("boss", {}).get("showdown", false):
+				# A showdown quest (the Lone Wanderer): the duel is the whole finale.
+				var sres := r.finish_showdown(str(bot_duel(r, bd).get("tier", "miss")))
+				if not sres.won:
+					r.status = "driven_back"
+				return
 			if not g.is_empty():
 				won = run_fight(r, g.enemies, n.type, "", g.reward, g.setup)
 			elif not bd.is_empty():

@@ -22,7 +22,7 @@ Resists: stun 50, bleed 35, poison 30, move 50, debuff 35, deathblow 67
 | **Serve a Warrant**: Names the target a wanted outlaw: Marked, and easier to hit. | 123 | one of 1234 | 102 | - | mark 3 rounds; dodge -10 for 3 rounds |
 | **Hold the Line**: Plants their boots. Taunts enemies into attacking the Marshal, gains Protection and sheds Fatigue. | 12 | self | - | - | taunt 2 rounds; prot +20 for 2 rounds; -4 fatigue (relief) |
 | **Weighted Shot**: A heavy-loaded round that hits like a mule's kick. Knocks the target back 2 ranks. | 12 | one of 12 | 92 | 2-4 | knockback 2 |
-| **Flash the Badge**: "By the authority of the Territory!" Shakes an ally free: clears stuns and every debuff, and hurries them along. | 123 | one ally in 1234 | - | - | cures stun/debuff; speed +2 for 3 rounds |
+| **Flash the Badge**: "By the authority of the Territory!" Shakes an ally free: clears stuns and every debuff, patches them up a little, and hurries them along. | 123 | one ally in 1234 | - | - | cures stun/debuff; heals 2-3 HP; speed +2 for 3 rounds |
 | **Armor-Piercing Rounds**: Thumbs steel-jacketed rounds into the cylinder. Attacks ignore 20% of the target's Protection. | 123 | self | - | - | pierce +20 for 3 rounds |
 
 Notes: 

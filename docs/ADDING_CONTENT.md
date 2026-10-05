@@ -354,9 +354,15 @@ expedition) and `tutorial_rebuilds` (the ruin that winning it restores).
 (`{place}` is filled in from `places`), `node_weights`, `fights`, `elites`, `final` (the last
 fight when there's no boss), `boss` (`name`, `intro`, `victory`, `enemies`), and optionally
 `always_boss`, `difficulty`, `bonus_hides` (extra Hides on the reward), `done_flag` (a story flag set when won; the rumor stops
-appearing) and `boss_keepsake`. `chances` sets the odds of a boss, a trinket, a recruit and a
+appearing) and `boss_keepsake`. Story chains: `requires_flag` (another rumor's `done_flag`
+first), `requires_track` (`{building: track}` bought at that settlement), `extra: true` (sits on
+the board on top of the chatter, one at a time). A boss with `showdown: true` and a `duel`
+(`kind: "showdown"`) ends the trip in a High Noon instead of a fight; `lose` is its losing
+line. `chances` sets the odds of a boss, a trinket, a recruit and a
 settler (a townsperson for the town) per Loose Lips level. Rumors borrow scenery, events and curios from the settlement's western
 region, scale to its tier, and use the painted set in config `quest_backdrop`.
+
+A trinket can carry `duel_edge` (seconds off the hero's High Noon reaction).
 
 ## Items
 

@@ -17,7 +17,13 @@ attack expects about 6-7 damage per turn and a good stun about 0.4-0.5 expected 
 
 ---
 
-## Round 17: a small heal for the classes without one (awaiting picks)
+## Round 17: a small heal for the classes without one
+
+Owner's picks (round 18):
+- **Flash the Badge** heals 2-3: built.
+- Gambler or Gunslinger: maybe one of them, still undecided.
+- Questionable Mushroom: the owner would rather widen it to the party (see below).
+
 
 The owner takes the Preacher on every expedition because almost nobody else can heal. These
 are small heals added to moves that already exist, so the Preacher and Frontier Doctor stay

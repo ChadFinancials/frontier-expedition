@@ -27,6 +27,9 @@ static func edge(h: Hero) -> float:
 	if h.class_id == "gunslinger":
 		e += float(c.get("quick_draw_per_level", 0.02)) * (h.skill_level("gs_quick_draw") - 1)
 	e += minf(float(c.get("speed_edge_cap", 0.05)), float(c.get("speed_edge", 0.01)) * maxf(0.0, h.stat("speed") - 4.0))
+	# Trinkets that quicken the draw (the Wanderer's Silver Dollar).
+	for k in h.keepsakes:
+		e += float(DB.keepsakes.get(k, {}).get("duel_edge", 0.0))
 	return e
 
 

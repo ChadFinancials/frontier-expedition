@@ -212,7 +212,7 @@ func _open_hero(h: Hero) -> void:
 func _travel(id: int, confirmed: bool = false) -> void:
 	if travelling or Main.inst.has_modal():
 		return
-	if not confirmed and run.node(id).type == "boss":
+	if not confirmed and run.node(id).type == "boss" and not run.region().get("boss", {}).get("showdown", false):
 		var lvl := 0.0
 		var hs := run.party_heroes()
 		for h in hs:
@@ -291,6 +291,10 @@ func _resolve_node() -> void:
 			var b: Dictionary = run.region().boss
 			# Some bosses (Mad Dog) face you in the street first.
 			var bd: Dictionary = b.get("duel", {})
+			if b.get("showdown", false):
+				Main.inst.dialog(b.name, run.boss_intro(), [["Step out", func():
+					_start_duel(bd, func(out: Dictionary): _showdown_end(out)), "Danger"]])
+				return
 			if not bd.is_empty():
 				Main.inst.dialog(b.name, run.boss_intro(), [["Face him", func():
 					_start_duel(bd, func(out: Dictionary):
@@ -331,6 +335,34 @@ func _resolve_node() -> void:
 
 
 ## setup: an event fight's extras (drop, wounded, foe_mods, foe_mark; see Effects "fight").
+## The end of a showdown quest: the duel's result, then home.
+func _showdown_end(out: Dictionary) -> void:
+	var tier := str(out.get("tier", "miss"))
+	var res := run.finish_showdown(tier)
+	Game.save_game()
+	var b: Dictionary = run.region().boss
+	var lines: Array = [out.text]
+	lines.append_array(out.msgs)
+	if res.won:
+		Audio.play("fanfare")
+		lines.append("")
+		lines.append(str(b.get("victory", "")))
+		for k in ["money", "timber", "iron", "hides"]:
+			if int(res.get(k, 0)) > 0:
+				lines.append("+%d %s" % [int(res[k]), "chips" if k == "money" else k.capitalize()])
+		for kk in res.keepsakes:
+			if kk != "":
+				lines.append("Trinket: %s" % DB.keepsakes[kk].name)
+		lines.append_array(res.msgs)
+	else:
+		lines.append("")
+		lines.append(str(b.get("lose", "")))
+	Main.inst.dialog("Victory!" if res.won else "Not Today", "\n".join(lines), [["Head Home", func():
+		var summary := Game.company.finish_run("victory" if res.won else "driven_back")
+		Game.save_game()
+		Main.inst.goto("results", {"summary": summary}), "Good"]])
+
+
 func _to_combat(enemies: Array, kind: String, surprise: String = "", reward: Dictionary = {}, setup: Dictionary = {}) -> void:
 	var foes := enemies.duplicate()
 	for d in setup.get("drop", []):

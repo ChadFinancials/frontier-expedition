@@ -1138,7 +1138,27 @@ func resolve_duel(duel: Dictionary, h: Hero, r: Dictionary) -> Dictionary:
 	var ores := Effects.apply(duel.get("on", {}).get(tier, []), self, h)
 	msgs.append_array(ores.msgs)
 	add_log([text] + msgs)
-	return {"text": text, "msgs": msgs, "setup": setup}
+	return {"text": text, "msgs": msgs, "setup": setup, "tier": tier}
+
+
+## A quest that ends in a showdown (the Lone Wanderer): no fight, the duel decides it. A
+## bullseye, hit or graze wins the quest's reward (a bullseye adds half its chips again);
+## a miss or jumping the gun ends the trip with nothing more, and the rumor comes back.
+## Returns after_combat's loot, plus "won".
+func finish_showdown(tier: String) -> Dictionary:
+	complete_current()
+	if tier in ["bullseye", "hit", "graze"]:
+		var e := CombatEngine.new()
+		e.state = "victory"
+		var res := after_combat(e, "boss")
+		if tier == "bullseye":
+			var extra := int(int(region().get("quest_reward", {}).get("money", 0)) * 0.5)
+			loot.money = int(loot.money) + extra
+			res.money = int(res.money) + extra
+		res["won"] = true
+		return res
+	driven_back = true
+	return {"won": false, "money": 0, "timber": 0, "iron": 0, "hides": 0, "charters": 0, "keepsakes": [], "msgs": []}
 
 
 ## How a duel's result carries into the fight with the duelist: dead (dropped; a boss can't
