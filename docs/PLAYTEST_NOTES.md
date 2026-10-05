@@ -105,6 +105,10 @@ decided, and what shipped. Update both at the end of every round.
     Storekeeper's help.
 - The owner starts a fresh run next.
 - **Transfusion** heals the most wounded ally for the damage dealt, 1:1 (was 150%).
+- **Crits too common, especially early:** -1% crit on every hero class (now 1-6%), on every
+  hero move with a crit bonus (Iron Justice, Grizzly Chop, Quick Draw, Point Blank, Called
+  Shot, Pickaxe, Scalpel Toss, Ride the Rods), and on the hero crit buffs (From the Shadows
+  4→3, the King of Diamonds 8→7).
 
 ### Round 19 (week 6)
 - **Questionable Mushroom's poison:**

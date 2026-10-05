@@ -11,12 +11,12 @@ the rest are learned at a Drill Hall. Heroes equip 4 moves at a time. Skills, we
 
 A lawman with a tin star and a long memory. Stands at the front, takes the hits meant for others, and makes outlaws think twice.
 
-`marshal` | HP **24** | dodge 5 | prot 10 | speed 2 | acc +2 | crit 4% | dmg 5-10 | prefers ranks 12
+`marshal` | HP **24** | dodge 5 | prot 10 | speed 2 | acc +2 | crit 3% | dmg 5-10 | prefers ranks 12
 Resists: stun 50, bleed 35, poison 30, move 50, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| ★ **Iron Justice**: A point-blank revolver shot, delivered with the full weight of the law. Bonus against outlaws (growing with each level), and more against Marked targets. | 123 | one of 12 | 92 | 5-10, +2% crit, +40% vs marked, +15% vs outlaw (+5% a level) | - |
+| ★ **Iron Justice**: A point-blank revolver shot, delivered with the full weight of the law. Bonus against outlaws (growing with each level), and more against Marked targets. | 123 | one of 12 | 92 | 5-10, +1% crit, +40% vs marked, +15% vs outlaw (+5% a level) | - |
 | ★ **Pistol-Whip**: Cracks a revolver butt across a skull. Stuns. | 12 | one of 12 | 92 | 2-3 | stun |
 | **Deputize**: Steps in to shield an ally: attacks aimed at them hit the Marshal instead. The Marshal gains Protection. | 123 | one ally in 1234 | - | - | guards the ally for 3 rounds; self: prot +15 for 3 rounds |
 | **Serve a Warrant**: Names the target a wanted outlaw: Marked, and easier to hit. | 123 | one of 1234 | 102 | - | mark 3 rounds; dodge -10 for 3 rounds |
@@ -31,18 +31,18 @@ Notes:
 
 Spent twenty winters alone in the deep woods and came back strange. Pays in blood for power: hits hardest below half health, and can bleed to mend others. Knows the wild: +20% damage and +2 Accuracy against beasts.
 
-`mountain_man` | HP **25** | dodge 5 | prot 5 | speed 3 | acc +0 | crit 6% | dmg 5-10 | prefers ranks 12
+`mountain_man` | HP **25** | dodge 5 | prot 5 | speed 3 | acc +0 | crit 5% | dmg 5-10 | prefers ranks 12
 Resists: stun 35, bleed 40, poison 50, move 40, debuff 50, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | ★ **Axe Cleave**: A wide swing of a felling axe that catches both front ranks and splits their guard. Vulnerable for a round. | 12 | ALL of 12 | 87 | 3-7 each | vulnerable +10 for 1 rounds |
-| ★ **Grizzly Chop**: An overhead chop. Much stronger when the Mystic is below half health. | 12 | one of 12 | 97 | 6-12, +4% crit, +50% when below half HP | - |
+| ★ **Grizzly Chop**: An overhead chop. Much stronger when the Mystic is below half health. | 12 | one of 12 | 97 | 6-12, +3% crit, +50% when below half HP | - |
 | **Gnarl at the Flesh**: Bites into their own arm and melts back into the trees: moves back 2, bleeds, and is hard to hit for a round. | 12 | self | - | - | bleed 2 x3 rounds; dodge +30 for 1 rounds; self: user moves back 2 |
 | **Bear Trap**: Kicks a sprung trap into the brush; it snaps shut on whoever steps there. Bleed and Slow. | 34 | 1 random in 234 | 92 | 3-5 x1 hits | bleed 2 x3 rounds; speed -3 for 2 rounds |
 | **Take a Piece of Me**: Old mountain medicine paid in the Mystic's own blood: heals an ally and hardens them against bleeding and venom. | 34 | one ally in 1234 | - | - | heals 6-10 HP; bleed_res +10 for 3 rounds; poison_res +10 for 3 rounds; self: self_damage |
 | **Bellow**: A roar from deep in the trees. Lowers all enemies' Accuracy, but it takes something out of the Mystic. | 4 | ALL of 1234 | 97 | - | acc -10 for 2 rounds; self: +3 fatigue |
-| **From the Shadows**: Steps out of the tree line swinging: moves forward 2 and gains Crit and Damage. | 34 | one of 123 | 92 | 2-5 | self: user moves forward 2; self: crit +4 for 3 rounds; self: dmg_flat +2 for 3 rounds |
+| **From the Shadows**: Steps out of the tree line swinging: moves forward 2 and gains Crit and Damage. | 34 | one of 123 | 92 | 2-5 | self: user moves forward 2; self: crit +3 for 3 rounds; self: dmg_flat +2 for 3 rounds |
 | **Edible Meat**: Best not to ask what it is. Heals and cures Bleed and Poison. | 234 | self | - | - | heals 3-6 HP; cures bleed/poison |
 
 Notes: 
@@ -51,7 +51,7 @@ Notes:
 
 Drove steel for the railroad until the railroad forgot to pay. Swings a nine-pound hammer like it weighs nothing.
 
-`rail_driver` | HP **27** | dodge 2 | prot 10 | speed 1 | acc +0 | crit 2% | dmg 7-13 | prefers ranks 12
+`rail_driver` | HP **27** | dodge 2 | prot 10 | speed 1 | acc +0 | crit 1% | dmg 7-13 | prefers ranks 12
 Resists: stun 45, bleed 35, poison 35, move 60, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
@@ -71,17 +71,17 @@ Notes:
 
 Fastest hands this side of the Missouri, and knows it. Fights anywhere in the line, empties cylinders faster than anyone can count.
 
-`gunslinger` | HP **19** | dodge 12 | prot 0 | speed 6 | acc +0 | crit 6% | dmg 5-9 | prefers ranks 123
+`gunslinger` | HP **19** | dodge 12 | prot 0 | speed 6 | acc +0 | crit 5% | dmg 5-9 | prefers ranks 123
 Resists: stun 30, bleed 30, poison 30, move 30, debuff 30, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
-| ★ **Quick Draw**: Clears leather before anyone else can blink. Reaches any rank. | 234 | one of 1234 | 94 | 5-8, +5% crit | - |
+| ★ **Quick Draw**: Clears leather before anyone else can blink. Reaches any rank. | 234 | one of 1234 | 94 | 5-8, +4% crit | - |
 | ★ **Fan the Hammer**: Three rapid shots at random enemies. | 23 | 3 random in 1234 | 84 | 3-5 x3 hits | - |
 | **Twin Shots**: Both pistols at once, two hits on one target. | 12 | one of 234 | 90 | 3-6 x2 hits | - |
-| **Point Blank**: Jams the barrel into the enemy's gut, fires, then steps back. Leaves them doubled over: Vulnerable. | 1 | one of 1 | 100 | 7-12, +6% crit | vulnerable +10 for 2 rounds; self: user moves back 1 |
+| **Point Blank**: Jams the barrel into the enemy's gut, fires, then steps back. Leaves them doubled over: Vulnerable. | 1 | one of 1 | 100 | 7-12, +5% crit | vulnerable +10 for 2 rounds; self: user moves back 1 |
 | **Duck and Weave**: Rolls forward into cover. Gains Dodge. | 234 | self | - | - | dodge +20 for 2 rounds; self: user moves forward 1 |
-| **Called Shot**: Takes careful aim. Huge bonus damage against Marked targets. | 23 | one of 1234 | 92 | 4-7, +8% crit, +60% vs marked | - |
+| **Called Shot**: Takes careful aim. Huge bonus damage against Marked targets. | 23 | one of 1234 | 92 | 4-7, +7% crit, +60% vs marked | - |
 | **Armor-Piercing Rounds**: Loads steel-cored rounds. Attacks ignore 15% of the target's Protection. | 23 | self | - | - | pierce +15 for 3 rounds |
 | **Smokescreen**: A shot into a powder pouch: a cloud of black smoke. The target is slowed and easier to hit. | 23 | one of 123 | 92 | 1-3 | speed -2 for 2 rounds; dodge -6 for 2 rounds |
 
@@ -91,7 +91,7 @@ Notes:
 
 Cattle drover with a loyal dog named Biscuit and a rope that never misses. Drags enemies where they don't want to be.
 
-`wrangler` | HP **21** | dodge 8 | prot 0 | speed 4 | acc +0 | crit 3% | dmg 5-8 | prefers ranks 23
+`wrangler` | HP **21** | dodge 8 | prot 0 | speed 4 | acc +0 | crit 2% | dmg 5-8 | prefers ranks 23
 Resists: stun 35, bleed 35, poison 35, move 40, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
@@ -111,7 +111,7 @@ Notes:
 
 Riverboat card sharp who bet a fortune on the frontier. Every shot is a wager, and the house doesn't always win.
 
-`gambler` | HP **16** | dodge 15 | prot 0 | speed 6 | acc +5 | crit 5% | dmg 4-8 | prefers ranks 23
+`gambler` | HP **16** | dodge 15 | prot 0 | speed 6 | acc +5 | crit 4% | dmg 4-8 | prefers ranks 23
 Resists: stun 30, bleed 30, poison 30, move 30, debuff 40, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
@@ -131,13 +131,13 @@ Notes:
 
 Forty-niner who never struck it rich but learned everything about blowing up rock. Carries more dynamite than is strictly legal. Nose for ore: +25% loot in caves and mines.
 
-`prospector` | HP **22** | dodge 5 | prot 5 | speed 3 | acc +0 | crit 2% | dmg 5-10 | prefers ranks 234
+`prospector` | HP **22** | dodge 5 | prot 5 | speed 3 | acc +0 | crit 1% | dmg 5-10 | prefers ranks 234
 Resists: stun 35, bleed 35, poison 45, move 35, debuff 30, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | ★ **Dynamite Toss**: A lit stick lobbed into the enemy's back lines. | 34 | ALL of 234 | 87 | 2-4 each | stun (50%) |
-| ★ **Pickaxe**: Swings the old pick like they're chasing a vein of gold, and chips a hole in their armour. Vulnerable. | 12 | one of 12 | 92 | 5-11, +3% crit | vulnerable +10 for 2 rounds |
+| ★ **Pickaxe**: Swings the old pick like they're chasing a vein of gold, and chips a hole in their armour. Vulnerable. | 12 | one of 12 | 92 | 5-11, +2% crit | vulnerable +10 for 2 rounds |
 | **Blasting Charge**: A charge with a short fuse, planted on one enemy. May Stun. | 234 | one of 123 | 92 | 4-6 | stun (85%) |
 | **Flash Powder**: A blinding puff of magnesium over the front pair or the back pair. Lowers Accuracy. | 234 | ALL of 12 or 34 | 87 | - | acc -12 for 2 rounds |
 | **Raise the Lamp**: Holds the miner's lamp high. The party gains Dodge and Accuracy; in caves, restores Lamplight. | 23 | whole party | - | - | dodge +3 for 2 rounds; acc +3 for 2 rounds; self: lamplight +20 |
@@ -149,7 +149,7 @@ Notes:
 
 Grew up on the edge of a Louisiana swamp and never lost the taste for it. Darts, gas and unspeakable frogs: poisons the enemy line, and grows deadlier when poisoned too.
 
-`sharpshooter` | HP **17** | dodge 12 | prot 0 | speed 5 | acc +0 | crit 5% | dmg 5-10 | prefers ranks 34
+`sharpshooter` | HP **17** | dodge 12 | prot 0 | speed 5 | acc +0 | crit 4% | dmg 5-10 | prefers ranks 34
 Resists: stun 30, bleed 30, poison 30, move 35, debuff 30, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
@@ -168,7 +168,7 @@ Notes:
 
 Studied medicine back east, practices it out west, and has opinions about which tinctures go in patients and which go in outlaws.
 
-`frontier_doctor` | HP **18** | dodge 10 | prot 0 | speed 4 | acc +0 | crit 3% | dmg 3-6 | prefers ranks 34
+`frontier_doctor` | HP **18** | dodge 10 | prot 0 | speed 4 | acc +0 | crit 2% | dmg 3-6 | prefers ranks 34
 Resists: stun 30, bleed 40, poison 60, move 30, debuff 35, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
@@ -180,7 +180,7 @@ Resists: stun 30, bleed 40, poison 60, move 30, debuff 35, deathblow 67
 | **Chloroform Rag**: A soaked rag over the mouth. Stuns. | 34 | one of 1 | 92 | 1-2 | stun |
 | **Laudanum**: A few drops take the edge off. Big Fatigue relief, but the patient is slow and sluggish. | 234 | one ally in 1234 | - | - | -12 fatigue (relief); speed -2 for 2 rounds; dodge -5 for 2 rounds |
 | **Transfusion**: A long needle into an enemy, and the blood goes to whoever needs it most: heals your most wounded ally for the damage dealt. | 34 | one of 123 | 90 | 3-5 | heals most wounded ally 100% of damage dealt |
-| **Scalpel Toss**: A flicked scalpel, placed exactly where it hurts. Bleeds, and a surgeon's eye finds the weak spot more often than most. | 34 | one of 123 | 92 | 2-4, +2% crit | bleed 2 x3 rounds |
+| **Scalpel Toss**: A flicked scalpel, placed exactly where it hurts. Bleeds, and a surgeon's eye finds the weak spot more often than most. | 34 | one of 123 | 92 | 2-4, +1% crit | bleed 2 x3 rounds |
 
 Notes: 
 
@@ -188,7 +188,7 @@ Notes:
 
 Carries a battered Bible, a brass lantern, and more faith than the rest of the company combined. Mends bodies and spirits alike.
 
-`preacher` | HP **20** | dodge 3 | prot 5 | speed 2 | acc +0 | crit 2% | dmg 4-7 | prefers ranks 34
+`preacher` | HP **20** | dodge 3 | prot 5 | speed 2 | acc +0 | crit 1% | dmg 4-7 | prefers ranks 34
 Resists: stun 40, bleed 30, poison 30, move 35, debuff 45, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
@@ -208,7 +208,7 @@ Notes:
 
 A drifter who rides the rails and never stays in one car. Builds Momentum by moving every turn, then spends it all on one enormous blow: End of the Line.
 
-`train_hopper` | HP **18** | dodge 14 | prot 0 | speed 7 | acc +0 | crit 7% | dmg 4-8 | prefers ranks 1234
+`train_hopper` | HP **18** | dodge 14 | prot 0 | speed 7 | acc +0 | crit 6% | dmg 4-8 | prefers ranks 1234
 Resists: stun 30, bleed 30, poison 30, move 30, debuff 30, deathblow 67
 
 | Move | From | Hits | Acc | Damage | Effects |
@@ -219,7 +219,7 @@ Resists: stun 30, bleed 30, poison 30, move 30, debuff 30, deathblow 67
 | **Railspike Toss**: A pried-loose railroad spike, thrown hard: the target is Vulnerable. Moves forward 1. | 234 | one of 234 | 90 | 3-5 | vulnerable +10 for 2 rounds; self: user moves forward 1; **momentum +20** |
 | **Emergency Brake**: Throws the brake and lets the train go on without her: moves back 2, gains Dodge and shakes off every debuff. | 12 | self | - | - | dodge +10 for 2 rounds; cures debuff; self: user moves back 2; **momentum +30** |
 | **The Dancing Man**: Hops and jigs on the car roof, daring them to try: Marks herself, gains Dodge, and moves forward 1. | 34 | self | - | - | mark 2 rounds; dodge +12 for 2 rounds; self: user moves forward 1; **momentum +20** |
-| **Ride the Rods**: Slips under the front line the way she rides under a freight car, strikes whoever's behind it, then rolls back 1. | 12 | one of 23 | 92 | 4-8, +4% crit | self: user moves back 1; **momentum +30** |
+| **Ride the Rods**: Slips under the front line the way she rides under a freight car, strikes whoever's behind it, then rolls back 1. | 12 | one of 23 | 92 | 4-8, +3% crit | self: user moves back 1; **momentum +30** |
 | **Catch Out**: Catches a departing train to reach a friend: swaps places with any ally, who gains Protection. | 1234 | one ally in 1234 | - | - | swaps places with the ally (any rank); prot +10 for 2 rounds; **momentum +20** |
 | **End of the Line**: Spends every scrap of Momentum on one blow from any rank: huge damage, more against a Marked target, and it ignores half their Protection. She lands in rank 1. A kill gives back 20 Momentum. | 1234 | one of 1234 | 100 | 10-18, +50% vs marked, ignores 50% prot | **MEGA: needs a full Momentum gauge, spends it all**; self: user moves forward 3; on kill: momentum +20 |
 
