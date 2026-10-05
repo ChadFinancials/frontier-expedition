@@ -80,6 +80,9 @@ every round.
     A Master Storekeeper still adds one, once the case is in.
   - The case stocks up the moment it's bought, without waiting for the week.
   - A save whose store already sold trinkets keeps none until the case is bought.
+- **The second Bunkhouse cost too much** for what is likely the first level 2 upgrade a
+  player buys (1,400 chips, 14 Timber, 8 Hides). It's now 700 chips, 8 Timber, 4 Hides, a
+  little over the first (600, 6, 3), since it only adds two more bunks (+4 becomes +6).
 
 ### Docs cleanup (before the fresh run)
 - Everything still to do now lives in [`BACKLOG.md`](BACKLOG.md), grouped by theme, with a
