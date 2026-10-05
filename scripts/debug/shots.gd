@@ -470,6 +470,10 @@ static func run(main: Main, args: Dictionary) -> void:
 		"embark":
 			Game.company.complete_tutorial()
 			Game.company.advance_week()
+			if args.has("stored"):
+				for kv in str(args.stored).split(","):
+					var pr := kv.split(":")
+					Game.company.storehouse[pr[0]] = int(pr[1])
 			await main.goto("embark", {"index": 0, "dest": args.get("dest", "tallgrass")}, true)
 		"trail", "combat", "camp", "cave", "event", "curio":
 			var co: Company = Game.company
@@ -612,6 +616,18 @@ static func run(main: Main, args: Dictionary) -> void:
 			# folk=1: a few townsfolk, a level 2 Saloon and Lumber Yard, and someone at work.
 			if args.has("folk"):
 				_folk(cb)
+			# build=a,b: build these first; stored=item:n,...: fill the storehouse.
+			if args.has("build"):
+				cb.timber += 100
+				cb.iron += 50
+				cb.hides += 30
+				cb.money += 3000
+				for bb in str(args.build).split(","):
+					cb.build(0, bb)
+			if args.has("stored"):
+				for kv in str(args.stored).split(","):
+					var pr := kv.split(":")
+					cb.storehouse[pr[0]] = int(pr[1])
 			await main.goto("settlement", {"index": 0}, true)
 			var bp: BuildingPanel = main.screen.open_building(args.get("id", "saloon"))
 			if args.has("pick"):

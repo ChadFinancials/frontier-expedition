@@ -387,6 +387,34 @@ func _store(body: VBoxContainer) -> void:
 		row.add_child(b)
 		body.add_child(row)
 	body.add_child(UI.lbl("Trinket stash: %d" % co.stash.size(), 18, "Ink"))
+	# The storehouse: supplies brought home. They load free on the next trip, or sell here.
+	body.add_child(UI.hdr("Storehouse", 24, true))
+	if co.storehouse.is_empty():
+		body.add_child(UI.lbl("Empty. Supplies left in the wagon come home here.", 17, "Ink"))
+	for it in EmbarkOrder.ORDER + co.storehouse.keys().filter(func(k): return not k in EmbarkOrder.ORDER):
+		var n := int(co.storehouse.get(it, 0))
+		if n <= 0 or not DB.items.has(it):
+			continue
+		var srow := UI.hb(12)
+		srow.add_child(ResIcon.make(DB.items[it].get("icon", it), 30))
+		var sl := UI.lbl("%s  x%d" % [DB.items[it].name, n], 19, "InkBold")
+		sl.custom_minimum_size.x = 260
+		srow.add_child(sl)
+		var each := co.sell_price(index, it)
+		var item: String = it
+		var b1 := UI.btn("Sell 1 (%d)" % each, func():
+			if co.sell_item(index, item, 1) > 0:
+				Audio.play("coin")
+				_changed(), "Small")
+		b1.disabled = each <= 0
+		srow.add_child(b1)
+		var ball := UI.btn("Sell all (%d)" % (each * n), func():
+			if co.sell_item(index, item, n) > 0:
+				Audio.play("coin")
+				_changed(), "Small")
+		ball.disabled = each <= 0
+		srow.add_child(ball)
+		body.add_child(srow)
 
 
 func _hiring(body: VBoxContainer) -> void:

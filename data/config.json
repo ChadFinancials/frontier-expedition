@@ -160,6 +160,7 @@
   ],
   "ruin_rebuild_pct": 100,
   "trade_markup": 2.2,
+  "sell_pct": [30, 40, 50],
   "staff_seats": [0, 1, 2],
   "wagon_slots": 12,
   "free_kit": {"food": 16, "bandages": 1, "wagon_parts": 1},

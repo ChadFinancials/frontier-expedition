@@ -261,19 +261,25 @@ func _refresh_supplies() -> void:
 		var ic := ResIcon.make(d.get("icon", it), 34)
 		ic.position = Vector2(6, 8)
 		b.add_child(ic)
-		var l := UI.lbl("%s%s  %d" % [d.name, " x4" if step > 1 else "", price * step], 17, "Bold")
+		# The storehouse's goes first, free.
+		# (Without a store the free kit comes first, then the storehouse.)
+		var kit_n := int(co.free_kit().get(it, 0)) if not co.has_store(index) else 0
+		var stored := maxi(0, int(co.storehouse.get(it, 0)) - maxi(0, int(supplies.get(it, 0)) - kit_n))
+		var l := UI.lbl("%s%s  %s" % [d.name, " x4" if step > 1 else "", ("%d stored" % stored) if stored > 0 else str(price * step)], 17, "Bold")
 		l.position = Vector2(46, 12)
 		l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(l)
 		b.tooltip_text = "%s: %s\n%d chips each. Stacks of %d per wagon slot." % [d.name, d.desc, price, Inventory.stack_size(it)]
 		var room := Inventory.room_for(supplies, it)
 		var sale := co.item_for_sale(index, it)
-		b.disabled = sale != "" or room <= 0 or co.supply_cost(index, supplies) + price * mini(step, room) > co.money
-		if sale != "":
+		b.disabled = room <= 0 or (stored <= 0 and (sale != "" or co.supply_cost(index, supplies) + price * mini(step, room) > co.money))
+		if sale != "" and stored <= 0:
 			b.tooltip_text = "%s: %s." % [d.name, sale]
 			b.modulate = Color(1, 1, 1, 0.5)
 		b.pressed.connect(func():
-			supplies[item] = int(supplies.get(item, 0)) + mini(step, Inventory.room_for(supplies, item))
+			var kit2 := int(co.free_kit().get(item, 0)) if not co.has_store(index) else 0
+			var left := maxi(0, int(co.storehouse.get(item, 0)) - maxi(0, int(supplies.get(item, 0)) - kit2))
+			supplies[item] = int(supplies.get(item, 0)) + mini(left if left > 0 else step, mini(step, Inventory.room_for(supplies, item)))
 			Audio.play("coin", 0.4)
 			_refresh_supplies())
 		store.add_child(b)

@@ -171,8 +171,10 @@ func _curio_room() -> void:
 	v.add_child(PaperFX.framed(art, Vector2(660, 160)))
 	v.add_child(UI.wrap(UI.lbl(DB.curios[cid].desc, 19, "Ink"), 660))
 	var holder := {"wrap": null}
-	var go := func(item: String):
+	var go := func(chosen: String):
 		Main.inst.close_modal(holder.wrap)
+		# A compulsion grabs it by hand, whatever supply you meant to use (as on the trail).
+		var item := "" if not comp.is_empty() else chosen
 		var doit := func(h: Hero):
 			SkillCheck.investigate(run, cid, h, item, func(res: Dictionary):
 				room.curio_done = true

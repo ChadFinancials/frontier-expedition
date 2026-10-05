@@ -91,6 +91,20 @@ decided, and what shipped. Update both at the end of every round.
 
 ## History
 
+### Round 20 (end of the old run)
+- **Gold Fever** stole every strongbox:
+  - It grabs a treasure curio before you choose who goes 25% of the time (was 45%).
+  - A Gold Fever hero who handles treasure by hand now pockets it half the time (it was
+    every time; `steal_chance` 50).
+  - In caves, a hero compelled to grab a curio now does it by hand, as on the trail.
+    Before, a chosen supply was still used.
+- **Storehouse:**
+  - Leftover supplies (three event whiskeys, say) come home.
+  - They load free on the next expedition.
+  - They sell at the General Store for 30 / 40 / 50% of the price by store level, plus the
+    Storekeeper's help.
+- The owner starts a fresh run next.
+
 ### Round 19 (week 6)
 - **Questionable Mushroom's poison:**
   - The owner asked whether 25% should be 60%, since heroes resist poison about 30%.

@@ -661,7 +661,7 @@ func _steals(h: Hero, cu: Dictionary) -> bool:
 	for q in h.quirks:
 		var comp: Dictionary = DB.quirks.get(q, {}).get("compulsion", {})
 		if comp.get("steals", false) and comp.get("tag", "") in cu.get("tags", []):
-			return true
+			return company.rng.randf() * 100.0 < float(comp.get("steal_chance", 100))
 	return false
 
 

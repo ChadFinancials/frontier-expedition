@@ -14,6 +14,7 @@ var townsfolk: Array = []       # townsperson dicts (see Townsfolk): a separate 
 var dead: Array = []            # {name, class_id, level, note, week}
 var settlements: Array = []     # {index, site, tier, buildings{id:lvl}, recruits[], stock[], used{}}
 var stash: Array = []           # keepsake ids not equipped
+var storehouse: Dictionary = {} # supplies brought home (item id -> count), loaded free next time or sold
 var known_keys: Dictionary = {} # curio id -> [item ids found to work]
 var beaten: Array = []          # region ids whose boss has fallen
 var run: RunState = null
@@ -1208,8 +1209,37 @@ func supply_cost(i: int, supplies: Dictionary) -> int:
 		return 0
 	var total := 0
 	for it in supplies:
-		total += item_price(i, it) * int(supplies[it])
+		total += item_price(i, it) * bought(supplies, it)
 	return total
+
+
+## How many of an item in a wagon load have to be bought: the storehouse's go first, free.
+func bought(supplies: Dictionary, item: String) -> int:
+	return maxi(0, int(supplies.get(item, 0)) - int(storehouse.get(item, 0)))
+
+
+## What the General Store pays for a stored item: a share of its price by store level, plus
+## its Storekeeper's help. 0 without a store.
+func sell_price(i: int, item: String) -> int:
+	var lvl := building_level(i, "general_store")
+	if lvl <= 0:
+		return 0
+	var pct: Array = DB.cfg("sell_pct", [30, 40, 50])
+	var p := float(pct[mini(lvl, pct.size()) - 1]) + staff_value(i, "general_store")
+	return int(floor(int(DB.items.get(item, {}).get("price", 0)) * minf(p, 90.0) / 100.0))
+
+
+func sell_item(i: int, item: String, n: int = 1) -> int:
+	var have := int(storehouse.get(item, 0))
+	n = mini(n, have)
+	var each := sell_price(i, item)
+	if n <= 0 or each <= 0:
+		return 0
+	storehouse[item] = have - n
+	if int(storehouse[item]) <= 0:
+		storehouse.erase(item)
+	money += each * n
+	return each * n
 
 
 ## Every destination from settlement i: the tutorial while it's pending, otherwise the
@@ -1482,11 +1512,11 @@ func can_embark(i: int, party_uids: Array, supplies: Dictionary, region: String 
 	if not has_store(i):
 		var kit := free_kit()
 		for it in supplies:
-			if int(supplies[it]) > int(kit.get(it, 0)):
-				return "Without a General Store you only have the basic kit."
+			if int(supplies[it]) > int(kit.get(it, 0)) + int(storehouse.get(it, 0)):
+				return "Without a General Store you only have the basic kit and the storehouse."
 	else:
 		for it in supplies:
-			if int(supplies[it]) > 0 and item_for_sale(i, it) != "":
+			if bought(supplies, it) > 0 and item_for_sale(i, it) != "":
 				return "%s: %s." % [DB.items[it].name, item_for_sale(i, it)]
 	if supply_cost(i, supplies) > money:
 		return "Can't afford those supplies."
@@ -1500,6 +1530,12 @@ func start_run(i: int, party_uids: Array, supplies: Dictionary, region: String =
 	if can_embark(i, party_uids, supplies, region) != "":
 		return null
 	money -= supply_cost(i, supplies)
+	for it in supplies:
+		var used := mini(int(supplies[it]), int(storehouse.get(it, 0)))
+		if used > 0:
+			storehouse[it] = int(storehouse[it]) - used
+			if int(storehouse[it]) <= 0:
+				storehouse.erase(it)
 	set_wagon_for(i)
 	var dest := region if region != "" else expedition_region(i)
 	# Taking a job from the chatter board takes it off the board.
@@ -1533,6 +1569,10 @@ func finish_run(status: String) -> Dictionary:
 		for k in r.loot.keepsakes:
 			if k != "":
 				stash.append(k)
+		# Whatever's left in the wagon goes into the storehouse.
+		for it in r.supplies:
+			if int(r.supplies[it]) > 0 and DB.items.has(it) and not DB.items[it].get("cargo", false):
+				storehouse[it] = int(storehouse.get(it, 0)) + int(r.supplies[it])
 		for p in r.townsfolk:
 			summary.settlers.append(welcome_townsperson(p.duplicate(true), r.origin))
 		for rd in r.recruits:
@@ -1608,7 +1648,7 @@ func to_dict() -> Dictionary:
 		hs.append(h.to_dict())
 	return {"version": 1, "week": week, "money": money, "timber": timber, "iron": iron, "hides": hides, "charters": charters,
 		"heroes": hs, "townsfolk": townsfolk.duplicate(true), "dead": dead.duplicate(true), "settlements": settlements.duplicate(true),
-		"stash": stash.duplicate(), "known_keys": known_keys.duplicate(true), "beaten": beaten.duplicate(),
+		"stash": stash.duplicate(), "storehouse": storehouse.duplicate(), "known_keys": known_keys.duplicate(true), "beaten": beaten.duplicate(),
 		"next_uid": next_uid, "victory_seen": victory_seen,
 		"tutorial_done": tutorial_done, "story_flags": story_flags.duplicate(), "missing": missing.duplicate(true), "quest_regions": quest_regions.duplicate(true), "stats": stats.duplicate(),
 		"rng_state": str(rng.state), "run": run.to_dict() if run != null else null}
@@ -1628,6 +1668,7 @@ static func from_dict(d: Dictionary) -> Company:
 	c.dead = d.get("dead", []).duplicate(true)
 	c.settlements = d.get("settlements", []).duplicate(true)
 	c.stash = d.get("stash", []).duplicate()
+	c.storehouse = d.get("storehouse", {}).duplicate()
 	c.known_keys = d.get("known_keys", {}).duplicate(true)
 	c.beaten = d.get("beaten", []).duplicate()
 	c.next_uid = int(d.get("next_uid", 1))

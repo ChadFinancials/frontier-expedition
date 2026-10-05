@@ -531,6 +531,11 @@ retired in round 7; the Shovel took its curios.)
 - Buildings cost roughly 300-450 / 800-1100 / 1800-2400 chips per level plus Timber, Iron and
   Hides (`buildings.json`). Gear, move training and treatment costs are in config.
 - Trading posts sell at 2.2× `[trade_markup]`.
+- **Storehouse:** supplies left in the wagon come home into a company-wide storehouse (lost
+  only if the party is wiped out). The embark screen loads stored goods first, free, and only
+  buys the rest; without a General Store they load on top of the free kit. The General Store
+  buys stored goods at 30 / 40 / 50% of their price by store level `[sell_pct]`, plus its
+  Storekeeper's help.
 - Townsfolk cost 10-30 chips a week each; the Lumber Yard, Iron Mine and Trapping Post (and
   their staff) are a steady trickle of materials.
 

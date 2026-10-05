@@ -82,6 +82,7 @@ func _ready() -> void:
 	test_townsfolk()
 	test_wanderer_quests()
 	test_building_locks()
+	test_storehouse()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -1839,9 +1840,17 @@ func test_quirk_pass() -> void:
 	# Gold Fever: pockets the money from a treasure curio searched by hand.
 	gs.quirks = ["gold_fever"]
 	var cash0 := int(run.loot.money)
-	for k in 12:
+	# Half the time (round 20): over many searches some money gets through, but less than
+	# without the quirk.
+	for k in 40:
 		run.interact_curio("strongbox", gs)
-	check(int(run.loot.money) == cash0, "Gold Fever keeps the strongbox money (loot %d -> %d)" % [cash0, int(run.loot.money)])
+	var with_fever := int(run.loot.money) - cash0
+	gs.quirks = []
+	var cash1 := int(run.loot.money)
+	for k in 40:
+		run.interact_curio("strongbox", gs)
+	var without := int(run.loot.money) - cash1
+	check(with_fever > 0 and with_fever < without, "Gold Fever pockets some of the strongbox money (%d vs %d)" % [with_fever, without])
 	# Drinker: forced to 100% here, they spend the week after the expedition at the saloon.
 	var saved := int(DB.quirks.drinker.bar_lock)
 	DB.quirks.drinker.bar_lock = 100
@@ -2505,3 +2514,54 @@ func test_building_locks() -> void:
 	check(co.building_lock(0, "drill_hall") == "", "the Drill Hall opens once its plans are won")
 	co._refresh_settlement(co.settlement(0))
 	check(not "drill_hall" in plan_quests.call(), "and its rumor is gone")
+
+
+func test_storehouse() -> void:
+	var co := Company.new()
+	co.new_game(71)
+	co.complete_tutorial()
+	co.money += 3000
+	co.timber += 60
+	co.iron += 30
+	co.hides += 20
+	var uids: Array = []
+	for h in co.heroes:
+		uids.append(h.uid)
+	# Leftover supplies come home into the storehouse.
+	var run := co.start_run(0, uids, {"food": 8}, "tallgrass")
+	check(run != null, "set out")
+	run.supplies["whiskey"] = 3
+	run.supplies["food"] = 2
+	co.finish_run("abandoned")
+	check(int(co.storehouse.get("whiskey", 0)) == 3 and int(co.storehouse.get("food", 0)) == 2, "leftovers go to the storehouse (%s)" % co.storehouse)
+	# No General Store yet: stored goods still load, on top of the free kit, and nothing sells.
+	check(co.can_embark(0, uids, {"food": 8, "whiskey": 3}, "tallgrass") == "", "stored whiskey loads without a store")
+	check(co.can_embark(0, uids, {"whiskey": 4}, "tallgrass") != "", "but no more than is stored")
+	check(co.sell_price(0, "whiskey") == 0, "no General Store, no buyer")
+	co.build(0, "general_store")
+	# Stored goods load first and are free; only the rest is bought.
+	var price := co.item_price(0, "whiskey")
+	check(co.supply_cost(0, {"whiskey": 3}) == 0, "stored whiskey is free to load")
+	check(co.supply_cost(0, {"whiskey": 4}) == price, "the fourth is bought")
+	for h in co.heroes:
+		h.busy_weeks = 0
+		h.fatigue = 0
+	var m0 := co.money
+	var run2 := co.start_run(0, uids, {"whiskey": 4, "food": 6}, "tallgrass")
+	check(run2 != null and co.money == m0 - price - co.item_price(0, "food") * 4, "only what wasn't stored is paid for")
+	check(not co.storehouse.has("whiskey") and not co.storehouse.has("food"), "loading empties the storehouse")
+	co.finish_run("defeat")
+	check(co.storehouse.is_empty(), "a wiped-out company brings nothing home")
+	# Selling at the General Store: a share of the price by store level.
+	co.storehouse["bandages"] = 2
+	var each := co.sell_price(0, "bandages")
+	check(each == int(floor(int(DB.items.bandages.price) * 30 / 100.0)), "a level 1 store pays 30%% (%d)" % each)
+	var m1 := co.money
+	check(co.sell_item(0, "bandages", 5) == each * 2 and co.money == m1 + each * 2 and not co.storehouse.has("bandages"), "sell what's there, no more")
+	# Save and load.
+	co.storehouse["rope"] = 1
+	var co2 := Company.from_dict(DB.normalize(JSON.parse_string(JSON.stringify(co.to_dict()))))
+	check(int(co2.storehouse.get("rope", 0)) == 1, "the storehouse saves")
+	# Gold Fever: grabs treasure 25% of the time and pockets it half the time.
+	var gf: Dictionary = DB.quirks.gold_fever.compulsion
+	check(int(gf.chance) == 25 and int(gf.steal_chance) == 50, "Gold Fever: 25% grab, 50% pocket")
