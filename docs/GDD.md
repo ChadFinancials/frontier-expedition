@@ -78,6 +78,17 @@ exist but wait until the start is crisp.
 | **Lumber Yard** | Cuts Timber every week | 2 / 3 / 4 a week, plus its staff |
 | **Iron Mine** | Digs Iron every week | 1 / 2 / 3 a week, plus its staff |
 | **Trapping Post** | Brings in Hides every week | 1 / 2 / 3 a week, plus its staff |
+| **Wheelwright** | Expeditions from here carry more cargo | +2 / 4 / 6 wagon slots, plus its staff |
+
+**Unlocks** (round 19, `unlock` in `buildings.json`). Built buildings and ruins are never
+locked; the build list shows what each locked one needs.
+
+| Opens | Buildings |
+|---|---|
+| From the start | Hiring Board, Saloon, General Store, Smithy (the burned ones rebuild as before), Lumber Yard |
+| A townsperson of the trade living there | Chapel (Parson), Boot Hill (Undertaker), Trapping Post (Trapper), Wheelwright (Wheelwright). Settlers of a trade that would open a building are 3× as likely |
+| The plans, from a Saloon rumor on the board from week N | Doctor's Office ("The Travelling Surgeon", week 3), Drill Hall ("The Old Army Post", week 4), Iron Mine ("The Assay Papers", week 5) |
+| A second settlement | Stage Line (new outposts still get one free) |
 
 - A hero treated at the Saloon, Chapel, Doctor or Boot Hill sits out the next expedition.
 - Heroes come home at full HP, with Shaken cleared. Fatigue, quirks and Breaking Points come
@@ -113,6 +124,7 @@ become townsfolk and townsfolk never ride out.
 | Logger | Lumber Yard | +2 / 3 / 4 Timber a week | |
 | Mucker | Iron Mine | +1 / 2 / 3 Iron a week | |
 | Trapper | Trapping Post | +1 / 2 / 3 Hides a week | |
+| Wheelwright | Wheelwright | +1 / 2 / 2 wagon slots | |
 | Laborer | anywhere | half a Greenhorn's help, then a full Greenhorn's from Hand | |
 
 - **Wrong trade:** anyone else in a seat gives half a Greenhorn's help. Staff discounts cap at

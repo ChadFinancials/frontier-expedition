@@ -297,6 +297,9 @@ func can_build(i: int, bid: String) -> String:
 		return "Not founded"
 	var lvl := building_level(i, bid)
 	var tier := tier_info(st.tier)
+	var lock := building_lock(i, bid)
+	if lock != "":
+		return lock
 	if lvl == 0 and not is_ruin(i, bid) and plots_used(i) >= int(tier.get("slots", 3)):
 		return "No free building plots (upgrade the %s)" % tier.get("name", "settlement")
 	if lvl >= int(tier.get("max_level", 1)):
@@ -307,6 +310,39 @@ func can_build(i: int, bid: String) -> String:
 	if not can_afford(cost):
 		return "Can't afford: " + cost_text(cost)
 	return ""
+
+
+## Why a new building can't be started here yet, or "". Built buildings and ruins are never
+## locked. Unlocks (buildings.json "unlock"): a townsperson of that trade living here, a story
+## flag (plans won from a Saloon rumor), or a number of settlements.
+func building_lock(i: int, bid: String) -> String:
+	if building_level(i, bid) > 0 or is_ruin(i, bid):
+		return ""
+	var u: Dictionary = DB.buildings.get(bid, {}).get("unlock", {})
+	if u.has("townsfolk"):
+		var tr := str(u.townsfolk)
+		if not townsfolk_at(i).any(func(p): return str(p.trade) == tr):
+			var tn: String = DB.townsfolk.get("trades", {}).get(tr, {}).get("name", tr)
+			return "Needs %s %s living here" % ["an" if tn.left(1).to_lower() in ["a", "e", "i", "o", "u"] else "a", tn]
+	if u.has("flag") and not story_flags.has(str(u.flag)):
+		return "Needs the plans (a Saloon rumor)"
+	if u.has("settlements") and settlements.size() < int(u.settlements):
+		return "Needs a second settlement"
+	return ""
+
+
+## Extra wagon slots for expeditions leaving settlement i: the Wheelwright and its staff.
+func wagon_bonus(i: int) -> int:
+	var lvl := building_level(i, "wheelwright")
+	if lvl <= 0:
+		return 0
+	var c: Array = DB.buildings.wheelwright.get("cargo", [0])
+	return int(c[mini(lvl, c.size()) - 1]) + int(round(staff_value(i, "wheelwright")))
+
+
+## Sets the wagon's size for an expedition from settlement i (see Inventory.extra_slots).
+func set_wagon_for(i: int) -> void:
+	Inventory.extra_slots = wagon_bonus(i)
 
 
 # Upgrade tracks: some buildings improve along separate lines (the Hiring Board's number
@@ -828,7 +864,7 @@ func make_townsperson(trade_id: String = "random", lvl: int = 1, trait_id: Strin
 	var tf := townsfolk_cfg()
 	var trades: Array = tf.get("trades", {}).keys()
 	if not trade_id in trades:
-		trade_id = Stats.pick(rng, trades)
+		trade_id = _pick_settler_trade(trades)
 	var traits: Dictionary = tf.get("traits", {})
 	if not traits.has(trait_id):
 		var good := rng.randf() < 0.55
@@ -845,8 +881,21 @@ func make_townsperson(trade_id: String = "random", lvl: int = 1, trait_id: Strin
 ## A trade from data: one id, a list to pick from, or "random".
 func pick_trade(spec: Variant) -> String:
 	if spec is Array:
-		return str(Stats.pick(rng, spec)) if not spec.is_empty() else "random"
+		return _pick_settler_trade(spec) if not spec.is_empty() else "random"
 	return str(spec)
+
+
+## Settlers lean toward a trade whose arrival would unlock a building nobody can build yet
+## (a Parson for the Chapel): three times as likely.
+func _pick_settler_trade(trades: Array) -> String:
+	var opts: Array = []
+	for t in trades:
+		var w := 1
+		for bid in DB.buildings:
+			if str(DB.buildings[bid].get("unlock", {}).get("townsfolk", "")) == str(t) and not townsfolk.any(func(p): return str(p.trade) == str(t)):
+				w = 3
+		opts.append({"id": str(t), "weight": w})
+	return str(Stats.pick_weighted(rng, opts).id)
 
 
 ## "Hattie Coombs" or "Old Abner": first and last, now and then a nickname instead.
@@ -1215,17 +1264,18 @@ func _roll_quests(st: Dictionary) -> void:
 		quest_regions[qid] = reg
 		DB.regions[qid] = reg
 		st.quests.append(qid)
-	# Extra rumors (the Lone Wanderer's challenges) sit on the board on top of the chatter,
-	# one at a time, until they're done.
+	# Extra rumors (the Lone Wanderer's challenges, building plans) sit on the board on top
+	# of the chatter until they're done; a chain shows only its next step.
 	if not starter:
+		var xn := 0
 		for k in DB.quests.templates:
 			if DB.quests.templates[k].get("extra", false) and quest_open(i, k):
-				var xid := "q_%d_%d_x" % [i, week]
+				var xid := "q_%d_%d_x%d" % [i, week, xn]
+				xn += 1
 				var xreg := _make_quest(k, west, tier_l)
 				quest_regions[xid] = xreg
 				DB.regions[xid] = xreg
 				st.quests.append(xid)
-				break
 
 
 ## Can this rumor template turn up at settlement i? Not once done; not before its story flag
@@ -1235,6 +1285,8 @@ func quest_open(i: int, tid: String) -> bool:
 	if story_flags.has(t.get("done_flag", "-")):
 		return false
 	if str(t.get("requires_flag", "")) != "" and not story_flags.has(str(t.requires_flag)):
+		return false
+	if week < int(t.get("min_week", 0)):
 		return false
 	var rt: Dictionary = t.get("requires_track", {})
 	for bid in rt:
@@ -1298,7 +1350,7 @@ func _make_quest(tid: String, west: String, tier_l: int, starter: bool = false) 
 			"showdown": b.get("showdown", false), "lose": str(b.get("lose", "")).replace("{place}", place)},
 		"crossing": {"name": str(t.name).replace("{place}", place), "enemies": t.get("final", [])},
 		"quest_reward": reward,
-		"done_flag": t.get("done_flag", ""), "boss_keepsake": t.get("boss_keepsake", ""),
+		"done_flag": t.get("done_flag", ""), "boss_keepsake": t.get("boss_keepsake", ""), "plans": str(t.get("plans", "")),
 		"difficulty": int(t.get("difficulty", 2)) + (1 if has_boss and not t.get("always_boss", false) else 0) + tl,
 	}
 	return reg
@@ -1332,6 +1384,8 @@ static func quest_hints(reg: Dictionary) -> String:
 		parts.append("a hand who wants to join")
 	if int(r.get("settler", 0)) > 0:
 		parts.append("a settler for your town")
+	if str(reg.get("plans", "")) != "":
+		parts.append("the plans for a %s" % DB.buildings.get(str(reg.plans), {}).get("name", "?"))
 	var s := "Rumored reward: " + ", ".join(parts) + "."
 	if reg.get("final", "") == "boss" and reg.get("boss", {}).get("showdown", false):
 		s += " It ends in a showdown with " + str(reg.boss.name) + ": no gang, just the draw."
@@ -1436,6 +1490,7 @@ func can_embark(i: int, party_uids: Array, supplies: Dictionary, region: String 
 				return "%s: %s." % [DB.items[it].name, item_for_sale(i, it)]
 	if supply_cost(i, supplies) > money:
 		return "Can't afford those supplies."
+	set_wagon_for(i)
 	if Inventory.slots_used(supplies) > Inventory.capacity():
 		return "The wagon can't carry that much (%d of %d slots)." % [Inventory.slots_used(supplies), Inventory.capacity()]
 	return ""
@@ -1445,6 +1500,7 @@ func start_run(i: int, party_uids: Array, supplies: Dictionary, region: String =
 	if can_embark(i, party_uids, supplies, region) != "":
 		return null
 	money -= supply_cost(i, supplies)
+	set_wagon_for(i)
 	var dest := region if region != "" else expedition_region(i)
 	# Taking a job from the chatter board takes it off the board.
 	settlement(i).get("quests", []).erase(dest)
@@ -1587,4 +1643,5 @@ static func from_dict(d: Dictionary) -> Company:
 		c.rng.state = str(d.rng_state).to_int()
 	if d.get("run", null) is Dictionary:
 		c.run = RunState.from_dict(d.run, c)
+		c.set_wagon_for(c.run.origin)
 	return c

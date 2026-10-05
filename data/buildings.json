@@ -1,5 +1,5 @@
 {
-  "_comment": "costs[i] is the price to build (i=0) or upgrade to level i+1. Per-level values are arrays indexed by level-1. Services are implemented per building id in scripts/core/company.gd. staff_seats[level-1]: townsfolk seats (default config staff_seats). produce: materials made each week by level, before staff (Lumber Yard, Mine, Trapping Post).",
+  "_comment": "costs[i] is the price to build (i=0) or upgrade to level i+1. Per-level values are arrays indexed by level-1. Services are implemented per building id in scripts/core/company.gd. unlock: what a new one needs before it can be built (townsfolk: a townsperson of that trade living there; flag: a story flag, e.g. plans won from a Saloon rumor; settlements: how many the company has). Built buildings and ruins are never locked. staff_seats[level-1]: townsfolk seats (default config staff_seats). produce: materials made each week by level, before staff (Lumber Yard, Mine, Trapping Post).",
 
   "saloon": {"name": "Saloon", "art": "saloon", "order": 1,
     "desc": "Whiskey, cards and a piano nobody's tuned since '49. Heroes shed Fatigue here, and sit out the next expedition.",
@@ -18,7 +18,7 @@
         "side_effects": [{"chance": 20, "type": "money", "amount": -120, "text": "%s loses their shirt at faro. (-120 chips)"},
                          {"chance": 12, "type": "money", "amount": 180, "text": "%s cleans out the table! (+180 chips)"}]}
     ]},
-  "chapel": {"name": "Chapel", "art": "chapel", "order": 2,
+  "chapel": {"name": "Chapel", "art": "chapel", "order": 2, "unlock": {"townsfolk": "parson"},
     "desc": "A whitewashed church with a crooked steeple. A quieter kind of rest.",
     "costs": [{"money": 350, "timber": 14, "iron": 1}, {"money": 900, "timber": 28, "iron": 4}, {"money": 2000, "timber": 50, "iron": 10}],
     "slots": [2, 3, 4],
@@ -27,7 +27,7 @@
       {"id": "hymns", "name": "Hymn Singing", "cost": [100, 100, 100], "relief": [30, 45, 60],
         "side_effects": [{"chance": 15, "type": "quirk", "quirk": "random_positive", "text": "%s finds something uplifting in the hymns."}]}
     ]},
-  "doctor": {"name": "Doctor's Office", "art": "doctor", "order": 3,
+  "doctor": {"name": "Doctor's Office", "art": "doctor", "order": 3, "unlock": {"flag": "plans_doctor"},
     "desc": "Carbolic, laudanum and a bone saw. Treats bad habits and broken spirits.",
     "costs": [{"money": 450, "timber": 10, "iron": 4, "hides": 2}, {"money": 1100, "timber": 20, "iron": 10, "hides": 5}, {"money": 2400, "timber": 35, "iron": 20, "hides": 10}],
     "slots": [1, 2, 3],
@@ -37,7 +37,7 @@
     "costs": [{"money": 450, "timber": 10, "iron": 5}, {"money": 1100, "timber": 15, "iron": 18, "hides": 3}, {"money": 2400, "timber": 25, "iron": 35, "hides": 6}],
     "max_tier": [2, 4, 5],
     "cost_mult": [1.0, 0.9, 0.8]},
-  "drill_hall": {"name": "Drill Hall", "art": "drill", "order": 5,
+  "drill_hall": {"name": "Drill Hall", "art": "drill", "order": 5, "unlock": {"flag": "plans_drill_hall"},
     "desc": "An old army barracks where veterans pass on hard-won tricks. Teaches new combat moves and trains known ones.",
     "costs": [{"money": 400, "timber": 14, "iron": 4}, {"money": 1000, "timber": 26, "iron": 10, "hides": 3}, {"money": 2200, "timber": 40, "iron": 20, "hides": 6}],
     "max_skill": [2, 4, 5],
@@ -62,11 +62,11 @@
       "bunks": {"name": "Bunkhouse", "desc": "Bunks out back: room for more heroes in the company.", "values": [0, 4, 6],
         "costs": [{"money": 600, "timber": 6, "hides": 3}, {"money": 1400, "timber": 14, "hides": 8}]}
     }},
-  "stage_line": {"name": "Stage Line", "art": "stage", "order": 8,
+  "stage_line": {"name": "Stage Line", "art": "stage", "order": 8, "unlock": {"settlements": 2},
     "desc": "A stable, a stagecoach and a driver who's seen it all. Sends heroes between settlements: one week per stop.",
     "costs": [{"money": 300, "timber": 10, "iron": 3, "hides": 4}, {"money": 800, "timber": 20, "iron": 8, "hides": 8}, {"money": 1800, "timber": 35, "iron": 15, "hides": 14}],
     "seats": [2, 3, 4], "staff_seats": [0, 0, 0]},
-  "boot_hill": {"name": "Boot Hill", "art": "graveyard", "order": 9,
+  "boot_hill": {"name": "Boot Hill", "art": "graveyard", "order": 9, "unlock": {"townsfolk": "undertaker"},
     "desc": "Wooden crosses on a windy rise. The company remembers its dead. Visiting heroes shed Fatigue.",
     "costs": [{"money": 150, "timber": 6, "iron": 0}, {"money": 400, "timber": 12, "iron": 2}, {"money": 900, "timber": 20, "iron": 5}],
     "slots": [1, 2, 3],
@@ -77,12 +77,16 @@
     "desc": "A sawpit, a log pile and a mule to drag them. Cuts Timber every week; Loggers cut more.",
     "costs": [{"money": 350, "timber": 6, "iron": 2}, {"money": 800, "timber": 14, "iron": 6}, {"money": 1800, "timber": 28, "iron": 12, "hides": 4}],
     "produce": {"timber": [2, 3, 4]}},
-  "mine": {"name": "Iron Mine", "art": "mine", "order": 11,
+  "mine": {"name": "Iron Mine", "art": "mine", "order": 11, "unlock": {"flag": "plans_mine"},
     "desc": "A timbered adit into the hill behind town. Digs Iron every week; Muckers dig more.",
     "costs": [{"money": 400, "timber": 14, "iron": 0}, {"money": 900, "timber": 24, "iron": 4}, {"money": 2000, "timber": 40, "iron": 10, "hides": 4}],
     "produce": {"iron": [1, 2, 3]}},
-  "trapping_post": {"name": "Trapping Post", "art": "trapper", "order": 12,
+  "trapping_post": {"name": "Trapping Post", "art": "trapper", "order": 12, "unlock": {"townsfolk": "trapper"},
     "desc": "Stretching frames and a smokehouse by the creek. Brings in Hides every week; Trappers bring more.",
     "costs": [{"money": 300, "timber": 10, "iron": 2}, {"money": 750, "timber": 18, "iron": 5}, {"money": 1600, "timber": 30, "iron": 10}],
-    "produce": {"hides": [1, 2, 3]}}
+    "produce": {"hides": [1, 2, 3]}},
+  "wheelwright": {"name": "Wheelwright", "art": "wheel", "order": 13, "unlock": {"townsfolk": "wheelwright"},
+    "desc": "Spokes, felloes and a bigger wagon bed. Every expedition from here leaves with more cargo room.",
+    "costs": [{"money": 350, "timber": 10, "iron": 3, "hides": 2}, {"money": 850, "timber": 20, "iron": 8, "hides": 4}, {"money": 1900, "timber": 35, "iron": 15, "hides": 8}],
+    "cargo": [2, 4, 6]}
 }

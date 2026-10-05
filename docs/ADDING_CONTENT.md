@@ -358,7 +358,9 @@ fight when there's no boss), `boss` (`name`, `intro`, `victory`, `enemies`), and
 `always_boss`, `difficulty`, `bonus_hides` (extra Hides on the reward), `done_flag` (a story flag set when won; the rumor stops
 appearing) and `boss_keepsake`. Story chains: `requires_flag` (another rumor's `done_flag`
 first), `requires_track` (`{building: track}` bought at that settlement), `extra: true` (sits on
-the board on top of the chatter, one at a time). A boss with `showdown: true` and a `duel`
+the board on top of the chatter until done), `min_week` (not before that week), `plans` (a
+building id, named in the rumor's hints; pair it with that building's `unlock` flag as the
+`done_flag`). A boss with `showdown: true` and a `duel`
 (`kind: "showdown"`) ends the trip in a High Noon instead of a fight; `lose` is its losing
 line. `chances` sets the odds of a boss, a trinket, a recruit and a
 settler (a townsperson for the town) per Loose Lips level. Rumors borrow scenery, events and curios from the settlement's western
@@ -382,7 +384,9 @@ such as `slots`, `seats` (Stage Line), `max_tier` (Smithy), `max_skill` (Drill H
 `side_effects`) are what heroes do in a slot. A building can have upgrade `tracks` instead of
 plain levels (the Hiring Board, the Saloon): each track has `name`, `desc`, `values` (per
 track level) and `costs`. Code reads a track with `Company.track_value(i, bid, track)`.
-`staff_seats` (per level) overrides config `staff_seats` ([0, 1, 2]) for townsfolk seats;
+`unlock` locks a new one until `{"townsfolk": trade}` (someone of that trade lives there),
+`{"flag": id}` (a story flag, e.g. a rumor's `done_flag`) or `{"settlements": n}`. `cargo` (per
+level) adds wagon slots to expeditions from that settlement. `staff_seats` (per level) overrides config `staff_seats` ([0, 1, 2]) for townsfolk seats;
 `produce` (`{"timber": [per level]}`) makes a building deliver materials every week (the
 Lumber Yard, Iron Mine and Trapping Post).
 

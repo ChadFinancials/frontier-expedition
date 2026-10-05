@@ -81,6 +81,7 @@ func _ready() -> void:
 	test_minigame_tuning()
 	test_townsfolk()
 	test_wanderer_quests()
+	test_building_locks()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -551,6 +552,13 @@ func test_settlement_services() -> void:
 	var msgs := co.do_activity(0, "saloon", "bar", h)
 	check(not msgs.is_empty() and h.fatigue < 80 and co.money < money0 and not h.available(), "saloon relieves fatigue and occupies hero")
 	check(co.can_do_activity(0, "chapel", "prayer", co.heroes[1]) != "", "no chapel at start")
+	# Locked buildings (round 19): the Chapel needs a Parson, the Doctor's Office its plans.
+	check(co.can_build(0, "chapel").contains("Parson"), "the Chapel waits for a Parson (%s)" % co.can_build(0, "chapel"))
+	check(co.can_build(0, "doctor").contains("plans"), "the Doctor's Office waits for its plans")
+	check(co.can_build(0, "stage_line").contains("second settlement"), "the Stage Line waits for a second settlement")
+	check(co.can_build(0, "lumber_yard") == "", "the Lumber Yard is open from the start")
+	co.welcome_townsperson(co.make_townsperson("parson", 1, "loyal"), 0)
+	co.story_flags["plans_doctor"] = true
 	check(co.can_build(0, "chapel") == "", "can build chapel in free slot")
 	check(co.build(0, "chapel"), "build chapel")
 	check(co.build(0, "smithy") and not co.is_ruin(0, "smithy"), "rebuild the burned smithy")
@@ -2195,6 +2203,7 @@ func test_townsfolk() -> void:
 	var sw := co.make_townsperson("sawbones", 3, "set_in_ways")
 	check(sw.level == 2, "Set in Their Ways never gets past Hand")
 	# Discounts: a Sawbones at the Doctor's Office; a Master adds a bed.
+	co.story_flags["plans_doctor"] = true
 	co.build(0, "doctor")
 	co.build(0, "doctor")
 	var h: Hero = co.heroes[0]
@@ -2367,7 +2376,7 @@ func test_wanderer_quests() -> void:
 	var fc: Combatant = me.heroes.filter(func(x): return x.hero == front)[0]
 	check(me.effect_chance(bpc, "ss_mushroom", pe, fc) == 25, "an ally's resist doesn't apply: the poison is a flat 25%% (%d)" % me.effect_chance(bpc, "ss_mushroom", pe, fc))
 	bp.skill_levels["ss_mushroom"] = 5
-	check(me.effect_chance(bpc, "ss_mushroom", pe, fc) == 5, "training the mushroom makes it safer (5%% at level 5)")
+	check(me.effect_chance(bpc, "ss_mushroom", pe, fc) == 25, "the mushroom's poison stays 25%% at every level")
 	# Flash the Badge patches an ally up a little (round 17).
 	var fb: Array = DB.skill("marshal_flash_badge").effects.filter(func(e): return e.type == "heal")
 	check(fb.size() == 1 and int(fb[0].min) == 2 and int(fb[0].max) == 3, "Flash the Badge heals 2-3")
@@ -2427,3 +2436,72 @@ func test_wanderer_quests() -> void:
 	gs.keepsakes.append("wanderers_dollar")
 	check(is_equal_approx(Duel.edge(gs) - e0, 0.05), "the Silver Dollar draws 0.05 s faster")
 	check(UI.keepsake_effects("wanderers_dollar").any(func(t): return str(t).contains("High Noon")), "its tooltip says so")
+
+
+func test_building_locks() -> void:
+	var co := Company.new()
+	co.new_game(61)
+	co.complete_tutorial()
+	co.story_flags["quest_run"] = true
+	co.money += 9000
+	co.timber += 200
+	co.iron += 100
+	co.hides += 60
+	for bid in ["chapel", "boot_hill", "trapping_post", "wheelwright", "doctor", "drill_hall", "mine", "stage_line"]:
+		check(co.building_lock(0, bid) != "", "%s is locked at the start" % bid)
+	for bid in ["hiring_board", "saloon", "general_store", "smithy", "lumber_yard"]:
+		check(co.building_lock(0, bid) == "", "%s is open at the start" % bid)
+	# A built building is never locked (old saves keep theirs).
+	co.settlement(0).buildings["chapel"] = 1
+	check(co.building_lock(0, "chapel") == "", "a built Chapel isn't locked")
+	co.settlement(0).buildings.erase("chapel")
+	# Townsfolk unlock: a Wheelwright, and the wagon grows.
+	co.welcome_townsperson(co.make_townsperson("wheelwright", 1, "loyal"), 0)
+	check(co.building_lock(0, "wheelwright") == "", "a Wheelwright in town opens the Wheelwright")
+	check(co.build(0, "wheelwright"), "build the Wheelwright")
+	co.set_wagon_for(0)
+	check(Inventory.capacity() == int(DB.cfg("wagon_slots", 12)) + 2, "a level 1 Wheelwright adds 2 wagon slots")
+	co.build(0, "wheelwright")
+	var ww: Dictionary = co.townsfolk_at(0).filter(func(p): return p.trade == "wheelwright")[0]
+	co.post_townsperson(ww, "wheelwright")
+	co.set_wagon_for(0)
+	check(Inventory.capacity() == int(DB.cfg("wagon_slots", 12)) + 5, "level 2 plus a Greenhorn Wheelwright: +5 slots (%d)" % Inventory.capacity())
+	Inventory.extra_slots = 0
+	# Settlers lean toward a trade that would open a building.
+	var parsons := 0
+	for n in 300:
+		if co._pick_settler_trade(["parson", "storekeeper"]) == "parson":
+			parsons += 1
+	check(parsons > 190, "a trade that opens a building is likelier (%d of 300)" % parsons)
+	# Schematic rumors: the Doctor's plans from week 3, the Drill Hall's from 4, the Mine's from 5.
+	var plan_quests := func() -> Array:
+		var out: Array = []
+		for q in co.settlement(0).quests:
+			var pl := str(DB.regions[q].get("plans", ""))
+			if pl != "":
+				out.append(pl)
+		return out
+	co.week = 2
+	co._refresh_settlement(co.settlement(0))
+	check(plan_quests.call().is_empty(), "no plans on the board in week 2")
+	co.week = 3
+	co._refresh_settlement(co.settlement(0))
+	check(plan_quests.call() == ["doctor"], "week 3: the Travelling Surgeon (%s)" % [plan_quests.call()])
+	co.week = 5
+	co._refresh_settlement(co.settlement(0))
+	check(plan_quests.call().size() == 3, "week 5: all three sets of plans (%s)" % [plan_quests.call()])
+	var dq: String = co.settlement(0).quests.filter(func(q): return str(DB.regions[q].get("plans", "")) == "drill_hall")[0]
+	check(Company.quest_hints(DB.regions[dq]).contains("plans for a Drill Hall"), "the rumor names the plans")
+	# Winning the rumor's boss opens the building.
+	var uids: Array = []
+	for h in co.heroes:
+		uids.append(h.uid)
+	var run := co.start_run(0, uids, {"food": 6}, dq)
+	run.current = run.nodes.size() - 1
+	var e := CombatEngine.new()
+	e.state = "victory"
+	run.after_combat(e, "boss")
+	co.finish_run("victory")
+	check(co.building_lock(0, "drill_hall") == "", "the Drill Hall opens once its plans are won")
+	co._refresh_settlement(co.settlement(0))
+	check(not "drill_hall" in plan_quests.call(), "and its rumor is gone")

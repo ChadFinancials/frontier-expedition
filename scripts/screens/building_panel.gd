@@ -555,7 +555,13 @@ func _empty_plot(v: VBoxContainer) -> void:
 	sc.add_child(list)
 	var st := co.settlement(index)
 	var ids: Array = DB.buildings.keys()
-	ids.sort_custom(func(a, b): return DB.buildings[a].get("order", 0) < DB.buildings[b].get("order", 0))
+	# What can be built comes first, then the locked ones.
+	ids.sort_custom(func(a, b):
+		var la := co.building_lock(index, a) != ""
+		var lb := co.building_lock(index, b) != ""
+		if la != lb:
+			return lb
+		return DB.buildings[a].get("order", 0) < DB.buildings[b].get("order", 0))
 	for id in ids:
 		if st.buildings.has(id) or co.is_ruin(index, id):
 			continue
@@ -577,6 +583,9 @@ func _empty_plot(v: VBoxContainer) -> void:
 				if on_change.is_valid():
 					on_change.call(), "Good")
 		var why := co.can_build(index, id)
+		var lock := co.building_lock(index, id)
+		if lock != "":
+			b.text = lock
 		b.disabled = why != ""
 		b.tooltip_text = why
 		row.add_child(b)

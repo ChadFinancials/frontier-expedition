@@ -22,6 +22,8 @@
       "desc": "Shovels ore out of the drifts."},
     "trapper":     {"name": "Trapper", "building": "trapping_post", "kind": "produce", "values": [1, 2, 3],
       "desc": "Runs trap lines along the creeks."},
+    "wheelwright": {"name": "Wheelwright", "building": "wheelwright", "kind": "cargo", "values": [1, 2, 2],
+      "desc": "Builds wheels, mends axles, and knows how to load a wagon."},
     "laborer":     {"name": "Laborer", "building": "", "kind": "any",
       "desc": "A strong back for any building. A Greenhorn gives half a Greenhorn's help anywhere; a Hand or Master gives a full Greenhorn's."}
   },

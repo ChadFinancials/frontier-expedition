@@ -487,6 +487,18 @@ func _draw_building(art: String, b: Vector2, level: int, bname: String) -> void:
 			draw_rect(Rect2(fx - 32, b.y - 96, 64, 76), Color("#3a2618"), false, 4)
 			_poly([Vector2(fx - 24, b.y - 88), Vector2(fx + 24, b.y - 90), Vector2(fx + 20, b.y - 52), Vector2(fx + 26, b.y - 28), Vector2(fx - 26, b.y - 30), Vector2(fx - 20, b.y - 56)], Color("#b98a5a"), false)
 			_sign(b + Vector2(0, -h * 0.98), "TRAPPING POST", w * 0.8)
+		"wheel":
+			# An open workshop with a big wagon wheel leaning out front.
+			_rect(Rect2(b.x - w / 2, b.y - h * 0.7, w * 0.7, h * 0.7), Color("#8a5a32"))
+			_poly([b + Vector2(-w / 2 - 10, -h * 0.7), b + Vector2(w * 0.2 + 10, -h * 0.7), b + Vector2(-w * 0.15, -h * 0.98)], Color("#5e3f27"))
+			_rect(Rect2(b.x - w / 2 + 16, b.y - h * 0.5, w * 0.4, h * 0.5), Color("#2a1d14"))
+			var wc := b + Vector2(w * 0.32, -40)
+			draw_arc(wc, 38, 0, TAU, 32, Color("#5a3822"), 7)
+			for k in 8:
+				var a := k * TAU / 8.0
+				draw_line(wc, wc + Vector2(cos(a), sin(a)) * 36, Color("#5a3822"), 4)
+			draw_circle(wc, 7, Color("#3a2618"))
+			_sign(b + Vector2(0, -h * 1.05), "WHEELWRIGHT", w * 0.75)
 	# Level stars.
 	for k in level:
 		draw_colored_polygon(PackedVector2Array(Figure.star_pts(b + Vector2(-(level - 1) * 12 + k * 24, 22), 9, 4, 5)), Color("#e0bd4f"))

@@ -7,8 +7,13 @@ extends RefCounted
 const ORDER := ["food", "bandages", "antivenom", "whiskey", "lamp_oil", "wagon_parts", "rope", "shovel", "crowbar", "salt", "timber", "iron", "hides"]
 
 
+## Extra slots for the expedition being planned or played (a Wheelwright at its home town;
+## set by Company.set_wagon_for).
+static var extra_slots := 0
+
+
 static func capacity() -> int:
-	return int(DB.cfg("wagon_slots", 12))
+	return int(DB.cfg("wagon_slots", 12)) + extra_slots
 
 
 static func stack_size(item: String) -> int:

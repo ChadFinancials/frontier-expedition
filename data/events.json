@@ -101,7 +101,7 @@
         "experts": {"sickly": {"averse": true, "always": true, "bonus": [{"type": "damage_pct", "value": 15, "target": "actor"}, {"type": "fatigue", "amount": 6, "target": "actor"}]}},
         "outcomes": [
         {"weight": 1, "good": true, "text": "{hero} works through the night. The father lives. The family sings your names as you leave.", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "quirk", "quirk": "random_positive", "target": "actor", "chance": 50}]},
-        {"weight": 1, "good": true, "text": "{hero} works through the night and the father lives. Come spring, the family says, they'll look for your town: \"Folks like you are folks worth living near.\"", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "townsfolk", "trade": ["laborer", "logger", "trapper", "sawbones"]}]}]},
+        {"weight": 1, "good": true, "text": "{hero} works through the night and the father lives. Come spring, the family says, they'll look for your town: \"Folks like you are folks worth living near.\"", "effects": [{"type": "fatigue", "amount": -10, "target": "party"}, {"type": "townsfolk", "trade": ["laborer", "logger", "trapper", "sawbones", "wheelwright"]}]}]},
       {"text": "Give them some food.", "requires": {"item": "food"}, "consume": {"item": 4}, "outcomes": [
         {"weight": 1, "good": true, "text": "It isn't much, but it's something. You feel good about it.", "effects": [{"type": "fatigue", "amount": -5, "target": "party"}]}]},
       {"text": "Sit with the family.", "requires": {"class": "preacher"}, "outcomes": [
@@ -748,7 +748,7 @@
     "text": "Gunfire ahead. A stagecoach is pinned down behind its own dead horses, and outlaws are working around the flanks.",
     "options": [
       {"text": "Ride to the rescue.", "outcomes": [
-        {"weight": 1, "text": "You hit them from behind.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "surprise": "enemies", "reward": {"money": 160, "settler": {"trade": ["storekeeper", "sawbones", "parson", "undertaker"]}}}]}]},
+        {"weight": 1, "text": "You hit them from behind.", "effects": [{"type": "fight", "enemies": ["outlaw_brawler", "outlaw_gunhand", "outlaw_rifleman"], "surprise": "enemies", "reward": {"money": 160, "settler": {"trade": ["storekeeper", "sawbones", "parson", "undertaker", "wheelwright"]}}}]}]},
       {"text": "Wait, then pick over what's left.",
         "experts": {"gold_fever": {"odds": 0, "bonus": [{"type": "money", "min": 40, "max": 80}]}, "preacher": {"averse": true, "always": true, "bonus": [{"type": "fatigue", "amount": 12, "target": "actor"}]}, "marshal": {"averse": true, "always": true, "bonus": [{"type": "fatigue", "amount": 12, "target": "actor"}]}},
         "outcomes": [

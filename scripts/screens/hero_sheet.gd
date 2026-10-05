@@ -211,16 +211,6 @@ func _skill_row(sid: String) -> Control:
 				return
 			Audio.play("click", 0.5)
 			_changed())
-	if index >= 0 and learned and co.building_level(index, "drill_hall") > 0 and h.skill_level(sid) < DB.cfg("max_skill_level", 5):
-		var nl := h.skill_level(sid) + 1
-		var why := co.can_upgrade_skill(index, h, sid)
-		var b := UI.btn("Train (%d chips)" % co.skill_cost(index, nl), func():
-			if co.upgrade_skill(index, h, sid):
-				Audio.play("buff")
-				_changed(), "Small")
-		b.disabled = why != ""
-		b.tooltip_text = why if why != "" else "Drill Hall: raise to level %d (+accuracy, damage, effect chance)" % nl
-		row.add_child(b)
 	return p
 
 

@@ -123,6 +123,8 @@ static func value_text(bid: String, v: float) -> String:
 			return "-%s%% chips" % s
 		"store":
 			return "%s%% more off" % s
+		"cargo":
+			return "+%s wagon slot%s" % [s, "" if s == "1" else "s"]
 		"produce":
 			var mats: Dictionary = DB.buildings.get(bid, {}).get("produce", {})
 			var mat: String = mats.keys()[0] if not mats.is_empty() else "timber"

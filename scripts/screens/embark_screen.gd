@@ -21,6 +21,7 @@ var warn_label: Label
 func setup(params: Dictionary) -> void:
 	index = int(params.get("index", 0))
 	var co: Company = Game.company
+	co.set_wagon_for(index)
 	var site := co.site_by_index(index)
 	var options := co.expedition_options(index)
 	dest = params.get("dest", co.expedition_region(index))

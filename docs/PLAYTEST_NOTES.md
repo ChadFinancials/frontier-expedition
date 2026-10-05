@@ -95,13 +95,27 @@ decided, and what shipped. Update both at the end of every round.
 - **Questionable Mushroom's poison:**
   - The owner asked whether 25% should be 60%, since heroes resist poison about 30%.
   - Resist doesn't apply to an effect from your own side, so 25% is the real chance.
-  - Move levels used to add +6% a level to effect odds, which would have made the poison
-    likelier as the move trained. A new effect field, `chance_per_level`, sets it to -5% a
-    level instead: 25% at level 1, 5% at level 5.
+  - Move levels add +6% a level to effect odds, which would have made the poison likelier
+    as the move trained. A new effect field, `chance_per_level`, overrides that; the
+    mushroom's is 0, a flat 25%.
 - **No heal for the Gambler or Gunslinger** (owner). The Marshal and Poisoner changes are
   enough for now.
-- **Too many buildings too early; Timber runs short.** Building locks are proposed below,
-  awaiting picks.
+- **Too many buildings too early; Timber runs short.** Built with the owner's picks:
+  - Open from the start: Hiring Board, Saloon, General Store, Smithy (the burned ones still
+    rebuild), Lumber Yard.
+  - Opened by a townsperson of the trade: Chapel (Parson), Boot Hill (Undertaker), Trapping
+    Post (Trapper), and a new **Wheelwright** (+2 / 4 / 6 wagon slots, Wheelwright staff
+    +1 / 2 / 2). Settlers of those trades are 3× as likely while their building is locked.
+  - Opened by plans won from Saloon rumors, on a set schedule: the Doctor's Office ("The
+    Travelling Surgeon", week 3), the Drill Hall ("The Old Army Post", week 4), the Iron Mine
+    ("The Assay Papers", week 5).
+  - Stage Line: once there's a second settlement.
+  - The build list puts what you can build first and shows what each locked one needs.
+  - The town painting still has a spot for every plot (9). No new backdrop needed yet.
+- **Questionable Mushroom:** back to a flat 25% at every level (owner). `chance_per_level: 0`.
+- **Train button removed from the hero sheet** (too easy to misclick); training is done at the
+  Drill Hall.
+- The owner will start a new run to test the locks.
 
 ### Round 18: picks from round 17
 - Flash the Badge now heals 2-3.
