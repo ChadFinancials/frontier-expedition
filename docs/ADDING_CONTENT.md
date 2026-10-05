@@ -382,10 +382,12 @@ Crowbar). The wagon has `wagon_slots` slots.
 
 `data/buildings.json`: `name`, `desc`, `art`, `order`, per-level `costs`, and per-level lists
 such as `slots`, `seats` (Stage Line), `max_tier` (Smithy), `max_skill` (Drill Hall),
-`discount` and `keepsake_stock` (General Store). `activities` (`cost`, `relief`,
+`discount` (General Store). `activities` (`cost`, `relief`,
 `side_effects`) are what heroes do in a slot. A building can have upgrade `tracks` instead of
 plain levels (the Hiring Board, the Saloon): each track has `name`, `desc`, `values` (per
-track level) and `costs`. Code reads a track with `Company.track_value(i, bid, track)`.
+track level) and `costs`. Code reads a track with `Company.track_value(i, bid, track)`. The
+General Store's `trinkets` track (the Glass Case) also has per-level `stock` and `rarity`
+weights.
 `unlock` locks a new one until `{"townsfolk": trade}` (someone of that trade lives there),
 `{"flag": id}` (a story flag, e.g. a rumor's `done_flag`) or `{"settlements": n}`. `cargo` (per
 level) adds wagon slots to expeditions from that settlement. `staff_seats` (per level) overrides config `staff_seats` ([0, 1, 2]) for townsfolk seats;

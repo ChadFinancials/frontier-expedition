@@ -43,10 +43,14 @@
     "max_skill": [2, 4, 5],
     "cost_mult": [1.0, 0.9, 0.8]},
   "general_store": {"name": "General Store", "art": "store", "order": 6,
-    "desc": "Flour, powder, rope and nails. Supplies expeditions and sells the odd trinket.",
+    "desc": "Flour, powder, rope and nails. Supplies expeditions; with a glass case, sells the odd trinket.",
     "costs": [{"money": 500, "timber": 14, "iron": 4, "hides": 2}, {"money": 800, "timber": 20, "iron": 6, "hides": 4}, {"money": 1800, "timber": 35, "iron": 12, "hides": 8}],
     "discount": [0, 10, 20],
-    "keepsake_stock": [2, 3, 4]},
+    "tracks": {
+      "trinkets": {"name": "Glass Case", "desc": "Trinkets for sale, restocked each week. Each level adds one, and better odds of a rare.", "values": [0, 1, 2, 3],
+        "stock": [0, 2, 3, 4], "rarity": [{}, {"common": 6, "uncommon": 2}, {"common": 6, "uncommon": 3, "rare": 1}, {"common": 4, "uncommon": 3, "rare": 2}],
+        "costs": [{"money": 400, "timber": 4, "iron": 2}, {"money": 900, "timber": 10, "iron": 5}, {"money": 1800, "timber": 18, "iron": 10}]}
+    }},
   "hiring_board": {"name": "Hiring Board", "art": "board", "order": 7,
     "desc": "A plank wall papered with notices. New hands arrive every week.",
     "costs": [{"money": 250, "timber": 8, "iron": 1}],

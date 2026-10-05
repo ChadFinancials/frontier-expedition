@@ -83,6 +83,7 @@ func _ready() -> void:
 	test_wanderer_quests()
 	test_building_locks()
 	test_storehouse()
+	test_glass_case()
 	test_clear_plots()
 	test_random_hits_repick()
 	test_look_ahead()
@@ -2518,6 +2519,44 @@ func test_building_locks() -> void:
 	check(co.building_lock(0, "drill_hall") == "", "the Drill Hall opens once its plans are won")
 	co._refresh_settlement(co.settlement(0))
 	check(not "drill_hall" in plan_quests.call(), "and its rumor is gone")
+
+
+func test_glass_case() -> void:
+	var co := Company.new()
+	co.new_game(73)
+	co.complete_tutorial()
+	co.money += 9000
+	co.timber += 120
+	co.iron += 60
+	co.hides += 30
+	co.build(0, "general_store")
+	co.restock_trinkets(0)
+	check(co.settlement(0).stock.is_empty(), "a General Store sells no trinkets until its Glass Case is bought")
+	check(co.upgrade_track(0, "general_store", "trinkets"), "buy the Glass Case")
+	check(co.settlement(0).stock.size() in [1, 2], "the case stocks up at once (%d)" % co.settlement(0).stock.size())
+	co.settlement(0).tier = "outpost"
+	check(co.can_upgrade_track(0, "general_store", "trinkets") != "", "an Outpost can't take the case further")
+	# Level 1 never shows a rare; level 3 often does, and shelves more.
+	var rare1 := 0
+	for n in 200:
+		co.restock_trinkets(0)
+		for k in co.settlement(0).stock:
+			if DB.keepsakes[k].get("rarity", "") == "rare":
+				rare1 += 1
+	check(rare1 == 0, "no rares at the first case level (%d)" % rare1)
+	co.settlement(0).tier = "city"
+	co.upgrade_track(0, "general_store", "trinkets")
+	check(co.upgrade_track(0, "general_store", "trinkets"), "a City takes the case to level 3")
+	var rare3 := 0
+	var shelved := 0
+	for n in 200:
+		co.restock_trinkets(0)
+		shelved += co.settlement(0).stock.size()
+		for k in co.settlement(0).stock:
+			if DB.keepsakes[k].get("rarity", "") == "rare":
+				rare3 += 1
+	check(rare3 > 40, "rares turn up at level 3 (%d)" % rare3)
+	check(shelved > 600, "more on the shelf at level 3 (%d over 200 weeks)" % shelved)
 
 
 func test_storehouse() -> void:

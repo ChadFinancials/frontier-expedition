@@ -70,6 +70,16 @@ every round.
     arriving all at once.
 - **Mad Dog's hideout:** "good and challenging". The standoff before the boss fight is "fun
   and a great mechanic" (owner). Other bosses getting a standoff stays in the backlog.
+- **General Store trinkets are an upgrade now.** The store opens selling supplies only. Its
+  **Glass Case** track puts trinkets on the shelf, restocked weekly:
+  - Level 1 (400 chips, 4 Timber, 2 Iron): 2 trinkets, common or uncommon, never rare.
+  - Level 2 (900 chips, 10 Timber, 5 Iron; a Town): 3. Each is rare 11% of the time, the
+    store's old odds.
+  - Level 3 (1,800 chips, 18 Timber, 10 Iron; a City): 4, each rare 22% of the time.
+  - The store's own levels no longer add trinkets (they still give the supply discount).
+    A Master Storekeeper still adds one, once the case is in.
+  - The case stocks up the moment it's bought, without waiting for the week.
+  - A save whose store already sold trinkets keeps none until the case is bought.
 
 ### Docs cleanup (before the fresh run)
 - Everything still to do now lives in [`BACKLOG.md`](BACKLOG.md), grouped by theme, with a

@@ -74,7 +74,7 @@ exist but wait until the start is crisp.
 | **Doctor's Office** | Remove a negative quirk; cure a Breaking Point | Slots, cost |
 | **Smithy** | Weapon and armor tiers | Max tier 2 / 4 / 5 |
 | **Drill Hall** | Learn new moves (`[learn_cost]` 300) and train move levels | Max move level 2 / 4 / 5 |
-| **General Store** | Sells supplies (curio keys from level 2) and a few trinkets | Discount, trinket stock |
+| **General Store** | Sells supplies (curio keys from level 2); trinkets once its Glass Case is bought | Discount; track: Glass Case (trinkets 2 / 3 / 4, rarer with each level) |
 | **Hiring Board** | New recruits each week | Tracks: More Notices (count), Word of Mouth (level and quirks), Bunkhouse (company size) |
 | **Stage Line** | Sends heroes between settlements, one week per stop | Seats |
 | **Boot Hill** | Remembers the dead; visiting heroes shed Fatigue | Slots |
@@ -122,7 +122,7 @@ become townsfolk and townsfolk never ride out.
 | Sawbones | Doctor's Office | -10 / 20 / 30% treatment cost | +1 bed |
 | Blacksmith | Smithy | -10 / 15 / 20% gear chips | |
 | Drillmaster | Drill Hall | -10 / 15 / 20% training chips | |
-| Storekeeper | General Store | +5 / 10 / 15% discount | +1 trinket on the shelf |
+| Storekeeper | General Store | +5 / 10 / 15% discount | +1 trinket on the shelf (with a Glass Case) |
 | Undertaker | Boot Hill | +5 / 10 / 15 relief | |
 | Logger | Lumber Yard | +2 / 3 / 4 Timber a week | |
 | Mucker | Iron Mine | +1 / 2 / 3 Iron a week | |

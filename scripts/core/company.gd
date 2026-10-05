@@ -427,6 +427,8 @@ func upgrade_track(i: int, bid: String, tid: String) -> bool:
 	if not st.tracks.has(bid):
 		st.tracks[bid] = {}
 	st.tracks[bid][tid] = track_level(i, bid, tid) + 1
+	if bid == "general_store" and tid == "trinkets":
+		restock_trinkets(i)
 	return true
 
 
@@ -821,11 +823,15 @@ func unequip_keepsake(h: Hero, kid: String) -> bool:
 	return true
 
 
-func random_keepsake(rarities: Array = ["common", "uncommon", "rare"]) -> String:
+## weights: rarity -> weight, overriding the default 6 / 3 / 1 (a rarity left out is never picked).
+func random_keepsake(rarities: Array = ["common", "uncommon", "rare"], weights: Dictionary = {}) -> String:
 	var pool: Array = []
 	for k in DB.keepsakes:
 		var r: String = DB.keepsakes[k].get("rarity", "common")
-		if r in rarities:
+		if not weights.is_empty():
+			if int(weights.get(r, 0)) > 0:
+				pool.append({"id": k, "weight": int(weights[r])})
+		elif r in rarities:
 			var w := 6 if r == "common" else (3 if r == "uncommon" else 1)
 			pool.append({"id": k, "weight": w})
 	var pick = Stats.pick_weighted(rng, pool)
@@ -1216,13 +1222,24 @@ func _refresh_settlement(st: Dictionary) -> void:
 				add_random_quirk(h, true)
 			h.location = i
 			st.recruits.append(h.to_dict())
+	restock_trinkets(i)
+
+
+## The General Store's trinkets for the week. None until its Glass Case is bought; each case
+## upgrade adds one and better odds of a rare. A Master Storekeeper adds one more.
+func restock_trinkets(i: int) -> void:
+	var st := settlement(i)
 	st.stock = []
-	var gs := building_level(i, "general_store")
-	if gs > 0:
-		for n in int(DB.buildings.general_store.keepsake_stock[gs - 1]) + staff_masters(i, "general_store"):
-			var k := random_keepsake()
-			if k != "" and not k in st.stock:
-				st.stock.append(k)
+	var tl := track_level(i, "general_store", "trinkets")
+	if building_level(i, "general_store") <= 0 or tl <= 0:
+		return
+	var t: Dictionary = DB.buildings.general_store.tracks.trinkets
+	var count := int(t.stock[mini(tl, t.stock.size() - 1)]) + staff_masters(i, "general_store")
+	var weights: Dictionary = t.rarity[mini(tl, t.rarity.size() - 1)]
+	for n in count:
+		var k := random_keepsake([], weights)
+		if k != "" and not k in st.stock:
+			st.stock.append(k)
 
 
 # --- Expeditions ---------------------------------------------------------------------

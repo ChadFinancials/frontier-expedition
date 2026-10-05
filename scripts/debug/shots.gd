@@ -624,6 +624,9 @@ static func run(main: Main, args: Dictionary) -> void:
 				cb.money += 3000
 				for bb in str(args.build).split(","):
 					cb.build(0, bb)
+			# case=n: buy the General Store's Glass Case up to level n.
+			for n in int(args.get("case", 0)):
+				cb.upgrade_track(0, "general_store", "trinkets")
 			if args.has("stored"):
 				for kv in str(args.stored).split(","):
 					var pr := kv.split(":")

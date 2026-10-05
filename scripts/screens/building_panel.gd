@@ -365,8 +365,9 @@ func _drill(body: VBoxContainer) -> void:
 func _store(body: VBoxContainer) -> void:
 	var co: Company = Game.company
 	var st := co.settlement(index)
-	body.add_child(UI.lbl("%d%% off supplies (bought when you plan an expedition). This week's trinkets:" % co.store_discount(index), 19, "InkBold"))
-	if st.stock.is_empty():
+	var has_case := co.track_level(index, "general_store", "trinkets") > 0
+	body.add_child(UI.lbl("%d%% off supplies (bought when you plan an expedition).%s" % [co.store_discount(index), " This week's trinkets:" if has_case else ""], 19, "InkBold"))
+	if has_case and st.stock.is_empty():
 		body.add_child(UI.lbl("Sold out. New stock arrives next week.", 18, "Ink"))
 	for k in st.stock:
 		var row := UI.hb(12)

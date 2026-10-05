@@ -38,6 +38,8 @@ The owner is starting a new run to test the round 16-20 changes.
   - storehouse sell prices of 30 / 40 / 50% (round 20)
   - Transfusion at 1:1 (round 20)
   - the Wrangler's new ranks (round 20)
+- **The Glass Case:** whether trinkets from the store come too late or cost too much, now
+  that the General Store doesn't sell them until the upgrade. (round 21)
 - **Money:** round 9 doubled every chip source. Recheck after a few weeks; `chips_mult`
   scales all of it at once. (round 9)
 
