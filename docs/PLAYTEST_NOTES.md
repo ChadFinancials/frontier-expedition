@@ -36,8 +36,8 @@ decided, and what shipped. Update both at the end of every round.
   - more Saloon rumor templates
   - short trips with a campfire halfway where you can head home early (supplies low, the
     wagon struggling) without the turn-back penalty
-- [ ] **Small heals** (round 17-18): Flash the Badge is done. Questionable Mushroom is done. Still open:
-      the Gambler or the Gunslinger.
+- [ ] **Small heals** (round 17-18): Flash the Badge is done. Questionable Mushroom is done. No heal for the
+      Gambler or Gunslinger (owner, round 19).
 - [ ] Money: round 9 doubled every chip source (owner was running short: one quest paid about
       200, one bar visit and one move). Recheck after a few weeks of play; `chips_mult` in
       config scales all of it at once.
@@ -90,6 +90,18 @@ decided, and what shipped. Update both at the end of every round.
 ---
 
 ## History
+
+### Round 19 (week 6)
+- **Questionable Mushroom's poison:**
+  - The owner asked whether 25% should be 60%, since heroes resist poison about 30%.
+  - Resist doesn't apply to an effect from your own side, so 25% is the real chance.
+  - Move levels used to add +6% a level to effect odds, which would have made the poison
+    likelier as the move trained. A new effect field, `chance_per_level`, sets it to -5% a
+    level instead: 25% at level 1, 5% at level 5.
+- **No heal for the Gambler or Gunslinger** (owner). The Marshal and Poisoner changes are
+  enough for now.
+- **Too many buildings too early; Timber runs short.** Building locks are proposed below,
+  awaiting picks.
 
 ### Round 18: picks from round 17
 - Flash the Badge now heals 2-3.

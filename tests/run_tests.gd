@@ -2363,6 +2363,11 @@ func test_wanderer_quests() -> void:
 	var bpc: Combatant = me.heroes.filter(func(x): return x.hero == bp)[0]
 	var tg: Array = me.valid_targets(bpc, "ss_mushroom")
 	check(tg.size() == 2, "the Poisoner can feed it to either hero, self included (%d targets)" % tg.size())
+	var pe: Dictionary = DB.skill("ss_mushroom").effects.filter(func(x): return x.type == "poison")[0]
+	var fc: Combatant = me.heroes.filter(func(x): return x.hero == front)[0]
+	check(me.effect_chance(bpc, "ss_mushroom", pe, fc) == 25, "an ally's resist doesn't apply: the poison is a flat 25%% (%d)" % me.effect_chance(bpc, "ss_mushroom", pe, fc))
+	bp.skill_levels["ss_mushroom"] = 5
+	check(me.effect_chance(bpc, "ss_mushroom", pe, fc) == 5, "training the mushroom makes it safer (5%% at level 5)")
 	# Flash the Badge patches an ally up a little (round 17).
 	var fb: Array = DB.skill("marshal_flash_badge").effects.filter(func(e): return e.type == "heal")
 	check(fb.size() == 1 and int(fb[0].min) == 2 and int(fb[0].max) == 3, "Flash the Badge heals 2-3")

@@ -668,7 +668,8 @@ func effect_chance(a: Combatant, sid: String, e: Dictionary, t: Combatant) -> in
 		if tag in t.tags:
 			base = float(e.chance_vs[tag])
 	if a.is_hero():
-		base += DB.cfg("skill_level_effect", 6) * (a.skill_level(sid) - 1)
+		# Move levels raise effect odds; a downside (the mushroom's poison) can shrink instead.
+		base += float(e.get("chance_per_level", DB.cfg("skill_level_effect", 6))) * (a.skill_level(sid) - 1)
 		base += a.skill_mod(sid, "effect_chance")
 		if kind == "stun":
 			base += a.stat("stun_chance", t)
