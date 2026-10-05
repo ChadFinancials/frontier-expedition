@@ -179,7 +179,7 @@ Resists: stun 30, bleed 40, poison 60, move 30, debuff 35, deathblow 67
 | **Smelling Salts**: Snaps an ally back to their senses. Cures Stun, Bleed and Poison, and gains Speed. | 234 | one ally in 1234 | - | - | cures bleed/poison/stun; speed +3 for 2 rounds |
 | **Chloroform Rag**: A soaked rag over the mouth. Stuns. | 34 | one of 1 | 92 | 1-2 | stun |
 | **Laudanum**: A few drops take the edge off. Big Fatigue relief, but the patient is slow and sluggish. | 234 | one ally in 1234 | - | - | -12 fatigue (relief); speed -2 for 2 rounds; dodge -5 for 2 rounds |
-| **Transfusion**: A long needle into an enemy, and the blood goes to whoever needs it most: heals your most wounded ally for 150% of the damage dealt. | 34 | one of 123 | 90 | 3-5 | heals most wounded ally 150% of damage dealt |
+| **Transfusion**: A long needle into an enemy, and the blood goes to whoever needs it most: heals your most wounded ally for the damage dealt. | 34 | one of 123 | 90 | 3-5 | heals most wounded ally 100% of damage dealt |
 | **Scalpel Toss**: A flicked scalpel, placed exactly where it hurts. Bleeds, and a surgeon's eye finds the weak spot more often than most. | 34 | one of 123 | 92 | 2-4, +2% crit | bleed 2 x3 rounds |
 
 Notes: 

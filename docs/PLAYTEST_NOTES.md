@@ -104,6 +104,7 @@ decided, and what shipped. Update both at the end of every round.
   - They sell at the General Store for 30 / 40 / 50% of the price by store level, plus the
     Storekeeper's help.
 - The owner starts a fresh run next.
+- **Transfusion** heals the most wounded ally for the damage dealt, 1:1 (was 150%).
 
 ### Round 19 (week 6)
 - **Questionable Mushroom's poison:**
