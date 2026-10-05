@@ -261,8 +261,12 @@ func look_ahead() -> Array:
 	for n in nodes:
 		var d := int(n.col) - c0
 		if d == 1:
-			n.intel = maxi(MapGen.intel(n), 1)
-			if MapGen.intel(n) < 2 and company.rng.randf() * 100.0 < 20.0 + score:
+			# A rough look (trouble or quiet) isn't guaranteed, and a clear one is rarer:
+			# without scouts most choices are made half blind.
+			var lk: Array = DB.cfg("look_ahead_pct", [50, 10])
+			if MapGen.intel(n) < 1 and company.rng.randf() * 100.0 < float(lk[0]) + score:
+				n.intel = 1
+			if MapGen.intel(n) < 2 and company.rng.randf() * 100.0 < float(lk[1]) + score:
 				n.intel = 2
 				spotted += 1
 			if MapGen.intel(n) == 2 and tracker and n.type in ["fight", "elite"]:

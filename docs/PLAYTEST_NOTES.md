@@ -30,6 +30,31 @@ every round.
   - Owner: every multi-hit move should land all its hits. Twin Shots (two shots at one
     target) now sends its second shot to another valid target if the first kills its
     target. Area moves are unchanged; they already hit everything in reach.
+- **Choosing stops half blind** (owner: "I always have this choice revealed and I'm likely to
+  always take the homestead"):
+  - A stop one step ahead now gets a rough look (trouble or quiet) at 50% + scouting. It used
+    to be every time.
+  - A clear look (its type) is 10% + scouting, down from 20%.
+  - The Scout survival skill gives 20 / 30 / 40 by rank, down from 35 / 50 / 65.
+  - 15% of quiet stops now look like trouble from afar, alongside the 15% of fights that look
+    quiet.
+  - Config: `look_ahead_pct`, `false_alarm_pct`.
+- **Fewer people per trip** (a recruit and a settler on one expedition felt like a lot):
+  - The plans and Wanderer rumors had homesteads at weight 12-14 (other rumors use 4-6), so
+    they drop to 6, with the rest moved to events.
+  - The drifter's "Welcome them aboard" now recruits half the time; otherwise a meal and a tip
+    about the road (-4 Fatigue, 2 stops revealed). "Swap hobo code" recruits 40% of the time.
+  - The widow's "Teach her to shoot" recruits 50% of the time.
+  - The homestead family's settler comes 1 time in 3, down from 1 in 2.
+- **Embark screen:**
+  - The party starts empty.
+  - Right-clicking a hero opens their sheet (moves, quirks, trinkets) without leaving the plan.
+- **Poison numbers** are a muted olive (#9a9a48), no longer a green close to heals.
+- **The Iron Mine plans' boss** was easier than the Railroad Enforcer fight before it. It's
+  now "The Railroad's Men": two Railroad Enforcers, a claim jumper and a dynamiter.
+- **Noted, open:** the Marshal is close to an automatic rank 1-2 pick (level 2, lots of
+  outlaws). The owner would rather lift the other front-liners than weaken him. Options go
+  to the owner.
 - **Snapshot at the start of week 6** (fresh run, a pacing reference):
   - Four level 2 heroes; two have learned new moves.
   - Built: Saloon, Smithy, Hiring Board, Lumber Yard, Drill Hall (week 4). The General Store

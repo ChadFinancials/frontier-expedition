@@ -158,6 +158,9 @@
     {"id": "city", "name": "City", "slots": 9, "max_level": 3, "population": 8,
       "cost": {"charters": 6, "money": 5000, "timber": 90, "iron": 60, "hides": 30}}
   ],
+  "_look_ahead": "Arriving at a stop, each stop one step ahead gets a rough look (trouble or quiet) at look_ahead_pct[0] + scouting %, and a clear look (its type) at look_ahead_pct[1] + scouting %. false_alarm_pct of quiet stops look like trouble from afar (as 15% of fights look quiet).",
+  "look_ahead_pct": [50, 10],
+  "false_alarm_pct": 15,
   "ruin_rebuild_pct": 100,
   "clear_plot_cost": [{"money": 250}, {"money": 500}],
   "trade_markup": 2.2,

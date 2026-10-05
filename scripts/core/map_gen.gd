@@ -89,6 +89,9 @@ static func generate(region_id: String, rng: RandomNumberGenerator, boss_beaten:
 			n.intel = 2
 		if n.type == "fight" and rng.randf() < 0.15:
 			n.decoy = true
+		# A false alarm: a quiet stop that looks like trouble from a distance.
+		elif n.type in ["event", "homestead", "curio", "trading_post"] and rng.randf() * 100.0 < float(DB.cfg("false_alarm_pct", 15)):
+			n.alarm = true
 	return nodes
 
 
@@ -151,6 +154,8 @@ static func vague_kind(n: Dictionary) -> String:
 	if n.type == "cave":
 		return "cave"
 	if n.type in ["fight", "elite", "boss", "crossing"] and not n.get("decoy", false):
+		return "danger"
+	if n.get("alarm", false):
 		return "danger"
 	return "quiet"
 

@@ -97,6 +97,8 @@ func _process(delta: float) -> void:
 				_press_text(m.screen, ["Dry Gulch Mine" if expeditions_done % 4 == 1 else "The Crow's Nest"])
 				return
 			if m.screen.party.is_empty():
+				m.screen.auto_party()
+			if m.screen.party.is_empty():
 				need_rest = true
 				_press_text(m.screen, ["<  Back"])
 				return

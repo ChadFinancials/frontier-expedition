@@ -16,7 +16,7 @@
       {"id": "forage", "name": "Forage", "hours": 3, "target": "self", "desc": "Gathers food, and sometimes herbs for bandages or antivenom.", "effects": [{"type": "food", "base": 2, "per_rank": 1}, {"type": "item", "item": "bandages", "chance": 40}, {"type": "item", "item": "antivenom", "chance": 30}], "unlock": 1},
       {"id": "wild_herbs", "name": "Wild Herb Poultice", "hours": 2, "target": "ally", "desc": "Heals one hero.", "effects": [{"type": "heal_pct", "base": 20, "per_rank": 8}], "unlock": 2}
     ]},
-  "scout": {"name": "Scout", "desc": "Rides ahead and comes back with news.", "passive": {"type": "scout", "base": 35, "per_rank": 15, "text": "Much better odds of seeing what lies ahead on the map"},
+  "scout": {"name": "Scout", "desc": "Rides ahead and comes back with news.", "passive": {"type": "scout", "base": 20, "per_rank": 10, "text": "Much better odds of seeing what lies ahead on the map"},
     "actions": [
       {"id": "scout_ahead", "name": "Scout Ahead", "hours": 2, "target": "self", "desc": "Rides ahead and identifies the nearest unscouted stops.", "effects": [{"type": "reveal", "base": 2, "per_rank": 1}], "unlock": 1},
       {"id": "night_watch", "name": "Night Watch", "hours": 2, "target": "self", "desc": "No ambush tonight; better odds of surprising the next enemies.", "effects": [{"type": "no_ambush"}, {"type": "next_fight_buff", "stat": "surprise", "base": 15, "per_rank": 10}], "unlock": 2}

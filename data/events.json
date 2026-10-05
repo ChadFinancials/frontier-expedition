@@ -471,7 +471,7 @@
       {"text": "Trade for supplies (30 chips).", "requires": {"money": 30}, "consume": {"money": 30}, "outcomes": [
         {"weight": 1, "good": true, "text": "Sacks of potatoes and salt pork.", "effects": [{"type": "food", "amount": 10}]}]},
       {"text": "Help with chores in exchange for lumber.", "outcomes": [
-        {"weight": 1, "text": "A day of hard work, a wagon full of boards.", "effects": [{"type": "timber", "amount": 5}, {"type": "fatigue", "amount": 6, "target": "party"}]},
+        {"weight": 2, "text": "A day of hard work, a wagon full of boards.", "effects": [{"type": "timber", "amount": 5}, {"type": "fatigue", "amount": 6, "target": "party"}]},
         {"weight": 1, "good": true, "text": "A day of hard work, a wagon full of boards, and the eldest asking if your town needs a strong back.", "effects": [{"type": "timber", "amount": 4}, {"type": "fatigue", "amount": 6, "target": "party"}, {"type": "townsfolk", "trade": ["laborer", "logger"]}]}]}
     ]},
 
@@ -488,18 +488,19 @@
         {"weight": 2, "good": true, "text": "\"Reckon there's nothing left for me here.\" She shoulders her shotgun.", "effects": [{"type": "recruit", "class": "random"}]},
         {"weight": 1, "text": "\"This is my land. I'm staying.\"", "effects": []}]},
       {"text": "Teach her to shoot.", "requires": {"class": "gunslinger"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} spends an afternoon with her and a row of bottles. By sundown she's hitting most of them, and she's packing.", "effects": [{"type": "recruit", "class": "random"}]}]}
+        {"weight": 1, "good": true, "text": "{hero} spends an afternoon with her and a row of bottles. By sundown she's hitting most of them, and she's packing.", "effects": [{"type": "recruit", "class": "random", "chance": 50}]}]}
     ]},
 
   "homestead_drifter": {"title": "Drifter's Camp", "art": "stranger",
     "text": "A drifter cooking beans over a small fire looks up. \"Heading west? Me too, if you'll have me.\"",
     "options": [
       {"text": "Welcome them aboard.", "outcomes": [
-        {"weight": 1, "good": true, "text": "Another hand for the trail.", "effects": [{"type": "recruit", "class": "random"}]}]},
+        {"weight": 1, "good": true, "text": "Another hand for the trail.", "effects": [{"type": "recruit", "class": "random"}]},
+        {"weight": 1, "good": true, "text": "The drifter shares your beans and your fire, then thinks better of it. \"Trail's yours, friend. I'll find my own.\" They leave you a good tip about the road ahead.", "effects": [{"type": "fatigue", "amount": -4, "target": "party"}, {"type": "reveal", "amount": 2}]}]},
       {"text": "Share a meal and move on.", "outcomes": [
         {"weight": 1, "good": true, "text": "Good beans. Good company.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}, {"type": "heal_pct", "value": 8, "target": "party"}]}]},
       {"text": "Swap hobo code.", "requires": {"class": "train_hopper"}, "outcomes": [
-        {"weight": 1, "good": true, "text": "{hero} and the drifter trade chalk marks and gossip. They know the trail ahead, and they want in.", "effects": [{"type": "recruit", "class": "random"}, {"type": "reveal", "amount": 3}]}]}
+        {"weight": 1, "good": true, "text": "{hero} and the drifter trade chalk marks and gossip. They know the trail ahead, and they want in.", "effects": [{"type": "recruit", "class": "random", "chance": 40}, {"type": "reveal", "amount": 3}]}]}
     ]},
 
   "homestead_trapper_cabin": {"title": "Trapper's Cabin", "art": "cabin",
@@ -720,7 +721,7 @@
     "text": "A fresh poster on a fencepost: SNAKE-EYE PIKE, rides with Crane's crew. 200 CHIPS. LAST SEEN HEREABOUTS.",
     "options": [
       {"text": "Go after him.", "outcomes": [
-        {"weight": 1, "text": "You find Snake-Eye Pike watering his horse at a creek. He turns, slow.", "effects": [{"type": "duel", "kind": "gang", "name": "Snake-Eye Pike", "opponent": "crane_lieutenant", "draw": 0.40, "tier": 2, "gang": ["crane_lieutenant", "outlaw_gunhand", "outlaw_rifleman"], "gang_name": "Pike's gang", "bounty": 200}]}]},
+        {"weight": 1, "text": "You find Snake-Eye Pike watering his horse at a creek. He turns, slow.", "effects": [{"type": "duel", "kind": "gang", "name": "Snake-Eye Pike", "opponent": "crane_lieutenant", "draw": 0.4, "tier": 2, "gang": ["crane_lieutenant", "outlaw_gunhand", "outlaw_rifleman"], "gang_name": "Pike's gang", "bounty": 200}]}]},
       {"text": "Look closer at the face.",
         "experts": {"good_humor": {"odds": 0, "swap": {"1": {"weight": 1, "good": true, "text": "Hey... that looks a lot like {hero}. {hero} laughs so hard the whole company joins in.", "effects": [{"type": "fatigue", "amount": -6, "target": "party"}]}}}},
         "outcomes": [

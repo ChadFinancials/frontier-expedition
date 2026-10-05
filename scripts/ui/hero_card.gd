@@ -3,6 +3,7 @@ extends PanelContainer
 ## Compact hero card: portrait, name, class/level, HP and Fatigue bars, status line.
 
 signal clicked(card: HeroCard)
+signal right_clicked(card: HeroCard)
 
 var hero: Hero
 var selected: bool = false:
@@ -74,4 +75,8 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		Audio.play("click", 0.5)
 		clicked.emit(self)
+		accept_event()
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT and right_clicked.get_connections().size() > 0:
+		Audio.play("page", 0.5)
+		right_clicked.emit(self)
 		accept_event()

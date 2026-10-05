@@ -31,6 +31,8 @@ The owner is starting a new run to test the round 16-20 changes.
   a plot. (round 15)
 - **The Lone Wanderer's three challenges:** their first real play, including the showdown
   finale. (round 18)
+- **Half-blind map choices:** the rough look is 50% + scouting, the clear look 10% +
+  scouting, the Scout skill 20 / 30 / 40, plus 15% false alarms. (round 21)
 - **Smaller checks:**
   - Gold Fever's 25% grab, 50% pocket (round 20)
   - storehouse sell prices of 30 / 40 / 50% (round 20)
@@ -97,6 +99,9 @@ The owner is starting a new run to test the round 16-20 changes.
   pass. (round 8)
 - **Owner's call: utility moves.** Should they get their own per-level upgrades? Today every
   move level adds the same accuracy, damage, effect and healing bonuses. (round 8)
+- **Owner's call: front-liners.** The Marshal is close to an automatic rank 1-2 pick. Lift
+  the Mountain Mystic and the Rail Driver rather than weaken him (options in round 21's
+  reply). (round 21)
 - **Watch: hero balance.** Re-rank with `python3 tools/hero_power.py` after the next
   playtest. (round 8)
 - **Watch:**

@@ -85,6 +85,7 @@ func _ready() -> void:
 	test_storehouse()
 	test_clear_plots()
 	test_random_hits_repick()
+	test_look_ahead()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -2641,3 +2642,35 @@ func test_random_hits_repick() -> void:
 			both += 1
 	check(both == 30, "Twin Shots always fires both shots (%d of 30)" % both)
 	gs.hp = gs.max_hp()
+
+
+func test_look_ahead() -> void:
+	# Round 21: without scouts, the next stops are often a mystery and rarely clear.
+	var co := Company.new()
+	co.new_game(95)
+	co.complete_tutorial()
+	var uids: Array = []
+	for h in co.heroes:
+		h.survival = {}
+		h.quirks = []
+		h.keepsakes = []
+		uids.append(h.uid)
+	var seen := 0
+	var rough := 0
+	var clear := 0
+	for k in 40:
+		co.rng.seed = 500 + k
+		var run := RunState.create(co, "tallgrass", 0, uids, {"food": 8})
+		check(run.scout_score() == 0.0, "no scouting in this party")
+		for id in run.choices():
+			var n: Dictionary = run.node(id)
+			seen += 1
+			if MapGen.intel(n) >= 1:
+				rough += 1
+			if MapGen.intel(n) >= 2:
+				clear += 1
+	var rp := rough * 100.0 / seen
+	var cp := clear * 100.0 / seen
+	check(rp > 35.0 and rp < 65.0, "about half the next stops get a rough look (%.0f%%)" % rp)
+	check(cp > 3.0 and cp < 20.0, "about 1 in 10 is seen clearly (%.0f%%)" % cp)
+	check(int(DB.survival.scout.passive.base) == 20 and int(DB.survival.scout.passive.per_rank) == 10, "the Scout skill: 20 / 30 / 40")

@@ -50,7 +50,7 @@ func setup(params: Dictionary) -> void:
 	var rv := UI.vb(8)
 	rp.add_child(rv)
 	rv.add_child(UI.hdr("Choose Your Party", 28, true))
-	rv.add_child(UI.lbl("Up to 4 heroes.", 18, "Ink"))
+	rv.add_child(UI.lbl("Up to 4 heroes. Right-click one for their moves and quirks.", 18, "Ink"))
 	var sc := ScrollContainer.new()
 	sc.custom_minimum_size = Vector2(850, 700)
 	sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -147,17 +147,29 @@ func setup(params: Dictionary) -> void:
 	depart_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	fh.add_child(depart_btn)
 	supplies = params.get("supplies", _default_load())
+	# The party starts empty: the player picks (owner, round 21).
 	if params.has("party"):
 		party = params.party
-	else:
-		# Default party: the four healthiest ready heroes, in a sensible order.
-		var avail := co.heroes_at(index).filter(func(h): return h.available())
-		avail.sort_custom(func(a, b): return a.fatigue < b.fatigue)
-		var pick := avail.slice(0, 4)
-		pick.sort_custom(func(a, b): return a.cls().get("ranks", [2]).min() < b.cls().get("ranks", [2]).min())
-		for h in pick:
-			party.append(h.uid)
 	_refresh()
+
+
+## The four healthiest ready heroes in a sensible order (the autopilot uses it).
+func auto_party() -> void:
+	party.clear()
+	var avail := Game.company.heroes_at(index).filter(func(h): return h.available())
+	avail.sort_custom(func(a, b): return a.fatigue < b.fatigue)
+	var pick := avail.slice(0, 4)
+	pick.sort_custom(func(a, b): return a.cls().get("ranks", [2]).min() < b.cls().get("ranks", [2]).min())
+	for h in pick:
+		party.append(h.uid)
+	_refresh()
+
+
+## A hero's sheet (moves, quirks, trinkets) without leaving the expedition plan.
+func open_hero(h: Hero) -> void:
+	var sheet := HeroSheet.new()
+	sheet.setup(h, index, func(): _refresh())
+	sheet.wrap = Main.inst.modal(sheet)
 
 
 func _refresh() -> void:
@@ -171,6 +183,7 @@ func _refresh() -> void:
 		card.selected = h.uid in party
 		card.dimmed = not h.available()
 		card.clicked.connect(func(_c): _toggle(h))
+		card.right_clicked.connect(func(_c): open_hero(h))
 		roster_grid.add_child(card)
 	# Stage: rank 4 on the left, rank 1 on the right.
 	UI.clear(stage_row)

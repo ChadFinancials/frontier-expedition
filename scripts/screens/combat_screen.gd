@@ -708,8 +708,8 @@ func _play_one(e: Dictionary) -> void:
 		"dot":
 			var c3 := engine.unit(e.target)
 			_shift_hp(c3, -int(e.amount))
-			_popup(c3, str(e.amount), Color("#e05a4a") if e.kind == "bleed" else Color("#8fce5a"), 30)
-			_flash(c3, Color("#e05a4a") if e.kind == "bleed" else Color("#8fce5a"))
+			_popup(c3, str(e.amount), Color("#e05a4a") if e.kind == "bleed" else Color("#9a9a48"), 30)
+			_flash(c3, Color("#e05a4a") if e.kind == "bleed" else Color("#8a8a3c"))
 			_log("%s takes %d %s damage." % [c3.display_name, e.amount, e.kind])
 			await _wait(0.45)
 		"act_out", "boon", "refuse":
