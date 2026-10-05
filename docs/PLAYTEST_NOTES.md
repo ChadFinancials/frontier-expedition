@@ -36,8 +36,8 @@ decided, and what shipped. Update both at the end of every round.
   - more Saloon rumor templates
   - short trips with a campfire halfway where you can head home early (supplies low, the
     wagon struggling) without the turn-back penalty
-- [ ] **Small heals** (round 17-18): Flash the Badge is done. Still open: the Gambler or the
-      Gunslinger, and a party Questionable Mushroom.
+- [ ] **Small heals** (round 17-18): Flash the Badge is done. Questionable Mushroom is done. Still open:
+      the Gambler or the Gunslinger.
 - [ ] Money: round 9 doubled every chip source (owner was running short: one quest paid about
       200, one bar visit and one move). Recheck after a few weeks of play; `chips_mult` in
       config scales all of it at once.
@@ -93,9 +93,12 @@ decided, and what shipped. Update both at the end of every round.
 
 ### Round 18: picks from round 17
 - Flash the Badge now heals 2-3.
+- Questionable Mushroom targets any one of the party, the Poisoner included. It heals 3-6
+  and sheds 4 Fatigue, with a 25% chance of a light poison (it used to always poison the
+  user).
 - **The Lone Wanderer's challenges:**
-  - A new one-level Saloon upgrade, the Stranger's Table (300 chips, 6 Timber, 2 Hides), puts
-    the challenge on the board on top of the chatter.
+  - The Saloon's first Chatter upgrade puts the challenge on the board, on top of the chatter
+    (the owner preferred this to a separate upgrade).
   - Three chapters, each a short trip ending in a showdown duel: no gang and no fight. The
     Wanderer draws 0.44, then 0.40, then 0.36 s.
   - Win on a bullseye, hit or graze; a bullseye pays half again. A loss sends you home and the
@@ -104,7 +107,6 @@ decided, and what shipped. Update both at the end of every round.
     Noon.
 - **Still open:**
   - a heal for the Gambler or the Gunslinger (or neither)
-  - a party version of Questionable Mushroom
 
 ### Round 17 (week 5 with the main company)
 - **Skill checks:** at most difficulty 2 in the first region. Config `check_base` [2, 3, 3] and

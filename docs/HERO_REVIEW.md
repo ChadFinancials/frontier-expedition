@@ -159,7 +159,7 @@ Resists: stun 30, bleed 30, poison 30, move 35, debuff 30, deathblow 67
 | **Bola Shot**: Weighted cords whirl into the middle of the line and tangle both. Stuns. | 234 | ALL of 23 | 87 | 2-3 each | stun (70%) |
 | **Suppressing Fire**: A spray of darts across the front of the line. Slows. | 34 | ALL of 123 | 92 | 2-3 each | speed -2 for 2 rounds |
 | **Blighted Sacrament**: A thorn dipped in the worst of the bayou. Heavy Poison; hits much harder if the user is poisoned. | 23 | 1 random in 123 | 92 | 4-6 x1 hits, +80% while user is poisoned | poison 5 x3 rounds |
-| **Questionable Mushroom**: Eats something off a log. It's fine. Mostly. Poisons self a little and sheds Fatigue. | 234 | self | - | - | poison 1 x3 rounds; -6 fatigue (relief) |
+| **Questionable Mushroom**: Something off a log, good for what ails you. Mostly. Heals one of the company (or the Poisoner) and sheds Fatigue, with a small chance of a light poison. | 234 | one ally in 1234 | - | - | heals 3-6 HP; -4 fatigue (relief); poison 1 x3 rounds (25%) |
 | **Sticky Frog**: Lobs a very unhappy tree frog. Whoever it lands on can't see straight or step lively. | 23 | 2 random in 123 | 92 | - | acc -10 for 2 rounds; dodge -5 for 2 rounds |
 
 Notes: 

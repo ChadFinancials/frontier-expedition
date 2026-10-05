@@ -2348,6 +2348,21 @@ func test_minigame_tuning() -> void:
 
 
 func test_wanderer_quests() -> void:
+	# Questionable Mushroom: one of the company, the Poisoner included (round 18).
+	var qm: Dictionary = DB.skill("ss_mushroom")
+	check(qm.target == "ally" and not qm.get("no_self", false) and not qm.get("aoe", false), "Questionable Mushroom targets any one of the party, self included")
+	check(qm.effects.any(func(e): return e.type == "heal") and qm.effects.any(func(e): return e.type == "poison" and int(e.get("chance", 100)) == 25), "it heals, with a 25% chance of a light poison")
+	var mco := Company.new()
+	mco.new_game(52)
+	var front: Hero = mco.make_hero("marshal", 1)
+	var bp: Hero = mco.make_hero("sharpshooter", 1)
+	bp.known = ["ss_mushroom"]
+	bp.equipped = ["ss_mushroom"]
+	var me := CombatEngine.new()
+	me.setup([front, bp], ["prairie_wolf"], {})
+	var bpc: Combatant = me.heroes.filter(func(x): return x.hero == bp)[0]
+	var tg: Array = me.valid_targets(bpc, "ss_mushroom")
+	check(tg.size() == 2, "the Poisoner can feed it to either hero, self included (%d targets)" % tg.size())
 	# Flash the Badge patches an ally up a little (round 17).
 	var fb: Array = DB.skill("marshal_flash_badge").effects.filter(func(e): return e.type == "heal")
 	check(fb.size() == 1 and int(fb[0].min) == 2 and int(fb[0].max) == 3, "Flash the Badge heals 2-3")
@@ -2358,18 +2373,17 @@ func test_wanderer_quests() -> void:
 	co.money += 5000
 	co.timber += 50
 	co.hides += 20
+	co.iron += 20
 	var has_wanderer := func() -> String:
 		for q in co.settlement(0).quests:
 			if str(DB.regions[q].get("template", "")).begins_with("wanderer"):
 				return str(DB.regions[q].template)
 		return ""
 	co._refresh_settlement(co.settlement(0))
-	check(has_wanderer.call() == "", "no Wanderer rumor before the Stranger's Table")
-	var plain: int = co.settlement(0).quests.size()
-	check(co.upgrade_track(0, "saloon", "strangers_table"), "buy the Stranger's Table")
-	check(co.can_upgrade_track(0, "saloon", "strangers_table") != "", "the Stranger's Table is a single upgrade")
+	check(has_wanderer.call() == "", "no Wanderer rumor before the first Chatter upgrade")
+	check(co.upgrade_track(0, "saloon", "chatter"), "upgrade Chatter once")
 	co._refresh_settlement(co.settlement(0))
-	check(has_wanderer.call() == "wanderer_1" and co.settlement(0).quests.size() == plain + 1, "chapter 1 appears on top of the usual chatter")
+	check(has_wanderer.call() == "wanderer_1" and co.settlement(0).quests.size() == int(co.track_value(0, "saloon", "chatter")) + 1, "chapter 1 appears on top of the usual chatter")
 	var qid: String = co.settlement(0).quests.filter(func(q): return str(DB.regions[q].template) == "wanderer_1")[0]
 	var reg: Dictionary = DB.regions[qid]
 	check(reg.final == "boss" and reg.boss.showdown and reg.boss.enemies.is_empty() and str(reg.boss.duel.kind) == "showdown", "it ends in a showdown, not a fight")

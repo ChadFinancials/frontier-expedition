@@ -22,7 +22,8 @@ attack expects about 6-7 damage per turn and a good stun about 0.4-0.5 expected 
 Owner's picks (round 18):
 - **Flash the Badge** heals 2-3: built.
 - Gambler or Gunslinger: maybe one of them, still undecided.
-- Questionable Mushroom: the owner would rather widen it to the party (see below).
+- **Questionable Mushroom** is now a single-target remedy for any one of the party, the
+  Poisoner included: heals 3-6, -4 Fatigue, 25% chance of a light poison (round 18). Built.
 
 
 The owner takes the Preacher on every expedition because almost nobody else can heal. These

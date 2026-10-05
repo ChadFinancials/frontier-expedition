@@ -66,7 +66,7 @@ exist but wait until the start is crisp.
 ### Buildings (`data/buildings.json`)
 | Building | Does | Scales with level |
 |---|---|---|
-| **Saloon** | Fatigue relief (Belly Up to the Bar, may add the Drinker quirk; Card Table, may win or lose chips). Rolls the week's **rumors** (side quests) | Tracks: Chatter (1-3 rumors a week), Loose Lips (better rumor rewards), Stranger's Table (one level, 300 chips, 6 Timber, 2 Hides: the Lone Wanderer's challenges) |
+| **Saloon** | Fatigue relief (Belly Up to the Bar, may add the Drinker quirk; Card Table, may win or lose chips). Rolls the week's **rumors** (side quests) | Tracks: Chatter (1-3 rumors a week; its first upgrade also brings the Lone Wanderer's challenges), Loose Lips (better rumor rewards) |
 | **Chapel** | Fatigue relief (Quiet Prayer; Hymn Singing, may add a positive quirk) | Slots, relief |
 | **Doctor's Office** | Remove a negative quirk; cure a Breaking Point | Slots, cost |
 | **Smithy** | Weapon and armor tiers | Max tier 2 / 4 / 5 |
@@ -159,7 +159,7 @@ become townsfolk and townsfolk never ride out.
   and Iron, and the place to train.
 
 ### The Lone Wanderer's challenges
-- Buying the Saloon's **Stranger's Table** puts the Wanderer's challenge on the rumor board,
+- The Saloon's first **Chatter** upgrade puts the Wanderer's challenge on the rumor board,
   on top of the usual chatter, one chapter at a time until it's won (`extra` templates in
   `quests.json`).
 - Each is a short rumor trip (more events and homesteads, fewer fights) that ends in a

@@ -6,12 +6,10 @@
     "costs": [{"money": 400, "timber": 12, "iron": 2, "hides": 2}, {"money": 1000, "timber": 25, "iron": 6, "hides": 4}, {"money": 2200, "timber": 45, "iron": 12, "hides": 8}],
     "slots": [2, 3, 4],
     "tracks": {
-      "chatter": {"name": "Chatter", "desc": "More talk at the bar: more side quests to choose from each week.", "values": [1, 2, 3],
+      "chatter": {"name": "Chatter", "desc": "More talk at the bar: more side quests to choose from each week. The first upgrade also brings word of the Lone Wanderer.", "values": [1, 2, 3],
         "costs": [{"money": 450, "timber": 8, "iron": 2}, {"money": 1100, "timber": 18, "iron": 6}]},
       "tips": {"name": "Loose Lips", "desc": "Better leads: side quests with richer rewards, and more bosses and rare trinkets.", "values": [0, 1, 2],
-        "costs": [{"money": 600, "timber": 6, "iron": 5}, {"money": 1400, "timber": 14, "iron": 12}]},
-      "strangers_table": {"name": "Stranger's Table", "desc": "A quiet table in the back where drifters leave word. The Lone Wanderer's challenges turn up here.", "values": [0, 1],
-        "costs": [{"money": 300, "timber": 6, "hides": 2}]}
+        "costs": [{"money": 600, "timber": 6, "iron": 5}, {"money": 1400, "timber": 14, "iron": 12}]}
     },
     "activities": [
       {"id": "bar", "name": "Belly Up to the Bar", "cost": [75, 75, 75], "relief": [45, 60, 80],
