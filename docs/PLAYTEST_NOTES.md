@@ -30,6 +30,14 @@ every round.
   - Owner: every multi-hit move should land all its hits. Twin Shots (two shots at one
     target) now sends its second shot to another valid target if the first kills its
     target. Area moves are unchanged; they already hit everything in reach.
+- **Snapshot at the start of week 6** (fresh run, a pacing reference):
+  - Four level 2 heroes; two have learned new moves.
+  - Built: Saloon, Smithy, Hiring Board, Lumber Yard, Drill Hall (week 4). The General Store
+    is still a ruin (500 chips, 14 Timber, 4 Iron, 2 Hides). All 6 plots are in use.
+  - 1,000 chips, 9 Timber, 8 Iron, 6 Hides.
+  - Dry Gulch Mine and two Saloon rumors still on offer; the Tallgrass Sea not yet tried.
+  - No townsfolk yet. The owner thinks that's right: they add depth later instead of
+    arriving all at once.
 - **Mad Dog's hideout:** "good and challenging". The standoff before the boss fight is "fun
   and a great mechanic" (owner). Other bosses getting a standoff stays in the backlog.
 
