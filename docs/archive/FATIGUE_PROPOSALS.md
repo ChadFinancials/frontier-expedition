@@ -1,5 +1,7 @@
 # Breaking Points and Second Winds: proposals (round 9)
 
+> Archived (round 20): fully built. The rules as they stand are in `docs/GDD.md`; open follow-ups are in `docs/BACKLOG.md`.
+
 Status: **✅ built with the owner's edits (round 9).** The final tables are in `GDD.md` §6.
 
 Owner's picks:

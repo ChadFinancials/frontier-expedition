@@ -1,5 +1,7 @@
 # Quirk proposals (round 9) — ✅ shipped with the owner's edits
 
+> Archived (round 20): fully built. The rules as they stand are in `docs/GDD.md`; open follow-ups are in `docs/BACKLOG.md`.
+
 **Shipped (owner's numbers):** Quick Feet +1 Speed; Eagle Eye +4 Acc, +2% Crit back;
 Tough as Nails +10% HP; Night Owl +5/+5 in caves; Trailwise 15 Scouting; Lucky +2% Crit only;
 Thick-Skinned +5 Prot; Hard to Rattle (was Trail-Hardened); Spooked by Critters -10% Dmg vs

@@ -1,5 +1,7 @@
 # Trinket proposals (round 9) — ✅ shipped with the owner's edits
 
+> Archived (round 20): fully built. The rules as they stand are in `docs/GDD.md`; open follow-ups are in `docs/BACKLOG.md`.
+
 **Owner's revisions:** Bench Warrant Book -2 Dodge; Pearl-Handled Grips +4% Crit, downside
 -4 Acc (not Dodge); Quick-Draw Holster no downside; Braided Rawhide Riata downside -5% Dmg;
 Lucky Silver Dollar +8% Crit; Assayer's Loupe -3 Dodge (not Acc); Ether Bottle -2 Speed;

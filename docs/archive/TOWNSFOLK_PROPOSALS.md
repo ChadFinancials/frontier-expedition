@@ -1,5 +1,7 @@
 # Townsfolk: the people who run the town
 
+> Archived (round 20): fully built. The rules as they stand are in `docs/GDD.md`; open follow-ups are in `docs/BACKLOG.md`.
+
 Status: **✅ built** with the owner's round 2 picks (below). The rules as built are in
 `GDD.md` ("Townsfolk"); the data fields are in `ADDING_CONTENT.md` ("Townsfolk"). Tuning
 lives in `data/townsfolk.json`.

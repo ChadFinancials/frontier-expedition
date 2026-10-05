@@ -1,8 +1,10 @@
 # Hero proposals (round 8, plus round 17 heals)
 
-Options for the owner to pick from. Nothing here is in the game yet. **Revision 2** (the
-owner's picks and revised specs) comes first; the original option lists follow for
-reference.
+Still open (see `BACKLOG.md`): **the Shotgun Guard** (approved design, not built), **the Bayou
+Poisoner's 8th move** (Mosquito Swarm was too close to Poison Darts) and **the Prospector**
+(on hold). Everything else here has shipped (the Preacher's and Doctor's moves, the Train
+Hopper, the round 17 heals) and stays for reference. **Revision 2** (the owner's picks and
+revised specs) comes first; the original option lists follow.
 
 - **Part 1:** moves to round out the four classes with fewer than 8.
 - **Part 2:** two new hero designs in lanes no class covers yet.
@@ -21,7 +23,7 @@ attack expects about 6-7 damage per turn and a good stun about 0.4-0.5 expected 
 
 Owner's picks (round 18):
 - **Flash the Badge** heals 2-3: built.
-- Gambler or Gunslinger: maybe one of them, still undecided.
+- Gambler or Gunslinger: neither, for now (round 19).
 - **Questionable Mushroom** is now a single-target remedy for any one of the party, the
   Poisoner included: heals 3-6, -4 Fatigue, 25% chance of a light poison (round 18). Built.
 

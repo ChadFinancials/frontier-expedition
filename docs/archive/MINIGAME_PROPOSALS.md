@@ -1,5 +1,7 @@
 # Hands-on moments: High Noon duels and skill checks (proposal)
 
+> Archived (round 20): fully built. The rules as they stand are in `docs/GDD.md`; open follow-ups are in `docs/BACKLOG.md`.
+
 Status: **✅ both built** (High Noon and the curio skill checks; round 3 picks below), then retuned after the owner's lab playtest (PLAYTEST_NOTES round 16). The numbers below are the original proposal; the current ones are in `GDD.md` and config `duel` and `checks`.
 
 Owner's round 3 picks:

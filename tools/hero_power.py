@@ -11,7 +11,7 @@ x4 for party heals) and their effects. Per class: EHP = HP / (1 - prot) / enemy 
 
 A comparison aid, not a simulation: it ignores ranks shifting, buffs stacking over turns,
 focus fire and kill order. Use it to see which moves are outliers. See docs/PLAYTEST_NOTES.md
-(balance proposals) for how it was read in round 8.
+(round 8) for how it was read.
 """
 import os
 import json

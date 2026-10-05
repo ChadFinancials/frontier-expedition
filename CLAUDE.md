@@ -12,7 +12,8 @@ These notes are for any agent (or person) picking up work on it.
 | `docs/DESIGN_BRIEF.md` | Creative direction agreed with the owner. Read before changing design |
 | `docs/GDD.md` | The systems as built |
 | `docs/ADDING_CONTENT.md` | Every data field, for adding classes, moves, enemies, events, regions |
-| `docs/PLAYTEST_NOTES.md` | The open backlog, then the history of what shipped each round |
+| `docs/BACKLOG.md` | Everything still to do, with its status (decided, owner's call, idea, watch) |
+| `docs/PLAYTEST_NOTES.md` | The history of what was decided and shipped each round |
 
 ## Architecture in brief
 
@@ -58,7 +59,7 @@ These notes are for any agent (or person) picking up work on it.
 ## Working with the owner
 
 - **Playtest rounds.** The owner plays and sends numbered notes. When they ask to plan first,
-  lay out the plan and wait. Record decisions and what shipped in `docs/PLAYTEST_NOTES.md`,
+  lay out the plan and wait. Record decisions and what shipped in `docs/PLAYTEST_NOTES.md`, and keep `docs/BACKLOG.md` current,
   and move open items to its backlog.
 - **The owner keeps their save** (since round 7). Changes must load an existing
   `user://save.json`: read new fields with a default (`d.get("x", default)`), and remember

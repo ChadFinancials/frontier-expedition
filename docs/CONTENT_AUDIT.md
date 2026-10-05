@@ -32,7 +32,7 @@ first-draft. "Revisions" counts the commits that changed the data file after it 
 
 ### Breaking Points and True Grit (was Second Winds) — 6 + 6 · **✅ revised round 9**
 - Each state now ties into a newer mechanic (Vulnerable, Mark, Taunt, rank, Last Legs); new
-  True Grit Cool-Headed. See FATIGUE_PROPOSALS.md and GDD §6.
+  True Grit Cool-Headed. See archive/FATIGUE_PROPOSALS.md and GDD §6.
 - Terms renamed away from Darkest Dungeon's: True Grit, Gut Check, Last Legs, Cheat Death.
 
 ### Trinkets (keepsakes) — 19 + 3 boss · **2 revisions, both on day one**
@@ -71,11 +71,11 @@ first-draft. "Revisions" counts the commits that changed the data file after it 
 
 ## Recommended order
 
-1. ✅ **Quirks** (round 9, QUIRK_PROPOSALS.md): 50 quirks, tied to Mark, Vulnerable, Death's
+1. ✅ **Quirks** (round 9, archive/QUIRK_PROPOSALS.md): 50 quirks, tied to Mark, Vulnerable, Death's
    Door, first round; behaviour quirks (Drinker's bar lock, Gold Fever, Homesick).
-   ✅ **Breaking Points and True Grit** (round 9, FATIGUE_PROPOSALS.md): a hook each, 6 + 6,
+   ✅ **Breaking Points and True Grit** (round 9, archive/FATIGUE_PROPOSALS.md): a hook each, 6 + 6,
    in-theme names (True Grit, Gut Check, Last Legs, Cheat Death).
-2. ✅ **Trinkets** (round 9, TRINKET_PROPOSALS.md): 22 class trinkets, general edits, 5 new.
+2. ✅ **Trinkets** (round 9, archive/TRINKET_PROPOSALS.md): 22 class trinkets, general edits, 5 new.
 3. 🟨 **Curios** (round 9, CURIO_PROPOSALS.md): class and skill experts, ★/✗ in the picker and
    quirk chances, done for the Fort Providence area's 16. Still to do: Red Canyons (Painted
    Canyon Wall) and Thunder Peaks (Stone Cairn, Giant's Bones, Frozen Pack, Hot Spring), and
@@ -85,6 +85,11 @@ first-draft. "Revisions" counts the commits that changed the data file after it 
      setup; follow-ups; `hide_if`; 12 new events.
    - Still to do: Red Canyons and Thunder Peaks events get the same treatment when those
      regions come up.
-5. ⬜ **Town buildings and upgrades** (owner, round 9): what each building and level is worth,
-   its costs in chips, Timber, Iron and Hides, the hiring board and bunkhouse tracks.
-6. ⬜ **Supplies, camp skills, side quests.** Smaller passes once the above settle.
+5. 🟨 **Town buildings and upgrades** (owner, round 9).
+   - Done since: townsfolk staff seats, producers (Lumber Yard, Iron Mine, Trapping Post),
+     the Wheelwright, building locks (round 19) and the storehouse (round 20).
+   - Still to do: a value pass on what each building and level is worth against its costs.
+6. ⬜ **Supplies, camp skills, side quests.** Smaller passes once the above settle. The Saloon
+   has grown since: the Lone Wanderer's challenges and three plans rumors.
+
+Everything still open is tracked in `BACKLOG.md`.

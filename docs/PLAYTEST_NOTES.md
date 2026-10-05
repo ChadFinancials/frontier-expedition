@@ -1,95 +1,22 @@
-# Playtest Notes & Backlog
+# Playtest Notes
 
-The owner plays from source after each batch and sends numbered notes. This file holds the
-**open backlog** first, then a **history** of each round: what the owner asked for, what was
-decided, and what shipped. Update both at the end of every round.
-
----
-
-## Open backlog
-
-### Bugs
-- [ ] **Crashes in combat** (round 7 Mad Dog killing blow, round 8 idle mid-battle). Not a
-      game bug: both crashed sessions' logs stop after startup with no error or backtrace, so
-      the NVIDIA OpenGL driver killed the game. Round 8 switched the default renderer to
-      **Vulkan** (Forward+); the owner reports it noticeably smoother. Watch for any further
-      crash; `play_opengl.bat` is the fallback. Idle figures and HUDs also no longer redraw
-      every frame.
-- [ ] Jagged edges on circles and cut-outs: the project's 2D MSAA now takes effect under
-      Vulkan (OpenGL ignored it). Check whether that is enough.
-
-### Gameplay
-- [ ] **The Lone Wanderer storyline (owner, later):** meet the wanderer again over time, as a
-      recurring event that builds into a small quest line. The MVP duel is in.
-- [ ] **Townsfolk: playtest the first build** (round 15). Watch how fast settlers arrive (eight
-      events, about 1 in 5 quests), whether wages bite, and whether the producers are worth a
-      plot. Later: moving townsfolk and heroes between settlements.
-- [ ] **Wagon (owner, after the townsfolk):**
-  - Some enemies and battles target the wagon, which sits behind the party: it loses
-    condition and/or cargo. Rework **enemy ambushes** around this (switched off in round 7
-    with config `hero_ambush: false`, including night-camp ambushes).
-  - The wagon has **no** combat role beyond being a target: no cover, no wagon actions.
-  - A **wagon upgrade track** (a building in town), with **expanded cargo** the big one.
-  - More places for the wagon and resources to matter (materials already take wagon space;
-    mishaps and events drain supplies).
-- [ ] **More to do before the Tallgrass Sea (round 17, owner's ideas, awaiting picks):**
-  - more Saloon rumor templates
-  - short trips with a campfire halfway where you can head home early (supplies low, the
-    wagon struggling) without the turn-back penalty
-- [ ] **Small heals** (round 17-18): Flash the Badge is done. Questionable Mushroom is done. No heal for the
-      Gambler or Gunslinger (owner, round 19).
-- [ ] Money: round 9 doubled every chip source (owner was running short: one quest paid about
-      200, one bar visit and one move). Recheck after a few weeks of play; `chips_mult` in
-      config scales all of it at once.
-- [ ] Gunslinger bullet system: 6 rounds in the cylinder shown overhead, moves spend bullets,
-      a Reload move.
-- [ ] Class workshop, second half (`docs/HERO_PROPOSALS.md`): Preacher and Doctor done.
-      Open: the Bayou Poisoner's 8th (Mosquito Swarm too close to Poison Darts; keep
-      workshopping), the Prospector (on hold) and the Shotgun Guard. (Train Hopper shipped.)
-- [ ] Decide whether utility moves need their own per-level upgrade paths (today every move
-      level adds the same accuracy, damage, effect and healing bonuses).
-- [ ] Stacked Deck "probably needs tuning" (round 8; owner: save for a later balancing pass). A second deal stacks on the first (two
-      Jacks of Clubs = +24 Dodge). Proposed: a new deal replaces that hero's previous card.
-- [ ] Hero balance: round 8 changes applied (see History); re-rank with
-      `python3 tools/hero_power.py` after the next playtest. Pre-change ranking: Gambler 9,
-      Bayou Poisoner 8, Rail Driver 7, Mountain Mystic 7, Gunslinger 7, Prospector 6,
-      Wrangler 6, Marshal 6, Frontier Doctor 5, Preacher 4.
-- [ ] Watch: Ruby Blackwing is hard and the crow summon strong; probably right (round 7).
-- [ ] Second region onward (Red Canyons, Thunder Peaks, Redwater Ford) waits until the first
-      region is crisp.
-
-### Quality of life
-- [ ] **Move animation pass** (owner, round 9: "End of the Line's animation is fantastic"):
-      give the moves that matter a proper animation, like End of the Line's (wind-up, travel,
-      impact, flash, shake, own sounds) instead of the shared small arm swing and one sound.
-      Start with each class's signature moves and the bosses' big moves.
-- [ ] **Trinket inventory screen**, like DD's (owner, round 9): a "Trinkets" button in the top
-      bar opens an equip menu showing the stash and every hero's two slots side by side, to
-      drag or click trinkets on and off. Needs an icon per trinket (49 today: 24 general,
-      22 class, 3 boss) from the owner's icon pipeline (`prep_icons.py`) before it's worth
-      building.
-
-### Visuals
-- [ ] **Big image pass (owner, later)** with the owner's image generator. It covers curio and
-      event art, trinket icons, more backdrops and the like. Until then, the drawn
-      placeholders are fine; don't spend effort polishing them.
-- [ ] **Backdrops**: about ten more images in the owner's prairie style for stops across side
-      quests and expeditions (composition rule: keep the lower middle open, see
-      `COMFYUI_GUIDE.md` §7). Also the idea of rebuilding favourite drawn scenes in code from
-      a painted reference, keeping quirks like the hanging clouds: the Crow's Nest, Dry Gulch
-      Mine and its interior, the Old Mill Road, the town.
-- [ ] Icons still drawn in code: `skull`; optionally the move-type and stat icons.
-- [ ] Town depth: the street is plots side by side; look at DD's Hamlet (layered, angled
-      buildings, foreground and background) without overdoing it.
-- [ ] A world map between settlements, later.
-
-### Economy
-- [x] ~~A third town material~~: **Hides** shipped in round 9.
-- [ ] Hides icon: the pelt is drawn in code; paint one through the icon pipeline.
+The owner plays from source after each batch and sends numbered notes. This file is the
+**history** of each round: what the owner asked for, what was decided, and what shipped,
+newest first. Work still to do lives in [`BACKLOG.md`](BACKLOG.md). Update both at the end of
+every round.
 
 ---
 
 ## History
+
+### Docs cleanup (before the fresh run)
+- Everything still to do now lives in [`BACKLOG.md`](BACKLOG.md), grouped by theme, with a
+  status and the round it came from. It also lists what was decided against.
+- This file is now history only.
+- Finished proposals moved to `archive/`: quirks, trinkets, Breaking Points and True Grit, High
+  Noon and skill checks, townsfolk.
+- Still active: `HERO_PROPOSALS.md` (the open workshop items) and `EVENT_PROPOSALS.md` /
+  `CURIO_PROPOSALS.md` (templates for the later regions).
 
 ### Round 20 (end of the old run)
 - **Gold Fever** stole every strongbox:
@@ -209,7 +136,7 @@ decided, and what shipped. Update both at the end of every round.
     lost), plus an upgrade track with expanded cargo. No cover or wagon combat actions.
   - **Townsfolk first:** a roster like the heroes', with upkeep and growth. Heroes and
     townsfolk are always separate pools (no retiring into townsfolk).
-- Drafted `docs/TOWNSFOLK_PROPOSALS.md`, then built it with the owner's answers:
+- Drafted `docs/archive/TOWNSFOLK_PROPOSALS.md`, then built it with the owner's answers:
   - Traits are their own pool, not hero quirks.
   - Empty buildings work as before.
   - Townsfolk come only from expeditions and quests: eight trail events, plus a settler on
@@ -382,7 +309,7 @@ decided, and what shipped. Update both at the end of every round.
   boss rewards ×2, side quests 160-300 (was 80-150), curio and event chips ×2, Trapper and
   Miner camp chips ×2. New dial `chips_mult` (1.0) scales every chip earned. The `econ=N`
   probe now reports chips per run home (bot: ~315; it usually turns back early).
-- **Trinket pass** (owner's picks, TRINKET_PROPOSALS.md): 22 class trinkets (2 per class,
+- **Trinket pass** (owner's picks, archive/TRINKET_PROPOSALS.md): 22 class trinkets (2 per class,
   class-locked, dropping at their rarity like any trinket; the owner turned down a roster bias), 4 general trinkets
   reworked off their quirk copies, 5 new general ones; 49 in all. Hooks: `class`,
   `skill_mods`, conditions `guarding` and `poisoned`, stats `heal_out_pct`, `stun_chance`,
@@ -396,7 +323,7 @@ decided, and what shipped. Update both at the end of every round.
   often, so read it as relative).
 - **End of the Line**: whistle, run-up, charge with speed streaks, heavy impact; a kill gives
   back 20 Momentum (was 50).
-- **Quirk pass** (owner's edits, see QUIRK_PROPOSALS.md): 50 quirks (26 good, 24 bad). New
+- **Quirk pass** (owner's edits, see archive/QUIRK_PROPOSALS.md): 50 quirks (26 good, 24 bad). New
   conditions `marked`, `vs_marked`, `vs_vulnerable`, `deaths_door`, `round1`; stat `xp_pct`;
   quirk fields `bar_lock`, `after_battle_fatigue`, compulsion `steals`.
 - Owner playtest (Mad Dog, all level 1: Doctor 4, Preacher 3, Prospector 2, Mountain Mystic
