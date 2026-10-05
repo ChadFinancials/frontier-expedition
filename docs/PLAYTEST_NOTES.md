@@ -20,6 +20,16 @@ every round.
   - Up to 2 extra in a Town (8 plots) and 1 in an Outpost; a City keeps its own 9.
   - The button appears once every plot is in use.
   - Config: `clear_plot_cost` and each tier's `extra_plots`.
+- **Bug: random-hit moves lost shots.** Fan the Hammer picked all three targets up front, so if
+  the first shot killed a pick (bones cleared), the shots still aimed at it went nowhere.
+  About half of all volleys against a nearly dead enemy lost a shot. Now a shot whose pick
+  has fallen re-rolls among the targets still standing (bones included; a guarded pick goes
+  to its guardian).
+  - Also fixed for Hammer Frenzy, Poison Darts, Gas Cloud, Sticky Frog and the enemies' random
+    volleys (Double Tap, Fan of Knives, Crane's Fusillade and others).
+  - Single-target multi-hit moves still stop when their target dies.
+- **Mad Dog's hideout:** "good and challenging". The standoff before the boss fight is "fun
+  and a great mechanic" (owner). Other bosses getting a standoff stays in the backlog.
 
 ### Docs cleanup (before the fresh run)
 - Everything still to do now lives in [`BACKLOG.md`](BACKLOG.md), grouped by theme, with a

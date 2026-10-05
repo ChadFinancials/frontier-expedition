@@ -84,6 +84,7 @@ func _ready() -> void:
 	test_building_locks()
 	test_storehouse()
 	test_clear_plots()
+	test_random_hits_repick()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -2590,3 +2591,33 @@ func test_clear_plots() -> void:
 	# The plans rumors' fights are 3-4 strong (round 21).
 	for tid in ["plans_doctor", "plans_drill_hall", "plans_mine"]:
 		check(DB.quests.templates[tid].fights.all(func(f): return f.enemies.size() >= 3), "%s: no two-enemy fights" % tid)
+
+
+func test_random_hits_repick() -> void:
+	# Round 21: Fan the Hammer's later shots used to vanish when an earlier one killed their
+	# pick (bones cleared). Now every shot finds a target while any stands.
+	var co := Company.new()
+	co.new_game(91)
+	var gs: Hero = co.make_hero("gunslinger", 1)
+	gs.known = ["gs_fan"]
+	gs.equipped = ["gs_fan"]
+	var full := 0
+	var tries := 0
+	for k in 60:
+		var e := CombatEngine.new()
+		var r := RandomNumberGenerator.new()
+		r.seed = 1000 + k
+		e.setup([gs], ["outlaw_brawler", "outlaw_gunhand"], {"rng": r})
+		var weak: Combatant = e.enemies[0]
+		weak.hp = 1
+		var tough: Combatant = e.enemies[1]
+		tough.hp = 999
+		var c: Combatant = e.heroes[0]
+		c.rank = 2
+		var ev := e.use_skill(c, "gs_fan", tough.id)
+		var swings := ev.filter(func(x): return x.t in ["hit", "miss"] and int(x.get("actor", -1)) == c.id and int(x.get("target", -1)) != c.id).size()
+		tries += 1
+		if swings >= 3:
+			full += 1
+	check(full == tries, "Fan the Hammer always fires all three shots (%d of %d volleys)" % [full, tries])
+	gs.hp = gs.max_hp()

@@ -754,9 +754,19 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 		"sfx": sk.get("sfx", ""), "hostile": is_hostile(sk)})
 
 	var crit_any := false
-	for t in targets:
+	var random_pick: bool = sk.get("random_hits", 0) > 0 or sk.get("random_targets", 0) > 0
+	var hit_ids: Array = []
+	for i in targets.size():
+		var t: Combatant = targets[i]
+		if t.dead and random_pick:
+			# A random shot whose pick already fell (an earlier hit killed it, or cleared its
+			# bones) finds another target instead of going to waste.
+			t = _repick(a, sid, hit_ids if sk.get("random_targets", 0) > 0 else [])
+			if t == null:
+				continue
 		if t.dead:
 			continue
+		hit_ids.append(t.id)
 		if is_hostile(sk):
 			crit_any = _resolve_attack(a, sid, sk, t, ev) or crit_any
 		else:
@@ -775,6 +785,20 @@ func use_skill(a: Combatant, sid: String, target_id: int) -> Array:
 				ev.append_array(Fatigue.add(h.hero, -DB.cfg("crit_relief_party", 2), rng))
 	_cleanup(ev)
 	return ev
+
+
+## A fresh random target for a random-hit move: any valid target still standing (bones
+## included), not one in `skip`; a guarded pick is taken by its guardian. Null if none.
+func _repick(a: Combatant, sid: String, skip: Array) -> Combatant:
+	var pool: Array = valid_targets(a, sid).filter(func(id): return not unit(id).dead and not id in skip)
+	if pool.is_empty():
+		return null
+	var t := unit(Stats.pick(rng, pool))
+	if t.guarded_by >= 0:
+		var g := unit(t.guarded_by)
+		if g != null and not g.dead:
+			t = g
+	return t
 
 
 ## Returns true on a crit.

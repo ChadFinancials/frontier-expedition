@@ -47,7 +47,7 @@ The owner is starting a new run to test the round 16-20 changes.
 - **Owner's call: more Saloon rumors.** Three or four new rumor types so the board doesn't
   repeat. (round 17)
 - **Idea: more boss standoffs.** Other bosses get a High Noon before their fight, like Mad
-  Dog. (minigame proposal, round 14)
+  Dog. The owner loved Mad Dog's (round 21). (minigame proposal, round 14)
 - **Idea: more of the Lone Wanderer.** The three challenges are built; more meetings could
   follow (the owner first asked for a recurring storyline). (round 14)
 - **Decided, later: the second region onward.** Red Canyons, Thunder Peaks and Redwater
