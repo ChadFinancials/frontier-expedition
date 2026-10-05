@@ -109,7 +109,7 @@ func refresh() -> void:
 	var st := co.settlement(index)
 	var site := co.site_by_index(index)
 	var tier := co.tier_info(st.tier)
-	top.set_title(site.name, "%s  |  %d of %d building plots used" % [tier.name, co.plots_used(index), int(tier.slots)])
+	top.set_title(site.name, "%s  |  %d of %d building plots used" % [tier.name, co.plots_used(index), co.plot_cap(index)])
 	top.refresh()
 	# Chain.
 	UI.clear(chain_row)
@@ -134,7 +134,7 @@ func refresh() -> void:
 		if i < co.site_count() - 1:
 			chain_row.add_child(UI.lbl("→", 22, "Bold"))
 	# Town.
-	town.set_buildings(st.buildings, int(tier.slots), st.get("ruins", []))
+	town.set_buildings(st.buildings, co.plot_cap(index), st.get("ruins", []))
 	# Roster.
 	var here := co.heroes_at(index)
 	roster_title.text = "Company at %s (%d)" % [site.name, here.size()]
@@ -166,6 +166,12 @@ func refresh() -> void:
 	var tb := UI.btn("Townsfolk (%d/%d)" % [co.population(index), co.housing(index)], open_townsfolk, "")
 	tb.tooltip_text = "The people who live here and staff the buildings. Wages: %d chips a week." % co.townsfolk_wages()
 	action_row.add_child(tb)
+	# Clearing a plot comes up once every plot is in use.
+	if st.get("clearing", false) or (not co.clear_plot_cost(index).is_empty() and co.plots_used(index) >= co.plot_cap(index)):
+		var cb := UI.btn("Clearing a Plot" if st.get("clearing", false) else "Clear a Plot", _clear_plot, "")
+		cb.disabled = st.get("clearing", false)
+		cb.tooltip_text = "Ready next week." if st.get("clearing", false) else "One more building plot, ready next week.\nCost: %s" % Company.cost_text(co.clear_plot_cost(index))
+		action_row.add_child(cb)
 	var nt := co.next_tier(st.tier)
 	if not nt.is_empty():
 		var ub := UI.btn("Grow to %s" % nt.name, _upgrade_tier, "")
@@ -219,6 +225,19 @@ func _upgrade_tier() -> void:
 		Game.save_game()
 		Audio.play("fanfare")
 		refresh(), "Build It")
+
+
+func _clear_plot() -> void:
+	var co: Company = Game.company
+	var why := co.can_clear_plot(index)
+	if why != "":
+		Main.inst.message("Not Yet", why)
+		return
+	Main.inst.confirm("Clear a Plot?", "Clear brush and stumps for one more building plot, ready next week.\nCost: %s" % Company.cost_text(co.clear_plot_cost(index)), func():
+		co.clear_plot(index)
+		Game.save_game()
+		Audio.play("hammer")
+		refresh(), "Clear It")
 
 
 func _rest_week() -> void:

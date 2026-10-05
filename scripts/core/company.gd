@@ -286,6 +286,44 @@ func is_ruin(i: int, bid: String) -> bool:
 	return bid in settlement(i).get("ruins", [])
 
 
+## Building plots: the tier's own, plus any cleared (a Town can clear 2 more, an Outpost 1).
+func plot_cap(i: int) -> int:
+	var st := settlement(i)
+	var tier := tier_info(st.get("tier", "outpost"))
+	return int(tier.get("slots", 3)) + mini(int(st.get("cleared", 0)), int(tier.get("extra_plots", 0)))
+
+
+## The cost to clear the next plot, or {} when no more can be cleared here.
+func clear_plot_cost(i: int) -> Dictionary:
+	var st := settlement(i)
+	var n := int(st.get("cleared", 0))
+	var costs: Array = DB.cfg("clear_plot_cost", [])
+	if n >= int(tier_info(st.get("tier", "outpost")).get("extra_plots", 0)) or n >= costs.size():
+		return {}
+	return costs[n]
+
+
+func can_clear_plot(i: int) -> String:
+	var st := settlement(i)
+	if st.get("clearing", false):
+		return "Already clearing one (ready next week)"
+	var cost := clear_plot_cost(i)
+	if cost.is_empty():
+		return "No more room to clear (grow the settlement)"
+	if not can_afford(cost):
+		return "Can't afford: " + cost_text(cost)
+	return ""
+
+
+## Starts clearing a plot: paid now, ready when the week turns.
+func clear_plot(i: int) -> bool:
+	if can_clear_plot(i) != "":
+		return false
+	pay(clear_plot_cost(i))
+	settlement(i)["clearing"] = true
+	return true
+
+
 func plots_used(i: int) -> int:
 	var st := settlement(i)
 	return st.get("buildings", {}).size() + st.get("ruins", []).size()
@@ -301,7 +339,7 @@ func can_build(i: int, bid: String) -> String:
 	var lock := building_lock(i, bid)
 	if lock != "":
 		return lock
-	if lvl == 0 and not is_ruin(i, bid) and plots_used(i) >= int(tier.get("slots", 3)):
+	if lvl == 0 and not is_ruin(i, bid) and plots_used(i) >= plot_cap(i):
 		return "No free building plots (upgrade the %s)" % tier.get("name", "settlement")
 	if lvl >= int(tier.get("max_level", 1)):
 		return "A %s can't support a bigger %s" % [tier.get("name", ""), DB.buildings[bid].name]
@@ -1123,6 +1161,11 @@ func advance_week() -> Array:
 	var msgs: Array = []
 	week += 1
 	_townsfolk_week(msgs)
+	for st in settlements:
+		if st.get("clearing", false):
+			st["clearing"] = false
+			st["cleared"] = int(st.get("cleared", 0)) + 1
+			msgs.append("A new building plot is cleared at %s." % settlement_name(int(st.index)))
 	var floor_money: int = DB.cfg("grubstake_floor", 150)
 	if money < floor_money:
 		msgs.append("A Casino agent stakes the company %d chips. (\"The house always wants you back at the table.\")" % (floor_money - money))

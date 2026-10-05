@@ -56,6 +56,9 @@ exist but wait until the start is crisp.
 | Town | 6 | 2 | 8 | 4 townsfolk | 3 Charters, 2000 chips, 40 Timber, 25 Iron, 12 Hides |
 | City | 9 | 3 | 12 | 8 townsfolk | 6 Charters, 5000 chips, 90 Timber, 60 Iron, 30 Hides |
 
+- **Clearing a plot** `[clear_plot_cost, extra_plots]`: once every plot is in use, a
+  settlement can clear another for 250 chips, then 500. Each is ready next week, one at a
+  time. Up to 2 in a Town (8 plots) and 1 in an Outpost; a City has 9 of its own.
 - **Founding** needs that region's boss beaten. A new outpost starts with a free Stage Line.
 - **Fort Providence** starts as a Town that Silas Crane burned: only the **Hiring Board**
   stands; the Saloon, General Store and Smithy are **ruins** that keep their plots and rebuild

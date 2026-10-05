@@ -83,6 +83,7 @@ func _ready() -> void:
 	test_wanderer_quests()
 	test_building_locks()
 	test_storehouse()
+	test_clear_plots()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -2565,3 +2566,27 @@ func test_storehouse() -> void:
 	# Gold Fever: grabs treasure 25% of the time and pockets it half the time.
 	var gf: Dictionary = DB.quirks.gold_fever.compulsion
 	check(int(gf.chance) == 25 and int(gf.steal_chance) == 50, "Gold Fever: 25% grab, 50% pocket")
+
+
+func test_clear_plots() -> void:
+	var co := Company.new()
+	co.new_game(81)
+	co.complete_tutorial()
+	co.money += 5000
+	check(co.plot_cap(0) == 6, "a Town starts with 6 plots")
+	var m0 := co.money
+	check(co.clear_plot(0) and co.money == m0 - 250, "clear a plot for 250 chips")
+	check(co.plot_cap(0) == 6 and co.can_clear_plot(0).contains("next week"), "it's ready next week, one at a time")
+	var msgs := co.advance_week()
+	check(co.plot_cap(0) == 7 and msgs.any(func(m): return str(m).contains("plot is cleared")), "a week later: 7 plots")
+	check(co.clear_plot(0) and co.money == m0 - 250 - 500, "the second costs 500")
+	co.advance_week()
+	check(co.plot_cap(0) == 8 and co.clear_plot_cost(0).is_empty() and co.can_clear_plot(0) != "", "a Town tops out at 8")
+	co.settlement(0).tier = "city"
+	check(co.plot_cap(0) == 9, "a City has its own 9")
+	var co2 := Company.from_dict(DB.normalize(JSON.parse_string(JSON.stringify(co.to_dict()))))
+	co2.settlement(0).tier = "town"
+	check(co2.plot_cap(0) == 8, "cleared plots save")
+	# The plans rumors' fights are 3-4 strong (round 21).
+	for tid in ["plans_doctor", "plans_drill_hall", "plans_mine"]:
+		check(DB.quests.templates[tid].fights.all(func(f): return f.enemies.size() >= 3), "%s: no two-enemy fights" % tid)

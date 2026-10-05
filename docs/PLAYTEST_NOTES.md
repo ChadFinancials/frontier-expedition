@@ -9,6 +9,18 @@ every round.
 
 ## History
 
+### Round 21 (fresh run)
+- The plans rumors arrived back to back and the Drill Hall came in week 4: good pacing
+  (owner).
+- **Plans-rumor fights were too easy** (a brawler and a gunhand), with so many non-combat
+  stops around them. Their fights are now 3-4 strong (outlaw trios and fours, a wolf-and-
+  coyote pack), and the elites add a four-outlaw gang and a hired gun's crew.
+- **Out of plots long before a City:** a settlement can now **clear a plot**. It costs 250
+  chips, then 500, and is ready next week.
+  - Up to 2 extra in a Town (8 plots) and 1 in an Outpost; a City keeps its own 9.
+  - The button appears once every plot is in use.
+  - Config: `clear_plot_cost` and each tier's `extra_plots`.
+
 ### Docs cleanup (before the fresh run)
 - Everything still to do now lives in [`BACKLOG.md`](BACKLOG.md), grouped by theme, with a
   status and the round it came from. It also lists what was decided against.

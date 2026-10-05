@@ -152,13 +152,14 @@
   "boss_money": 500,
 
   "tiers": [
-    {"id": "outpost", "name": "Outpost", "slots": 3, "max_level": 1, "population": 0},
-    {"id": "town", "name": "Town", "slots": 6, "max_level": 2, "population": 4,
+    {"id": "outpost", "name": "Outpost", "slots": 3, "extra_plots": 1, "max_level": 1, "population": 0},
+    {"id": "town", "name": "Town", "slots": 6, "extra_plots": 2, "max_level": 2, "population": 4,
       "cost": {"charters": 3, "money": 2000, "timber": 40, "iron": 25, "hides": 12}},
     {"id": "city", "name": "City", "slots": 9, "max_level": 3, "population": 8,
       "cost": {"charters": 6, "money": 5000, "timber": 90, "iron": 60, "hides": 30}}
   ],
   "ruin_rebuild_pct": 100,
+  "clear_plot_cost": [{"money": 250}, {"money": 500}],
   "trade_markup": 2.2,
   "sell_pct": [30, 40, 50],
   "staff_seats": [0, 1, 2],
