@@ -99,9 +99,9 @@ The owner is starting a new run to test the round 16-20 changes.
   pass. (round 8)
 - **Owner's call: utility moves.** Should they get their own per-level upgrades? Today every
   move level adds the same accuracy, damage, effect and healing bonuses. (round 8)
-- **Owner's call: front-liners.** The Marshal is close to an automatic rank 1-2 pick. Lift
-  the Mountain Mystic and the Rail Driver rather than weaken him (options in round 21's
-  reply). (round 21)
+- **Watch: front-liners.** The Mountain Mystic (Grizzly Chop vs beasts) and the Rail Driver
+  (Brace Yourselves braces a neighbour) were lifted so the Marshal isn't the automatic pick.
+  (round 21)
 - **Watch: hero balance.** Re-rank with `python3 tools/hero_power.py` after the next
   playtest. (round 8)
 - **Watch:**

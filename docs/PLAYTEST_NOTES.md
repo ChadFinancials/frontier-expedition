@@ -52,9 +52,14 @@ every round.
 - **Poison numbers** are a muted olive (#9a9a48), no longer a green close to heals.
 - **The Iron Mine plans' boss** was easier than the Railroad Enforcer fight before it. It's
   now "The Railroad's Men": two Railroad Enforcers, a claim jumper and a dynamiter.
-- **Noted, open:** the Marshal is close to an automatic rank 1-2 pick (level 2, lots of
-  outlaws). The owner would rather lift the other front-liners than weaken him. Options go
-  to the owner.
+- **Front-liners** (the Marshal was close to an automatic rank 1-2 pick; the owner would
+  rather lift the others than weaken him):
+  - **Mountain Mystic:** Grizzly Chop does +15% vs beasts, +5% per move level (as Iron
+    Justice does vs outlaws), on top of the class's own +20% damage and +2 Accuracy vs
+    beasts.
+  - **Rail Driver:** Brace Yourselves also gives the ally beside them +10 Protection for 2
+    rounds. From rank 1 it goes to the ally in rank 2; from rank 2, to the more hurt of ranks
+    1 and 3 (the front one on a tie). New self-effect: `buff_neighbor`.
 - **Snapshot at the start of week 6** (fresh run, a pacing reference):
   - Four level 2 heroes; two have learned new moves.
   - Built: Saloon, Smithy, Hiring Board, Lumber Yard, Drill Hall (week 4). The General Store

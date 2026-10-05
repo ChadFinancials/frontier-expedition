@@ -86,6 +86,7 @@ func _ready() -> void:
 	test_clear_plots()
 	test_random_hits_repick()
 	test_look_ahead()
+	test_frontliners()
 	print("> test_save_roundtrip()")
 	test_save_roundtrip()
 	print("> test_tutorial_and_story()")
@@ -184,7 +185,7 @@ func test_combat_basics() -> void:
 	var mmc: Combatant = emm.heroes[0]
 	var wolf: Combatant = emm.enemies[0]
 	var man: Combatant = emm.enemies[1]
-	check(is_equal_approx(emm.dmg_mult(mmc, "mm_grizzly_chop", wolf) - emm.dmg_mult(mmc, "mm_grizzly_chop", man), 0.2), "Mountain Mystic +20% damage vs beasts")
+	check(is_equal_approx(emm.dmg_mult(mmc, "mm_axe_cleave", wolf) - emm.dmg_mult(mmc, "mm_axe_cleave", man), 0.2), "Mountain Mystic +20% damage vs beasts")
 	check(emm.hit_chance(mmc, "mm_grizzly_chop", wolf) - emm.hit_chance(mmc, "mm_grizzly_chop", man) == 2 + int(man.stat("dodge", mmc) - wolf.stat("dodge", mmc)), "Mountain Mystic +2 accuracy vs beasts")
 	check(wolf.max_hp == 8, "prairie wolf has 8 HP (got %d)" % wolf.max_hp)
 	var prev := e.dmg_preview(marshal, "marshal_iron_justice", brawler)
@@ -2674,3 +2675,53 @@ func test_look_ahead() -> void:
 	check(rp > 35.0 and rp < 65.0, "about half the next stops get a rough look (%.0f%%)" % rp)
 	check(cp > 3.0 and cp < 20.0, "about 1 in 10 is seen clearly (%.0f%%)" % cp)
 	check(int(DB.survival.scout.passive.base) == 20 and int(DB.survival.scout.passive.per_rank) == 10, "the Scout skill: 20 / 30 / 40")
+
+
+func test_frontliners() -> void:
+	# Round 22: Grizzly Chop hits beasts harder (growing with level); Brace Yourselves braces
+	# the ally beside the Rail Driver.
+	var gc: Dictionary = DB.skill("mm_grizzly_chop")
+	check(is_equal_approx(float(gc.vs_tags.beast), 0.15) and is_equal_approx(float(gc.vs_tags_per_level.beast), 0.05), "Grizzly Chop: +15% vs beasts, +5% a level")
+	var co := Company.new()
+	co.new_game(97)
+	var mm: Hero = co.make_hero("mountain_man", 1)
+	var e := CombatEngine.new()
+	e.setup([mm], ["prairie_wolf", "outlaw_brawler"], {})
+	var mc: Combatant = e.heroes[0]
+	var wolf: Combatant = e.enemies.filter(func(x): return x.enemy_id == "prairie_wolf")[0]
+	var thug: Combatant = e.enemies.filter(func(x): return x.enemy_id == "outlaw_brawler")[0]
+	check(e.dmg_mult(mc, "mm_grizzly_chop", wolf) > e.dmg_mult(mc, "mm_grizzly_chop", thug) + 0.3, "Grizzly Chop hits a wolf harder than an outlaw (%.2f vs %.2f)" % [e.dmg_mult(mc, "mm_grizzly_chop", wolf), e.dmg_mult(mc, "mm_grizzly_chop", thug)])
+	# Brace Yourselves from rank 1: the ally in rank 2.
+	var rd: Hero = co.make_hero("rail_driver", 1)
+	var a2: Hero = co.make_hero("gunslinger", 1)
+	var a3: Hero = co.make_hero("preacher", 1)
+	rd.known = ["rd_brace"]
+	rd.equipped = ["rd_brace"]
+	var prot_of := func(c: Combatant) -> int:
+		var n := 0
+		for b in c.buffs:
+			if b.stat == "prot":
+				n += int(b.value)
+		return n
+	var e2 := CombatEngine.new()
+	e2.setup([rd, a2, a3], ["outlaw_brawler"], {})
+	var rc: Combatant = e2.heroes.filter(func(x): return x.hero == rd)[0]
+	var c2: Combatant = e2.heroes.filter(func(x): return x.hero == a2)[0]
+	var c3: Combatant = e2.heroes.filter(func(x): return x.hero == a3)[0]
+	rc.rank = 1
+	c2.rank = 2
+	c3.rank = 3
+	e2.use_skill(rc, "rd_brace", rc.id)
+	check(prot_of.call(c2) == 10 and prot_of.call(c3) == 0, "from rank 1, the ally in rank 2 gets +10 Protection")
+	# From rank 2: the more hurt of ranks 1 and 3.
+	var e3 := CombatEngine.new()
+	e3.setup([a2, rd, a3], ["outlaw_brawler"], {})
+	rc = e3.heroes.filter(func(x): return x.hero == rd)[0]
+	c2 = e3.heroes.filter(func(x): return x.hero == a2)[0]
+	c3 = e3.heroes.filter(func(x): return x.hero == a3)[0]
+	c2.rank = 1
+	rc.rank = 2
+	c3.rank = 3
+	c3.hp = 1
+	e3.use_skill(rc, "rd_brace", rc.id)
+	check(prot_of.call(c3) == 10 and prot_of.call(c2) == 0, "from rank 2, the more hurt neighbour (rank 3) gets it")

@@ -225,6 +225,8 @@ drop [id], foe_mods [mod with rounds], foe_mark {id or "*": rounds}}`, `buff {st
 name, opponent, draw, tier, gang, gang_name, bounty, reward, on {result: [effects]}, text
 {result: line}}` (High Noon, see GDD), `reveal {amount}`, `light`, `clear_shaken`.
 - `target`: party (default), actor, random.
+- Self-effect `buff_neighbor {stat, value, rounds}`: the ally beside the user (from rank 1,
+  rank 2; otherwise the more hurt neighbour).
 - A move effect's `chance_per_level` replaces the usual +6% per move level (negative for a
   downside that should shrink, like the mushroom's poison).
 - Any effect can have `chance`.

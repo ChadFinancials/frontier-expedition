@@ -1053,6 +1053,15 @@ func _apply_self_effect(a: Combatant, sid: String, e: Dictionary, ev: Array) -> 
 	match e.get("type", ""):
 		"move":
 			_shift(a, int(e.get("amount", 1)), ev)
+		"buff_neighbor":
+			# One ally beside the user: from rank 1 the ally in rank 2; from further back the more
+			# hurt of the ranks either side (the one in front on a tie).
+			var near: Array = side_of(a).filter(func(o): return o != a and not o.dead and not o.corpse and absi(o.rank - a.rank) == 1)
+			if not near.is_empty():
+				near.sort_custom(func(x, y): return x.hp_ratio() < y.hp_ratio() if not is_equal_approx(x.hp_ratio(), y.hp_ratio()) else x.rank < y.rank)
+				var o2: Combatant = near[0]
+				o2.buffs.append({"stat": e.stat, "value": e.value, "rounds": e.get("rounds", 2), "name": DB.skill(sid).get("name", "")})
+				ev.append({"t": "buff", "target": o2.id, "stat": e.stat, "value": e.value})
 		"buff_kin":
 			# Buffs the user's living allies of the same kind (not itself). Refreshes unless "stack".
 			var bname: String = DB.skill(sid).get("name", "")

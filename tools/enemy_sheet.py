@@ -107,6 +107,8 @@ def _effect_text(fx):
 		return "heals self %d%% max HP" % fx.get("value", 10)
 	if t == "buff":
 		return "%s %+d%s" % (fx.get("stat"), fx.get("value", 0), " (rest of fight, stacks)" if fx.get("rounds", 3) >= 99 else " for %d rounds" % fx.get("rounds", 3))
+	if t == "buff_neighbor":
+		return "the ally beside: %s %+d for %d rounds" % (fx.get("stat"), fx.get("value", 0), fx.get("rounds", 2))
 	if t == "buff_kin":
 		return "other %s: %s for %d rounds" % (fx.get("kin", "kin"), ", ".join("%s %+d" % (m["stat"], m["value"]) for m in fx.get("mods", [])), fx.get("rounds", 2))
 	if t == "move":

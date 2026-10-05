@@ -458,6 +458,8 @@ static func effect_text(e: Dictionary, level: int = 1) -> String:
 			return "Knocks back %d rank%s%s" % [int(e.get("amount", 1)), "" if int(e.get("amount", 1)) == 1 else "s", chance]
 		"pull":
 			return "Pulls forward %d rank%s%s" % [int(e.get("amount", 1)), "" if int(e.get("amount", 1)) == 1 else "s", chance]
+		"buff_neighbor":
+			return "The ally beside: %s for %d rounds" % [Stats.mod_text({"stat": e.stat, "value": e.value}), int(e.get("rounds", 2))]
 		"buff_kin":
 			var mods: Array = []
 			for m in e.get("mods", []):

@@ -37,7 +37,7 @@ Resists: stun 35, bleed 40, poison 50, move 40, debuff 50, deathblow 67
 | Move | From | Hits | Acc | Damage | Effects |
 |---|---|---|---|---|---|
 | ★ **Axe Cleave**: A wide swing of a felling axe that catches both front ranks and splits their guard. Vulnerable for a round. | 12 | ALL of 12 | 87 | 3-7 each | vulnerable +10 for 1 rounds |
-| ★ **Grizzly Chop**: An overhead chop. Much stronger when the Mystic is below half health. | 12 | one of 12 | 97 | 6-12, +3% crit, +50% when below half HP | - |
+| ★ **Grizzly Chop**: An overhead chop. Much stronger when the Mystic is below half health, and against beasts (growing with each level). | 12 | one of 12 | 97 | 6-12, +3% crit, +50% when below half HP, +15% vs beast (+5% a level) | - |
 | **Gnarl at the Flesh**: Bites into their own arm and melts back into the trees: moves back 2, bleeds, and is hard to hit for a round. | 12 | self | - | - | bleed 2 x3 rounds; dodge +30 for 1 rounds; self: user moves back 2 |
 | **Bear Trap**: Kicks a sprung trap into the brush; it snaps shut on whoever steps there. Bleed and Slow. | 34 | 1 random in 234 | 92 | 3-5 x1 hits | bleed 2 x3 rounds; speed -3 for 2 rounds |
 | **Take a Piece of Me**: Old mountain medicine paid in the Mystic's own blood: heals an ally and hardens them against bleeding and venom. | 34 | one ally in 1234 | - | - | heals 6-10 HP; bleed_res +10 for 3 rounds; poison_res +10 for 3 rounds; self: self_damage |
@@ -60,7 +60,7 @@ Resists: stun 45, bleed 35, poison 35, move 60, debuff 35, deathblow 67
 | ★ **Rain of Nails**: Swings a keg of railroad spikes into the second line. Slows. | 12 | ALL of 23 | 92 | 3-5 each | speed -3 for 2 rounds (90%) |
 | **Hammered Rhythm**: Finds the work song's beat. Gains Damage and Speed. | 123 | self | - | - | dmg_pct +20 for 3 rounds; speed +2 for 3 rounds |
 | **Line Breaker**: A sweeping swing that shoves the front two enemies back. | 1 | ALL of 12 | 87 | 3-5 each | knockback 1 (90%) |
-| **Brace Yourselves!**: Sets their feet and bellows for the enemy to come at them. Gains Protection, heals a little, and Marks themself as the target. | 12 | self | - | - | prot +20 for 2 rounds; heals 2-4 HP; mark 2 rounds |
+| **Brace Yourselves!**: Sets their feet and bellows for the enemy to come at them. Gains Protection, heals a little, and Marks themself as the target. The ally beside them braces too (+10 Protection): from rank 1 the ally in rank 2; from rank 2 the more hurt of ranks 1 and 3. | 12 | self | - | - | prot +20 for 2 rounds; heals 2-4 HP; mark 2 rounds; self: the ally beside: prot +10 for 2 rounds |
 | **Sledge Toss**: Hurls a spare sledge blind into the enemy line, then steps forward. Rings their bell: Vulnerable. | 23 | 1 random in 234 | 87 | 8-12 x1 hits | vulnerable +10 for 2 rounds; self: user moves forward 1 |
 | **Hammer Frenzy**: Three wild swings at whatever's closest. Leaves them off balance, and the Rail Driver winded (stuns self). | 12 | 3 random in 1234 | 87 | 6-8 x3 hits | dodge -5 for 2 rounds; self: stun |
 | **Quarrel**: "You want some of this?" Marks the target and cracks its guard. | 123 | one of 12 | 92 | - | mark 3 rounds; prot -15 for 3 rounds |
